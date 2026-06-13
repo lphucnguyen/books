@@ -35,7 +35,7 @@ An expiry policy based on TTL is a workaround for _cache invalidation_ , which i
 The simplest way to implement a cache is to co-locate it with the client. For example, the client could use a simple in-memory hash table or an embeddable key-value store, like RocksDB[2] , to cache responses (see Figure 20.1). 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0211-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0211-05.png)
 
 
 Figure 20.1: In-process cache 
@@ -71,7 +71,7 @@ Since the cache is shared among its clients, there is only a single version of e
 195 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0213-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0213-02.png)
 
 
 Figure 20.2: Out-of-process cache 

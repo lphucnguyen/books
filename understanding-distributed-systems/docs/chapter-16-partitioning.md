@@ -16,7 +16,7 @@ Partitioning is not a free lunch since it introduces a fair amount of complexity
 156 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0174-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0174-02.png)
 
 
 Figure 16.1: A partitioned application with a gateway that routes requests to partitions 
@@ -39,7 +39,7 @@ Now that we have an idea of what partitioning is and why it’s useful, let’s 
 Range partitioning splits the data by key range into lexicographically sorted partitions, as shown in Figure 16.2. To make range scans fast, each partition is generally stored in sorted order on disk. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0175-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0175-05.png)
 
 
 Figure 16.2: A range-partitioned dataset 
@@ -69,7 +69,7 @@ Although this approach ensures that the partitions contain more
 159 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0177-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0177-02.png)
 
 
 Figure 16.3: A hash-partitioned dataset or less the same number of entries, it doesn’t eliminate hotspots if the _access pattern_ is not uniform. For example, if a single key is accessed significantly more often than others, the node hosting the partition it belongs to could become overloaded. In this case, the partition needs to be split further by increasing the total number of partitions. Alternatively, the key needs to be split into sub-keys by, e.g., prepending a random prefix. 
@@ -86,7 +86,7 @@ Now, when a new partition is added, only the keys that now map
 160 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0178-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0178-02.png)
 
 
 Figure 16.4: With consistent hashing, partition identifiers and keys are randomly distributed around a circle, and each key is assigned to the next partition that appears on the circle in clockwise order. to it on the circle need to be reassigned, as shown in Figure 16.5. 
@@ -97,7 +97,7 @@ The main drawback of hash partitioning compared to range partitioning is that th
 161 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0179-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0179-02.png)
 
 
 Figure 16.5: After partition P4 is added, the key ’for’ is reassigned to P4, but the assignment of the other keys doesn’t change. 

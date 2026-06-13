@@ -39,7 +39,7 @@ The _stream layer_ implements a distributed append-only file system in which the
 165 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0183-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0183-02.png)
 
 
 Figure 17.1: A high-level view of Azure Storage’s architecture is represented as a sequence of _extents_ , where the extent is the unit of replication. Writes to extents are replicated synchronously using chain replication[4] . 
@@ -54,7 +54,7 @@ The _partition layer_ is where high-level file operations are translated
 166 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0184-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0184-02.png)
 
 
 Figure 17.2: The stream layer uses chain replication to replicate extents across storage servers. to low-level stream operations. Within this layer, the _partition manager_ (yet another control plane) manages a large index of all files stored in the cluster. Each entry in the index contains metadata such as account and file name and a pointer to the actual data in the stream service (list of extent plus offset and length). The partition manager range-partitions the index and maps each partition to a partition server. The partition manager is also responsible for load-balancing partitions across servers, splitting partitions when they become too hot, and merging cold ones (see Figure 17.3). 
@@ -66,7 +66,7 @@ Finally, the _front-end service_ (a reverse proxy) is a stateless service that a
 Although we have only coarsely described the architecture of AS, it’s a great showcase of the scalability patterns applied to a concrete system. As an interesting historical note, AS was built from the ground up to be strongly consistent, while AWS S3 started of167 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0185-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0185-02.png)
 
 
 Figure 17.3: The partition manager range-partitions files across partition servers and rebalances the partitions when necessary. fering the same guarantee in 2021[5] . 

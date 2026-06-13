@@ -37,7 +37,7 @@ The resolution process involves several round trips in the worst case, but its b
 33 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0051-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0051-02.png)
 
 
 Figure 4.1: DNS resolution process server lookups. Not only that, but think of the scale required for the name servers to handle the global resolution load. So caching is used to speed up the resolution process since the mapping of domain names to IP addresses doesn’t change often — the browser, operating system, and DNS resolver all use caches internally. 

@@ -47,7 +47,7 @@ A server must be listening for connection requests from clients before a connect
 The sequence numbers are used by TCP to ensure the data is delivered in order and without holes. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0037-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0037-05.png)
 
 
 Figure 2.1: Three-way handshake 
@@ -66,7 +66,7 @@ Moreover, closing a socket doesn’t dispose of it immediately as it
 Flow control is a backoff mechanism that TCP implements to prevent the sender from overwhelming the receiver. The receiver stores incoming TCP segments waiting to be processed by the application into a receive buffer, as shown in Figure 2.2. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0038-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0038-05.png)
 
 
 Figure 2.2: The receive buffer stores data that hasn’t yet been processed by the destination process. 
@@ -79,7 +79,7 @@ The receiver also communicates the size of the buffer to the sender whenever it 
 Assuming it’s respecting the protocol, the sender avoids sending 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0039-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0039-03.png)
 
 
 Figure 2.3: The size of the receive buffer is communicated in the headers of acknowledgment segments. 
@@ -96,7 +96,7 @@ TCP guards not only against overwhelming the receiver, but also against flooding
 When a new connection is established, the size of the congestion window is set to a system default. Then, for every segment acknowledged, the window increases its size exponentially until it reaches an upper limit. This means we can’t use the network’s full capacity right after a connection is established. The shorter the round-trip time (RTT), the quicker the sender can start utilizing the underlying network’s bandwidth, as shown in Figure 2.4. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0040-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0040-03.png)
 
 
 Figure 2.4: The shorter the RTT, the quicker the sender can start utilizing the underlying network’s bandwidth. 
@@ -111,7 +111,7 @@ As mentioned earlier, the size of the congestion window defines the maximum numb
 23 an acknowledgment. Because the sender needs to wait for a full round trip to get an acknowledgment, we can derive the maximum theoretical bandwidth by dividing the size of the congestion window by the round trip time: 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0041-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0041-03.png)
 
 
 The equation[5] shows that bandwidth is a function of latency. TCP will try very hard to optimize the window size since it can’t do anything about the round-trip time. However, that doesn’t always yield the optimal configuration. Due to the way congestion control works, the shorter the round-trip time, the better the underlying network’s bandwidth is utilized. This is more reason to put servers geographically close to the clients. 

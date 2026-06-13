@@ -16,7 +16,7 @@ A message channel acts as a temporary buffer for the receiver. Unlike the direct
 Typically, a message can either be a command, which specifies an operation to be invoked by the receiver, or an event, which signals the receiver that something of interest happened to the sender. A service can use inbound adapters to receive messages from channels and outbound adapters to send messages to channels, as shown in Figure 23.1. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0236-04.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0236-04.png)
 
 
 Figure 23.1: The message consumer (an inbound adapter) is part of the API surface of the service. 
@@ -43,7 +43,7 @@ Because messaging is a core pattern of distributed systems, we will take a close
 In this messaging style, the producer writes a message to a pointto-point channel with the expectation that a consumer will eventually read and process it (see Figure 23.2). This is the style we used in the example earlier. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0238-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0238-03.png)
 
 
 Figure 23.2: One-way messaging style 
@@ -62,13 +62,13 @@ In this messaging style, the producer writes a message to a publishsubscribe cha
 221 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0239-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0239-02.png)
 
 
 Figure 23.3: Request-response messaging style 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0239-04.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0239-04.png)
 
 
 Figure 23.4: Broadcast messaging style 

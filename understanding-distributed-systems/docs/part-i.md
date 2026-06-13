@@ -25,7 +25,7 @@ The protocols are arranged in a stack[6] , where each layer builds on the abstra
 14 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0032-01.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0032-01.png)
 
 
 Figure 1.3: Internet protocol suite 

@@ -118,7 +118,7 @@ SLIs are best defined as a ratio of two metrics: the number of “good events”
 - _Availability_ — The proportion of time the service was usable, defined as the number of successful requests over the total number of requests. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0320-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0320-05.png)
 
 
 Figure 31.1: An SLI defined as the ratio of good events over the total number of events 
@@ -158,7 +158,7 @@ Smaller time windows force the team to act quicker and prioritize bug fixes and 
 305 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0323-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0323-02.png)
 
 
 Figure 31.2: An SLO defines the range of acceptable values for an SLI. in. Consequently, it makes sense to have multiple SLOs with different window sizes. 
@@ -215,7 +215,7 @@ The categories of dashboards presented here (see Figure 31.3) are by no means st
 309 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0327-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0327-02.png)
 
 
 Figure 31.3: Dashboards should be tailored to their audience. 

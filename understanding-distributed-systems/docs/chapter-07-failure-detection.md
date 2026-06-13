@@ -14,7 +14,7 @@ But a process doesn’t need to wait to send a message to find out that the dest
 62 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0080-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0080-02.png)
 
 
 Figure 7.1: The client can’t tell whether the server is slow, it crashed or a message was delayed/dropped because of a network issue. 

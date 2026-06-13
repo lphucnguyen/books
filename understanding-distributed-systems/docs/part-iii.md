@@ -23,7 +23,7 @@ In this part, we will walk through the journey of scaling a simple CRUD web appl
 Users interact with _Cruder_ through their browsers. Typically, a browser issues a DNS request to resolve the domain name to an IP address (if it doesn’t have it cached already), opens a TLS connection with the server, and sends its first HTTP _GET_ request to it (see Figure 13.2). 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0158-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0158-02.png)
 
 
 Figure 13.2: Cruder’s architecture 
@@ -60,7 +60,7 @@ Chapter 15 describes using a content delivery network (CDN), a geographically di
 142 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0160-01.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0160-01.png)
 
 
 Figure 13.3: Moving the database to its own dedicated machine is an example of functional decomposition to further reduce the number of requests the application needs to handle. 

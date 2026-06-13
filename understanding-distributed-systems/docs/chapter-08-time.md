@@ -52,7 +52,7 @@ A _Lamport clock_[3] is a logical clock based on this idea. To implement it, eac
 66 it received with its local counter by taking the maximum of the two. Finally, it increments the counter by 1. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0084-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0084-03.png)
 
 
 Figure 8.1: Three processes using Lamport clocks. For example, because D happened before F, D’s logical timestamp is less than F’s. 
@@ -94,7 +94,7 @@ The beauty of vector clock timestamps is that they can be partially ordered[6] ;
 68 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0086-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0086-02.png)
 
 
 Figure 8.2: Each process has a vector clock represented by an array of three counters. 

@@ -45,7 +45,7 @@ That said, the chance of an entire region being destroyed is extremely low. Befo
 246 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0264-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0264-02.png)
 
 
 Figure 25.1: A simplistic multi-region architecture reasons for it. It’s more likely your application will be forced to have a presence in multiple regions for legal compliance reasons. For example, there are laws mandating that the data of European customers has to be processed and stored within Europe[3] . 

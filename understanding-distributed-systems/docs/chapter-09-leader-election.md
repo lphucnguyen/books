@@ -56,7 +56,7 @@ The compare-and-swap operation atomically updates the value of a key if and only
 74 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0092-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0092-02.png)
 
 
 Figure 9.1: Raft’s leader election algorithm represented as a state machine. rameters: 𝐾, 𝑉𝑜, and 𝑉𝑛, where 𝐾 is a key, and 𝑉𝑜 and 𝑉𝑛 are values referred to as the old and new value, respectively. The operation atomically compares the current value of 𝐾 with 𝑉𝑜, and if they match, it updates the value of 𝐾 to 𝑉𝑛. If the values don’t match, then 𝐾 is not modified, and the operation fails. 

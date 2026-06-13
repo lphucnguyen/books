@@ -33,7 +33,7 @@ Load-shedding and load leveling don’t address an increase in load
 263 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0281-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0281-02.png)
 
 
 Figure 28.1: The channel smooths out the load for the consuming service. directly but rather protect a service from getting overloaded. To handle more load, the service needs to be scaled out. This is why these protection mechanisms are typically combined with autoscaling[3] , which detects that the service is running hot and automatically increases its scale to handle the additional load. 
@@ -82,13 +82,13 @@ With bucketing, we can compress the information about the number of requests see
 266 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0284-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0284-02.png)
 
 
 Figure 28.2: Buckets divide time into 1-minute intervals, which keep track of the number of requests seen. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0284-04.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0284-04.png)
 
 
 Figure 28.3: When a new request comes in, its timestamp is used to determine the bucket it belongs to. sliding window that moves across the buckets in real time, keeping track of the number of requests within it. 
@@ -99,7 +99,7 @@ The sliding window represents the interval of time used to decide whether to rat
 267 buckets. To derive the number of requests under the sliding window, we have to compute a weighted sum of the bucket’s counters, where each bucket’s weight is proportional to its overlap with the sliding window (see Figure 28.4). 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0285-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0285-03.png)
 
 
 Figure 28.4: A bucket’s weight is proportional to its overlap with the sliding window. 
@@ -128,7 +128,7 @@ Now, rather than updating the data store on each request, the process can batch 
 What happens if the data store is down? Remember the CAP theorem’s essence: when there is a network fault, we can either sacrifice consistency and keep our system up or maintain consistency and stop serving requests. In our case, temporarily rejecting requests just because the data store used for rate-limiting is not reachable could damage the business. Instead, it’s safer to keep serving re269 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0287-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0287-02.png)
 
 
 Figure 28.5: Servers batch bucket updates in memory for some time, and flush them asynchronously to the data store at the end of it. quests based on the last state read from the store.[4] 

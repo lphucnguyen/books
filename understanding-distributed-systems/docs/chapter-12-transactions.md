@@ -52,7 +52,7 @@ To protect against these race conditions, a transaction needs to be isolated fro
 An isolation level is defined based on the type of race conditions it forbids, as shown in Figure 12.1. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0132-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0132-05.png)
 
 
 Figure 12.1: Isolation levels define which race conditions they forbid. 
@@ -146,7 +146,7 @@ There are two points of no return in the protocol. If a participant replies to a
 121 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0139-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0139-02.png)
 
 
 Figure 12.2: The two-phase commit protocol consists of a prepare and a commit phase. if the coordinator crashes, the participant is stuck. 
@@ -191,7 +191,7 @@ If you recall the discussion about MVCC in section 12.2, you should know that ea
 124 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0142-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0142-02.png)
 
 
 Figure 12.3: Spanner combines 2PC with 2PL and state machine replication. In this figure, there are three partitions and three replicas per partition. current physical time 𝑡𝑟𝑒𝑎𝑙, it knows it’s within the interval with a very high probability. 

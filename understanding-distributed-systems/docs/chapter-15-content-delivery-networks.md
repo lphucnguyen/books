@@ -33,7 +33,7 @@ The routing algorithms of the overlay network are optimized to select paths with
 153 to avoid the overhead of setting up new connections and using optimal TCP window sizes to maximize the effective bandwidth (see Figure 15.1). 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0171-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0171-03.png)
 
 
 Figure 15.1: A CDN reduces the round trip time of network calls for clients and the load for the origin server. 

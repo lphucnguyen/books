@@ -35,7 +35,7 @@ A _log_ is an immutable list of time-stamped events that happened over time. An 
 317 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0335-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0335-02.png)
 
 
 Figure 32.1: Observability is a superset of monitoring. message brokers, proxies, data stores, etc. Most languages offer libraries that make it easy to emit structured logs. Logs are typically dumped to disk files, which are sent by an agent to an external log collector asynchronously, like an ELK stack[2] or AWS CloudWatch logs. 
@@ -83,7 +83,7 @@ When a request begins, it’s assigned a unique trace ID. The trace ID is propag
 320 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0338-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0338-02.png)
 
 
 Figure 32.2: An execution flow can be represented with spans. 

@@ -52,7 +52,7 @@ The size of a test[4] reflects how much computing resources it needs to run, lik
 282 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0300-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0300-02.png)
 
 
 Figure 29.1: Test pyramid the scope and size of a test tend to be correlated, they are distinct concepts, and it helps to separate them. 
@@ -96,7 +96,7 @@ As suggested earlier, we should try to write the smallest possible
 284 test for the desired scope while minimizing the use of test doubles that don’t resemble how the real implementation behaves. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0302-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0302-03.png)
 
 
 Figure 29.2: How should we test the service? 
@@ -148,7 +148,7 @@ If we were to model this with TLA+, the model checker would be able to identify 
 Although modeling writes as atomic (i.e., either both writes succeed, or they both fail) fixes the liveness issue, the model isn’t cor287 rect yet. For example, if two service instances are writing to A and B simultaneously, the two data stores can end up in different states because the order of writes can differ, as shown in Fig 29.3. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0305-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0305-03.png)
 
 
 Figure 29.3: Data stores can see writes in different orders. 

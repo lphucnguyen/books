@@ -18,7 +18,7 @@ The server uses specific HTTP response headers[2] to let clients know that a res
 146 with the resource, it adds a _Cache-Control_ header that defines for how long to cache the resource (TTL) and an _ETag_ header with a version identifier. Finally, when the cache receives the response, it stores the resource locally and returns it to the client (see Figure 14.1). 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0164-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0164-03.png)
 
 
 Figure 14.1: A client accessing a resource for the first time (the Age header contains the time in seconds the object was in the cache) 
@@ -31,7 +31,7 @@ If the resource has expired, it’s considered _stale_ . In this case, the
 147 cache sends a GET request to the server with a conditional header (like _If-None-Match_ ) containing the version identifier of the stale resource to check whether a newer version is available. If there is, the server returns the updated resource; if not, the server replies with a _304 Not Modified_ status code (see Figure 14.2). 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0165-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0165-03.png)
 
 
 Figure 14.2: A client accessing a stale resource 
@@ -52,7 +52,7 @@ To summarize, allowing clients to cache static resources has reduced the load on
 A _reverse proxy_ is a server-side proxy that intercepts all communications with clients. Since the proxy is indistinguishable from the actual server, clients are unaware that they are communicating through an intermediary (see Figure 14.3). 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0166-07.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0166-07.png)
 
 
 Figure 14.3: A reverse proxy acts as an intermediary between the clients and the servers. 

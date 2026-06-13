@@ -20,7 +20,7 @@ There is a balance between the safety of a rollout and the time it takes to rele
 At a high level, a code change needs to go through a pipeline of four stages to be released to production: review, build, pre-production rollout, and production rollout. 
 
 
-![](understanding-distributed-systems-github-pages/images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0308-07.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0308-07.png)
 
 
 Figure 30.1: Continuous delivery and deployment pipeline stages 
