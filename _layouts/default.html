@@ -4,29 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title | default: site.title }}</title>
-    <!-- Add Inter font from Google Fonts -->
+    <!-- Modern Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Cache Busted CSS -->
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
-                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
-            <div class="logo">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color)"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-                <a href="{{ '/' | relative_url }}">{{ site.title | default: "Tech Books" }}</a>
+    <header class="site-header">
+        <div class="header-inner">
+            <div style="display: flex; align-items: center;">
+                <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle Menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <a href="{{ '/' | relative_url }}" class="brand">
+                    <svg class="brand-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                    </svg>
+                    {{ site.title | default: "Tech Books" }}
+                </a>
             </div>
             <div class="header-links">
-                <a href="https://github.com/" target="_blank" aria-label="GitHub">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                <a href="https://github.com/lphucnguyen/books" target="_blank" aria-label="GitHub Repository">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                    </svg>
                 </a>
             </div>
         </div>
@@ -35,157 +42,126 @@
     <div class="mobile-overlay" id="mobile-overlay"></div>
 
     <div class="layout-wrapper">
-        <aside class="left-sidebar" id="left-sidebar">
-            <h3>Navigation</h3>
-            <ul class="nav-list">
-                <li><a href="{{ '/' | relative_url }}" class="{% if page.url == '/' or page.url == '/index.html' %}active{% endif %}">Home</a></li>
-                {% for book in site.data.navigation %}
-                {% assign is_book_active = false %}
-                {% if page.url == book.url %}
-                    {% assign is_book_active = true %}
-                {% endif %}
-                {% for chapter in book.chapters %}
-                    {% if page.url == chapter.url %}
+        <aside class="sidebar left-sidebar" id="left-sidebar">
+            <div class="nav-group">
+                <div class="nav-group-title">Menu</div>
+                <ul class="nav-list">
+                    <li>
+                        <a href="{{ '/' | relative_url }}" class="nav-link {% if page.url == '/' or page.url == '/index.html' %}active{% endif %}">Home</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-title">Books</div>
+                <ul class="nav-list">
+                    {% for book in site.data.navigation %}
+                    {% assign is_book_active = false %}
+                    {% if page.url == book.url %}
                         {% assign is_book_active = true %}
                     {% endif %}
-                {% endfor %}
-                <li class="nav-book">
-                    <details {% if is_book_active %}open{% endif %}>
-                        <summary class="{% if is_book_active %}active-book{% endif %}">{{ book.title }}</summary>
-                        <ul class="nav-chapters">
-                            <li><a href="{{ book.url | relative_url }}" class="{% if page.url == book.url %}active{% endif %}">Introduction</a></li>
-                            {% for chapter in book.chapters %}
-                            <li>
-                                <a href="{{ chapter.url | relative_url }}" class="{% if page.url == chapter.url %}active{% endif %}">
-                                    {{ chapter.title }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </details>
-                </li>
-                {% endfor %}
-            </ul>
+                    {% for chapter in book.chapters %}
+                        {% if page.url == chapter.url %}
+                            {% assign is_book_active = true %}
+                        {% endif %}
+                    {% endfor %}
+                    <li>
+                        <details class="nav-book" {% if is_book_active %}open{% endif %}>
+                            <summary>{{ book.title }}</summary>
+                            <ul class="nav-chapters">
+                                <li>
+                                    <a href="{{ book.url | relative_url }}" class="nav-link {% if page.url == book.url %}active{% endif %}">
+                                        Introduction
+                                    </a>
+                                </li>
+                                {% for chapter in book.chapters %}
+                                <li>
+                                    <a href="{{ chapter.url | relative_url }}" class="nav-link {% if page.url == chapter.url %}active{% endif %}">
+                                        {{ chapter.title }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </details>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </aside>
 
         <main class="main-content">
-            {{ content }}
+            <div class="content-inner markdown-body">
+                {{ content }}
+            </div>
         </main>
 
-        <aside class="right-sidebar">
-            <h3>On this page</h3>
-            <div class="toc-widget">
+        <aside class="sidebar right-sidebar">
+            <div class="nav-group-title" style="margin-bottom: 1rem;">On this page</div>
+            <div class="toc-widget" id="toc-widget">
                 <!-- TOC generated by JavaScript -->
             </div>
         </aside>
     </div>
 
-    <footer>
-        <p>&copy; 2026 Tech Books Library. Built with Jekyll.</p>
-    </footer>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Mobile Menu Toggle
-            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileBtn = document.getElementById('mobile-nav-toggle');
             const leftSidebar = document.getElementById('left-sidebar');
             const overlay = document.getElementById('mobile-overlay');
 
             function toggleMenu() {
                 leftSidebar.classList.toggle('open');
                 overlay.classList.toggle('active');
+                document.body.style.overflow = leftSidebar.classList.contains('open') ? 'hidden' : '';
             }
 
-            mobileBtn.addEventListener('click', toggleMenu);
-            overlay.addEventListener('click', toggleMenu);
+            if (mobileBtn && leftSidebar && overlay) {
+                mobileBtn.addEventListener('click', toggleMenu);
+                overlay.addEventListener('click', toggleMenu);
+            }
 
-            // TOC Generation & Scrollspy
-            const tocContainer = document.querySelector('.toc-widget');
-            const headings = document.querySelectorAll('.main-content h2, .main-content h3');
+            // TOC Generation
+            const tocContainer = document.getElementById('toc-widget');
+            const headings = document.querySelectorAll('.markdown-body h2, .markdown-body h3');
             
             if (headings.length === 0) {
-                tocContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.875rem;">No table of contents.</p>';
-                return;
-            }
-            
-            let tocHTML = '<ul class="toc-list">';
-            headings.forEach(h => {
-                if (!h.id) {
-                    h.id = h.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                }
-                const level = h.tagName.toLowerCase() === 'h3' ? 'toc-h3' : 'toc-h2';
-                tocHTML += `<li class="${level}"><a href="#${h.id}" data-id="${h.id}">${h.innerText}</a></li>`;
-            });
-            tocHTML += '</ul>';
-            tocContainer.innerHTML = tocHTML;
-
-            // Smooth scrolling for TOC links
-            document.querySelectorAll('.toc-list a').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href').substring(1);
-                    const targetElement = document.getElementById(targetId);
-                    if (targetElement) {
-                        const headerOffset = 80;
-                        const elementPosition = targetElement.getBoundingClientRect().top;
-                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                        
-                        window.scrollTo({
-                            top: offsetPosition,
-                            behavior: "smooth"
-                        });
+                tocContainer.innerHTML = '<p style="color: var(--text-muted);">No table of contents.</p>';
+            } else {
+                let tocHTML = '<ul class="toc-list">';
+                headings.forEach(h => {
+                    if (!h.id) {
+                        h.id = h.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                     }
+                    const levelClass = h.tagName.toLowerCase() === 'h3' ? 'toc-h3' : 'toc-h2';
+                    tocHTML += `<li class="${levelClass}"><a href="#${h.id}">${h.innerText}</a></li>`;
                 });
-            });
+                tocHTML += '</ul>';
+                tocContainer.innerHTML = tocHTML;
 
-            // Scrollspy using IntersectionObserver
-            const tocLinks = document.querySelectorAll('.toc-list a');
-            const observerOptions = {
-                root: null,
-                rootMargin: '-80px 0px -80% 0px',
-                threshold: 0
-            };
+                // Scrollspy
+                const tocLinks = document.querySelectorAll('.toc-list a');
+                const observerOptions = {
+                    rootMargin: '-80px 0px -80% 0px',
+                    threshold: 0
+                };
 
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const id = entry.target.id;
-                        tocLinks.forEach(link => {
-                            link.classList.remove('active');
-                            if (link.getAttribute('href') === `#${id}`) {
-                                link.classList.add('active');
-                            }
-                        });
-                    }
-                });
-            }, observerOptions);
-
-            headings.forEach(h => observer.observe(h));
-            
-            // Fallback scroll active state logic
-            let scrollTimeout;
-            window.addEventListener('scroll', () => {
-                if (scrollTimeout) {
-                    cancelAnimationFrame(scrollTimeout);
-                }
-                scrollTimeout = requestAnimationFrame(() => {
-                    let current = '';
-                    headings.forEach(h => {
-                        const top = h.getBoundingClientRect().top;
-                        if (top <= 100) {
-                            current = h.id;
+                const observer = new IntersectionObserver(entries => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const id = entry.target.id;
+                            tocLinks.forEach(link => {
+                                link.classList.remove('active');
+                                if (link.getAttribute('href') === `#${id}`) {
+                                    link.classList.add('active');
+                                }
+                            });
                         }
                     });
-                    if (current) {
-                        tocLinks.forEach(link => {
-                            link.classList.remove('active');
-                            if (link.getAttribute('href') === `#${current}`) {
-                                link.classList.add('active');
-                            }
-                        });
-                    }
-                });
-            });
+                }, observerOptions);
+
+                headings.forEach(h => observer.observe(h));
+            }
         });
     </script>
 </body>
