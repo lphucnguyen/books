@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title | default: site.title }}</title>
-    <!-- Modern Web Fonts -->
+    <!-- Preconnect to required origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="{{ '/assets/css/style.css' | relative_url }}" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ site.time | date: '%s' }}"></noscript>
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <!-- Cache Busted CSS -->
-    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 </head>
 <body>
     <header class="site-header">
@@ -124,7 +126,7 @@
             // TOC Generation
             const tocContainer = document.getElementById('toc-widget');
             const headings = document.querySelectorAll('.markdown-body h2, .markdown-body h3');
-            
+
             if (headings.length === 0) {
                 tocContainer.innerHTML = '<p style="color: var(--text-muted);">No table of contents.</p>';
             } else {
