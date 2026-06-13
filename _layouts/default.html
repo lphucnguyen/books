@@ -9,22 +9,58 @@
 <body>
     <header>
         <div class="header-container">
-            <div class="logo">📚 {{ site.title | default: "Tech Books Library" }}</div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div class="logo">📚 <a href="{{ '/' | relative_url }}">{{ site.title | default: "Tech Books Library" }}</a></div>
             <div class="header-links"><a href="https://github.com/" target="_blank">GitHub</a></div>
         </div>
     </header>
+
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
     <div class="layout-wrapper">
-        <aside class="left-sidebar">
+        <aside class="left-sidebar" id="left-sidebar">
             <h3>Điều hướng</h3>
-            <ul>
-                <li><a href="{{ '/' | relative_url }}">Trang chủ</a></li>
-                <li><a href="#">Sách DDIA</a></li>
-                <li><a href="#">Sách Event-Driven</a></li>
+            <ul class="nav-list">
+                <li><a href="{{ '/' | relative_url }}" class="{% if page.url == '/' or page.url == '/index.html' %}active{% endif %}">Trang chủ</a></li>
+                {% for book in site.data.navigation %}
+                {% assign is_book_active = false %}
+                {% if page.url == book.url %}
+                    {% assign is_book_active = true %}
+                {% endif %}
+                {% for chapter in book.chapters %}
+                    {% if page.url == chapter.url %}
+                        {% assign is_book_active = true %}
+                    {% endif %}
+                {% endfor %}
+                <li class="nav-book">
+                    <details {% if is_book_active %}open{% endif %}>
+                        <summary class="{% if is_book_active %}active-book{% endif %}">{{ book.title }}</summary>
+                        <ul class="nav-chapters">
+                            <li><a href="{{ book.url | relative_url }}" class="{% if page.url == book.url %}active{% endif %}">Giới thiệu sách</a></li>
+                            {% for chapter in book.chapters %}
+                            <li>
+                                <a href="{{ chapter.url | relative_url }}" class="{% if page.url == chapter.url %}active{% endif %}">
+                                    {{ chapter.title }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </details>
+                </li>
+                {% endfor %}
             </ul>
         </aside>
+
         <main class="main-content">
             {{ content }}
         </main>
+
         <aside class="right-sidebar">
             <h3>Trong trang này</h3>
             <div class="toc-widget">
@@ -32,25 +68,94 @@
             </div>
         </aside>
     </div>
+
     <footer>
         <p>&copy; 2026 Tech Books Library. Built with Jekyll.</p>
     </footer>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Mobile Menu Toggle
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const leftSidebar = document.getElementById('left-sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+
+            function toggleMenu() {
+                leftSidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+
+            mobileBtn.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', toggleMenu);
+
+            // TOC Generation & Scrollspy
             const tocContainer = document.querySelector('.toc-widget');
             const headings = document.querySelectorAll('.main-content h2, .main-content h3');
+            
             if (headings.length === 0) {
                 tocContainer.innerHTML = '<p class="text-muted">Không có mục lục.</p>';
                 return;
             }
+            
             let tocHTML = '<ul class="toc-list">';
             headings.forEach(h => {
-                if (!h.id) h.id = h.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                tocHTML += `<li class="toc-${h.tagName.toLowerCase()}"><a href="#${h.id}">${h.innerText}</a></li>`;
+                if (!h.id) {
+                    h.id = h.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                }
+                const level = h.tagName.toLowerCase() === 'h3' ? 'toc-h3' : 'toc-h2';
+                tocHTML += `<li class="${level}"><a href="#${h.id}" data-id="${h.id}">${h.innerText}</a></li>`;
             });
             tocHTML += '</ul>';
             tocContainer.innerHTML = tocHTML;
+
+            // Scrollspy using IntersectionObserver
+            const tocLinks = document.querySelectorAll('.toc-list a');
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -80% 0px', // Trigger when heading is near top
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        tocLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            headings.forEach(h => observer.observe(h));
+            
+            // Fallback scroll active state logic for initial load and fast scrolling
+            let scrollTimeout;
+            window.addEventListener('scroll', () => {
+                if (scrollTimeout) {
+                    cancelAnimationFrame(scrollTimeout);
+                }
+                scrollTimeout = requestAnimationFrame(() => {
+                    let current = '';
+                    headings.forEach(h => {
+                        const top = h.getBoundingClientRect().top;
+                        if (top <= 100) {
+                            current = h.id;
+                        }
+                    });
+                    if (current) {
+                        tocLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${current}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            });
         });
     </script>
 </body>
