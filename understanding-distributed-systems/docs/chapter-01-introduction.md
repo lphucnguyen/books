@@ -15,7 +15,6 @@ Some applications are inherently distributed. For example, the web is a distribu
 Another reason for building distributed systems is that some applications require high availability and need to be resilient to singlenode failures. For example, Dropbox replicates your data across multiple nodes so that the loss of a single one doesn’t cause your data to be lost. 
 
 
-2 
 
 Some applications need to tackle workloads that are just too big to fit on a single node, no matter how powerful. For example, Google receives tens of thousands of search requests per second from all over the globe. There is no way a single node could handle that. 
 
@@ -32,7 +31,6 @@ How are the request and response messages represented on the wire? What happens 
 > 1“The Law of Leaky Abstractions,” https://www.joelonsoftware.com/2002/ 11/11/the-law-of-leaky-abstractions/ 
 
 
-3 
 
 ## **1.2 Coordination** 
 
@@ -49,7 +47,7 @@ Because coordination is such a key topic, the second part of the book is dedicat
 The performance of an application represents how efficiently it can handle _load_ . Intuitively, load is anything that consumes the system’s resources such as CPU, memory, and network bandwidth. Since the nature of load depends on the application’s use cases and architecture, there are different ways to measure it. For example, 
 
 
-4 the number of concurrent users or the ratio of writes to reads are different forms of load. 
+the number of concurrent users or the ratio of writes to reads are different forms of load. 
 
 For the type of applications discussed in this book, performance is generally measured in terms of throughput and response time. _Throughput_ is the number of requests processed per second by the application, while _response time_ is the time elapsed in seconds between sending a request to the application and receiving a response. 
 
@@ -62,7 +60,6 @@ As load increases, the application will eventually reach its _capacity_ , i.e., 
 Figure 1.1: The system throughput on the y axis is the subset of client requests (x axis) that can be handled without errors and with low response times, also referred to as its goodput. 
 
 
-5 
 
 The capacity of a distributed system depends on its architecture, its implementation, and an intricate web of physical limitations like the nodes’ memory size and clock cycle and the bandwidth and latency of network links. For an application to be scalable, a load increase should not degrade the application’s performance. This requires increasing the capacity of the application at will. 
 
@@ -79,7 +76,6 @@ A distributed system is resilient when it can continue to do its job even when f
 2“Amazon EC2,” https://aws.amazon.com/ec2/ 
 
 
-6 
 
 Failures that are left unchecked can impact the system’s _availability_[3] , i.e., the percentage of time the system is available for use. It’s a ratio defined as the amount of time the application can serve requests ( _uptime_ ) divided by the total time measured ( _uptime_ plus _downtime_ , i.e., the time the application can’t serve requests). 
 
@@ -129,7 +125,6 @@ Going forward, we will refer to a process running a service as a _server_ , and 
 > 5“Dependency inversion principle,” https://en.wikipedia.org/wiki/Depend ency_inversion_principle 
 
 
-9 
 
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0027-02.png)

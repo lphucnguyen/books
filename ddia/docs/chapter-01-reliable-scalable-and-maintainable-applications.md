@@ -185,9 +185,6 @@ Simply handling 12,000 writes per second (the peak rate for posting tweets) woul
 
 ```
 SELECTtweets.*, users.*FROMtweets
-```
-
-```
 JOINusersONtweets.sender_id=users.id
 JOINfollowsONfollows.followee_id=users.id
 WHEREfollows.follower_id=current_user

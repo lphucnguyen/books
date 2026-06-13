@@ -27,22 +27,30 @@
         flex-shrink: 0;
         /* DEBUG: visible border */
         border: 2px solid #0066cc;
+        box-sizing: border-box;
       }
       .main-content {
         flex: 1;
         padding: 20px;
         position: relative;
         overflow-x: hidden;
+        margin-right: 220px;
+        box-sizing: border-box;
       }
       .sidebar-right {
+        position: fixed;
+        top: 0;
+        right: 0;
         width: 220px;
-        background: #f8f9fa;
+        height: 100vh;
         padding: 20px;
+        background: #f8f9fa;
         border-left: 1px solid #e9ecef;
         overflow-y: auto;
-        flex-shrink: 0;
         /* DEBUG: visible border */
         border: 2px solid #0066cc;
+        box-sizing: border-box;
+        z-index: 1000;
       }
       @media (max-width: 992px) {
         .wrapper {
@@ -58,7 +66,14 @@
           border-bottom: none;
         }
         .sidebar-right {
+          position: static;
+          width: 100%;
+          height: auto;
           border-top: none;
+          margin-right: 0;
+        }
+        .main-content {
+          margin-right: 0;
         }
       }
       /* Sidebar headings */
@@ -227,10 +242,13 @@
 
     <script>
       document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOMContentLoaded fired');
         // Left sidebar dropdown toggling
         const dropdowns = document.querySelectorAll('.sidebar-left .dropdown');
+        console.log('Found dropdowns:', dropdowns.length);
         dropdowns.forEach(dropdown => {
           dropdown.addEventListener('click', () => {
+            console.log('Dropdown clicked:', dropdown.textContent.trim());
             dropdown.classList.toggle('open');
           });
         });
