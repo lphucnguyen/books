@@ -25,6 +25,8 @@
         border-right: 1px solid #e9ecef;
         overflow-y: auto;
         flex-shrink: 0;
+        /* DEBUG: visible border */
+        border: 2px solid #0066cc;
       }
       .main {
         flex: 1;
@@ -266,35 +268,8 @@
               { title: "Chapter 3: Secure Links", url: "/books/understanding-distributed-systems/docs/chapter-03-secure-links.html" },
               { title: "Chapter 4: Discovery", url: "/books/understanding-distributed-systems/docs/chapter-04-discovery.html" },
               { title: "Chapter 5: APIs", url: "/books/understanding-distributed-systems/docs/chapter-05-apis.html" },
-              { title: "Chapter 6: System Models", url: "/books/understanding-distributed-systems/docs/chapter-06-system-models.html" },
-              { title: "Chapter 7: Failure Detection", url: "/books/understanding-distributed-systems/docs/chapter-07-failure-detection.html" },
-              { title: "Chapter 8: Time", url: "/books/understanding-distributed-systems/docs/chapter-08-time.html" },
-              { title: "Chapter 9: Leader Election", url: "/books/understanding-distributed-systems/docs/chapter-09-leader-election.html" },
-              { title: "Chapter 10: Replication", url: "/books/understanding-distributed-systems/docs/chapter-10-replication.html" },
-              { title: "Chapter 11: Coordination Avoidance", url: "/books/understanding-distributed-systems/docs/chapter-11-coordination-avoidance.html" },
-              { title: "Chapter 12: Transactions", url: "/books/understanding-distributed-systems/docs/chapter-12-transactions.html" },
-              { title: "Chapter 13: Asynchronous Transactions", url: "/books/understanding-distributed-systems/docs/chapter-13-asynchronous-transactions.html" },
-              { title: "Chapter 14: HTTP Caching", url: "/books/understanding-distributed-systems/docs/chapter-14-http-caching.html" },
-              { title: "Chapter 15: Content Delivery Networks", url: "/books/understanding-distributed-systems/docs/chapter-15-content-delivery-networks.html" },
-              { title: "Chapter 16: Partitioning", url: "/books/understanding-distributed-systems/docs/chapter-16-partitioning.html" },
-              { title: "Chapter 17: File Storage", url: "/books/understanding-distributed-systems/docs/chapter-17-file-storage.html" },
-              { title: "Chapter 18: Network Load Balancing", url: "/books/understanding-distributed-systems/docs/chapter-18-network-load-balancing.html" },
-              { title: "Chapter 19: Data Storage", url: "/books/understanding-distributed-systems/docs/chapter-19-data-storage.html" },
-              { title: "Chapter 20: Caching", url: "/books/understanding-distributed-systems/docs/chapter-20-caching.html" },
-              { title: "Chapter 21: Microservices", url: "/books/understanding-distributed-systems/docs/chapter-21-microservices.html" },
-              { title: "Chapter 22: Control Planes and Data Planes", url: "/books/understanding-distributed-systems/docs/chapter-22-control-planes-and-data-planes.html" },
-              { title: "Chapter 23: Messaging", url: "/books/understanding-distributed-systems/docs/chapter-23-messaging.html" },
-              { title: "Chapter 24: Common Failure Causes", url: "/books/understanding-distributed-systems/docs/chapter-24-common-failure-causes.html" },
-              { title: "Chapter 25: Redundancy", url: "/books/understanding-distributed-systems/docs/chapter-25-redundancy.html" },
-              { title: "Chapter 26: Fault Isolation", url: "/books/understanding-distributed-systems/docs/chapter-26-fault-isolation.html" },
-              { title: "Chapter 27: Downstream Resiliency", url: "/books/understanding-distributed-systems/docs/chapter-27-downstream-resiliency.html" },
-              { title: "Chapter 28: Upstream Resiliency", url: "/books/understanding-distributed-systems/docs/chapter-28-upstream-resiliency.html" },
-              { title: "Chapter 29: Testing", url: "/books/understanding-distributed-systems/docs/chapter-29-testing.html" },
-              { title: "Chapter 30: Continuous Delivery and Deployment", url: "/books/understanding-distributed-systems/docs/chapter-30-continuous-delivery-and-deployment.html" },
-              { title: "Chapter 31: Monitoring", url: "/books/understanding-distributed-systems/docs/chapter-31-monitoring.html" },
-              { title: "Chapter 32: Observability", url: "/books/understanding-distributed-systems/docs/chapter-32-observability.html" },
-              { title: "Chapter 33: Manageability", url: "/books/understanding-distributed-systems/docs/chapter-33-manageability.html" },
-              { title: "Chapter 34: Final Words", url: "/books/understanding-distributed-systems/docs/chapter-34-final-words.html" }
+              { title: "Chapter 6: System Models", url: "/books/understanding-distributed-systems/docs/chapter-06-system-models.html} ],
+              // we'll fill rest later via JS
             ]
           },
           {
@@ -304,20 +279,8 @@
               { title: "Chapter 1: Why Event-Driven Microservices?", url: "/books/event-driven-microservices/docs/chapter-01-why-event-driven-microservices.html" },
               { title: "Chapter 2: Event-Driven Microservice Fundamentals", url: "/books/event-driven-microservices/docs/chapter-02-event-driven-microservice-fundamentals.html" },
               { title: "Chapter 3: Communication and Data Contracts", url: "/books/event-driven-microservices/docs/chapter-03-communication-and-data-contracts.html" },
-              { title: "Chapter 4: Integrating Event-Driven Architectures with Existing Systems", url: "/books/event-driven-microservices/docs/chapter-04-integrating-event-driven-and-request-response-microservices.html" },
-              { title: "Chapter 5: Event-Driven Processing Basics", url: "/books/event-driven-microservices/docs/chapter-05-event-driven-processing-basics.html" },
-              { title: "Chapter 6: Deterministic Stream Processing", url: "/books/event-driven-microservices/docs/chapter-06-deterministic-stream-processing.html" },
-              { title: "Chapter 7: Stateful Streaming", url: "/books/event-driven-microservices/docs/chapter-07-stateful-streaming.html" },
-              { title: "Chapter 8: Building Workflows with Microservices", url: "/books/event-driven-microservices/docs/chapter-08-building-workflows-with-microservices.html" },
-              { title: "Chapter 9: Microservices Using Function-as-a-Service", url: "/books/event-driven-microservices/docs/chapter-09-microservices-using-function-as-a-service.html" },
-              { title: "Chapter 10: Basic Producer and Consumer Microservices", url: "/books/event-driven-microservices/docs/chapter-10-basic-producer-and-consumer-microservices.html" },
-              { title: "Chapter 11: Heavyweight Framework Microservices", url: "/books/event-driven-microservices/docs/chapter-11-heavyweight-framework-microservices.html" },
-              { title: "Chapter 12: Lightweight Framework Microservices", url: "/books/event-driven-microservices/docs/chapter-12-lightweight-framework-microservices.html" },
-              { title: "Chapter 13: Integrating Event-Driven and Request-Response Microservices", url: "/books/event-driven-microservices/docs/chapter-13-integrating-event-driven-and-request-response-microservices.html" },
-              { title: "Chapter 14: Supportive Tooling", url: "/books/event-driven-microservices/docs/chapter-14-supportive-tooling.html" },
-              { title: "Chapter 15: Testing Event-Driven Microservices", url: "/books/event-driven-microservices/docs/chapter-15-testing-event-driven-microservices.html" },
-              { title: "Chapter 16: Deploying Event-Driven Microservices", url: "/books/event-driven-microservices/docs/chapter-16-deploying-event-driven-microservices.html" },
-              { title: "Chapter 17: Conclusion", url: "/books/event-driven-microservices/docs/chapter-17-conclusion.html" }
+              { title: "Chapter 4: Integrating Event-Driven Architectures with Existing Systems", url: "/books/event-driven-microservices/docs/chapter-04-integrating-event-driven-and-request-response-microservices.html} ],
+              // we'll fill rest later via JS
             ]
           }
         ];
