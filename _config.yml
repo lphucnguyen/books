@@ -1,4 +1,4 @@
-theme: jekyll-theme-cayman
+theme: jekyll-theme-minimal
 title: "Tech Books Library"
 description: "Collection of technical books converted to Markdown"
 baseurl: "/books"
