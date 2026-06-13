@@ -16,7 +16,7 @@ There are a number of patterns and frameworks for sourcing and sinking event dat
 Data liberation is the identification and publication of cross-domain data sets to their corresponding event streams and is part of a _migration strategy_ for event-driven architectures. Cross-domain data sets include any data stored in one data store that is required by other external systems. Point-to-point dependencies between existing services, and data stores often highlight the cross-domain data that should be liberated, as shown in Figure 4-1, where three dependent services are querying the legacy system directly. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0072-04.png)
+![](../images/Event-Driven_Microservices.pdf-0072-04.png)
 
 
 _Figure 4-1. Point-to-point dependencies, accessing data directly from the underlying service_ 
@@ -26,7 +26,7 @@ Data liberation enforces two primary features of event-driven architecture: the 
 By serving as a single source of truth, these streams also standardize the way in which systems across the organization access data. Systems no longer need to couple directly to the underlying data stores and applications, but instead can couple solely on the data contracts of event streams. The post-liberation workflow is shown in Figure 4-2. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0073-00.png)
+![](../images/Event-Driven_Microservices.pdf-0073-00.png)
 
 
 _Figure 4-2. Post-data-liberation workflow_ 
@@ -38,7 +38,7 @@ A data set and its liberated event stream must be kept fully in sync, although t
 In the perfect world, all state would be created, managed, maintained, and restored from the single source of truth of the event streams. Any shared state should be published to the event broker _first_ and materialized back to any services that need to materialize the state, including the service that produced the data in the first place, as shown in Figure 4-3. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0073-05.png)
+![](../images/Event-Driven_Microservices.pdf-0073-05.png)
 
 
 _Figure 4-3. Publish to stream before materializing_ 
@@ -65,7 +65,7 @@ Changes made to legacy systems may have unintended consequences, especially when
 There is an opportunity for compromise here. You can use data liberation patterns to extract the data out of the data store and create the necessary event streams. This is a form of unidirectional event-driven architecture, as the legacy system will _not_ be reading back from the liberated event stream, as shown in Figure 4-3. Instead, the fundamental goal is to keep the internal data set synchronized with the external event stream through strictly controlled publishing of event data. The event stream will be eventually consistent with the internal data set of the legacy application, as shown in Figure 4-4. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0074-08.png)
+![](../images/Event-Driven_Microservices.pdf-0074-08.png)
 
 
 _Figure 4-4. Liberating and materializing state between two services_ 
@@ -76,7 +76,7 @@ _Figure 4-4. Liberating and materializing state between two services_
 Liberated data, much like any other event, is subject to the same recommendations of schematization that were introduced in Chapter 3. One of the properties of a welldefined event stream is that there is an explicitly defined and evolutionarily compatible schema for the events it contains. You should ensure that consumers have basic data quality guarantees as part of the data contract defined by the schema. Changes to the schema can only be made according to evolutionary rules. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0075-02.png)
+![](../images/Event-Driven_Microservices.pdf-0075-02.png)
 
 
 Use the same standard format for both liberated event data and native event data across your organization. 
@@ -163,7 +163,7 @@ Specific queries can be executed more frequently to meet tighter SLAs (servicele
 Relational databases can provide isolation from the internal data model by using views or materialized views of the underlying data. This technique can be used to hide domain model information that should not be exposed outside of the data store. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0078-11.png)
+![](../images/Event-Driven_Microservices.pdf-0078-11.png)
 
 
 Remember that the liberated data will be the single source of truth. Consider whether any concealed or omitted data should instead be liberated, or if the source data model needs to be refactored. This often occurs during data liberation from legacy systems, where business data and entity data have become intertwined over time. 
@@ -215,7 +215,7 @@ You must checkpoint progress when capturing events from the changelogs, though d
 There are a number of options available for sourcing data from changelogs. Debezium is one of the most popular choices for relational databases, as it supports the most common ones. Debezium can produce records to both Apache Kafka and Apache Pulsar with its existing implementations. Support for additional brokers is certainly possible, though it may require some in-house development work. Maxwell is another example of a binary log reader option, though it is currently limited in support to just MySQL databases and can produce data only to Apache Kafka. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0080-04.png)
+![](../images/Event-Driven_Microservices.pdf-0080-04.png)
 
 
 _Figure 4-5. The end-to-end workflow of a Debezium capturing data from a MySQL database’s binary log, and writing it to event streams in Kafka_ 
@@ -273,7 +273,7 @@ The records in outbox tables must have a strict ordering identifier, for the sam
 An autoincrementing ID, assigned at insertion time, is best used to determine the order in which the events are to be published. A `created_at` timestamp column should also be maintained, as it reflects the event time that the record was created in the data store and can be used instead of the wall-clock time during publishing to the event stream. This will allow accurate interleaving by the event scheduler as discussed in Chapter 6. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0083-00.png)
+![](../images/Event-Driven_Microservices.pdf-0083-00.png)
 
 
 _Figure 4-6. The end-to-end workflow of an outbox table CDC solution_ 
@@ -289,7 +289,7 @@ The inclusion of outbox tables introduces additional load on the data store and 
 An outbox does not need to map 1:1 with an internal table. In fact, one of the major benefits of the outbox is that the data store client can isolate the internal data model from downstream consumers. The internal data model of the domain may use a number of highly normalized tables that are optimized for relational operations but are largely unsuitable for consumption by downstream consumers. Even simple domains may comprise multiple tables, which if exposed as independent streams, would require reconstruction for usage by downstream consumers. This quickly becomes extremely expensive in terms of operational overhead, as multiple downstream teams will have to reconstruct the domain model and deal with handling relational data in event streams. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0084-00.png)
+![](../images/Event-Driven_Microservices.pdf-0084-00.png)
 
 
 Exposing the internal data model to downstream consumers is an anti-pattern. Downstream consumers should only access data formatted with public-facing data contracts as described in Chapter 3. 
@@ -297,7 +297,7 @@ Exposing the internal data model to downstream consumers is an anti-pattern. Dow
 The data store client can instead denormalize data upon insertion time such that the outbox mirrors the intended public data contract, though this does come at the expense of additional performance and storage space. Another option is to maintain the 1:1 mapping of changes to output event streams and denormalize the streams with a downstream event processor dedicated to just this task. This is a process that I call _eventification_ , as it converts highly normalized relational data into easy-toconsume single event updates. This mimics what the data store client _could_ do but does it externally to the data store to reduce load. An example of this is shown in Figure 4-7, where a User is denormalized based on User, Location, and Employer. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0084-03.png)
+![](../images/Event-Driven_Microservices.pdf-0084-03.png)
 
 
 _Figure 4-7. Eventification of public User events using private User, Location, and Employer event streams_ 
@@ -318,7 +318,7 @@ Schema serialization (and therefore, validation) can also be built into the capt
 Serializing prior to committing the transaction to the outbox table provides the strongest guarantee of data consistency. A serialization failure will cause the transaction to fail and roll back any changes made to the internal tables, ensuring that the outbox table and internal tables stay in sync. This process is shown in Figure 4-8. A successful validation will see the event serialized and ready for event stream publishing. The main advantage of this approach is that data inconsistencies between the internal state and the output event stream are significantly reduced. The event stream data is treated as a first-class citizen, and publishing correct data is considered just as important as maintaining consistent internal state. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0085-04.png)
+![](../images/Event-Driven_Microservices.pdf-0085-04.png)
 
 
 _Figure 4-8. Serializing change-data before writing to outbox table_ 
@@ -326,7 +326,7 @@ _Figure 4-8. Serializing change-data before writing to outbox table_
 Serializing before writing to the outbox also provides you with the option of using a single outbox for all transactions. The format is simple, as the content is predominantly serialized data with the target output event stream mapping. This is shown in Figure 4-9. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0085-07.png)
+![](../images/Event-Driven_Microservices.pdf-0085-07.png)
 
 
 _Figure 4-9. A single output table with events already validated and serialized (note the output_stream entry for routing purposes)_ 
@@ -337,7 +337,7 @@ One drawback of serializing before publishing is that performance may suffer due
 Alternately, serialization can be performed after the event has been written to the outbox table, as is shown in Figure 4-8. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0086-02.png)
+![](../images/Event-Driven_Microservices.pdf-0086-02.png)
 
 
 _Figure 4-10. Serializing change-data after writing to outbox table, as part of the publishing process_ 
@@ -345,7 +345,7 @@ _Figure 4-10. Serializing change-data after writing to outbox table, as part of 
 With this strategy you typically have independent outboxes, one for each domain model, mapped to the public schema of the corresponding output event stream. The publisher process reads the unserialized event from the outbox and attempts to serialize it with the associated schema prior to producing it to the output event stream. Figure 4-11 shows an example of multiple outboxes, one for a User entity and one for an Account entity. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0086-05.png)
+![](../images/Event-Driven_Microservices.pdf-0086-05.png)
 
 
 _Figure 4-11. Multiple outbox tables (note that the data is not serialized, which means that it may not be compatible with the schema of the output event stream)_ 
@@ -358,7 +358,7 @@ will have pushed incompatible data into the outbox table, and there is no guaran
 In reality, you will typically end up with a large number of unserializable events in your outbox. Human intervention will most likely be required to try to salvage some of the data, but resolving the issue will be time-consuming and difficult and may even require downtime to prevent additional issues. This is compounded by the fact that _some_ events may indeed be compatible and have already been published, leading to possible incorrect ordering of events in output streams. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0087-02.png)
+![](../images/Event-Driven_Microservices.pdf-0087-02.png)
 
 
 Before-the-fact serialization provides a stronger guarantee against incompatible data than after-the-fact and prevents propagation of events that violate their data contract. The tradeoff is that this implementation will also prevent the business process from completing should serialization fail, as the transaction must be rolled back. 
@@ -403,7 +403,7 @@ The performance impact to the business workflow may be nontrivial, particularly 
 The performance impact to the data store may be nontrivial, especially when a significant quantity of records are being written, read, and deleted from the outbox. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0088-08.png)
+![](../images/Event-Driven_Microservices.pdf-0088-08.png)
 
 
 Performance impacts must be balanced against other costs. For instance, some organizations simply emit events by parsing change-data capture logs and leave it up to downstream teams to clean up the events after the fact. This incurs its own set of expenses in the form of computing costs for processing and standardizing the events, as well as human-labor costs in the form of resolving incompatible schemas and attending to the effects of strong coupling to internal data models. Costs saved at the producer side are often dwarfed by the expenses incurred at the consumer side for dealing with these issues. 
@@ -417,7 +417,7 @@ You can capture row-level changes to an audit table by using an `AFTER` trigger.
 Consider the example shown in Figure 4-12. User data is being upserted to a user table, with a trigger capturing the events as they occur. Note that the trigger is also capturing the time at which the insertion occurred as well as an autoincrementing sequence ID for the event publisher process to use. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0089-00.png)
+![](../images/Event-Driven_Microservices.pdf-0089-00.png)
 
 
 _Figure 4-12. Using a trigger to capture changes to a user table_ 
@@ -429,13 +429,13 @@ Figure 4-13 shows a continuation of the previous example. After-the-fact validat
 The change-data capture table schema is the bridge between the internal table schema and the output event stream schema. Compatibility among all three is essential for ensuring that data can be produced to the output event stream. Because output schema validation is typically not performed during trigger execution, it is best to keep the change-data table in sync with the format of the output event schema. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0090-00.png)
+![](../images/Event-Driven_Microservices.pdf-0090-00.png)
 
 
 _Figure 4-13. After-the-fact validation and production to the output event stream_ 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0090-02.png)
+![](../images/Event-Driven_Microservices.pdf-0090-02.png)
 
 
 Compare the format of the output event schema with the changedata table during testing. This can expose incompatibilities before production deployment. 
@@ -443,7 +443,7 @@ Compare the format of the output event schema with the changedata table during t
 That being said, triggers can work great in many legacy systems. Legacy systems tend to use, by definition, old technology; triggers have existed for a very long time and may very well be able to provide the necessary change-data capture mechanism. The access and load patterns tend to be well defined and stable, such that the impact of adding triggering can be accurately estimated. Finally, although schema validation is unlikely to occur during the triggering process itself, it may be equally unlikely that the schemas themselves are going to change, simply due to the legacy nature of the system. After-the-fact validation is only an issue if schemas are expected to change frequently. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0090-05.png)
+![](../images/Event-Driven_Microservices.pdf-0090-05.png)
 
 
 Try to avoid the use of triggers if you can instead use more modern functionality for generating or accessing change-data. You should not underestimate the overhead performance and management required for a trigger-based solution, particularly when many dozens or hundreds of tables and data models are involved. 
@@ -486,7 +486,7 @@ The quantity of triggers required scales linearly with the number of data sets t
 Schema enforcement for the output event occurs only after the record has been published to the outbox table. This can lead to unpublishable events in the outbox table. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0091-18.png)
+![](../images/Event-Driven_Microservices.pdf-0091-18.png)
 
 
 Some databases allow for triggers to be executed with languages that can validate compatibility with output event schemas during the trigger’s execution (e.g., Python for PostgreSQL). This can increase the complexity and expense, but significantly reduces the risk of downstream schema incompatibilities. 
@@ -497,7 +497,7 @@ Some databases allow for triggers to be executed with languages that can validat
 Integrating data definition changes can be difficult in a data liberation framework. Data migrations are a common operation for many relational database applications and need to be supported by capture. Data definition changes for a relational database can include adding, deleting, and renaming columns; changing the type of a column; and adding or removing defaults. While all of these operations are valid data set changes, they can create issues for the production of data to liberated event streams. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0092-02.png)
+![](../images/Event-Driven_Microservices.pdf-0092-02.png)
 
 
 _Data definition_ is the formal description of the data set. For example, a table in a relational database is defined using a _data definition language_ (DDL). The resultant table, columns, names, types, and indices are all part of its data definition. 
@@ -505,7 +505,7 @@ _Data definition_ is the formal description of the data set. For example, a tabl
 For example, if full schema evolution compatibility is required, you cannot drop a non-nullable column without a default value from the data set under capture, as consumers using the previously defined schema expect a value for that field. Consumers would be unable to fall back to any default because none was specified at contract definition time, so they would end up in an ambiguous state. If an incompatible change is absolutely necessary and a breach of data contract is inevitable, then the producer and consumers of the data must agree upon a new data contract. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0092-05.png)
+![](../images/Event-Driven_Microservices.pdf-0092-05.png)
 
 
 Valid alterations to the data set under capture may not be valid changes for the liberated event schema. This incompatibility will cause breaking schema changes that will impact all downstream consumers of the event stream. 
@@ -547,7 +547,7 @@ There are two main traps that you can fall into when using a centralized framewo
 The second issue is a bit more pervasive, especially in an organization where eventdriven principles are only partially adopted. Systems can become too reliant upon frameworks and connectors to do their event-driven work for them. Once data has been liberated from the internal state stores and published to event streams, the organization may become complacent about moving onward into microservices. Teams can become overly reliant upon the connector framework for sourcing and sinking data, and choose not to refactor their applications into native event-driven applications. In this scenario they instead prefer to just requisition new sources and sinks as necessary, leaving their entire underlying application completely ignorant to events. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0095-00.png)
+![](../images/Event-Driven_Microservices.pdf-0095-00.png)
 
 
 CDC tools are _not_ the final destination in moving to an eventdriven architecture, but instead are primarily meant to help bootstrap the process. The real value of the event broker as the data communication layer is in providing a robust, reliable, and truthful source of event data decoupled from the implementation layers, and the broker is only as good as the quality and reliability of its data. 

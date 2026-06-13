@@ -63,7 +63,7 @@ Splitting a big database into smaller subsets called _partitions_ so that differ
 These are separate mechanisms, but they often go hand in hand, as illustrated in Figure II-1. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0170-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0170-00.png)
 
 
 _Figure II-1. A database split into two partitions, with two replicas per partition._ 

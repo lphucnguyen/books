@@ -16,7 +16,7 @@ Now, before going much further, it’s important to note that this chapter is me
 Unit tests are used to test the smallest pieces of code in an application to ensure that they work as expected. These small testing units provide a foundation for which larger, more comprehensive tests can be written to test higher functionality of the application. Event-driven topologies often apply transformation, aggregation, mapping, and reduction functions to events, making these functions ideal candidates for unit testing. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0274-02.png)
+![](../images/Event-Driven_Microservices.pdf-0274-02.png)
 
 
 Make sure to test boundary conditions, such as null and maximum values, for each of your functions. 
@@ -231,7 +231,7 @@ A more flexible option is to create a single container that has all of the neces
 wants to test its application in this way. You can maintain an open source contribution model (even if internal to the organization), allowing fixes, updates, and new features to be added back for the benefit of all teams. This model is flexible enough to be used with any programming language, though it’s far easier to use with a programmatic API that allows for easy communication with the system components in the container. A lightweight processing framework example is shown in Figure 15-1, with the schema registry, event broker, and necessary topics created internally to the container. The microservice instance itself is executed externally to the container, and simply references the addresses of the broker and schema registry from its testing config file. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0281-01.png)
+![](../images/Event-Driven_Microservices.pdf-0281-01.png)
 
 
 _Figure 15-1. Lightweight microservice using containerized testing dependencies for local integration testing_ 
@@ -250,7 +250,7 @@ Lambda functions and Microsoft Azure’s functions. The open source solutions Op
 Establishing an integration testing environment for applications using heavyweight frameworks is similar to the process of establishing one for FaaS frameworks. Each requires that the framework be installed and configured, with the application submitting the processing job directly to the framework. With heavyweight frameworks, a typical single-container installation will just need to run the master and worker instances side-by-side along with the event broker and any other dependencies. With the heavyweight framework set up, you simply need to submit the processing job to the master and await test output on the output event streams. An example is illustrated in Figure 15-2, where the entire set of dependencies has been containerized for easy distribution among developers. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0282-02.png)
+![](../images/Event-Driven_Microservices.pdf-0282-02.png)
 
 
 _Figure 15-2. Heavyweight microservice using containerized testing dependencies for local integration testing_ 
@@ -269,7 +269,7 @@ The good news is that most of the biggest closed source service providers are ma
 Full remote integration testing enables you to perform specific tests that are difficult to conduct in local environments. For example, performance and load testing are essential for ensuring that the microservice under test achieves its service-level objectives. Event processing throughput, request-response latency, instance scaling, and failure recovery are all enabled by full integration testing. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0283-04.png)
+![](../images/Event-Driven_Microservices.pdf-0283-04.png)
 
 
 The goal of full integration testing is to create an environment as close to possible as that of production, including event streams, event data volume, event schemas, and request-response patterns (if applicable), in which to run the application. 
@@ -389,7 +389,7 @@ Another option involves creating a single testing environment with a shared pool
 - It inaccurately represents the entire range of events found in production. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0287-02.png)
+![](../images/Event-Driven_Microservices.pdf-0287-02.png)
 
 
 This strategy is the worst of the options in terms of usability, as the event broker eventually becomes a dumping ground of confusing event streams and broken data. 

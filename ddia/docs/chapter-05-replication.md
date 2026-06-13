@@ -37,7 +37,7 @@ Every write to the database needs to be processed by every replica; otherwise, t
 3. When a client wants to read from the database, it can query either the leader or any of the followers. However, writes are only accepted on the leader (the followers are read-only from the client’s point of view). 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0175-01.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0175-01.png)
 
 
 _Figure 5-1. Leader-based (master–slave) replication._ 
@@ -53,7 +53,7 @@ Think about what happens in Figure 5-1, where the user of a website updates thei
 Figure 5-2 shows the communication between various components of the system: the user’s client, the leader, and two followers. Time flows from left to right. A request or response message is shown as a thick arrow. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0176-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0176-00.png)
 
 
 _Figure 5-2. Leader-based replication with one synchronous and one asynchronous follower._ 
@@ -237,7 +237,7 @@ With asynchronous replication, there is a problem, illustrated in Figure 5-3: if
 > iii. The term _eventual consistency_ was coined by Douglas Terry et al. [24], popularized by Werner Vogels [22], and became the battle cry of many NoSQL projects. However, not only NoSQL databases are eventually consistent: followers in an asynchronously replicated relational database have the same characteristics. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0185-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0185-00.png)
 
 
 _Figure 5-3. A user makes a write, followed by a read from a stale replica. To prevent this anomaly, we need read-after-write consistency._ 
@@ -272,7 +272,7 @@ Our second example of an anomaly that can occur when reading from asynchronous f
 This can happen if a user makes several reads from different replicas. For example, Figure 5-4 shows user 2345 making the same query twice, first to a follower with little lag, then to a follower with greater lag. (This scenario is quite likely if the user refreshes a web page, and each request is routed to a random server.) The first query returns a comment that was recently added by user 1234, but the second query doesn’t return anything because the lagging follower has not yet picked up that write. In effect, the second query is observing the system at an earlier point in time than the first query. This wouldn’t be so bad if the first query hadn’t returned anything, because user 2345 probably wouldn’t know that user 1234 had recently added a comment. However, it’s very confusing for user 2345 if they first see user 1234’s comment appear, and then see it disappear again. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0187-01.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0187-01.png)
 
 
 _Figure 5-4. A user first reads from a fresh replica, then from a stale replica. Time appears to go backward. To prevent this anomaly, we need monotonic reads._ 
@@ -309,7 +309,7 @@ How far into the future can you see, Mrs. Cake?
 To the observer it looks as though Mrs. Cake is answering the question before Mr. Poons has even asked it. Such psychic powers are impressive, but very confusing [25]. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0188-07.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0188-07.png)
 
 
 _Figure 5-5. If some partitions are replicated slower than others, an observer may see the answer before they see the question._ 
@@ -355,7 +355,7 @@ In a multi-leader configuration, you can have a leader in _each_ datacenter. Fig
 > iv. If the database is partitioned (see Chapter 6), each partition has one leader. Different partitions may have their leaders on different nodes, but each partition must nevertheless have one leader node. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0191-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0191-00.png)
 
 
 _Figure 5-6. Multi-leader replication across multiple datacenters._ 
@@ -413,7 +413,7 @@ The biggest problem with multi-leader replication is that write conflicts can oc
 For example, consider a wiki page that is simultaneously being edited by two users, as shown in Figure 5-7. User 1 changes the title of the page from A to B, and user 2 changes the title from A to C at the same time. Each user’s change is successfully applied to their local leader. However, when the changes are asynchronously replicated, a conflict is detected [33]. This problem does not occur in a single-leader database. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0193-06.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0193-06.png)
 
 
 _Figure 5-7. A write conflict caused by two leaders concurrently updating the same record._ 
@@ -503,7 +503,7 @@ There isn’t a quick ready-made answer, but in the following chapters we will t
 A _replication topology_ describes the communication paths along which writes are propagated from one node to another. If you have two leaders, like in Figure 5-7, there is only one plausible topology: leader 1 must send all of its writes to leader 2, and vice versa. With more than two leaders, various different topologies are possible. Some examples are illustrated in Figure 5-8. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0197-04.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0197-04.png)
 
 
 _Figure 5-8. Three example topologies in which multi-leader replication can be set up._ 
@@ -524,7 +524,7 @@ A problem with circular and star topologies is that if just one node fails, it c
 On the other hand, all-to-all topologies can have issues too. In particular, some network links may be faster than others (e.g., due to network congestion), with the result that some replication messages may “overtake” others, as illustrated in Figure 5-9. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0198-03.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0198-03.png)
 
 
 _Figure 5-9. With multi-leader replication, writes may arrive in the wrong order at some replicas._ 
@@ -560,7 +560,7 @@ configuration, if you want to continue processing writes, you may need to perfor
 On the other hand, in a leaderless configuration, failover does not exist. Figure 5-10 shows what happens: the client (user 1234) sends the write to all three replicas in parallel, and the two available replicas accept the write but the unavailable replica misses it. Let’s say that it’s sufficient for two out of three replicas to acknowledge the write: after user 1234 has received two _ok_ responses, we consider the write to be successful. The client simply ignores the fact that one of the replicas missed the write. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0200-02.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0200-02.png)
 
 
 _Figure 5-10. A quorum write, quorum read, and read repair after a node outage._ 
@@ -600,7 +600,7 @@ More generally, if there are _n_ replicas, every write must be confirmed by _w_ 
 In Dynamo-style databases, the parameters _n_ , _w_ , and _r_ are typically configurable. A common choice is to make _n_ an odd number (typically 3 or 5) and to set _w_ = _r_ = ( _n_ + 1) / 2 (rounded up). However, you can vary the numbers as you see fit. For example, a workload with few writes and many reads may benefit from setting _w_ = _n_ and _r_ = 1. This makes reads faster, but has the disadvantage that just one failed node causes all database writes to fail. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0202-01.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0202-01.png)
 
 
 There may be more than _n_ nodes in the cluster, but any given value is stored only on _n_ nodes. This allows the dataset to be partitioned, supporting datasets that are larger than you can fit on one node. We will return to partitioning in Chapter 6. 
@@ -618,7 +618,7 @@ The quorum condition, _w_ + _r_ > _n_ , allows the system to tolerate unavailabl
 - Normally, reads and writes are always sent to all _n_ replicas in parallel. The parameters _w_ and _r_ determine how many nodes we wait for—i.e., how many of the _n_ nodes need to report success before we consider the read or write to be successful. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0202-09.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0202-09.png)
 
 
 _Figure 5-11. If w + r > n, at least one of the r replicas you read from must have seen the most recent successful write._ 
@@ -715,7 +715,7 @@ The problem is that events may arrive in a different order at different nodes, d
 - Node 3 first receives the write from B, then the write from A. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0207-04.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0207-04.png)
 
 
 _Figure 5-12. Concurrent writes in a Dynamo-style datastore: there is no well-defined ordering._ 
@@ -782,7 +782,7 @@ Figure 5-13 shows two clients concurrently adding items to the same shopping car
 5. Finally, client 1 wants to add `bacon` . It previously received `[milk, flour]` and `[eggs]` from the server at version 3, so it merges those, adds `bacon` , and sends the final value `[milk, flour, eggs, bacon]` to the server, along with the version number 3. This overwrites `[milk, flour]` (note that `[eggs]` was already overwritten in the last step) but is concurrent with `[eggs, milk, ham]` , so the server keeps those two concurrent values. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0211-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0211-00.png)
 
 
 _Figure 5-13. Capturing causal dependencies between two clients concurrently editing a shopping cart._ 
@@ -790,7 +790,7 @@ _Figure 5-13. Capturing causal dependencies between two clients concurrently edi
 The dataflow between the operations in Figure 5-13 is illustrated graphically in Figure 5-14. The arrows indicate which operation _happened before_ which other operation, in the sense that the later operation _knew about_ or _depended on_ the earlier one. In this example, the clients are never fully up to date with the data on the server, since there is always another operation going on concurrently. But old versions of the value do get overwritten eventually, and no writes are lost. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0211-03.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0211-03.png)
 
 
 _Figure 5-14. Graph of causal dependencies in Figure 5-13._ 
@@ -833,7 +833,7 @@ Like the version numbers in Figure 5-13, version vectors are sent from the datab
 Also, like in the single-replica example, the application may need to merge siblings. The version vector structure ensures that it is safe to read from one replica and subsequently write back to another replica. Doing so may result in siblings being created, but no data is lost as long as siblings are merged correctly. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0213-08.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0213-08.png)
 
 
 ## **Version vectors and vector clocks** 

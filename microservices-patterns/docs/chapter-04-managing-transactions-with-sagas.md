@@ -55,7 +55,7 @@ The traditional approach to maintaining data consistency across multiple service
 _**Transaction management in a microservice architecture**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0143-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0143-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -93,7 +93,7 @@ The example saga used throughout this chapter is the Create Order Saga, which is
 _**Transaction management in a microservice architecture**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0145-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0145-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -130,7 +130,7 @@ undo the changes made by the first three steps. You must write what are known as
 Suppose that the ( _n_ + 1)[th] transaction of a saga fails. The effects of the previous _n_ transactions must be undone. Conceptually, each of those steps, Ti, has a corresponding compensating transaction, Ci, which undoes the effects of the Ti. To undo the effects of those first _n_ steps, the saga must execute each Ci in reverse order. The sequence of steps is T1 … Tn, Cn … C1, as shown in figure 4.3. In this example, Tn+1 fails, which requires steps T1 … Tn to be undone. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0146-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0146-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -201,7 +201,7 @@ One way you can implement a saga is by using choreography. When using choreograp
 Figure 4.4 shows the design of the choreography-based version of the Create Order Saga. The participants communicate by exchanging events. Each participant, starting with the Order Service, updates its database and publishes an event that triggers the next participant. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0148-08.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0148-08.png)
 
 
 **----- Start of picture text -----**<br>
@@ -251,7 +251,7 @@ The sequence of events is as follows:
 As you can see, the participants of choreography-based sagas interact using publish/ subscribe. Let’s take a closer look at some issues you’ll need to consider when implementing publish/subscribe-based communication for your sagas. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0150-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0150-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -302,7 +302,7 @@ To show how orchestration-based sagas work, I’ll first describe an example. Th
 Figure 4.6 shows the design of the orchestration-based version of the Create Order Saga. The saga is orchestrated by the CreateOrderSaga class, which invokes the saga participants using asynchronous request/response. This class keeps track of the process and sends command messages to saga participants, such as Kitchen Service and Consumer Service. The CreateOrderSaga class reads reply messages from its reply channel and then determines the next step, if any, in the saga. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0152-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0152-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -354,7 +354,7 @@ Figure 4.7 shows the state machine model for the Create Order Saga. This state m
 - Order Rejected—A final state indicating that the Order was rejected by one of the participants. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0154-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0154-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -583,7 +583,7 @@ It’s likely that you’ll need to use one or more of these countermeasures whe
 Now that we’ve looked at various saga design and implementation issues, let’s see an example. Figure 4.9 shows the design of Order Service. The service’s business logic consists of traditional business logic classes, such as Order Service and the Order 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0162-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0162-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -609,7 +609,7 @@ Let’s look in more detail at the design, starting with the OrderService class.
 The OrderService class is a domain service called by the service’s API layer. It’s responsible for creating and managing orders. Figure 4.10 shows OrderService and some of its collaborators. OrderService creates and updates Orders, invokes the OrderRepository to persist Orders, and creates sagas, such as the CreateOrderSaga, using the SagaManager. The SagaManager class is one of the classes provided by the Eventuate Tram Saga framework, which is a framework for writing saga orchestrators and participants, and is discussed a little later in this section. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0163-08.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0163-08.png)
 
 
 **----- Start of picture text -----**<br>
@@ -650,7 +650,7 @@ Let’s look at the CreateOrderSaga and its associated classes.
 _**The design of the Order Service and the Create Order Saga**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0165-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0165-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -750,7 +750,7 @@ Proxy classes, such as KitchenServiceProxy, aren’t strictly necessary. A saga 
 The Eventuate Tram Saga, shown in figure 4.12, is a framework for writing both saga orchestrators and saga participants. It uses transactional messaging capabilities of Eventuate Tram, discussed in chapter 3. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0170-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0170-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -773,7 +773,7 @@ The saga orchestration package is the most complex part of the framework. It pro
 _**The design of the Order Service and the Create Order Saga**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0171-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0171-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -789,7 +789,7 @@ Figure 4.13 The sequence of events when **OrderService** creates an instance of 
 Figure 4.14 shows the sequence of events when SagaManager receives a reply from Consumer Service. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0171-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0171-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -824,7 +824,7 @@ Order Service participates in its own sagas. For example, CreateOrderSaga invoke
 Each handler method invokes OrderService to update an Order and makes a reply message. The SagaCommandDispatcher class routes the command messages to the appropriate handler method and sends the reply. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0172-10.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0172-10.png)
 
 
 **----- Start of picture text -----**<br>

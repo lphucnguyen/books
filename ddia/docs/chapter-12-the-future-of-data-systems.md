@@ -366,7 +366,7 @@ Subscribing to a stream of changes, rather than querying the current state when 
 At an abstract level, the dataflow systems discussed in the last section give you a process for creating derived datasets (such as search indexes, materialized views, and predictive models) and keeping them up to date. Let’s call that process the _write path_ : whenever some piece of information is written to the system, it may go through multiple stages of batch and stream processing, and eventually every derived dataset is updated to incorporate the data that was written. Figure 12-1 shows an example of updating a search index. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0531-05.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0531-05.png)
 
 
 _Figure 12-1. In a search index, writes (document updates) meet reads (queries)._ 
@@ -1266,7 +1266,7 @@ _29th European Conference on Object-Oriented Programming_ (ECOOP), July 2015. do
 ## **Glossary** 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0575-01.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0575-01.png)
 
 
 Please note that the definitions in this glossary are short and simple, intended to convey the core idea but not the full subtleties of a term. For more detail, please follow the references into the main text. 

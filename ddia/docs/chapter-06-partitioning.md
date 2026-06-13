@@ -7,7 +7,7 @@ _Clearly, we must break away from the sequential and not limit the computers. We
 In Chapter 5 we discussed replication—that is, having multiple copies of the same data on different nodes. For very large datasets, or very high query throughput, that is not sufficient: we need to break the data up into _partitions_ , also known as _sharding_ .[i] 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0221-04.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0221-04.png)
 
 
 ## **Terminological confusion** 
@@ -38,7 +38,7 @@ A node may store more than one partition. If a leader–follower replication mod
 Everything we discussed in Chapter 5 about replication of databases applies equally to replication of partitions. The choice of partitioning scheme is mostly independent of the choice of replication scheme, so we will keep things simple and ignore replication in this chapter. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0223-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0223-00.png)
 
 
 _Figure 6-1. Combining replication and partitioning: each node acts as leader for some partitions and follower for other partitions._ 
@@ -63,7 +63,7 @@ We can do better. Let’s assume for now that you have a simple key-value data m
 One way of partitioning is to assign a continuous range of keys (from some minimum to some maximum) to each partition, like the volumes of a paper encyclopedia (Figure 6-2). If you know the boundaries between the ranges, you can easily determine which partition contains a given key. If you also know which partition is assigned to which node, then you can make your request directly to the appropriate node (or, in the case of the encyclopedia, pick the correct book off the shelf). 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0224-02.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0224-02.png)
 
 
 _Figure 6-2. A print encyclopedia is partitioned by key range._ 
@@ -92,7 +92,7 @@ Once you have a suitable hash function for keys, you can assign each partition a
 **Partitioning of Key-Value Data | 203** 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0226-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0226-00.png)
 
 
 _Figure 6-3. Partitioning by hash of key._ 
@@ -148,7 +148,7 @@ You want to let users search for cars, allowing them to filter by color and by m
 > ii. If your database only supports a key-value model, you might be tempted to implement a secondary index yourself by creating a mapping from values to document IDs in application code. If you go down this route, you need to take great care to ensure your indexes remain consistent with the underlying data. Race conditions and intermittent write failures (where some changes were saved but others weren’t) can very easily cause the data to go out of sync—see “The need for multi-object transactions” on page 231. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0229-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0229-00.png)
 
 
 _Figure 6-4. Partitioning secondary indexes by document._ 
@@ -160,7 +160,7 @@ However, reading from a document-partitioned index requires care: unless you hav
 This approach to querying a partitioned database is sometimes known as _scatter/ gather_ , and it can make read queries on secondary indexes quite expensive. Even if you query the partitions in parallel, scatter/gather is prone to tail latency amplification (see “Percentiles in Practice” on page 16). Nevertheless, it is widely used: MongoDB, Riak [15], Cassandra [16], Elasticsearch [17], SolrCloud [18], and VoltDB [19] all use document-partitioned secondary indexes. Most database vendors recommend that you structure your partitioning scheme so that secondary index queries can be served from a single partition, but that is not always possible, especially when you’re using multiple secondary indexes in a single query (such as filtering cars by color and by make at the same time). 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0230-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0230-00.png)
 
 
 _Figure 6-5. Partitioning secondary indexes by term._ 
@@ -230,7 +230,7 @@ Now, if a node is added to the cluster, the new node can _steal_ a few partition
 Only entire partitions are moved between nodes. The number of partitions does not change, nor does the assignment of keys to partitions. The only thing that changes is the assignment of partitions to nodes. This change of assignment is not immediate— it takes some time to transfer a large amount of data over the network—so the old assignment of partitions is used for any reads and writes that happen while the transfer is in progress. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0233-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0233-00.png)
 
 
 _Figure 6-6. Adding a new node to a database cluster with multiple partitions per node._ 
@@ -298,7 +298,7 @@ On a high level, there are a few different approaches to this problem (illustrat
 In all cases, the key problem is: how does the component making the routing decision (which may be one of the nodes, or the routing tier, or the client) learn about changes in the assignment of partitions to nodes? 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0237-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0237-00.png)
 
 
 _Figure 6-7. Three different ways of routing a request to the right node._ 
@@ -308,7 +308,7 @@ This is a challenging problem, because it is important that all participants agr
 Many distributed data systems rely on a separate coordination service such as ZooKeeper to keep track of this cluster metadata, as illustrated in Figure 6-8. Each node registers itself in ZooKeeper, and ZooKeeper maintains the authoritative mapping of partitions to nodes. Other actors, such as the routing tier or the partitioning-aware client, can subscribe to this information in ZooKeeper. Whenever a partition changes ownership, or a node is added or removed, ZooKeeper notifies the routing tier so that it can keep its routing information up to date. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0237-04.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0237-04.png)
 
 
 _Figure 6-8. Using ZooKeeper to keep track of assignment of partitions to nodes._ 

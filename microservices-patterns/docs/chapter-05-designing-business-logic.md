@@ -46,7 +46,7 @@ This service consists of the business logic and the following adapters:
 _**Designing business logic in a microservice architecture**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0178-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0178-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -68,7 +68,7 @@ business logic: the procedural Transaction script pattern, and the object-orient
 Although I’m a strong advocate of the object-oriented approach, there are some situations where it is overkill, such as when you are developing simple business logic. In such a situation, a better approach is to write procedural code and use what the book _Patterns of Enterprise Application Architecture_ by Martin Fowler (Addison-Wesley Professional, 2002) calls the Transaction script pattern. Rather than doing any object-oriented design, you write a method called a _transaction script_ to handle each request from the presentation tier. As figure 5.2 shows, an important characteristic of this approach is that the classes that implement behavior are separate from those that store state. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0179-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0179-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -102,7 +102,7 @@ Organize the business logic as an object model consisting of classes that have s
 In an object-oriented design, the business logic consists of an object model, a network of relatively small classes. These classes typically correspond directly to concepts from the problem domain. In such a design some classes have only either state or behavior, but many contain both, which is the hallmark of a well-designed class. Figure 5.3 shows an example of the Domain model pattern. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0180-09.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0180-09.png)
 
 
 **----- Start of picture text -----**<br>
@@ -147,7 +147,7 @@ These building blocks are used by many developers. Some are supported by framewo
 In traditional object-oriented design, a domain model is a collection of classes and relationships between classes. The classes are usually organized into packages. For example, figure 5.4 shows part of a domain model for the FTGO application. It’s a typical domain model consisting of a web of interconnected classes. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0182-08.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0182-08.png)
 
 
 **----- Start of picture text -----**<br>
@@ -203,7 +203,7 @@ Figure 5.5 shows the Order aggregate and its boundary. An Order aggregate consis
 _**Designing a domain model using the DDD aggregate pattern**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0185-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0185-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -238,7 +238,7 @@ A service, for example, uses a repository to load an aggregate from the database
 Another rule is that aggregates reference each other by identity (for example, primary key) instead of object references. For example, as figure 5.6 shows, an Order references its Consumer using a consumerId rather than a reference to the Consumer object. Similarly, an Order references a Restaurant using a restaurantId. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0186-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0186-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -262,7 +262,7 @@ Another rule that aggregates must obey is that a transaction can only create or 
 This rule makes it more complicated to implement operations that need to create or update multiple aggregates. But this is exactly the problem that sagas (described in chapter 4) are designed to solve. Each step of the saga creates or updates exactly one aggregate. Figure 5.7 shows how this works. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0187-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0187-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -285,7 +285,7 @@ When developing a domain model, a key decision you must make is how large to mak
 For example, earlier I mentioned how in the FTGO application’s domain model Order and Consumer are separate aggregates. An alternative design is to make Order part of the Consumer aggregate. Figure 5.8 shows this alternative design. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0188-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0188-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -307,7 +307,7 @@ _**Designing a domain model using the DDD aggregate pattern**_
 In a typical (micro)service, the bulk of the business logic consists of aggregates. The rest of the business logic resides in the domain services and the sagas. The sagas orchestrate sequences of local transactions in order to enforce data consistency. The services are the entry points into the business logic and are invoked by inbound adapters. A service uses a repository to retrieve aggregates from the database or save aggregates to the database. Each repository is implemented by an outbound adapter that accesses the database. Figure 5.9 shows the aggregate-based design of the business logic for the Order Service. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0189-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0189-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -431,7 +431,7 @@ Event storming consist of three main steps:
 Figure 5.10 shows the result of an event-storming workshop. In just a couple of hours, the participants identified numerous domain events, commands, and aggregates. It was a good first step in the process of creating a domain model. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0193-11.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0193-11.png)
 
 
 **----- Start of picture text -----**<br>
@@ -581,7 +581,7 @@ The service also has two outbound adapters:
 _**Kitchen Service business logic**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0199-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0199-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -706,7 +706,7 @@ In addition to the Order and Restaurant aggregates, the business logic consists 
 _**Designing business logic in a microservice architecture**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0204-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0204-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -745,7 +745,7 @@ The Order aggregate represents an order placed by a consumer. We’ll first look
 Figure 5.13 shows the structure of the Order aggregate. The Order class is the root of the Order aggregate. The Order aggregate also consists of value objects such as OrderLineItem, DeliveryInfo, and PaymentInfo. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0205-14.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0205-14.png)
 
 
 **----- Start of picture text -----**<br>
@@ -782,7 +782,7 @@ _**Order Service business logic**_
 a semantic lock countermeasure, which helps ensure that sagas are isolated from one another. Eventually, once the saga has invoked the participating services, it then updates the Order to reflect the outcome. For example, as described in chapter 4, the Create Order Saga has multiple participant services, including Consumer Service, Accounting Service, and Kitchen Service. OrderService first creates an Order in an APPROVAL_PENDING state, and then later changes its state to either APPROVED or REJECTED. The behavior of an Order can be modeled as the state machine shown in figure 5.14. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0207-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0207-03.png)
 
 
 **----- Start of picture text -----**<br>

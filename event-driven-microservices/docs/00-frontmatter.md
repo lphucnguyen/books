@@ -110,19 +110,19 @@ Shows commands or other text that should be typed literally by the user.
 Shows text that should be replaced with user-supplied values or by values determined by context. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0016-10.png)
+![](../images/Event-Driven_Microservices.pdf-0016-10.png)
 
 
 This element signifies a tip or suggestion. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0016-12.png)
+![](../images/Event-Driven_Microservices.pdf-0016-12.png)
 
 
 This element signifies a general note. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0016-14.png)
+![](../images/Event-Driven_Microservices.pdf-0016-14.png)
 
 
 This element indicates a warning or caution. 
@@ -130,7 +130,7 @@ This element indicates a warning or caution.
 ## **O’Reilly Online Learning** 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0016-17.png)
+![](../images/Event-Driven_Microservices.pdf-0016-17.png)
 
 
 For more than 40 years, _O’Reilly Media_ has provided technology and business training, knowledge, and insight to help companies succeed. 

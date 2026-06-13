@@ -117,7 +117,7 @@ Each message is delivered to _one_ of the consumers, so the consumers can share 
 Each message is delivered to _all_ of the consumers. Fan-out allows several independent consumers to each “tune in” to the same broadcast of messages, without affecting each other—the streaming equivalent of having several different batch jobs that read the same input file. (This feature is provided by topic subscriptions in JMS, and exchange bindings in AMQP.) 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0467-02.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0467-02.png)
 
 
 _Figure 11-1. (a) Load balancing: sharing the work of consuming a topic among consumers; (b) fan-out: delivering each message to multiple consumers._ 
@@ -134,7 +134,7 @@ If the connection to a client is closed or times out without the broker receivin
 When combined with load balancing, this redelivery behavior has an interesting effect on the ordering of messages. In Figure 11-2, the consumers generally process messages in the order they were sent by producers. However, consumer 2 crashes while processing message _m3_ , at the same time as consumer 1 is processing message _m4_ . The unacknowledged message _m3_ is subsequently redelivered to consumer 1, with the result that consumer 1 processes messages in the order _m4_ , _m3_ , _m5_ . Thus, _m3_ and _m4_ are not delivered in the same order as they were sent by producer 1. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0468-01.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0468-01.png)
 
 
 _Figure 11-2. Consumer 2 crashes while processing m3, so it is redelivered to consumer 1 at a later time._ 
@@ -165,7 +165,7 @@ In order to scale to higher throughput than a single disk can offer, the log can
 Within each partition, the broker assigns a monotonically increasing sequence number, or _offset_ , to every message (in Figure 11-3, the numbers in boxes are message offsets). Such a sequence number makes sense because a partition is append-only, so the messages within a partition are totally ordered. There is no ordering guarantee across different partitions. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0470-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0470-00.png)
 
 
 _Figure 11-3. Producers send messages by appending them to a topic-partition file, and consumers read these files sequentially._ 
@@ -254,7 +254,7 @@ However, dual writes have some serious problems, one of which is a race conditio
 item X: client 1 wants to set the value to A, and client 2 wants to set it to B. Both clients first write the new value to the database, then write it to the search index. Due to unlucky timing, the requests are interleaved: the database first sees the write from client 1 setting the value to A, then the write from client 2 setting the value to B, so the final value in the database is B. The search index first sees the write from client 2, then client 1, so the final value in the search index is A. The two systems are now permanently inconsistent with each other, even though no error occurred. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0475-01.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0475-01.png)
 
 
 _Figure 11-4. In the database, X is first set to A and then to B, while at the search index the writes arrive in the opposite order._ 
@@ -279,7 +279,7 @@ More recently, there has been growing interest in _change data capture_ (CDC), w
 For example, you can capture the changes in a database and continually apply the same changes to a search index. If the log of changes is applied in the same order, you can expect the data in the search index to match the data in the database. The search index and any other derived data systems are just consumers of the change stream, as illustrated in Figure 11-5. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0476-05.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0476-05.png)
 
 
 _Figure 11-5. Taking data in the order it was written to one database, and applying the changes to other systems in the same order._ 
@@ -393,7 +393,7 @@ No matter how the state changes, there was always a sequence of events that caus
 If you are mathematically inclined, you might say that the application state is what you get when you integrate an event stream over time, and a change stream is what you get when you differentiate the state by time, as shown in Figure 11-6 [49, 50, 51]. The analogy has limitations (for example, the second derivative of state does not seem to be meaningful), but it’s a useful starting point for thinking about data. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0482-03.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0482-03.png)
 
 
 _Figure 11-6. The relationship between the current application state and an event stream._ 
@@ -580,7 +580,7 @@ Confusing event time and processing time leads to bad data. For example, say you
 ii. Thank you to Kostas Kloudas from the Flink community for coming up with this analogy. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0492-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0492-00.png)
 
 
 _Figure 11-7. Windowing by processing time introduces artifacts due to variations in processing rate._ 

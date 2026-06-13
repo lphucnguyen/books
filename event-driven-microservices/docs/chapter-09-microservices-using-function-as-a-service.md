@@ -100,7 +100,7 @@ You can see that `myFunction` is set to trigger when a new event is delivered to
 Once the triggers, metadata, and policies are established, the function is ready to process incoming events. When a new event arrives in its input event stream, the function will be started by the FaaS framework, get passed a batch of events, and begin processing. Upon completion, the function will terminate and wait for more events to come in. This is a typical implementation of the event-stream listener pattern, which is discussed more in the next section. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0173-00.png)
+![](../images/Event-Driven_Microservices.pdf-0173-00.png)
 
 
 Each function-based microservice implementation must have its own independent consumer group, just as with other non-FaaS microservices. 
@@ -129,7 +129,7 @@ injected directly into the function in a form of an array of events, in sequenti
 FaaS solutions from Google, Microsoft, and Amazon provide this trigger for usage with their proprietary event brokers, but currently do not support triggering directly from open source brokers. The generalized structure of this approach is shown in Figure 9-1. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0174-02.png)
+![](../images/Event-Driven_Microservices.pdf-0174-02.png)
 
 
 _Figure 9-1. Integrated event-stream listener with FaaS framework_ 
@@ -137,7 +137,7 @@ _Figure 9-1. Integrated event-stream listener with FaaS framework_
 Conversely, open source solutions such as OpenFaaS, Kubeless, Nuclio, and others provide a variety of triggering plug-ins with various event brokers, such as Kafka, Pulsar, and NATS, to name a few. For instance, Apache Kafka Connect allows you to trigger the functions of third-party FaaS frameworks. Since Kafka Connect runs outside of the FaaS framework, you would end up with an event-stream listener as per Figure 9-2. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0174-05.png)
+![](../images/Event-Driven_Microservices.pdf-0174-05.png)
 
 
 _Figure 9-2. External event-stream listener application provided by Kafka Connect_ 
@@ -171,7 +171,7 @@ return0;
 ```
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0175-05.png)
+![](../images/Event-Driven_Microservices.pdf-0175-05.png)
 
 
 Much like a containerized microservice, triggers for the eventstream listener pattern can be configured to start processing events from a stream’s latest offsets, earliest offsets, or anywhere in between. 
@@ -254,7 +254,7 @@ Given the short lifespan of functions, most stateful FaaS-based solutions requir
 Although previous local state may be available if a function starts in a warm state, there is no guarantee that this will always be the case. Functions connect to external state stores exactly as any other client would—by creating a connection to the state store and using the corresponding API. Any state must be persisted and retrieved explicitly by the function. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0178-03.png)
+![](../images/Event-Driven_Microservices.pdf-0178-03.png)
 
 
 Be sure to use strict access permissions for your function’s state, such that nothing outside of its bounded context is allowed access. 
@@ -268,7 +268,7 @@ FaaS frameworks will continue to grow and include new features. Simple managemen
 Functions are often used to execute other functions and may also be used for both choreographed and orchestrated workflows. Communication between functions can be facilitated asynchronously through events, via request-response calls, or with a combination of both. These choices depend highly on the FaaS framework and the problem space of the bounded context. It’s common to use choreography and orchestration design patterns when implementing a multifunction solution. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0179-00.png)
+![](../images/Event-Driven_Microservices.pdf-0179-00.png)
 
 
 To avoid out-of-order processing issues, ensure that all processing is completed for one event before processing the next event. 
@@ -278,7 +278,7 @@ To avoid out-of-order processing issues, ensure that all processing is completed
 The output of one function can be produced into an event stream for another consuming function. A bounded context may be made up of many functions and many internal event streams, with varying triggering and scaling logic for each function definition. Each function processes incoming events at its own rate, with events being consumed, work being performed, and outputs produced accordingly. An example of this design is shown in Figure 9-3. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0179-04.png)
+![](../images/Event-Driven_Microservices.pdf-0179-04.png)
 
 
 _Figure 9-3. Multifunction event-driven FaaS topology representing a single microservice_ 
@@ -297,7 +297,7 @@ In the direct-call pattern, a function can call other functions directly from it
 Asychronous direct calls lead to a choreography-based FaaS solution. One function simply invokes the next one based on its business logic, leaving it up to that function and the FaaS framework to handle the next steps, including any failures or errors. An asynchronous direct-call function topology is a simple way to chain function calls together. Figure 9-4 illustrates an example. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0180-04.png)
+![](../images/Event-Driven_Microservices.pdf-0180-04.png)
 
 
 _Figure 9-4. Choreographed asynchronous function calls within a bounded context_ 
@@ -352,7 +352,7 @@ Synchronous function calls allow you to invoke other functions and await the res
 **Event stream—triggered processing.** In the following example, a single orchestration function is triggered when new events arrive in a partitioned event stream. The function starts up and begins processing the input batch of events, dispatching event sequentially for each function. Figure 9-5 shows an example of function-based orchestration within a single bounded context. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0182-00.png)
+![](../images/Event-Driven_Microservices.pdf-0182-00.png)
 
 
 _Figure 9-5. Orchestrated synchronous function calls within a bounded context_ 
@@ -410,7 +410,7 @@ If a function is unable to process its assigned batch of events during its execu
 - Decrease the maximum batch size of events processed by the function. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0184-06.png)
+![](../images/Event-Driven_Microservices.pdf-0184-06.png)
 
 
 Functions that establish their own connections to the event broker and manage the consumption of events can also periodically commit offsets during execution, ensuring partial completion of the batch. This does not work when the function is passed the batch of consumed events, as it has no way to update the consumer offsets during processing. 
@@ -431,7 +431,7 @@ For functions that instantiate and manage their own event broker connections, be
 Static partition assignments eliminate the rebalancing overhead of dynamically assigned consumer groups and can also be used to copartition event streams. Functions will start with the foreknowledge of which partitions they will consume from; there will be no rebalancing, and events can simply be consumed whenever the function is triggered. This approach does require a more careful consideration of the work that your function is performing, as you need to ensure that each partition is being consumed. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0185-04.png)
+![](../images/Event-Driven_Microservices.pdf-0185-04.png)
 
 
 Be careful about thrashing triggers and scaling policy. Frequent rebalancing of partition assignments can be expensive for event brokers. Try to scale your function count up or down at most once every few minutes. 

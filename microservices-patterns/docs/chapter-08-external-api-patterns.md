@@ -45,7 +45,7 @@ One approach to API design is for clients to invoke the services directly. On th
 _**External API design issues**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0285-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0285-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -74,7 +74,7 @@ The monolithic version of the FTGO application has an API endpoint that returns 
 If the mobile client invokes the services directly, then it must, as figure 8.2 shows, make multiple calls to retrieve this data. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0286-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0286-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -153,7 +153,7 @@ Section 8.1.1 described the drawbacks of clients, such as the FTGO mobile applic
 and rate limiting. Figure 8.3 shows the relationship between the clients, the API gateway, and the services. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0290-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0290-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -180,7 +180,7 @@ The FTGO API gateway provides a coarse-grained API that enables mobile clients t
 ## **Many API calls required** 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0291-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0291-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -232,7 +232,7 @@ As a result, it’s often convenient to use the third option and implement these
 An API gateway has a layered, modular architecture. Its architecture, shown in figure 8.5, consists of two layers: the API layer and a common layer. The API layer consists of one or more independent API modules. Each API module implements an API for a 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0293-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0293-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -272,7 +272,7 @@ One concern with an API gateway is that responsibility for it is blurred. Multip
 _**The API gateway pattern**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0295-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0295-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -288,7 +288,7 @@ The solution is to have an API gateway for each client, the so-called Backends f
 Implement a separate API gateway for each type of client. See http://microservices .io/patterns/apigateway.html. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0296-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0296-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -495,7 +495,7 @@ Spring Cloud Gateway provides a simple yet comprehensive way to do the following
 Figure 8.8 shows the key parts of an API gateway built using this framework. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0304-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0304-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -656,7 +656,7 @@ Another challenge, mentioned earlier, is that different clients need slightly di
 Implementing an API gateway with a REST API that supports a diverse set of clients well is time consuming. Consequently, you may want to consider using a graphbased API framework, such as GraphQL, that’s designed to support efficient data fetching. The key idea with graph-based API frameworks is that, as figure 8.9 shows, the server’s API consists of a graph-based schema. The graph-based schema defines a set of _nodes_ (types), which have _properties_ (fields) and relationships with other nodes. The client retrieves data by executing a query that specifies the required data in terms of the graph’s nodes and their properties and relationships. As a result, a client can retrieve the data it needs in a single round-trip to the API gateway. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0310-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0310-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -697,7 +697,7 @@ There’s also a small amount of glue code that integrates the GraphQL server wi
 _**External API patterns**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0312-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0312-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -810,7 +810,7 @@ GraphQL uses a recursive algorithm to execute the resolver functions. First, it 
 Figure 8.11 shows how this algorithm executes the query that retrieves a consumer’s orders and each order’s delivery information and restaurant. First, the GraphQL engine invokes resolveConsumer(), which retrieves Consumer. Next, it invokes resolveConsumerOrders(), which is the resolver for the Consumer.orders field that returns the consumer’s orders. The GraphQL engine then iterates through Orders, invoking the resolvers for the Order.restaurant and Order.deliveryInfo fields. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0317-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0317-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -879,7 +879,7 @@ There are a couple of different ways a client application can invoke the GraphQL
 The following listing shows the FtgoGraphQLClient class, which is a simple GraphQL-based client for the FTGO application. Its constructor instantiates ApolloClient, which is provided by the Apollo GraphQL client library. The FtgoGraphQLClient class defines a findConsumer() method that uses the client to retrieve the name of a consumer. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0320-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0320-07.png)
 
 
 **----- Start of picture text -----**<br>

@@ -58,7 +58,7 @@ This is the idea behind _linearizability_ [6] (also known as _atomic consistency
 In a linearizable system, as soon as one client successfully completes a write, all clients reading from the database must be able to see the value just written. Maintaining the illusion of a single copy of the data means guaranteeing that the value read is the most recent, up-to-date value, and doesn’t come from a stale cache or replica. In other words, linearizability is a _recency guarantee_ . To clarify this idea, let’s look at an example of a system that is not linearizable. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0346-04.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0346-04.png)
 
 
 _Figure 9-1. This system is not linearizable, causing football fans to be confused._ 
@@ -75,7 +75,7 @@ The basic idea behind linearizability is simple: to make a system appear as if t
 Figure 9-2 shows three clients concurrently reading and writing the same key _x_ in a linearizable database. In the distributed systems literature, _x_ is called a _register_ —in practice, it could be one key in a key-value store, one row in a relational database, or one document in a document database, for example. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0347-05.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0347-05.png)
 
 
 _Figure 9-2. If a read request is concurrent with a write request, it may return either the old or the new value._ 
@@ -109,7 +109,7 @@ ii. A register in which reads may return either the old or the new value if they
 To make the system linearizable, we need to add another constraint, illustrated in Figure 9-3. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0349-01.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0349-01.png)
 
 
 _Figure 9-3. After any one read has returned the new value, all following reads (on the same or other clients) must also return the new value._ 
@@ -132,7 +132,7 @@ The requirement of linearizability is that the lines joining up the operation ma
 ensures the recency guarantee we discussed earlier: once a new value has been written or read, all subsequent reads see the value that was written, until it is overwritten again. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0350-01.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0350-01.png)
 
 
 _Figure 9-4. Visualizing the points in time at which the reads and writes appear to have taken effect. The final read by B is not linearizable._ 
@@ -205,7 +205,7 @@ Similar situations can arise in computer systems. For example, say you have a we
 The image resizer needs to be explicitly instructed to perform a resizing job, and this instruction is sent from the web server to the resizer via a message queue (see Chapter 11). The web server doesn’t place the entire photo on the queue, since most message brokers are designed for small messages, and a photo may be several megabytes in size. Instead, the photo is first written to a file storage service, and once the write is complete, the instruction to the resizer is placed on the queue. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0354-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0354-00.png)
 
 
 _Figure 9-5. The web server and image resizer communicate both through file storage and a message queue, opening the potential for race conditions._ 
@@ -255,7 +255,7 @@ configuration of the quorums, and depending on how you define strong consistency
 Intuitively, it seems as though strict quorum reads and writes should be linearizable in a Dynamo-style model. However, when we have variable network delays, it is possible to have race conditions, as demonstrated in Figure 9-6. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0356-04.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0356-04.png)
 
 
 _Figure 9-6. A nonlinearizable execution, despite using a strict quorum._ 
@@ -280,7 +280,7 @@ As some replication methods can provide linearizability and others cannot, it is
 We already discussed some use cases for different replication methods in Chapter 5; for example, we saw that multi-leader replication is often a good choice for multidatacenter replication (see “Multi-datacenter operation” on page 168). An example of such a deployment is illustrated in Figure 9-7. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0357-07.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0357-07.png)
 
 
 _Figure 9-7. A network interruption forcing a choice between linearizability and availability._ 
@@ -475,7 +475,7 @@ The use of Lamport timestamps is illustrated in Figure 9-8. Each node has a uniq
 nodes may sometimes have the same counter value, but by including the node ID in the timestamp, each timestamp is made unique. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0368-01.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0368-01.png)
 
 
 _Figure 9-8. Lamport timestamps provide a total ordering consistent with causality._ 
@@ -516,7 +516,7 @@ If your program runs only on a single CPU core, it is easy to define a total ord
 As discussed, single-leader replication determines a total order of operations by choosing one node as the leader and sequencing all operations on a single CPU core on the leader. The challenge then is how to scale the system if the throughput is greater than a single leader can handle, and also how to handle failover if the leader fails (see “Handling Node Outages” on page 156). In the distributed systems literature, this problem is known as _total order broadcast_ or _atomic broadcast_ [25, 57, 58].[ix] 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0370-04.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0370-04.png)
 
 
 ## **Scope of ordering guarantee** 
@@ -677,13 +677,13 @@ Two-phase commit is an algorithm for achieving atomic transaction commit across 
 The basic flow of 2PC is illustrated in Figure 9-9. Instead of a single commit request, as with a single-node transaction, the commit/abort process in 2PC is split into two phases (hence the name). 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0378-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0378-00.png)
 
 
 _Figure 9-9. A successful execution of two-phase commit (2PC)._ 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0378-02.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0378-02.png)
 
 
 ## **Don’t confuse 2PC and 2PL** 
@@ -737,7 +737,7 @@ If the coordinator fails before sending the prepare requests, a participant can 
 The situation is illustrated in Figure 9-10. In this particular example, the coordinator actually decided to commit, and database 2 received the commit request. However, the coordinator crashed before it could send the commit request to database 1, and so database 1 does not know whether to commit or abort. Even a timeout does not help here: if database 1 unilaterally aborts after a timeout, it will end up inconsistent with database 2, which has committed. Similarly, it is not safe to unilaterally commit, because another participant may have aborted. 
 
 
-![](ddia-github-pages/images/Designing_Data_Intensive_Applications.pdf-0381-00.png)
+![](../images/Designing_Data_Intensive_Applications.pdf-0381-00.png)
 
 
 _Figure 9-10. The coordinator crashes after participants vote “yes.” Database 1 does not know whether to commit or abort._ 

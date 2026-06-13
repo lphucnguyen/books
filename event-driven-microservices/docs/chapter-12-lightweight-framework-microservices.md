@@ -14,7 +14,7 @@ The lightweight model relies upon the event broker to provide the mechanisms for
 management mechanisms. Figure 12-1 illustrates the basic lightweight model, including an internal event stream used to communicate between instances. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0218-01.png)
+![](../images/Event-Driven_Microservices.pdf-0218-01.png)
 
 
 _Figure 12-1. The lightweight framework model, showcasing the usage of internal event streams for repartitioning data_ 
@@ -35,7 +35,7 @@ The lightweight framework leverages the event broker to provide this communicati
 The default mode of operation for lightweight frameworks is to use internal state backed by changelogs stored in the event broker. Using internal state allows for each microservice to control the resources it acquires using deployment configurations. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0219-02.png)
+![](../images/Event-Driven_Microservices.pdf-0219-02.png)
 
 
 Since every lightweight application is fully independent of the others, one application could request to run on instances with very high-performance local disk, while another could request to run on instances with extremely large, albeit perhaps much slower, harddisk drives. 
@@ -51,7 +51,7 @@ Scaling a microservice and recovering from failures are effectively the same pro
 One of the main benefits of the lightweight framework model is that applications can be dynamically scaled as they are under execution. There is no need to restart an application just to change parallelism, though there may be a delay in processing due to consumer group rebalancing and rematerialization of state from the changelog. Figure 12-2 illustrates the process of scaling an application up. The assigned input partitions are rebalanced (including any internal streams) and the state is restored from the changelogs prior to continuation of work. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0220-00.png)
+![](../images/Event-Driven_Microservices.pdf-0220-00.png)
 
 
 _Figure 12-2. Scaling up a lightweight microservice_ 
@@ -101,7 +101,7 @@ Samza offers many of the same features as Kafka Streams, though it lags behind i
 Samza’s embedded mode allows you to embed this functionality within individual applications, just like any other Java library. This deployment mode removes the need for a dedicated heavyweight cluster, instead relying on the lightweight framework model discussed in the previous section. By default, Samza does rely on using Apache Zookeeper for coordination across individual instances, but you can modify this to use other coordination mechanisms such as Kubernetes. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0222-03.png)
+![](../images/Event-Driven_Microservices.pdf-0222-03.png)
 
 
 Apache Samza’s embedded mode may not provide all of the functionality that it has in cluster mode. 
@@ -197,7 +197,7 @@ conversions
 The topology represented by the code is as follows, illustrated in Figure 12-3. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0224-08.png)
+![](../images/Event-Driven_Microservices.pdf-0224-08.png)
 
 
 _Figure 12-3. Processing topology for advertising engagement-sessions_ 
@@ -276,7 +276,7 @@ _Table 12-5. Enriched-Advertising-Engagements stream key/value definitions_
 This sample table shows the expected aggregations from stage 3, joined with the `Advertising` entity data. `AdKey4` and `AdKey5` each show the results of a full outer join: no conversions have yet occurred for `AdKey4` , while there is no advertising entity data yet available for `AdKey5` . 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0227-01.png)
+![](../images/Event-Driven_Microservices.pdf-0227-01.png)
 
 
 Check your documentation to validate which types of joins are available for your framework. Kafka Streams supports foreign-key table-table joins, which can be extremely useful for handling relational event data. 

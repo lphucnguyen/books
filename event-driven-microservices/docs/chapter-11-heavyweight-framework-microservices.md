@@ -10,7 +10,7 @@ A second defining characteristic is that the heavyweight framework uses its own 
 These two characteristics are the main reasons why these frameworks are dubbed “heavyweight.” Having to manage and maintain additional clustered frameworks independently of the event broker and the CMS is no small task. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0196-01.png)
+![](../images/Event-Driven_Microservices.pdf-0196-01.png)
 
 
 Some heavyweight frameworks are moving toward lightweight-like execution modes. These lightweight modes integrate well with the CMS used to operate other microservice implementations. 
@@ -33,7 +33,7 @@ These technologies are undoubtedly familiar to most big-data aficionados and are
 The aforementioned heavyweight open source Apache frameworks all operate in a fairly similar manner. Proprietary solutions, like Google’s Dataflow, which executes applications written using Apache Beam’s API, probably operate in a similar fashion, but this is only an assumption, given that the source is closed and the backend is not described in detail. One of the challenges of describing heavyweight frameworks in detail is that each has its own operational and design nuances, and full coverage of each framework is far beyond the scope of this chapter. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0197-04.png)
+![](../images/Event-Driven_Microservices.pdf-0197-04.png)
 
 
 Make sure that you thoroughly read and understand the documents detailing how your specific heavyweight framework operates. 
@@ -41,7 +41,7 @@ Make sure that you thoroughly read and understand the documents detailing how yo
 A heavyweight stream processing cluster is a grouping of dedicated processing and storage resources, broken down into two primary roles. The first role is the master node, which prioritizes, assigns, and manages executors and tasks performed by the workers. The second role, the executor, completes these tasks using the processing power, memory, local, and remote disk available to that worker node. In event-driven processing, these tasks will connect to the event broker and consume events from event streams. Figure 11-1 shows a rough breakdown of how this works. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0198-00.png)
+![](../images/Event-Driven_Microservices.pdf-0198-00.png)
 
 
 _Figure 11-1. A generic view of a heavyweight stream-processing framework_ 
@@ -49,7 +49,7 @@ _Figure 11-1. A generic view of a heavyweight stream-processing framework_
 This figure also shows Apache Zookeeper, which plays a supporting role for this streaming cluster. Zookeeper provides highly reliable distributed coordination and is used to determine which master node is in charge (as it is not uncommon for nodes to fail, be they workers, masters, or Zookeeper nodes). Upon failure of a master node, Zookeeper helps decide which of the remaining masters is the new leader to ensure continuity of operations. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0198-03.png)
+![](../images/Event-Driven_Microservices.pdf-0198-03.png)
 
 
 Zookeeper has historically been a major component in providing coordination of distributed heavyweight frameworks. Newer frameworks may or may not use Zookeeper. In either case, distributed coordination is essential for reliably running distributed workloads. 
@@ -64,7 +64,7 @@ with high-availability, such that if the node on which the task manager is opera
 Figure 11-2 shows a job being submitted to the cluster via master node 1, which in turn is translated into tasks for processing by the executors. These long-running tasks establish connections to the event broker and begin to consume events from the event stream. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0199-02.png)
+![](../images/Event-Driven_Microservices.pdf-0199-02.png)
 
 
 _Figure 11-2. Submitting a stream processing job to read from an event stream_ 
@@ -125,7 +125,7 @@ A cluster can also be created in conjunction with the container management syste
 Deploying the heavyweight cluster using the CMS has many benefits. The master nodes, worker nodes, and Zookeeper (if applicable) are brought up within their own container or virtual machines. These containers are managed and monitored like any other container, providing visibility into failures as well as the means to automatically restart these instances. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0202-04.png)
+![](../images/Event-Driven_Microservices.pdf-0202-04.png)
 
 
 You can enforce static assignment of master nodes and any other services that you require to be highly available, to prevent the CMS from shuffling them around as it scales the underlying compute resources. This prevents excessive alerts from the cluster monitor about missing master nodes. 
@@ -137,13 +137,13 @@ Historically, the heavyweight cluster has been responsible for assigning and man
 Spark and Flink enable you to directly leverage Kubernetes for scalable application deployment beyond their original dedicated cluster configuration, where each application has its own set of dedicated worker nodes. For example, Apache Flink allows for applications to run independently within their own isolated session cluster using Kubernetes. Apache Spark offers a similar option, allowing Kubernetes to play the role of the master node and maintain isolated worker resources for each application. A basic overview of how this works is shown in Figure 11-3. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0203-00.png)
+![](../images/Event-Driven_Microservices.pdf-0203-00.png)
 
 
 _Figure 11-3. Single job deployed on and managed by Kubernetes cluster_ 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0203-02.png)
+![](../images/Event-Driven_Microservices.pdf-0203-02.png)
 
 
 This deployment mode is nearly identical to how you would deploy non-heavyweight microservices and merges lightweight and BPC deployment strategies. 
@@ -201,13 +201,13 @@ The pairs of < `key` , `state` >. This is the state pertaining to a keyed entity
 Both the operator and keyed state must be synchronously recorded such that the keyed state accurately represents the processing of all the events marked as consumed by the operator state. A failure to do so may result in events either not being processed at all or being processed multiple times. An example of this state as recorded into a checkpoint is shown in Figure 11-4. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0205-07.png)
+![](../images/Event-Driven_Microservices.pdf-0205-07.png)
 
 
 _Figure 11-4. A checkpoint with operator and key state_ 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0205-09.png)
+![](../images/Event-Driven_Microservices.pdf-0205-09.png)
 
 
 Restoring from a checkpointed state is functionally equivalent to using snapshots to restore external state stores, as covered in “Using snapshots” on page 123. 
@@ -222,7 +222,7 @@ ensuring the correct assignment of partitions among tasks. Each of the major hea
 The maximum parallelism of a heavyweight application is constrained by the same factors discussed in Chapter 5. A typical stateful stream processor will be limited by the input count of the lowest partitioned stream. Because heavyweight processing frameworks are particularly well suited for computing massive amounts of usergenerated data, it is quite common to see cyclical patterns with significant computational requirements during the day and very few in the middle of the night. An example of a daily cyclical pattern is shown in Figure 11-5. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0206-03.png)
+![](../images/Event-Driven_Microservices.pdf-0206-03.png)
 
 
 _Figure 11-5. Sample of daily cyclical data volume_ 
@@ -230,7 +230,7 @@ _Figure 11-5. Sample of daily cyclical data volume_
 Applications that process such data benefit greatly from the ability to scale up with increasing demand and down with decreasing demand. Proper scaling can ensure that the application has sufficient capacity to process all events in a timely manner, without wasting resources by overprovisioning. Ideally, the latency between when an event is received and when it is fully processed should be minimized, though many applications are not that sensitive to temporarily increased latency. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0206-06.png)
+![](../images/Event-Driven_Microservices.pdf-0206-06.png)
 
 
 Scaling an application is separate from scaling a cluster. All scaling discussed here assumes that there are sufficient cluster resources to increase parallelism for the application. Refer to your framework’s documentation for scaling of cluster resources. 
@@ -247,7 +247,7 @@ There are two main strategies for scaling stateful applications, and while the s
 The first strategy allows you to remove, add, or reassign application instances without stopping the application or affecting processing accuracy. It is available only in some heavyweight streaming frameworks, as it requires careful handling of both state and shuffled events. The addition and removal of instances requires redistributing any assigned stream partitions and reloading state from the last checkpoint. Figure 11-6 shows a regular shuffle, where each downstream reduce operation sources its shuffled events from the upstream `groupByKey` operations. If one of the instances were abruptly terminated, the reduce nodes would no longer know where to source the shuffled events from, leading to a fatal exception. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0207-04.png)
+![](../images/Event-Driven_Microservices.pdf-0207-04.png)
 
 
 _Figure 11-6. Logical representation of a regular shuffle_ 
@@ -255,7 +255,7 @@ _Figure 11-6. Logical representation of a regular shuffle_
 Spark’s dynamic resource allocation implements this scaling strategy. However, it requires using coarse-grained mode for cluster deployment and using an _external shuffle service_ (ESS) as an isolation layer. The ESS receives the shuffled events from the upstream tasks and stores them for consumption by the downstream tasks, as shown in Figure 11-7. The downstream consumers access the events by asking the ESS for the data that is assigned to them. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0208-00.png)
+![](../images/Event-Driven_Microservices.pdf-0208-00.png)
 
 
 _Figure 11-7. Logical representation of a shuffle using an external shuffle service_ 
@@ -263,13 +263,13 @@ _Figure 11-7. Logical representation of a shuffle using an external shuffle serv
 Executor/instances of tasks can now be terminated, since the downstream operations are no longer dependent on a specific upstream instance. The shuffled data remains within the ESS, and a scaled-down service, as shown in Figure 11-8, can resume processing. In this example, instance 0 is the only remaining processor and takes on both partitions, while the downstream operations seamlessly continue processing via the interface with the ESS. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0208-03.png)
+![](../images/Event-Driven_Microservices.pdf-0208-03.png)
 
 
 _Figure 11-8. Downscaled application using an external shuffle service (note instance 1 is gone)_ 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0209-00.png)
+![](../images/Event-Driven_Microservices.pdf-0209-00.png)
 
 
 Shuffles in real-time event stream continue to be an area of development for heavyweight frameworks. In the next chapter, we take a look at how lightweight frameworks directly leverage the event broker to play the role of the external shuffle service. 
@@ -300,7 +300,7 @@ Heavyweight clusters are designed to be highly tolerant to the inevitable failur
 In the case of a worker node failure, the tasks that were being executed on that node are moved to another available worker. Any required internal state is reloaded from the most recent checkpoint along with the partition assignments. Master node failures should be transparent to applications already being executed, but depending on your cluster’s configuration you may be unable to deploy new jobs during a master node outage. High-availability mode backed by Zookeeper (or similar technology) can mitigate the loss of a master node. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0210-05.png)
+![](../images/Event-Driven_Microservices.pdf-0210-05.png)
 
 
 Make sure you have proper monitoring and alerting for your master and worker nodes. While a single cluster node failure won’t necessarily halt processing, it can still degrade performance and prevent applications from recovering from successive failures. 
@@ -336,7 +336,7 @@ Software service providers may offer these platforms as a service, though the op
 Lastly, the popularity of a framework will inform your decision. Spark is extremely popular, with Flink and Storm being less popular but still actively used. Applications can be written independently of heavyweight framework runtime execution through Apache Beam, though this may not be of use or concern to your organization. Heron, a revised form of Storm that offers more advanced features, appears to be the least popular of the options. Apply the same considerations you gave to the selection of your CMS and event broker to the selection of, or abstention from, a heavyweight framework. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0212-02.png)
+![](../images/Event-Driven_Microservices.pdf-0212-02.png)
 
 
 Keep in mind that a heavyweight streaming framework is not reasonably capable of implementing _all_ event-driven microservices. Verify that it is the correct solution for your problem space before committing to it. 
@@ -406,7 +406,7 @@ clickStream
 A visual representation of this topology is shown in Figure 11-9, with a parallelism of 2 (note the 2 separate instances). 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0214-00.png)
+![](../images/Event-Driven_Microservices.pdf-0214-00.png)
 
 
 _Figure 11-9. Session-generating processing topology from user views and clicks_ 
@@ -424,7 +424,7 @@ The `keyBy` operator, in conjunction with the downstream `window` and `aggregate
 Session windows for each user can be generated now that each user’s events are local to a single instance. Events are added to the local state store in sequential timestamp order, with the aggregation function applied to each event, until a break of 30 minutes or more is detected. At this point the event store evicts the completed session and purges the memory of the `<windowId,userId>` key and value. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0214-08.png)
+![](../images/Event-Driven_Microservices.pdf-0214-08.png)
 
 
 Your framework may allow for additional control over windowing and time-based aggregations. This can include retaining sessions and windows that have closed for a period of time, so that latearriving events can be applied and an update emitted to the output stream. Check the documentation of your framework for more information. 
@@ -433,7 +433,7 @@ Your framework may allow for additional control over windowing and time-based ag
 Next, Figure 11-10 illustrates the effects of scaling down to just a single degree of parallelism. Assuming no dynamic scaling, you would need to halt the stream processor before restoring it from a checkpoint with the new parallelism setting. Upon startup, the service reads the stateful keyed data back from the last known good checkpoint and restores the operator state to the assigned partitions. Once state is restored, the service can resume normal stream processing. 
 
 
-![](event-driven-microservices-github-pages/images/Event-Driven_Microservices.pdf-0215-01.png)
+![](../images/Event-Driven_Microservices.pdf-0215-01.png)
 
 
 _Figure 11-10. Session-generating processing topology with no parallelism_ 

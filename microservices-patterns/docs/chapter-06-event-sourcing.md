@@ -44,21 +44,21 @@ _**Developing business logic using event sourcing**_
 The traditional approach to persistence maps classes to database tables, fields of those classes to table columns, and instances of those classes to rows in those tables. For example, figure 6.1 shows how the Order aggregate, described in chapter 5, is mapped to the ORDER table. Its OrderLineItems are mapped to the ORDER_LINE_ITEM table. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0215-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0215-04.png)
 
 
 **----- Start of picture text -----**<br>
 «class»<br>Order<br>«class»<br>OrderLineItem<br>**----- End of picture text -----**<br>
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0215-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0215-05.png)
 
 
 **----- Start of picture text -----**<br>
 ORDER table<br>ID CUSTOMER_ID ORDER_TOTAL ...<br>1234 customer-abc 1234.56 ...<br>**----- End of picture text -----**<br>
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0215-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0215-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -163,7 +163,7 @@ Some events, such as the Order Shipped event, contain little or no data and just
 _**Developing business logic using event sourcing**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0219-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0219-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -181,7 +181,7 @@ Figure 6.3 Applying event **E** when the **Order** is in state **S** must change
 The business logic handles a request to update an aggregate by calling a command method on the aggregate root. In a traditional application, a command method typically validates its arguments and then updates one or more of the aggregate’s fields. Command methods in an event sourcing-based application work because they must generate events. As figure 6.4 shows, the outcome of invoking an aggregate’s command method is a sequence of events that represent the state changes that must be made. These events are persisted in the database and applied to the aggregate to update its state. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0219-08.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0219-08.png)
 
 
 **----- Start of picture text -----**<br>
@@ -198,7 +198,7 @@ The other methods each take a particular event type as a parameter and update th
 The Eventuate Client framework, an event-sourcing framework described in more detail in section 6.2.2, names these methods process() and apply(). A process() method takes a command object, which contains the arguments of the update request, as a parameter and returns a list of events. An apply() method takes an event as a parameter and returns void. An aggregate will define multiple overloaded versions of these methods: one process() method for each command class and one apply() method for each event type emitted by the aggregate. Figure 6.5 shows an example. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0220-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0220-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -309,7 +309,7 @@ If events are stored in the EVENTS table shown in figure 6.6, an event publisher
 The problem with this approach is that transactions can commit in an order that’s different from the order in which they generate events. As a result, the event publisher can accidentally skip over an event. Figure 6.6 shows such as a scenario. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0224-09.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0224-09.png)
 
 
 **----- Start of picture text -----**<br>
@@ -347,7 +347,7 @@ A common solution is to periodically persist a snapshot of the aggregate’s sta
 **The application only needs to retrieve the snapshot and events that occur after it.** 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0225-14.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0225-14.png)
 
 
 **----- Start of picture text -----**<br>
@@ -571,7 +571,7 @@ Eventuate Local is an open source event store. Figure 6.9 shows the architecture
 ## **Stores the events** 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0233-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0233-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -647,14 +647,14 @@ The Eventuate client framework enables developers to write event sourcing-based 
 _**Developing business logic with event sourcing**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0236-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0236-03.png)
 
 
 **----- Start of picture text -----**<br>
 Abstract classes and interfaces that<br>application classes extend or implement<br>**----- End of picture text -----**<br>
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0236-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0236-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -847,7 +847,7 @@ For example, figure 6.11 shows how Order Service creates a CreateOrderSaga using
 Order aggregate and persists it in the event store. The event store publishes the OrderCreated event, which is consumed by the event handler. The event handler invokes the Eventuate Tram saga framework to create a CreateOrderSaga. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0242-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0242-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -904,7 +904,7 @@ Let’s look at an example to see how this works.
 This example looks at Accounting Service, one of the participants of Create Order Saga. Figure 6.12 shows how Accounting Service handles the Authorize Command sent by the saga. Accounting Service is implemented using the Eventuate Saga framework. The Eventuate Saga framework is an open source framework for writing sagas that use event sourcing. It’s built on the Eventuate Client framework. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0244-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0244-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -986,7 +986,7 @@ RDBMS-based event store, such as Eventuate Local, can use the same approach. An 
 The trick is to persist a SagaCommandEvent, which represents a command to send. An event handler then subscribes to SagaCommandEvents and sends each command message to the appropriate channel. Figure 6.13 shows how this works. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0247-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0247-04.png)
 
 
 **----- Start of picture text -----**<br>

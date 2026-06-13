@@ -26,7 +26,7 @@ Mary and her team at FTGO are almost finished writing their first service. Altho
 _Deployment_ is a combination of two interrelated concepts: process and architecture. The deployment process consists of the steps that must be performed by people— developers and operations—in order to get software into production. The deployment architecture defines the structure of the environment in which that software runs. Both aspects of deployment have changed radically since I first started developing Enterprise Java applications in the late 1990s. The manual process of developers throwing code over the wall to production has become highly automated. As figure 12.1 shows, physical production environments have been replaced by increasingly lightweight and ephemeral computing infrastructure. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0414-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0414-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -51,7 +51,7 @@ It’s no coincidence that the evolution of deployment processes and architectur
 Figure 12.2 shows a high-level view of a production environment. The production environment enables developers to configure and manage their services, the deployment 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0415-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0415-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -101,7 +101,7 @@ To deploy Restaurant Service on a machine, you would first install the necessary
 Ideally, you’ve set up your deployment pipeline to automatically deploy the service to production, as shown in figure 12.3. The deployment pipeline builds an executable JAR file or WAR file. It then invokes the production environment’s service management interface to deploy the new version. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0417-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0417-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -115,7 +115,7 @@ A service instance is typically a single process but sometimes may be a group of
 Sometimes you might deploy a single service instance on a machine, while retaining the option to deploy multiple service instances on the same machine. For example, as figure 12.4 shows, you could run multiple JVMs on a single machine. Each JVM runs a single service instance. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0418-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0418-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -127,7 +127,7 @@ Figure 12.4 Deploying multiple service instances on the same machine. They might
 Some languages also let you run multiple services instances in a single process. For example, as figure 12.5 shows, you can run multiple Java services on a single Apache Tomcat. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0418-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0418-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -215,7 +215,7 @@ The virtual machine image is built by the service’s deployment pipeline. The d
 _**Deploying services using the Service as a virtual machine pattern**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0421-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0421-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -307,7 +307,7 @@ Deploy services packaged as container images into production. Each service insta
 ## **Each container is a sandbox that isolates the processes.** 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0424-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0424-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -328,7 +328,7 @@ Let’s take a look at build-time and runtime steps in more detail.
 _**Deploying services using the Service as a container pattern**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0425-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0425-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -446,7 +446,7 @@ A Docker orchestration framework, such as Kubernetes , has three main functions:
 - _Service management_ —Implements the concept of named and versioned services that map directly to services in the microservice architecture. The orchestration framework ensures that the desired number of healthy instances is running at all times. It load balances requests across them. The orchestration framework performs rolling upgrades of services and lets you roll back to an old version. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0430-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0430-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -471,7 +471,7 @@ A master runs several components, including the following:
 _**Deploying the FTGO application with Kubernetes**_ 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0431-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0431-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -654,7 +654,7 @@ Figure 12.11 shows Istio’s architecture. It consists of a control plane and a 
 The two main components of the control plane are the Pilot and the Mixer. The _Pilot_ extracts information about deployed services from the underlying infrastructure. When running on Kubernetes, for example, the Pilot retrieves the services and healthy pods. It configures the Envoy proxies to route traffic according to the defined routing rules. The _Mixer_ collects telemetry from the Envoy proxies and enforces policies. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0439-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0439-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -712,7 +712,7 @@ CREATE ROUTING RULES TO ROUTE TO THE V1 VERSION
 Let’s imagine that you deployed the ftgo-consumer-service-v2 deployment. In the absence of routing rules, Istio load balances requests across all versions of a service. It would, therefore, load balance across versions 1 and 2 of ftgo-consumer-service, which defeats the purpose of using Istio. In order to safely roll out a new version, you must define a routing rule that routes all traffic to the current v1 version. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0442-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0442-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -885,7 +885,7 @@ The architecture of the service, shown in figure 12.14, is quite similar to that
 The service consists of a presentation tier consisting of the request handlers, which are invoked by AWS Lambda to handle the HTTP requests, and a traditional business 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0450-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0450-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -895,7 +895,7 @@ API gateway<br>GET/restaurant/<br>POST/restaurant<br>{restaurantId}<br>AWS Lambd
 Figure 12.13 Deploying **Restaurant Service** as AWS Lambda functions. The AWS API Gateway routes HTTP requests to the AWS Lambda functions, which are implemented by request handler classes defined by **Restaurant Service** . 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0450-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0450-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -917,7 +917,7 @@ Let’s take a look at the FindRestaurantRequestHandler class.
 The FindRestaurantRequestHandler class implements the GET /restaurant/ {restaurantId} endpoint. This class along with the other request handler classes are the leaves of the class hierarchy shown in figure 12.15. The root of the hierarchy is RequestHandler, which is part of the AWS SDK. Its abstract subclasses handle errors and inject dependencies. 
 
 
-![](microservices-patterns-github-pages/images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0451-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0451-06.png)
 
 
 **----- Start of picture text -----**<br>
