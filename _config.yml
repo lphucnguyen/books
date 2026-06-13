@@ -1,4 +1,5 @@
-theme: jekyll-theme-cayman
+# theme: jekyll-theme-cayman
 title: "Tech Books Library"
 description: "Collection of technical books converted to Markdown"
 baseurl: "/books"
+url: "https://lphucnguyen.github.io"
