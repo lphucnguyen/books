@@ -38,7 +38,7 @@ Deployments may require that other services change their APIs or data models, su
 Breaking schema changes may be inevitable in some circumstances, requiring the creation of new event streams and a renegotiation of the data contract with downstream consumers. Ensure that these discussions happen before any deployment and that a migration plan for consumers is in place. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0292-08.png)
+![](../images/Event-Driven_Microservices-0292-08.png)
 
 
 Microservices should be independently deployable, and it is an anti-pattern if they are not. If a particular microservice deployment regularly requires other microservices to synchronize their deployments, it is an indicator that their bounded contexts are ill-defined and should be reviewed. 
@@ -59,13 +59,13 @@ _Continuous delivery_ is the practice of keeping your codebase deployable. Micro
 _Continuous deployment_ is the automated deployment of the build. In an end-to-end continuous deployment, a committed code change propagates through the CI pipeline, reaches a deliverable state, and is automatically deployed to production according to the deployment configuration. This contributes to a tight development loop with a short turnaround time, as committed changes quickly enter production. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0293-05.png)
+![](../images/Event-Driven_Microservices-0293-05.png)
 
 
 _Figure 16-1. A CI pipeline showcasing the difference between continuous delivery and continuous deployment_ 
 
 
-![](../images/Event-Driven_Microservices.pdf-0293-07.png)
+![](../images/Event-Driven_Microservices-0293-07.png)
 
 
 Continuous deployment is difficult to do in practice. Stateful services are particularly challenging, as deployments may require rebuilding state stores and reprocessing event streams, which are especially disruptive to dependent services. 
@@ -86,7 +86,7 @@ The basic full-stop deployment pattern is the basis of all other patterns, and t
 2. **Execute automated unit and integration tests.** This step is part of the CI pipeline to validate that the committed code passes all the unit and integration tests necessary for merging. Integration tests may require that you spin up transient environments and populate them with data to perform more complex tests. This requires integration of the CI pipeline with the tooling described in “Local Integration Testing” on page 259 so that each service can bring up its own integration testing environment. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0295-00.png)
+![](../images/Event-Driven_Microservices-0295-00.png)
 
 
 It’s best to have independent integration testing environments for any sort of automated integration, as it allows you to run tests for a given service in isolation from other services. This significantly reduces multitenancy issues that arise from having a long-running and shared integration test environment. 
@@ -112,7 +112,7 @@ It’s best to have independent integration testing environments for any sort of
 **The Basic Full-Stop Deployment Pattern | 277** 
 
 
-![](../images/Event-Driven_Microservices.pdf-0296-00.png)
+![](../images/Event-Driven_Microservices-0296-00.png)
 
 
 Consider the impacts to all dependent services, including SLAs, downtime, stream processing catch-up time, output event load, new event streams, and breaking schema changes. Communicate with dependent service owners to ensure that the impacts are acceptable. 
@@ -136,7 +136,7 @@ So long as the prerequisites are met, this deployment pattern works well for sce
 - Bugs need to be fixed but don’t require reprocessing 
 
 
-![](../images/Event-Driven_Microservices.pdf-0296-11.png)
+![](../images/Event-Driven_Microservices-0296-11.png)
 
 
 Inadvertently altering the internal microservice topology is one of the most common mistakes people make when trying to use this deployment pattern. Doing so is a breaking change and will require a full application reset instead of a rolling update. 
@@ -144,7 +144,7 @@ Inadvertently altering the internal microservice topology is one of the most com
 During a rolling update, only step 4 of “The Basic Full-Stop Deployment Pattern” on page 276 is changed. Instead of stopping each instance at the same time, only one instance at a time is stopped. The stopped instance is then updated and started back up, such that a mixture of new and old instances are running during the deployment process. This rolling update means that for a short period of time, both old and new logic will be operating simultaneously. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0296-14.png)
+![](../images/Event-Driven_Microservices-0296-14.png)
 
 
 Smart implementations will run a test that checks compatibility of a release to notify you if the rolling update is valid. Doing this manually is quite error-prone and should be avoided. 
@@ -165,7 +165,7 @@ Re-creating the entities for the new stream will require reprocessing the necess
 Breaking schema changes often reflect a fundamental shift in the domain of an entity or event. These usually don’t happen too often, but when they do, the change is usually significant enough that consumers must be updated to reflect the shifted business meaning of the domain. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0298-00.png)
+![](../images/Event-Driven_Microservices-0298-00.png)
 
 
 _Figure 16-2. Breaking schema change producer options for re-creating events with new schema_ 
@@ -192,7 +192,7 @@ This strategy makes a couple of assumptions:
 - **Eventual migration will not cause downstream inconsistencies.** Downstream services will continue consuming two different definitions, but there will not be consequential effects, or those effects will be limited. Again, the breaking change in the schema suggests the domain has been altered enough that the redefinition was necessary to the organization. It is seldom the case that the breaking change is necessary for the business but largely inconsequential to the consumers that use the events. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0299-04.png)
+![](../images/Event-Driven_Microservices-0299-04.png)
 
 
 One of the main risks of eventual migration is that the migration is never finished, and similar-yet-different data streams remain in use indefinitely. Additionally, new services created during the migration may inadvertently register themselves as consumers on the old stream instead of the new one. Use metadata tagging (see “Event Stream Metadata Tagging” on page 240) to mark streams as deprecated and keep migration windows small. 
@@ -213,7 +213,7 @@ ensure that business requirements can be met. Downstream services could have maj
 The biggest risk of this deployment plan is that consumers may fail in their migration to the new event stream, but be unable to gracefully fall back to the old source of data as they would using the eventual migration strategy. Integration testing (preferably using programmatically generated environments and source data) can reduce this risk by providing an environment in which to completely exercise the migration process. You can create and register the producer and the consumers together in the test environment to validate the migration prior to performing it in production. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0300-02.png)
+![](../images/Event-Driven_Microservices-0300-02.png)
 
 
 Synchronized migrations tend to be rare in practice, as they require significant breaking changes or even the destruction of the event’s previous domain model. Core business entities usually have very stable domain models, but when major breaking changes occur, a synchronous migration may be unavoidable. 
@@ -223,7 +223,7 @@ Synchronized migrations tend to be rare in practice, as they require significant
 The main goal of blue-green deployment is to provide zero downtime while deploying new functionality. This pattern is predominantly used in synchronous requestresponse microservice deployments, as it allows for synchronous requests to continue while the service is updated. An example of this pattern is shown in Figure 16-3. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0300-06.png)
+![](../images/Event-Driven_Microservices-0300-06.png)
 
 
 _Figure 16-3. Blue-green deployment pattern_ 
@@ -236,7 +236,7 @@ The switchover of traffic is performed by the router in front of the services. A
 At this point, depending on the sensitivity of your application and the need to provide a quick fallback, the green instances can be turned off immediately or left to idle until sufficient time without incident has passed. In the case that an error occurs during this cooldown period, the router can quickly reroute the traffic back to the green instances. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0301-03.png)
+![](../images/Event-Driven_Microservices-0301-03.png)
 
 
 Monitoring and alerting—including resource usage metrics, consumer group lag, autoscaling triggers, and system alerts—need to be integrated as part of the color switching process. 
@@ -244,7 +244,7 @@ Monitoring and alerting—including resource usage metrics, consumer group lag, 
 Blue-green deployments work well for microservices that consume from event streams. They can also work well when events are produced _only_ due to requestresponse activity, such as when the request is converted directly into an event (see “Handling Requests Within an Event-Driven Workflow” on page 223). 
 
 
-![](../images/Event-Driven_Microservices.pdf-0301-06.png)
+![](../images/Event-Driven_Microservices-0301-06.png)
 
 
 Blue-green deployments _do not work_ when the microservice produces events to an output stream in reaction to an input event stream. The two microservices will overwrite each other’s results in the case of entity streams or will create duplicated events in the case of event streams. Use either the rolling update pattern or the basic full-stop deployment pattern instead. 

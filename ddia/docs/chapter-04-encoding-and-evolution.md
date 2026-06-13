@@ -45,7 +45,7 @@ sequence-of-bytes representation looks quite different from the data structures 
 Thus, we need some kind of translation between the two representations. The translation from the in-memory representation to a byte sequence is called _encoding_ (also known as _serialization_ or _marshalling_ ), and the reverse is called _decoding_ ( _parsing_ , _deserialization_ , _unmarshalling_ ).[ii] 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0135-02.png)
+![](../images/Designing_Data_Intensive_Applications-0135-02.png)
 
 
 ## **Terminology clash** 
@@ -128,7 +128,7 @@ The binary encoding is 66 bytes long, which is only a little less than the 81 by
 In the following sections we will see how we can do much better, and encode the same record in just 32 bytes. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0139-00.png)
+![](../images/Designing_Data_Intensive_Applications-0139-00.png)
 
 
 _Figure 4-1. Example record (Example 4-1) encoded using MessagePack._ 
@@ -163,7 +163,7 @@ Thrift and Protocol Buffers each come with a code generation tool that takes a s
 What does data encoded with this schema look like? Confusingly, Thrift has two different binary encoding formats,[iii] called _BinaryProtocol_ and _CompactProtocol_ , respectively. Let’s look at BinaryProtocol first. Encoding Example 4-1 in that format takes 59 bytes, as shown in Figure 4-2 [19]. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0140-04.png)
+![](../images/Designing_Data_Intensive_Applications-0140-04.png)
 
 
 _Figure 4-2. Example record encoded using Thrift’s BinaryProtocol._ 
@@ -178,7 +178,7 @@ The big difference compared to Figure 4-1 is that there are no field names ( `us
 The Thrift CompactProtocol encoding is semantically equivalent to BinaryProtocol, but as you can see in Figure 4-3, it packs the same information into only 34 bytes. It does this by packing the field type and tag number into a single byte, and by using variable-length integers. Rather than using a full eight bytes for the number 1337, it is encoded in two bytes, with the top bit of each byte used to indicate whether there are still more bytes to come. This means numbers between –64 and 63 are encoded in one byte, numbers between –8192 and 8191 are encoded in two bytes, etc. Bigger numbers use more bytes. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0141-03.png)
+![](../images/Designing_Data_Intensive_Applications-0141-03.png)
 
 
 _Figure 4-3. Example record encoded using Thrift’s CompactProtocol._ 
@@ -189,7 +189,7 @@ Finally, Protocol Buffers (which has only one binary encoding format) encodes th
 otherwise very similar to Thrift’s CompactProtocol. Protocol Buffers fits the same record in 33 bytes. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0142-01.png)
+![](../images/Designing_Data_Intensive_Applications-0142-01.png)
 
 
 _Figure 4-4. Example record encoded using Protocol Buffers._ 
@@ -253,7 +253,7 @@ First of all, notice that there are no tag numbers in the schema. If we encode o
 If you examine the byte sequence, you can see that there is nothing to identify fields or their datatypes. The encoding simply consists of values concatenated together. A string is just a length prefix followed by UTF-8 bytes, but there’s nothing in the encoded data that tells you that it is a string. It could just as well be an integer, or something else entirely. An integer is encoded using a variable-length encoding (the same as Thrift’s CompactProtocol). 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0145-00.png)
+![](../images/Designing_Data_Intensive_Applications-0145-00.png)
 
 
 _Figure 4-5. Example record encoded using Avro._ 
@@ -276,7 +276,7 @@ Avro library resolves the differences by looking at the writer’s schema and th
 For example, it’s no problem if the writer’s schema and the reader’s schema have their fields in a different order, because the schema resolution matches up the fields by field name. If the code reading the data encounters a field that appears in the writer’s schema but not in the reader’s schema, it is ignored. If the code reading the data expects some field, but the writer’s schema does not contain a field of that name, it is filled in with a default value declared in the reader’s schema. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0146-02.png)
+![](../images/Designing_Data_Intensive_Applications-0146-02.png)
 
 
 _Figure 4-6. An Avro reader resolves differences between the writer’s schema and the reader’s schema._ 
@@ -397,7 +397,7 @@ However, there is an additional snag. Say you add a field to a record schema, an
 The encoding formats discussed previously support such preservation of unknown fields, but sometimes you need to take care at an application level, as illustrated in Figure 4-7. For example, if you decode a database value into model objects in the application, and later reencode those model objects, the unknown field might be lost in that translation process. Solving this is not a hard problem; you just need to be aware of it. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0152-00.png)
+![](../images/Designing_Data_Intensive_Applications-0152-00.png)
 
 
 _Figure 4-7. When an older version of the application updates data previously written by a newer version of the application, data may be lost if you’re not careful._ 

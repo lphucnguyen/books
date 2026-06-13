@@ -72,7 +72,7 @@ your producers to register the schemas they have used to write the event. This p
 The workflow for a schema registry is shown in Figure 14-1. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0260-05.png)
+![](../images/Event-Driven_Microservices-0260-05.png)
 
 
 _Figure 14-1. Schema registry workflow for producing and consuming an event_ 
@@ -84,7 +84,7 @@ The consumer receives the event and gets the schema (step 4) for that specific I
 Confluent has provided an excellent implementation of a schema registry for Apache Kafka. It supports Apache Avro, Protobuf, and JSON formats and is freely available for production use. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0261-00.png)
+![](../images/Event-Driven_Microservices-0261-00.png)
 
 
 Registering the schemas to a dedicated event stream frees the schema registry implementation from having to provide durable storage. This is the design choice Confluent made with its schema registry. 
@@ -123,7 +123,7 @@ For production-grade DevOps, a team must own the microservice in order to modify
 Access control to data is important not only from a business security standpoint, but also as a means of enforcing the single writer principle. Permissions and access control lists ensure that bounded contexts can enforce their boundaries. Access permissions to a given event stream should be granted only by the team that owns the producing microservice, a restriction you can enforce by using the microservice-toteam assignment system. Permissions usually fall into these common categories (depending, of course, on the event broker implementation): READ, WRITE, CREATE, DELETE, MODIFY, and DESCRIBE. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0262-07.png)
+![](../images/Event-Driven_Microservices-0262-07.png)
 
 
 ACLs rely on individual identification for each consumer and producer. Ensure that you enable and enforce identification for your event broker and services as soon as possible, preferably from day one. Adding identification after the fact is extremely painful, as it requires updating and reviewing every single service that connects to the event broker. 
@@ -293,7 +293,7 @@ A business owner could look at this overlay and ask themselves, “Does this imp
 Figure 14-2 shows a topology with 25 microservices, overlaid with the ownership of four teams. For purposes of clarity, each arrow represents the production of data to an event stream as well as consumption by the consuming process. Thus, microservice 3 is consuming a stream of data from microservice 4. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0270-00.png)
+![](../images/Event-Driven_Microservices-0270-00.png)
 
 
 _Figure 14-2. Topology map of service connections_ 
@@ -317,7 +317,7 @@ Let’s see what happens if we reduce the number of interteam connections and th
 assigned to team 4 to further reduce the cross-boundary communication. This result is shown in Figure 14-3 and Table 14-3. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0271-01.png)
+![](../images/Event-Driven_Microservices-0271-01.png)
 
 
 _Figure 14-3. Topology map of service connections after reassignment of microservices_ 

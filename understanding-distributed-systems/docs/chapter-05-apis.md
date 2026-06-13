@@ -55,7 +55,7 @@ HTTP is a stateless protocol, which means that everything needed by a server to 
 38 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0056-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0056-02.png)
 
 
 Figure 5.1: An example HTTP transaction between a browser and a web server request itself, without context from previous requests. HTTP uses TCP for the reliability guarantees discussed in chapter 2. When it runs on top of TLS, it’s also referred to as HTTPS. 

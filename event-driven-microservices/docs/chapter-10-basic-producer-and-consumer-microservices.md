@@ -28,7 +28,7 @@ In some scenarios it’s not possible to safely modify the legacy codebase to pr
 An ecommerce store has a frontend that displays all the stock and product data it contains. Previously, the frontend service would source all of its data by synchronizing with a read-only subordinate data store using a scheduled batch job, as in Figure 10-1. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0188-09.png)
+![](../images/Event-Driven_Microservices-0188-09.png)
 
 
 _Figure 10-1. Scheduled batch between monoliths_ 
@@ -37,7 +37,7 @@ _Figure 10-1. Scheduled batch between monoliths_
 Today, there are two event streams, one with product information and one with product stock levels. You can use a sidecar implementation to sink this data into the data store, where a BPC consumes the events and upserts them into the associated data sets. The frontend gains access to a near-real time data feed of product updates, without having to change any of the system code, as in Figure 10-2. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0189-01.png)
+![](../images/Event-Driven_Microservices-0189-01.png)
 
 
 _Figure 10-2. Using the sidecar to upsert data into the frontend data store_ 
@@ -69,7 +69,7 @@ Each of these event streams acts as a driver of logic. When a new event comes in
 **Where Do BPCs Work Well? | 171** 
 
 
-![](../images/Event-Driven_Microservices.pdf-0190-00.png)
+![](../images/Event-Driven_Microservices-0190-00.png)
 
 
 _Figure 10-3. Gating the readiness of a book_ 
@@ -77,7 +77,7 @@ _Figure 10-3. Gating the readiness of a book_
 In this example, the book ending with ISBN 0010 will already have been published to the output book event stream. Meanwhile, the book ending with ISBN 0011 is currently waiting for cover art to be available and has not been published to the output stream. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0190-03.png)
+![](../images/Event-Driven_Microservices-0190-03.png)
 
 
 Explicit approval from a human being may also be required in the gating pattern. This is covered in more detail in “Example: Newspaper publishing workflow (approval pattern)” on page 225. 
@@ -107,7 +107,7 @@ The partition assignor can reassign the input event stream partitions to a singl
 During the day, additional processing instances can be brought online to handle the increased event load. The query rate of the data store will also increase in this particular scenario, but caching, partitioning, and batching can help keep the load lighter than the linear increase in processing requirements. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0191-08.png)
+![](../images/Event-Driven_Microservices-0191-08.png)
 
 
 Service providers such as Google, Amazon, and Microsoft offer highly scalable pay-per-read/write data stores that accommodate this pattern very well. 
@@ -126,7 +126,7 @@ The BPC implementation can perform operations that would otherwise be unavailabl
 Say your BPC service needs to leverage the joining capabilities of a stream-processing framework, which is particularly good at joining large sets of materialized event streams. The external stream processor will simply materialize event streams into tables and join those rows together that have the same key. This simple join operation is shown in Figure 10-4. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0192-05.png)
+![](../images/Event-Driven_Microservices-0192-05.png)
 
 
 _Figure 10-4. A typical outsourceable operation performed at scale by a stream-processing framework_ 
@@ -135,13 +135,13 @@ _Figure 10-4. A typical outsourceable operation performed at scale by a stream-p
 The hybrid BPC needs to use a compatible client to start up the work on the external stream processing framework. This client will transform the code into instructions for the framework, which will itself handle consuming, joining, and producing events into the joined output event stream. This design outsources the work to an external processing service that will return the results in the form of an event stream. The workflow for this would look like Figure 10-5. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0193-01.png)
+![](../images/Event-Driven_Microservices-0193-01.png)
 
 
 _Figure 10-5. A hybrid workflow showing an external stream-processing application sending results back to the BPC via an intermediate event stream_ 
 
 
-![](../images/Event-Driven_Microservices.pdf-0193-03.png)
+![](../images/Event-Driven_Microservices-0193-03.png)
 
 
 The BPC instantiates a client to run the external stream processing work. When the BPC is terminated, the external stream processing instance should also be terminated to ensure that no ghost processes are left running. 

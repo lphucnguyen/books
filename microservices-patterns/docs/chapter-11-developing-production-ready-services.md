@@ -71,14 +71,14 @@ Figure 11.2 shows a high-level view of how the FTGO application implements secur
 _**Developing secure services**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0381-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0381-02.png)
 
 
 **----- Start of picture text -----**<br>
 Log in to obtain session<br>token, which is a cookie.<br>**----- End of picture text -----**<br>
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0381-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0381-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -105,7 +105,7 @@ The other key part of the security implementation is the security _context_ , wh
 framework uses the standard Java EE approach of storing the security context in a static, thread-local variable, which is readily accessible to any code that’s invoked to handle the request. A request handler can call SecurityContextHolder.getContext() .getAuthentication() to obtain information about the current user, such as their identity and roles. In contrast, the Passport framework stores the security context as the user attribute of the request. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0382-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0382-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -178,7 +178,7 @@ _**Developing secure services**_
 ## **API clients supply credentials in the Authorization header.** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0385-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0385-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -265,7 +265,7 @@ The sequence of events shown in figure 11.4 is as follows:
 ## **Password grant request** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0388-11.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0388-11.png)
 
 
 **----- Start of picture text -----**<br>
@@ -287,7 +287,7 @@ An OAuth 2.0-based API gateway can authenticate session-oriented clients by usin
 ## **Password grant request** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0389-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0389-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -335,14 +335,14 @@ Nor does it make sense to hard-wire different sets of configuration properties i
 _**Designing configurable services**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0391-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0391-02.png)
 
 
 **----- Start of picture text -----**<br>
 Environment-specific configuration<br>**----- End of picture text -----**<br>
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0391-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0391-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -369,7 +369,7 @@ We’ll look at each approach, starting with the push model.
 The push model relies on the collaboration of the deployment environment and the service. The deployment environment supplies the configuration properties when it creates a service instance. It might, as figure 11.7 shows, pass the configuration properties as environment variables. Alternatively, the deployment environment may supply the configuration properties using a configuration file. The service instance then reads the configuration properties when it starts up. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0392-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0392-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -421,7 +421,7 @@ There are a variety of ways to implement a configuration server, including the f
 - Specialized configuration servers, such as Spring Cloud Config Server, Hashicorp Vault, which is a store for sensitive data such as credentials, and AWS Parameter Store 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0394-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0394-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -463,7 +463,7 @@ You can use the following patterns to design observable services:
 - _Log aggregation_ —Log service activity and write logs into a centralized logging server, which provides searching and alerting. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0395-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0395-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -502,7 +502,7 @@ _**Designing observable services**_
 library implements a GET /hc endpoint (https://docs.microsoft.com/en-us/dotnet/ standard/microservices-architecture/implement-resilient-applications/monitor-apphealth). The deployment infrastructure periodically invokes this endpoint to determine the health of the service instance and takes the appropriate action if it’s unhealthy. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0397-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0397-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -547,7 +547,7 @@ _**Designing observable services**_
 The solution is to use log aggregation. As figure 11.11 shows, the log aggregation pipeline sends the logs of all of the service instances to a centralized logging server. Once the logs are stored by the logging server, you can view, search, and analyze them. You can also configure alerts that are triggered when certain messages appear in the logs. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0399-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0399-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -600,7 +600,7 @@ interact during the handling of external requests, including a breakdown of wher
 Figure 11.12 shows an example of how a distributed tracing server displays what happens when the API gateway handles a request. It shows the inbound request to the API gateway and the request that the gateway makes to Order Service. For each request, the distributed tracing server shows the operation that’s performed and the timing of the request. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0401-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0401-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -631,7 +631,7 @@ The [ftgo-order-service,8d8fdc37be104cc6,8d8fdc37be104cc6,false] part of the log
 If you search the logs for 8d8fdc37be104cc6, you’ll find all log entries for that request. Figure 11.13 shows how distributed tracing works. There are two parts to distributed tracing: an instrumentation library, which is used by each service, and a distributed tracing server. The instrumentation library manages the traces and spans. It also adds 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0402-08.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0402-08.png)
 
 
 **----- Start of picture text -----**<br>
@@ -665,7 +665,7 @@ A key part of the production environment is monitoring and alerting. As figure 1
 Services report metrics to a central server that provides aggregation, visualization, and alerting. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0404-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0404-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -747,7 +747,7 @@ There are a couple of ways to integrate the exception tracking service into your
 _**Designing observable services**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0407-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0407-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -809,7 +809,7 @@ Build services on a framework or collection of frameworks that handle cross-cutt
 A much faster way to develop services is to build your services upon a microservices chassis. As figure 11.16 shows, a _microservice chassis_ is a framework or set of frameworks that handle these concerns. When using a microservice chassis, you write little, if any, code to handle these concerns. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0409-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0409-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -862,7 +862,7 @@ _**Developing services using the Microservice chassis pattern**_
 ## **Fewer functions** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0411-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0411-03.png)
 
 
 **----- Start of picture text -----**<br>

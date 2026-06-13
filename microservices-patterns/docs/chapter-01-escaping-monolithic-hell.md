@@ -43,7 +43,7 @@ FTGO is a typical enterprise Java application. Figure 1.1 shows its architecture
 ## **Invoked by mobile applications** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0033-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0033-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -89,7 +89,7 @@ A major problem with the FTGO application is that it’s too complex. It’s too
 _**The slow march toward monolithic hell**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0035-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0035-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -212,7 +212,7 @@ _**Microservice architecture to the rescue**_
 book describes a useful, three-dimensional scalability model: the _scale cube_ , shown in figure 1.3. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0039-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0039-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -234,7 +234,7 @@ _Z-axis_ scaling also runs multiple instances of the monolith application, but u
 In this example, each application instance is responsible for a subset of users. The router uses the userId specified by the request Authorization header to select one of 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0040-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0040-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -244,7 +244,7 @@ Route requests using a N  identical application<br>load balancing algorithm. ins
 Figure 1.4 X-axis scaling runs multiple, identical instances of the monolithic application behind a load balancer. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0040-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0040-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -261,7 +261,7 @@ X- and Z-axis scaling improve the application’s capacity and availability. But
 _**Microservice architecture to the rescue**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0041-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0041-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -321,7 +321,7 @@ _**Microservice architecture to the rescue**_
 - Accounting Service—Handles billing and payments 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0043-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0043-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -405,7 +405,7 @@ EACH SERVICE IS SMALL AND EASILY MAINTAINED
 Another benefit of the microservice architecture is that each service is relatively small. The code is easier for a developer to understand. The small code base doesn’t slow down the IDE, making developers more productive. And each service typically starts a lot faster than a large monolith does, which also makes developers more productive and speeds up deployments. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0046-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0046-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -582,7 +582,7 @@ then apply numerous successor patterns, including service discovery patterns and
 In addition, you can organize patterns that tackle issues in a particular problem area into groups. The explicit description of related patterns provides valuable guidance on how to effectively solve a particular problem. Figure 1.9 shows how the relationships between patterns is visually represented. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0052-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0052-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -614,7 +614,7 @@ The Microservice architecture pattern language is a collection of patterns that 
 The pattern language consists of several groups of patterns. On the left in figure 1.10 is the application architecture patterns group, the Monolithic architecture pattern and the Microservice architecture pattern. Those are the patterns we’ve been discussing 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0053-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0053-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -639,7 +639,7 @@ These patterns are grouped together based on the kind of problem they solve. Let
 Deciding how to decompose a system into a set of services is very much an art, but there are a number of strategies that can help. The two decomposition patterns shown in figure 1.11 are different strategies you can use to define your application’s architecture. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0054-09.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0054-09.png)
 
 
 **----- Start of picture text -----**<br>
@@ -668,7 +668,7 @@ An application built using the microservice architecture is a distributed system
 _**The Microservice architecture pattern language**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0055-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0055-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -690,7 +690,7 @@ PATTERNS FOR QUERYING DATA IN A MICROSERVICE ARCHITECTURE
 The other issue with using a database per service is that some queries need to join data that’s owned by multiple services. A service’s data is only accessible via its API, so you can’t use distributed queries against its database. Figure 1.14 shows a couple of patterns you can use to implement queries. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0056-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0056-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -700,7 +700,7 @@ Domain<br>Key<br>event<br>Predecessor Successor<br>Alternative A Alternative B<b
 Figure 1.13 Because each service has its own database, you must use the Saga pattern to maintain data consistency across services. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0056-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0056-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -723,7 +723,7 @@ The traditional, and often manual, way of deploying applications in a languagesp
 _**The Microservice architecture pattern language**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0057-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0057-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -788,7 +788,7 @@ architecture in order to successfully develop software, but it’s not the only 
 For a large, complex application, the microservice architecture is usually the best choice. But in addition to having the right architecture, successful software development requires you to also have organization, and development and delivery processes. Figure 1.16 shows the relationships between process, organization, and architecture. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0059-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0059-05.png)
 
 
 **----- Start of picture text -----**<br>

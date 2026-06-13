@@ -1,20 +1,20 @@
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0001-00.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-00.png)
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0001-01.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-01.png)
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0001-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-02.png)
 
 
 Chris Richardson 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0001-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-04.png)
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0001-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-05.png)
 
 
 **M A N N I N G** 

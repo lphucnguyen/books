@@ -40,7 +40,7 @@ Secondly, increasingly many applications now have such demanding or wide-ranging
 For example, if you have an application-managed caching layer (using Memcached or similar), or a full-text search server (such as Elasticsearch or Solr) separate from your main database, it is normally the application code’s responsibility to keep those caches and indexes in sync with the main database. Figure 1-1 gives a glimpse of what this may look like (we will go into detail in later chapters). 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0027-00.png)
+![](../images/Designing_Data_Intensive_Applications-0027-00.png)
 
 
 _Figure 1-1. One possible architecture for a data system that combines several components._ 
@@ -196,13 +196,13 @@ WHEREfollows.follower_id=current_user
 2. Maintain a cache for each user’s home timeline—like a mailbox of tweets for each recipient user (see Figure 1-3). When a user _posts a tweet_ , look up all the people who follow that user, and insert the new tweet into each of their home timeline caches. The request to read the home timeline is then cheap, because its result has been computed ahead of time. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0034-01.png)
+![](../images/Designing_Data_Intensive_Applications-0034-01.png)
 
 
 _Figure 1-2. Simple relational schema for implementing a Twitter home timeline._ 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0034-03.png)
+![](../images/Designing_Data_Intensive_Applications-0034-03.png)
 
 
 _Figure 1-3. Twitter’s data pipeline for delivering tweets to followers, with load parameters as of November 2012 [16]._ 
@@ -233,7 +233,7 @@ In a batch processing system such as Hadoop, we usually care about _throughput_ 
 > iii. In an ideal world, the running time of a batch job is the size of the dataset divided by the throughput. In practice, the running time is often longer, due to skew (data not being spread evenly across worker processes) and needing to wait for the slowest task to complete. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0036-00.png)
+![](../images/Designing_Data_Intensive_Applications-0036-00.png)
 
 
 ## **Latency and response time** 
@@ -245,7 +245,7 @@ Even if you only make the same request over and over again, you’ll get a sligh
 In Figure 1-4, each gray bar represents a request to a service, and its height shows how long that request took. Most requests are reasonably fast, but there are occasional _outliers_ that take much longer. Perhaps the slow requests are intrinsically more expensive, e.g., because they process more data. But even in a scenario where you’d think all requests should take the same time, you get variation: random additional latency could be introduced by a context switch to a background process, the loss of a network packet and TCP retransmission, a garbage collection pause, a page fault forcing a read from disk, mechanical vibrations in the server rack [18], or many other causes. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0036-05.png)
+![](../images/Designing_Data_Intensive_Applications-0036-05.png)
 
 
 _Figure 1-4. Illustrating mean and percentiles: response times for a sample of 100 requests to a service._ 
@@ -283,7 +283,7 @@ If you want to add response time percentiles to the monitoring dashboards for yo
 The naïve implementation is to keep a list of response times for all requests within the time window and to sort that list every minute. If that is too inefficient for you, there are algorithms that can calculate a good approximation of percentiles at minimal CPU and memory cost, such as forward decay [25], t-digest [26], or HdrHistogram [27]. Beware that averaging percentiles, e.g., to reduce the time resolution or to combine data from several machines, is mathematically meaningless—the right way of aggregating response time data is to add the histograms [28]. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0039-00.png)
+![](../images/Designing_Data_Intensive_Applications-0039-00.png)
 
 
 _Figure 1-5. When several backend calls are needed to serve a request, it takes just a single slow backend request to slow down the entire end-user request._ 

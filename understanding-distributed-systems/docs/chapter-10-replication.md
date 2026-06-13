@@ -39,7 +39,7 @@ As shown in Figure 10.1, a log is an ordered list of entries where each entry in
 - and the leader’s election term (the number in each box). 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0097-07.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0097-07.png)
 
 
 Figure 10.1: The leader’s log is replicated to its followers. 
@@ -113,7 +113,7 @@ For example, one of the most common uses of consensus is for coordination purpos
 We discussed state machine replication with the goal of implementing a data store that can withstand failures and scale out to serve a larger number of requests. Now that we know how to build a replicated data store in principle, let’s take a closer look at what happens when a client sends a request to it. In an ideal world, the request executes instantaneously, as shown in Figure 10.2. 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0101-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0101-05.png)
 
 
 Figure 10.2: A write request executing instantaneously 
@@ -126,7 +126,7 @@ The best guarantee the system can provide is that the request executes somewhere
 84 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0102-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0102-02.png)
 
 
 Figure 10.3: A write request can’t execute instantaneously because it takes time to reach the leader and be executed. what you are used to when writing single-threaded applications. For example, if you assign 42 to x and read its value immediately afterward, you expect to find 42 in there, assuming there is no other thread writing to the same variable. But when you deal with replicated systems, all bets are off. Let’s see why that’s the case. 
@@ -145,7 +145,7 @@ If clients send writes and reads exclusively to the leader, then every request a
 Because a request is not served instantaneously, and there is a single process that can serve it, the request executes somewhere between its invocation and completion time. By the time it completes, its side-effects are visible to all observers, as shown in Figure 10.4. 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0103-06.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0103-06.png)
 
 
 Figure 10.4: The side-effects of a strongly consistent operation are visible to all observers once it completes. 
@@ -177,7 +177,7 @@ The consistency model that ensures operations occur in the same order for all ob
 87 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0105-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0105-02.png)
 
 
 Figure 10.5: Although followers have a different view of the system’s state, they process updates in the same order. what differentiates sequential consistency from linearizability. 
@@ -249,7 +249,7 @@ Fault tolerance is delegated to a dedicated component, the configuration manager
 91 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0109-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0109-02.png)
 
 
 Figure 10.6: Writes propagate through all processes in the chain, while reads are served exclusively by the tail. single view of the chain’s topology that every process agrees with. For this to work, the control plane needs to be fault-tolerant, which requires state machine replication (e.g., Raft). So while the chain can tolerate up to N −1 processes failing, where N is the chain’s length, the control plane can only tolerate[𝐶] 2[failures,][where][C][is] the number of replicas that make up the control plane. 
@@ -279,7 +279,7 @@ However, there is a price to pay in terms of write latency. Since an update need
 That said, chain replication allows write requests to be pipelined, which can significantly improve throughput. Moreover, read throughput can be further increased by distributing reads across replicas while still guaranteeing linearizability. The idea is for replicas to store multiple versions of an object, each including a version number and a dirty flag. Replicas mark an update as dirty as it propagates from the head to the tail. Once the tail receives it, it’s considered committed, and the tail sends an acknowledgment back along the chain. When a replica receives an acknowledgment, it marks the corresponding version as clean. Now, when a replica receives a read request for an object, it will immediately serve it if the latest version is clean. If not, it first contacts the tail to request the latest committed version (see Fig 10.7). 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0111-04.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0111-04.png)
 
 
 Figure 10.7: A dirty read can be served by any replica with an additional request to the tail to guarantee strong consistency. 

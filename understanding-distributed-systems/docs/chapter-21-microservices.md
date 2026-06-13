@@ -5,7 +5,7 @@
 If _Cruder_ is successful in the market, we can safely assume that we will continue to add more components to it to satisfy an evergrowing list of business requirements, as shown in Figure 21.1. 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0215-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0215-03.png)
 
 
 Figure 21.1: A monolithic application composed of multiple components 
@@ -20,7 +20,7 @@ Also, a change to a component might require the entire application to be rebuilt
 One way to mitigate the growing pains of a _monolithic_ application is to functionally decompose it into a set of independently deployable services that communicate via APIs, as shown in Figure 21.2. The APIs decouple the services from each other by creating boundaries that are hard to violate, unlike the ones between components running in the same process. 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0216-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0216-05.png)
 
 
 Figure 21.2: An application split into independently deployable services that communicate via APIs 
@@ -110,7 +110,7 @@ The most obvious function of an API gateway is routing inbound requests to inter
 203 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0221-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0221-02.png)
 
 
 Figure 21.3: The API gateway hides the internal APIs from its clients. 

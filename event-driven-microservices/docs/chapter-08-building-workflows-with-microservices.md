@@ -44,7 +44,7 @@ Choreography is desirable in the majority of interteam communications, as it all
 The relationships between the microservices define the workflow of a choreographed architecture. A series of microservices operating together can be responsible for providing the business functionality of the workflow. This choreographed workflow is a form of _emergent behavior_ , where it is not just the individual microservices that dictate the workflow, but the relationships between them as well. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0155-00.png)
+![](../images/Event-Driven_Microservices-0155-00.png)
 
 
 Direct-call microservice architectures focus on providing reusable _services_ , to be used as building blocks for business workflows. Event-driven microservice architectures, on the other hand, focus on providing reusable _events_ , with no foreknowledge of downstream consumption. The latter architecture enables the usage of highly decoupled, choreographed architectures. 
@@ -62,7 +62,7 @@ As you can see, a direct-call microservice is tightly coupled and fully dependen
 Figure 8-1 shows the output of a choreographed workflow in which service A feeds directly into service B, which in turn feeds into service C. In this particular case, you can infer that the services have a dependent workflow of A → B → C. The output of service C indicates the result of the workflow as a whole. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0155-08.png)
+![](../images/Event-Driven_Microservices-0155-08.png)
 
 
 _Figure 8-1. Simple event-driven choreographed workflow_ 
@@ -70,7 +70,7 @@ _Figure 8-1. Simple event-driven choreographed workflow_
 Now, say that the workflow needs to be rearranged such that the business actions in service C must be performed before those in service B, as shown in Figure 8-2. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0156-00.png)
+![](../images/Event-Driven_Microservices-0156-00.png)
 
 
 _Figure 8-2. Business changes required by the simple event-driven choreographed workflow_ 
@@ -93,7 +93,7 @@ Consider now a much larger-scale example, such as an order fulfillment process a
 The customer may only really care where the order is in the progression from payment to fulfillment to shipping notification. You could reasonably monitor this by tapping off events from three separate event streams. It would be sufficiently resilient to change due to both the “public” nature and the low number of event streams it is consuming from. Meanwhile, a view into the full end-to-end workflow could require consuming from dozens of event streams. This may be more challenging to accomplish due to both the volume of events and the independence of event streams, particularly if the workflow is subject to regular change. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0157-05.png)
+![](../images/Event-Driven_Microservices-0157-05.png)
 
 
 Be sure you know what it is you’re trying to make visible in the choreographed workflow. Different observers have different requirements, and not all steps of a workflow may require explicit exposure. 
@@ -103,7 +103,7 @@ Be sure you know what it is you’re trying to make visible in the choreographed
 In the orchestration pattern a central microservice, the orchestrator, issues commands to and awaits responses from subordinate worker microservices. Orchestration can be thought of much like a musical orchestra, where a single conductor commands the musicians during the performance. The orchestrator microservice contains the entire workflow logic for a given business process and sends specific events to worker microservices to tell them what to do. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0158-00.png)
+![](../images/Event-Driven_Microservices-0158-00.png)
 
 
 The orchestrator awaits responses from the instructed microservices and handles the results according to the workflow logic. This is in contrast to the choreographed workflow, in which there is no centralized coordination. 
@@ -113,7 +113,7 @@ The orchestration pattern allows for a flexible definition of the workflow withi
 If a payment microservice attempts to fulfill payment three times before failing, it must make those three attempts _internal_ to the payment microservice. It does _not_ make one attempt and notify the orchestrator that it failed and wait to be told to try again or not. The orchestrator should have no say about how payments are processed, including how many attempts to make, as that is part of the bounded context of the payment microservice. The only thing the orchestrator needs to know is if the payment has _completely_ succeeded or if it has _completely_ failed. From there, it may act accordingly based on the workflow logic. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0158-04.png)
+![](../images/Event-Driven_Microservices-0158-04.png)
 
 
 Ensure the orchestrator’s bounded context is limited strictly to workflow logic and that it contains minimal business fulfillment logic. The orchestrator contains only the workflow logic, while the services under orchestration contain the bulk of the business logic. 
@@ -126,7 +126,7 @@ Note that the business responsibilities of a nonorchestrator microservice in an 
 Figure 8-3 shows an orchestration version of the architecture in Figure 8-1. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0159-02.png)
+![](../images/Event-Driven_Microservices-0159-02.png)
 
 
 _Figure 8-3. Simple orchestrated event-driven workflow_ 
@@ -190,7 +190,7 @@ consumer.commitOffsets()
 Orchestration can also use a request-response pattern, where the orchestrator synchronously calls the microservice’s API and awaits a response for results. The topology shown in Figure 8-4 is nearly identical to the one in Figure 8-3, aside from substitution of direct calls. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0160-06.png)
+![](../images/Event-Driven_Microservices-0160-06.png)
 
 
 _Figure 8-4. Simple direct-call orchestrated workflow_ 
@@ -242,7 +242,7 @@ You gain visibility into the orchestration workflow by querying the materialized
 A _distributed_ transaction is a transaction that spans two or more microservices. Each microservice is responsible for processing its portion of the transaction, as well as reversing that processing in the case that the transaction is aborted and reverted. Both the fulfillment and reversal logic must reside within the same microservice, both for maintainability purposes and to ensure that new transactions cannot be started if they can’t also be rolled back. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0162-05.png)
+![](../images/Event-Driven_Microservices-0162-05.png)
 
 
 It is best to avoid implementing distributed transactions whenever possible, as they can add significant risk and complexity to a workflow. You must account for a whole host of concerns, such as synchronizing work between systems, facilitating rollbacks, managing transient failures of instances, and network connectivity, to name just a few. 
@@ -263,7 +263,7 @@ The choreographed saga pattern is suitable for simple distributed transactions, 
 Continuing with the previous choreographed workflow example, consider the series of microservices A, B, C. The input event stream to service A kicks off a transaction, with the work of services A, B, and C being fully completed, or consequently canceled and rolled back. A failure at any step in the chain aborts the transaction and begins the rollback. The resultant workflow is shown in Figure 8-5. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0163-05.png)
+![](../images/Event-Driven_Microservices-0163-05.png)
 
 
 _Figure 8-5. Choreographed transaction success_ 
@@ -271,7 +271,7 @@ _Figure 8-5. Choreographed transaction success_
 Suppose now that service C is unable to complete its part of the transaction. It must now reverse the workflow, either by issuing events or by responding to the previous service’s request. Services B and A must revert their portion of the transaction, in order, as shown in Figure 8-6. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0163-08.png)
+![](../images/Event-Driven_Microservices-0163-08.png)
 
 
 _Figure 8-6. Choreographed transaction failure with rollbacks_ 
@@ -280,7 +280,7 @@ _Figure 8-6. Choreographed transaction failure with rollbacks_
 Service A, the original consumer of the input event, must now decide what to do with the failed transaction results. A curious situation is already evident in the preceding two figures. The status of a successful transaction comes from the output of microservice C. However, the status of the aborted transaction comes out of microservice A, so a consumer would need to listen to both the output of C and the failed transaction stream from A to get a complete picture of finalized transactions. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0164-01.png)
+![](../images/Event-Driven_Microservices-0164-01.png)
 
 
 Remember the single-writer principle. No more than one service should publish to an event stream. 
@@ -301,7 +301,7 @@ The transaction can be aborted at any point in the workflow due to a return valu
 A simple two-stage orchestrated transaction topology is shown in Figure 8-7. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0165-01.png)
+![](../images/Event-Driven_Microservices-0165-01.png)
 
 
 _Figure 8-7. Simple orchestrated transaction topology_ 
@@ -309,7 +309,7 @@ _Figure 8-7. Simple orchestrated transaction topology_
 Events are consumed from the input stream and processed by the orchestrator. In this example, the orchestrator is using direct request-response calls to the workflow’s microservices. A request is made to service A, and the orchestrator blocks while awaiting a response. Once it obtains the response, the orchestrator updates its internal state and calls service B, as shown in Figure 8-8. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0165-04.png)
+![](../images/Event-Driven_Microservices-0165-04.png)
 
 
 _Figure 8-8. Simple orchestrated transaction with a failure in the transaction_ 
@@ -317,7 +317,7 @@ _Figure 8-8. Simple orchestrated transaction with a failure in the transaction_
 Service B cannot perform the necessary operation and, after exhausting its own retries and error-handling logic, eventually returns a failure response to the orchestrator. The orchestrator must now enact its rollback logic based on the current state of that event, ensuring that it issues rollback commands to all required microservices. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0165-07.png)
+![](../images/Event-Driven_Microservices-0165-07.png)
 
 
 Each microservice is fully responsible for ensuring its own retry policy, error handling, and intermittent failure management. The orchestrator does not manage any of these. 
@@ -326,7 +326,7 @@ Each microservice is fully responsible for ensuring its own retry policy, error 
 Figure 8-9 demonstrates the orchestrator issuing a rollback command to service A (service B’s failure response indicates it did not write anything to its internal data store). In this example, Service A performs the rollback successfully, but if it were to fail during its rollback, it would be up to the orchestrator to determine what to do next. The orchestrator could reissue the command a number of times, issue alerts via monitoring frameworks, or terminate the application to prevent further issues. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0166-01.png)
+![](../images/Event-Driven_Microservices-0166-01.png)
 
 
 _Figure 8-9. Issuing the rollback commands in an orchestrated transaction_ 
@@ -334,7 +334,7 @@ _Figure 8-9. Issuing the rollback commands in an orchestrated transaction_
 Once the transaction has been rolled back, it is up to the orchestrator to decide what to do next to finalize the processing of that event. It may retry the event a number of times, discard it, terminate the application, or output a failure event. The orchestrator, being the single producer, publishes the transaction failure to the output stream and lets a downstream consumer handle it. This differs from choreography, where there is no single stream from which to consume all output without discarding the single writer principle. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0166-04.png)
+![](../images/Event-Driven_Microservices-0166-04.png)
 
 
 Just as each microservice is fully responsible for its own state changes, it is also responsible for ensuring that its state is consistent after a rollback. The orchestrator’s responsibility in this scenario is limited to issuing the rollback commands and awaiting confirmations from the dependent microservices. 

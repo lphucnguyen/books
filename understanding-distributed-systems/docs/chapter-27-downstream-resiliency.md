@@ -71,7 +71,7 @@ Actively waiting and retrying failed network requests isn’t the only way to im
 257 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0275-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0275-02.png)
 
 
 Figure 27.1: Retry storm request into a _retry queue_ . The same process, or possibly another, can read from the same queue later and retry the failed requests. 
@@ -88,7 +88,7 @@ Suppose that handling a user request requires going through a chain of three ser
 Having retries at multiple levels of the dependency chain can amplify the total number of retries — the deeper a service is in the chain, the higher the load it will be exposed to due to retry amplification (see Figure 27.2). 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0276-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0276-03.png)
 
 
 Figure 27.2: Retry amplification in action 
@@ -111,7 +111,7 @@ Unlike retries, circuit breakers prevent network calls entirely, making the patt
 A circuit breaker can be implemented as a state machine with three states: open, closed, and half-open (see Figure 27.3). 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0277-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0277-05.png)
 
 
 Figure 27.3: Circuit breaker state machine 

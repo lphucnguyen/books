@@ -11,7 +11,7 @@ We can increase the read capacity of the database by creating replicas. The most
 By creating read-only followers and putting them behind a load balancer, we can increase the read capacity of the database. Repli182 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0200-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0200-02.png)
 
 
 Figure 19.1: Single leader replication cation also increases the availability of the database. For example, the load balancer can automatically take a faulty replica out of the pool when it detects that it’s no longer healthy or available. And when the leader fails, a replica can be reconfigured to take its place. Additionally, individual followers can be used to isolate specific workloads, like expensive analytics queries that are run periodically, so that they don’t impact the leader and other replicas. 

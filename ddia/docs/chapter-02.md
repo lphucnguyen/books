@@ -82,7 +82,7 @@ For example, Figure 2-1 illustrates how a résumé (a LinkedIn profile) could be
 > i. A term borrowed from electronics. Every electric circuit has a certain impedance (resistance to alternating current) on its inputs and outputs. When you connect one circuit’s output to another one’s input, the power transfer across the connection is maximized if the output and input impedances of the two circuits match. An impedance mismatch can lead to signal reflections and other troubles. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0053-00.png)
+![](../images/Designing_Data_Intensive_Applications-0053-00.png)
 
 
 _Figure 2-1. Representing a LinkedIn profile using a relational schema. Photo of Bill Gates courtesy of Wikimedia Commons, Ricardo Stuckert, Agência Brasil._ 
@@ -133,7 +133,7 @@ The JSON representation has better _locality_ than the multi-table schema in Fig
 The one-to-many relationships from the user profile to the user’s positions, educational history, and contact information imply a tree structure in the data, and the JSON representation makes this tree structure explicit (see Figure 2-2). 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0054-04.png)
+![](../images/Designing_Data_Intensive_Applications-0054-04.png)
 
 
 _Figure 2-2. One-to-many relationships forming a tree structure._ 
@@ -162,7 +162,7 @@ The advantage of using an ID is that because it has no meaning to humans, it nev
 ii. Literature on the relational model distinguishes several different normal forms, but the distinctions are of little practical interest. As a rule of thumb, if you’re duplicating values that could be stored in just one place, the schema is not normalized. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0056-00.png)
+![](../images/Designing_Data_Intensive_Applications-0056-00.png)
 
 
 Database administrators and developers love to argue about normalization and denormalization, but we will suspend judgment for now. In Part III of this book we will return to this topic and explore systematic ways of dealing with caching, denormalization, and derived data. 
@@ -184,7 +184,7 @@ Say you want to add a new feature: one user can write a recommendation for anoth
 iii. At the time of writing, joins are supported in RethinkDB, not supported in MongoDB, and only supported in predeclared views in CouchDB. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0057-00.png)
+![](../images/Designing_Data_Intensive_Applications-0057-00.png)
 
 
 _Figure 2-3. The company name is not just a string, but a link to a company entity. Screenshot of linkedin.com._ 
@@ -192,7 +192,7 @@ _Figure 2-3. The company name is not just a string, but a link to a company enti
 Figure 2-4 illustrates how these new features require many-to-many relationships. The data within each dotted rectangle can be grouped into one document, but the references to organizations, schools, and other users need to be represented as references, and require joins when queried. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0057-03.png)
+![](../images/Designing_Data_Intensive_Applications-0057-03.png)
 
 
 _Figure 2-4. Extending résumés with many-to-many relationships._ 
@@ -596,7 +596,7 @@ In this section we will use the example shown in Figure 2-5. It could be taken f
 **Graph-Like Data Models | 49** 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0072-00.png)
+![](../images/Designing_Data_Intensive_Applications-0072-00.png)
 
 
 _Figure 2-5. Example of graph-structured data (boxes represent vertices, arrows represent edges)._ 
@@ -1030,7 +1030,7 @@ One possible way of applying the rules is thus:
 By repeated application of rules 1 and 2, the `within_recursive` predicate can tell us all the locations in North America (or any other location name) contained in our database. This process is illustrated in Figure 2-6. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0084-07.png)
+![](../images/Designing_Data_Intensive_Applications-0084-07.png)
 
 
 _Figure 2-6. Determining that Idaho is in North America, using the Datalog rules from Example 2-11._ 

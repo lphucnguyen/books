@@ -37,7 +37,7 @@ The problem with this approach is that the client has no idea whether the public
 For a TLS certificate to be trusted by a device, the certificate, or one of its ancestors, must be present in the trusted store of the client. Trusted root CAs, such as Let’s Encrypt[4] , are typically included in the client’s trusted store by default by the operating system vendor. 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0045-04.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0045-04.png)
 
 
 Figure 3.1: A certificate chain ends with a self-signed certificate issued by a root CA. 

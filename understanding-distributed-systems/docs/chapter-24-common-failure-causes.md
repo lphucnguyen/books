@@ -121,7 +121,7 @@ You would think that if a system has hundreds of processes, it shouldn’t make 
 For example, suppose multiple clients are querying two database replicas, A and B, behind a load balancer. Each replica handles about 50 transactions per second (see Figure 24.1). 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0257-04.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0257-04.png)
 
 
 Figure 24.1: Two replicas behind a load balancer; each is handling half the load. 
@@ -136,7 +136,7 @@ Suppose now that replica B becomes available again and the load balancer puts it
 240 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0258-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0258-02.png)
 
 
 Figure 24.2: When replica B becomes unavailable, A will be hit with more load, which can strain it beyond its capacity. 
@@ -157,7 +157,7 @@ At this point, you might feel overwhelmed by the sheer amount of things that can
 241 a chance of happening, it doesn’t mean we have to do something about it. We first have to consider the probability it will manifest and the impact it will cause to the system’s users when it does. By multiplying the two factors together, we get a risk score[13] that we can use to prioritize which faults to address (see Figure 24.3) first. For example, a fault that is very likely to happen, and has a large impact, should be tackled head on; on the other hand, a fault with a low likelihood and low impact can wait. 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0259-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0259-03.png)
 
 
 Figure 24.3: Risk matrix 

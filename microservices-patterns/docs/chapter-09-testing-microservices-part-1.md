@@ -61,7 +61,7 @@ Let’s first look at the concept of an automated test. Then I discuss the diffe
 _**Testing strategies for microservice architectures**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0325-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0325-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -73,7 +73,7 @@ Test suite<br>Test Verifies behavior of System Under<br>Test (SUT)<br>Figure 9.1
 Automated tests are usually written using a testing framework. JUnit, for example, is a popular Java testing framework. Figure 9.2 shows the structure of an automated test. Each test is implemented by a test method, which belongs to a test class. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0325-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0325-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -102,7 +102,7 @@ An SUT often has dependencies. The trouble with dependencies is that they can co
 The solution, as figure 9.3 shows, is to replace the SUT’s dependencies with test doubles. A _test double_ is an object that simulates the behavior of the dependency. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0326-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0326-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -149,7 +149,7 @@ A good way to categorize tests is Brian Marick’s _test quadrant_ (www.exampler
 - _Whether the goal of the test is to support programming or critique the application_ —Developers use tests that support programming as part of their daily work. Tests that critique the application aim to identify areas that need improvement. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0328-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0328-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -184,7 +184,7 @@ The key idea of the test pyramid is that as we move up the pyramid we should wri
 _**Testing strategies for microservice architectures**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0329-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0329-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -209,7 +209,7 @@ As described in chapter 3, services communicate with each other using a variety 
 Other services interact through request/asynchronous reply or publish/subscribe using asynchronous messaging. For instance, figure 9.6 shows how some of the services in the FTGO application communicate. Each arrow points from a consumer service to a producer service. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0330-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0330-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -259,7 +259,7 @@ _**Testing microservices: Part 1**_
 The team that develops the consumer writes a contract test suite and adds it (for example, via a pull request) to the provider’s test suite. The developers of other services that invoke Order Service also contribute a test suite, as shown in figure 9.7. Each test suite will test those aspects of Order Service’s API that are relevant to each consumer. The test suite for Order History Service, for example, verifies that Order Service publishes the expected events. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0332-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0332-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -299,7 +299,7 @@ Say, for example, you’re working on API Gateway and want to write a consumer c
 - 2 The Order Service team tests Order Service using consumer contract tests, which Spring Cloud Contract code generates from contracts. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0334-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0334-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -343,7 +343,7 @@ Every service has a deployment pipeline. Jez Humble’s book, Continuous Deliver
 of a series of stages that execute test suites, followed by a stage that releases or deploys the service. Ideally, it’s fully automated, but it might contain manual steps. A deployment pipeline is often implemented using a Continuous Integration (CI) server, such as Jenkins. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0336-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0336-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -383,7 +383,7 @@ Imagine that you want to write a test that verifies that the FTGO application’
 As figure 9.10 shows, unit tests are the lowest level of the test pyramid. They’re technology-facing tests that support development. A unit test verifies that a _unit_ , which is a very small part of a service, works correctly. A unit is typically a class, so the goal of unit testing is to verify that it behaves as expected. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0337-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0337-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -402,7 +402,7 @@ There are two types of unit tests (https://martinfowler.com/bliki/UnitTest.html)
 The responsibilities of the class and its role in the architecture determine which type of test to use. Figure 9.11 shows the hexagonal architecture of a typical service and the type of unit test that you’ll typically use for each kind of class. Controller and service classes are often tested using solitary unit tests. Domain objects, such as entities and value objects, are typically tested using sociable unit tests. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0338-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0338-06.png)
 
 
 **----- Start of picture text -----**<br>

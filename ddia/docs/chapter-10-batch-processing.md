@@ -270,7 +270,7 @@ Figure 10-1 shows the dataflow in a Hadoop MapReduce job. Its parallelization is
 Each input file is typically hundreds of megabytes in size. The MapReduce scheduler (not shown in the diagram) tries to run each mapper on one of the machines that stores a replica of the input file, provided that machine has enough spare RAM and CPU resources to run the map task [26]. This principle is known as _putting the computation near the data_ [27]: it saves copying the input file over the network, reducing network load and increasing locality. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0423-00.png)
+![](../images/Designing_Data_Intensive_Applications-0423-00.png)
 
 
 _Figure 10-1. A MapReduce job with three mappers and three reducers._ 
@@ -325,7 +325,7 @@ When we talk about joins in the context of batch processing, we mean resolving a
 A typical example of a join in a batch job is illustrated in Figure 10-2. On the left is a log of events describing the things that logged-in users did on a website (known as _activity events_ or _clickstream data_ ), and on the right is a database of users. You can think of this example as being part of a star schema (see “Stars and Snowflakes: Schemas for Analytics” on page 93): the log of events is the fact table, and the user database is one of the dimensions. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0426-03.png)
+![](../images/Designing_Data_Intensive_Applications-0426-03.png)
 
 
 _Figure 10-2. A join between a log of user activity events and a database of user profiles._ 
@@ -344,7 +344,7 @@ Thus, a better approach would be to take a copy of the user database (for exampl
 Recall that the purpose of the mapper is to extract a key and value from each input record. In the case of Figure 10-2, this key would be the user ID: one set of mappers would go over the activity events (extracting the user ID as the key and the activity event as the value), while another set of mappers would go over the user database (extracting the user ID as the key and the user’s date of birth as the value). This process is illustrated in Figure 10-3. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0427-04.png)
+![](../images/Designing_Data_Intensive_Applications-0427-04.png)
 
 
 _Figure 10-3. A reduce-side sort-merge join on user ID. If the input datasets are partitioned into multiple files, each could be processed with multiple mappers in parallel._ 
@@ -685,7 +685,7 @@ In “Graph-Like Data Models” on page 49 we discussed using graphs for modelin
 It is also interesting to look at graphs in a batch processing context, where the goal is to perform some kind of offline processing or analysis on an entire graph. This need often arises in machine learning applications such as recommendation engines, or in ranking systems. For example, one of the most famous graph analysis algorithms is PageRank [69], which tries to estimate the popularity of a web page based on what other web pages link to it. It is used as part of the formula that determines the order in which web search engines present their results. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0446-03.png)
+![](../images/Designing_Data_Intensive_Applications-0446-03.png)
 
 
 Dataflow engines like Spark, Flink, and Tez (see “Materialization of Intermediate State” on page 419) typically arrange the operators in a job as a directed acyclic graph (DAG). This is not the same as graph processing: in dataflow engines, the _flow of data from one operator to another_ is structured as a graph, while the data itself typically consists of relational-style tuples. In graph processing, the _data itself_ has the form of a graph. Another unfortunate naming confusion! 

@@ -74,7 +74,7 @@ $ cat database
 Our `db_set` function actually has pretty good performance for something that is so simple, because appending to a file is generally very efficient. Similarly to what `db_set` does, many databases internally use a _log_ , which is an append-only data file. Real databases have more issues to deal with (such as concurrency control, reclaiming disk space so that the log doesn’t grow forever, and handling errors and partially written records), but the basic principle is the same. Logs are incredibly useful, and we will encounter them several times in the rest of this book. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0093-01.png)
+![](../images/Designing_Data_Intensive_Applications-0093-01.png)
 
 
 The word _log_ is often used to refer to application logs, where an application outputs text that describes what’s happening. In this book, _log_ is used in the more general sense: an append-only sequence of records. It doesn’t have to be human-readable; it might be binary and intended only for other programs to read. 
@@ -97,7 +97,7 @@ Key-value stores are quite similar to the _dictionary_ type that you can find in
 Let’s say our data storage consists only of appending to a file, as in the preceding example. Then the simplest possible indexing strategy is this: keep an in-memory hash map where every key is mapped to a byte offset in the data file—the location at which the value can be found, as illustrated in Figure 3-1. Whenever you append a new key-value pair to the file, you also update the hash map to reflect the offset of the data you just wrote (this works both for inserting new keys and for updating existing keys). When you want to look up a value, use the hash map to find the offset in the data file, seek to that location, and read the value. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0094-04.png)
+![](../images/Designing_Data_Intensive_Applications-0094-04.png)
 
 
 _Figure 3-1. Storing a log of key-value pairs in a CSV-like format, indexed with an inmemory hash map._ 
@@ -112,7 +112,7 @@ A storage engine like Bitcask is well suited to situations where the value for e
 As described so far, we only ever append to a file—so how do we avoid eventually running out of disk space? A good solution is to break the log into segments of a certain size by closing a segment file when it reaches a certain size, and making subsequent writes to a new segment file. We can then perform _compaction_ on these segments, as illustrated in Figure 3-2. Compaction means throwing away duplicate keys in the log, and keeping only the most recent update for each key. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0095-03.png)
+![](../images/Designing_Data_Intensive_Applications-0095-03.png)
 
 
 _Figure 3-2. Compaction of a key-value update log (counting the number of times each cat video was played), retaining only the most recent value for each key._ 
@@ -120,7 +120,7 @@ _Figure 3-2. Compaction of a key-value update log (counting the number of times 
 Moreover, since compaction often makes segments much smaller (assuming that a key is overwritten several times on average within one segment), we can also merge several segments together at the same time as performing the compaction, as shown in Figure 3-3. Segments are never modified after they have been written, so the merged segment is written to a new file. The merging and compaction of frozen segments can be done in a background thread, and while it is going on, we can still continue to serve read and write requests as normal, using the old segment files. After the merging process is complete, we switch read requests to using the new merged segment instead of the old segments—and then the old segment files can simply be deleted. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0096-00.png)
+![](../images/Designing_Data_Intensive_Applications-0096-00.png)
 
 
 _Figure 3-3. Performing compaction and segment merging simultaneously._ 
@@ -180,7 +180,7 @@ We call this format _Sorted String Table_ , or _SSTable_ for short. We also requ
 1. Merging segments is simple and efficient, even if the files are bigger than the available memory. The approach is like the one used in the _mergesort_ algorithm and is illustrated in Figure 3-4: you start reading the input files side by side, look at the first key in each file, copy the lowest key (according to the sort order) to the output file, and repeat. This produces a new merged segment file, also sorted by key. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0098-05.png)
+![](../images/Designing_Data_Intensive_Applications-0098-05.png)
 
 
 _Figure 3-4. Merging several SSTable segments, retaining only the most recent value for each key._ 
@@ -191,7 +191,7 @@ What if the same key appears in several input segments? Remember that each segme
 2. In order to find a particular key in the file, you no longer need to keep an index of all the keys in memory. See Figure 3-5 for an example: say you’re looking for the key `handiwork` , but you don’t know the exact offset of that key in the segment file. However, you do know the offsets for the keys _handbag_ and _handsome_ , and because of the sorting you know that _handiwork_ must appear between those two. This means you can jump to the offset for _handbag_ and scan from there until you find _handiwork_ (or not, if the key is not present in the file). 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0099-02.png)
+![](../images/Designing_Data_Intensive_Applications-0099-02.png)
 
 
 _Figure 3-5. An SSTable with an in-memory index._ 
@@ -254,7 +254,7 @@ The log-structured indexes we saw earlier break the database down into variable-
 Each page can be identified using an address or location, which allows one page to refer to another—similar to a pointer, but on disk instead of in memory. We can use these page references to construct a tree of pages, as illustrated in Figure 3-6. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0102-04.png)
+![](../images/Designing_Data_Intensive_Applications-0102-04.png)
 
 
 _Figure 3-6. Looking up a key using a B-tree index._ 
@@ -271,7 +271,7 @@ The number of references to child pages in one page of the B-tree is called the 
 If you want to update the value for an existing key in a B-tree, you search for the leaf page containing that key, change the value in that page, and write the page back to disk (any references to that page remain valid). If you want to add a new key, you need to find the page whose range encompasses the new key and add it to that page. If there isn’t enough free space in the page to accommodate the new key, it is split into two half-full pages, and the parent page is updated to account for the new subdivision of key ranges—see Figure 3-7.[ii] 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0103-03.png)
+![](../images/Designing_Data_Intensive_Applications-0103-03.png)
 
 
 _Figure 3-7. Growing a B-tree by splitting a page._ 
@@ -429,7 +429,7 @@ Further changes to storage engine design will probably be needed if _non-volatil
 In the early days of business data processing, a write to the database typically corresponded to a _commercial transaction_ taking place: making a sale, placing an order with a supplier, paying an employee’s salary, etc. As databases expanded into areas that didn’t involve money changing hands, the term _transaction_ nevertheless stuck, referring to a group of reads and writes that form a logical unit. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0112-04.png)
+![](../images/Designing_Data_Intensive_Applications-0112-04.png)
 
 
 A transaction needn’t necessarily have ACID (atomicity, consistency, isolation, and durability) properties. _Transaction processing_ just means allowing clients to make low-latency reads and writes— as opposed to _batch processing_ jobs, which only run periodically (for example, once per day). We discuss the ACID properties in Chapter 7 and batch processing in Chapter 10. 
@@ -474,7 +474,7 @@ These OLTP systems are usually expected to be highly available and to process tr
 A _data warehouse_ , by contrast, is a separate database that analysts can query to their hearts’ content, without affecting OLTP operations [48]. The data warehouse contains a read-only copy of the data in all the various OLTP systems in the company. Data is extracted from OLTP databases (using either a periodic data dump or a continuous stream of updates), transformed into an analysis-friendly schema, cleaned up, and then loaded into the data warehouse. This process of getting data into the warehouse is known as _Extract–Transform–Load_ (ETL) and is illustrated in Figure 3-8. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0114-01.png)
+![](../images/Designing_Data_Intensive_Applications-0114-01.png)
 
 
 _Figure 3-8. Simplified outline of ETL into a data warehouse._ 
@@ -505,7 +505,7 @@ The example schema in Figure 3-9 shows a data warehouse that might be found at a
 **Transaction Processing or Analytics? | 93** 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0116-00.png)
+![](../images/Designing_Data_Intensive_Applications-0116-00.png)
 
 
 _Figure 3-9. Example of a star schema for use in a data warehouse._ 
@@ -561,13 +561,13 @@ In order to process a query like Example 3-1, you may have indexes on `fact_sale
 The idea behind _column-oriented storage_ is simple: don’t store all the values from one row together, but store all the values from each _column_ together instead. If each column is stored in a separate file, a query only needs to read and parse those columns that are used in that query, which can save a lot of work. This principle is illustrated in Figure 3-10. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0118-06.png)
+![](../images/Designing_Data_Intensive_Applications-0118-06.png)
 
 
 Column storage is easiest to understand in a relational data model, but it applies equally to nonrelational data. For example, Parquet [57] is a columnar storage format that supports a document data model, based on Google’s Dremel [54]. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0119-00.png)
+![](../images/Designing_Data_Intensive_Applications-0119-00.png)
 
 
 _Figure 3-10. Storing relational data by column, rather than by row._ 
@@ -583,7 +583,7 @@ Take a look at the sequences of values for each column in Figure 3-10: they ofte
 **Column-Oriented Storage | 97** 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0120-00.png)
+![](../images/Designing_Data_Intensive_Applications-0120-00.png)
 
 
 _Figure 3-11. Compressed, bitmap-indexed storage of a single column._ 
@@ -610,7 +610,7 @@ Load the bitmaps for `product_sk = 31` and `store_sk = 3` , and calculate the bi
 There are also various other compression schemes for different kinds of data, but we won’t go into them in detail—see [58] for an overview. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0121-03.png)
+![](../images/Designing_Data_Intensive_Applications-0121-03.png)
 
 
 ## **Column-oriented storage and column families** 
@@ -675,7 +675,7 @@ such updates make writes more expensive, which is why materialized views are not
 A common special case of a materialized view is known as a _data cube_ or _OLAP cube_ [64]. It is a grid of aggregates grouped by different dimensions. Figure 3-12 shows an example. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0124-02.png)
+![](../images/Designing_Data_Intensive_Applications-0124-02.png)
 
 
 _Figure 3-12. Two dimensions of a data cube, aggregating data by summing._ 

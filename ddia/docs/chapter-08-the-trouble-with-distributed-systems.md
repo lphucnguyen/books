@@ -108,7 +108,7 @@ The internet and most internal networks in datacenters (often Ethernet) are _asy
 6. The remote node may have processed your request, but the response has been delayed and will be delivered later (perhaps the network or your own machine is overloaded). 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0300-09.png)
+![](../images/Designing_Data_Intensive_Applications-0300-09.png)
 
 
 _Figure 8-1. If you send a request and don’t get a response, it’s not possible to distinguish whether (a) the request was lost, (b) the remote node is down, or (c) the response was lost._ 
@@ -127,7 +127,7 @@ There are some systematic studies, and plenty of anecdotal evidence, showing tha
 Public cloud services such as EC2 are notorious for having frequent transient network glitches [14], and well-managed private datacenter networks can be stabler environments. Nevertheless, nobody is immune from network problems: for example, a problem during a software upgrade for a switch could trigger a network topology reconfiguration, during which network packets could be delayed for more than a minute [17]. Sharks might bite undersea cables and damage them [18]. Other surprising faults include a network interface that sometimes drops all inbound packets but sends outbound packets successfully [19]: just because a network link works in one direction doesn’t guarantee it’s also working in the opposite direction. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0301-06.png)
+![](../images/Designing_Data_Intensive_Applications-0301-06.png)
 
 
 ## **Network partitions** 
@@ -195,7 +195,7 @@ When driving a car, travel times on road networks often vary most due to traffic
 network link or the receiving node [27]. This means additional queueing at the sender before the data even enters the network. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0305-01.png)
+![](../images/Designing_Data_Intensive_Applications-0305-01.png)
 
 
 _Figure 8-2. If several machines send network traffic to the same destination, its switch queue can fill up. Here, ports 1, 2, and 4 are all trying to send packets to port 3._ 
@@ -369,7 +369,7 @@ Let’s consider one particular situation in which it is tempting, but dangerous
 Figure 8-3 illustrates a dangerous use of time-of-day clocks in a database with multileader replication (the example is similar to Figure 5-9). Client A writes _x_ = 1 on node 1; the write is replicated to node 3; client B increments _x_ on node 3 (we now have _x_ = 2); and finally, both writes are replicated to node 2. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0314-00.png)
+![](../images/Designing_Data_Intensive_Applications-0314-00.png)
 
 
 _Figure 8-3. The write by client B is causally later than the write by client A, but B’s write has an earlier timestamp._ 
@@ -494,7 +494,7 @@ In many programming languages and operating systems, threads and processes may p
 Some software runs in environments where a failure to respond within a specified time can cause serious damage: computers that control aircraft, rockets, robots, cars, and other physical objects must respond quickly and predictably to their sensor inputs. In these systems, there is a specified _deadline_ by which the software must respond; if it doesn’t meet the deadline, that may cause a failure of the entire system. These are so-called _hard real-time_ systems. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0320-06.png)
+![](../images/Designing_Data_Intensive_Applications-0320-06.png)
 
 
 ## **Is real-time really real?** 
@@ -568,7 +568,7 @@ If a node continues acting as the chosen one, even though the majority of nodes 
 For example, Figure 8-4 shows a data corruption bug due to an incorrect implementation of locking. (The bug is not theoretical: HBase used to have this problem [74, 75].) Say you want to ensure that a file in a storage service can only be accessed by one client at a time, because if multiple clients tried to write to it, the file would become corrupted. You try to implement this by requiring a client to obtain a lease from a lock service before accessing the file. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0324-04.png)
+![](../images/Designing_Data_Intensive_Applications-0324-04.png)
 
 
 _Figure 8-4. Incorrect implementation of a distributed lock: client 1 believes that it still has a valid lease, even though it has expired, and thus corrupts a file in storage._ 
@@ -581,7 +581,7 @@ The problem is an example of what we discussed in “Process Pauses” on page 2
 When using a lock or lease to protect access to some resource, such as the file storage in Figure 8-4, we need to ensure that a node that is under a false belief of being “the chosen one” cannot disrupt the rest of the system. A fairly simple technique that achieves this goal is called _fencing_ , and is illustrated in Figure 8-5. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0325-02.png)
+![](../images/Designing_Data_Intensive_Applications-0325-02.png)
 
 
 _Figure 8-5. Making access to storage safe by allowing writes only in the order of increasing fencing tokens._ 

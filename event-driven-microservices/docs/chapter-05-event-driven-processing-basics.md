@@ -50,7 +50,7 @@ Building a microservice topology requires thinking in an event-driven way, as th
 Consider the topology in Figure 5-1. Events are consumed one at a time and are processed according to the transformations in stages 1 and 2. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0098-04.png)
+![](../images/Event-Driven_Microservices-0098-04.png)
 
 
 _Figure 5-1. A simple event processing topology_ 
@@ -85,7 +85,7 @@ A consumer application may need to _branch_ event streams—that is, apply a log
 Applications may also need to _merge_ streams, where events from multiple input streams are consumed, possibly processed in some meaningful way, and then output to a single output stream. There aren’t too many scenarios where it’s important to merge multiple streams into just one, since it is common for microservices to consume from as many input streams as necessary to fulfill their business logic. Chapter 6 discusses how to handle consuming and processing events from multiple input streams in a consistent and reproducible order. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0099-09.png)
+![](../images/Event-Driven_Microservices-0099-09.png)
 
 
 If you do end up merging event streams, define a new unified schema representative of the merged event steam domain. If this domain doesn’t make sense, then it may be best to leave the streams unmerged and reconsider your system design. 
@@ -110,7 +110,7 @@ Change the logic used to select which partition an event will be written to.
 It’s rare that a purely stateless processor will need to repartition an event stream, barring the case of increasing the partition count for increased downstream parallelism. That being said, a stateless microservice may be used to repartition events that are consumed by a downstream _stateful_ processor, which is the subject of the next example. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0100-07.png)
+![](../images/Event-Driven_Microservices-0100-07.png)
 
 
 The partitioner algorithm deterministically maps an event’s key to a specific partition, typically by using a hash function. This ensures that all events with the same key end up in the same partition. 
@@ -124,7 +124,7 @@ Consumers of this state are interested in ensuring that all of the data belongin
 Producing all events for a given key into a single partition provides the basis for _data locality_ . A consumer need only consume events from a single partition to build a complete picture of events pertaining to that key. This enables consumer microservices to scale up to many instances, each consuming from a single partition, while maintaining a complete stateful account of all events pertaining to that key. Repartitioning and data locality are essential parts of performing stateful processing at scale. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0101-00.png)
+![](../images/Event-Driven_Microservices-0101-00.png)
 
 
 _Figure 5-2. Repartitioning an event stream_ 
@@ -140,7 +140,7 @@ Consider again the repartition example of Figure 5-2. Say that you now need to j
 Both streams have the same partition count, and both have been partitioned using the same partitioner algorithm. Note that the key distribution of each partition matches the distribution of the other stream and that each join is performed by its own consumer instance. The next section covers how partitions are assigned to a microservice instance to leverage copartitioned streams, as was done in this join example. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0102-00.png)
+![](../images/Event-Driven_Microservices-0102-00.png)
 
 
 _Figure 5-3. Copartitioned user event and user entity streams_ 
@@ -181,7 +181,7 @@ All partitions are tallied into a list and assigned in a round-robin manner to e
 Figure 5-4 shows two consumer instances, each with its own set of assigned partitions. C0 has two sets of copartitioned partitions compared to one for C1, since assignment both began and ended on C0. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0104-00.png)
+![](../images/Event-Driven_Microservices-0104-00.png)
 
 
 _Figure 5-4. Round-robin partition assignments for two consumer instances_ 
@@ -189,7 +189,7 @@ _Figure 5-4. Round-robin partition assignments for two consumer instances_
 When the number of consumer instances for the given consumer group increases, partition assignments should be rebalanced to spread the load among the newly added resources. Figure 5-5 shows the effects of adding two more consumer instances. 
 
 
-![](../images/Event-Driven_Microservices.pdf-0104-03.png)
+![](../images/Event-Driven_Microservices-0104-03.png)
 
 
 _Figure 5-5. Round-robin partition assignments for four consumer instances_ 

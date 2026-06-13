@@ -25,7 +25,7 @@ Let’s start by taking a look at how to write integration tests.
 Services typically interact with other services. For example, Order Service, as figure 10.1 shows, interacts with several services. Its REST API is consumed by API Gateway, and its domain events are consumed by services, including Order History Service. Order Service uses several other services. It persists Orders in MySQL. It also sends commands to and consumes replies from several other services, such as Kitchen Service. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0349-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0349-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -42,7 +42,7 @@ testing sometimes, but it’s at the top of the test pyramid, so you want to min
 A much more effective strategy is to write what are known as integration tests. As figure 10.2 shows, integration tests are the layer above unit tests in the testing pyramid. They verify that a service can properly interact with infrastructure services and other services. But unlike end-to-end tests, they don’t launch services. Instead, we use a couple of strategies that significantly simplify the tests without impacting their effectiveness. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0350-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0350-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -125,7 +125,7 @@ Figure 10.3 shows how to use Spring Cloud Contract to test REST-based interactio
 The consumer-side OrderServiceProxyTest invokes OrderServiceProxy, which has been configured to make HTTP requests to WireMock. WireMock is a tool for efficiently mocking HTTP servers—in this test it simulates Order Service. Spring Cloud 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0353-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0353-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -247,7 +247,7 @@ _**Writing integration tests**_
 ## **Class under test** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0357-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0357-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -348,7 +348,7 @@ Figure 10.5 shows how to test the interaction between Order Service and Kitchen 
 _**Writing integration tests**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0361-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0361-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -459,7 +459,7 @@ I begin by briefly describing how to use a testing DSL called Gherkin to write a
 Let’s look at writing acceptance tests using Gherkin. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0366-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0366-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -607,7 +607,7 @@ Using Cucumber with the Spring Boot testing framework requires a slightly unusua
 _**Developing component tests**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0371-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0371-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -745,7 +745,7 @@ Now that we’ve looked at how to test a service in isolation, we’ll see how t
 Component testing tests each service separately. End-to-end testing, though, tests the entire application. As figure 10.8 shows, end-to-end testing is the top of the test pyramid. That’s because these kinds of tests are—say it with me now—slow, brittle, and time consuming to develop. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0375-10.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0375-10.png)
 
 
 **----- Start of picture text -----**<br>

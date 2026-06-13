@@ -44,7 +44,7 @@ The information displayed by the _Order Status_ view includes basic information 
 ## **Data from multiple services Mobile device or web application** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0252-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0252-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -80,7 +80,7 @@ query operation by invoking the services that own the data and combining the res
 - _A provider service_ —This is a service that owns some of the data that the query returns. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0253-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0253-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -105,7 +105,7 @@ required data, the aggregator might need to perform an inefficient, in-memory jo
 The findOrder() query operation corresponds to a simple primary key-based equijoin query. It’s reasonable to expect that each of the _Provider services_ has an API endpoint for retrieving the required data by orderId. Consequently, the findOrder() query operation is an excellent candidate to be implemented by the API composition pattern. The _API composer_ invokes the four services and combines the results together. Figure 7.3 shows the design of the Find Order Composer. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0254-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0254-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -137,7 +137,7 @@ Let’s look at each issue.
 One decision that you must make is who plays the role of the query operation’s _API composer_ . You have three options. The first option, shown in figure 7.4, is for a client of the services to be the _API composer_ . 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0255-09.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0255-09.png)
 
 
 **----- Start of picture text -----**<br>
@@ -155,14 +155,14 @@ This option makes sense if the query operation is part of the application’s ex
 The third option, shown in figure 7.6, is to implement an _API composer_ as a standalone service. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0256-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0256-02.png)
 
 
 **----- Start of picture text -----**<br>
 External client, such as<br>mobile application<br>findOrder()<br>API gateway<br>API composer<br>Order Delivery<br>Service Service<br>Kitchen Accounting<br>Service Service<br>**----- End of picture text -----**<br>
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0256-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0256-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -264,7 +264,7 @@ _**Implementing queries in a microservice architecture**_
 There are two ways an _API composer_ could solve this problem. One solution is for the _API composer_ to do an in-memory join, as shown in figure 7.7. It retrieves all orders for the consumer from Delivery Service and Accounting Service and performs a join with the orders retrieved from Order Service and Kitchen Service. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0260-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0260-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -334,7 +334,7 @@ Both the non-CQRS and CQRS versions of the service have an API consisting of var
 _**Using the CQRS pattern**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0263-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0263-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -355,7 +355,7 @@ Not only can CQRS be applied within a service, but you can also use this pattern
 subscribing to events published by multiple services. This kind of view doesn’t belong to any particular service, so it makes sense to implement it as a standalone service. A good example of such a service is Order History Service, which is a query service that implements the findOrderHistory() query operation. As figure 7.9 shows, this service subscribes to events published by several services, including Order Service, Delivery Service, and so on. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0264-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0264-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -445,7 +445,7 @@ A CQRS view module has an API consisting of one more query operations. It implem
 _**Designing CQRS views**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0267-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0267-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -528,7 +528,7 @@ For example, an event handler for an Order* event might be invoked at the same t
 As mentioned in chapter 3, an event handler may be invoked with the same event more than once. This is generally not a problem if a query-side event handler is idempotent. An event handler is idempotent if handling duplicate events results in the correct outcome. In the worst case, the view datastore will temporarily be out-of-date. For example, an event handler that maintains the Order History view might be invoked with the (admittedly improbable) sequence of events shown in figure 7.11: DeliveryPickedUp, DeliveryDelivered, DeliveryPickedUp, and DeliveryDelivered. After delivering the DeliveryPickedUp and DeliveryDelivered events the first time, the message broker, perhaps because of a network error, starts delivering the events from an earlier point in time, and so redelivers DeliveryPickedUp and DeliveryDelivered. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0270-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0270-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -600,7 +600,7 @@ _**Implementing a CQRS view with AWS DynamoDB**_
 - ftgo-order-history _DynamoDB table_ —The table that stores the orders 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0273-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0273-04.png)
 
 
 **----- Start of picture text -----**<br>

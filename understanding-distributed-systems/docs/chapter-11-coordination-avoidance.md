@@ -28,7 +28,7 @@ Network communication over wide area networks, like the internet, only offers po
 A broadcast protocol is characterized by the guarantees it provides. _Best-effort broadcast_ guarantees that if the sender doesn’t crash, the message is delivered to all non-faulty processes in a group. A simple way to implement it is to send the message to all processes in a group one by one over reliable links (see Fig 11.1). However, if, for example, the sender fails mid-way, some processes will never receive the message. 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0114-06.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0114-06.png)
 
 
 Figure 11.1: Best-effort broadcast 
@@ -39,7 +39,7 @@ Unlike best-effort broadcast, _reliable broadcast_ guarantees that the message i
 97 delivered. One way to implement reliable broadcast is to have each process retransmit the message to the rest of the group the first time it is delivered (see Fig 11.2). This approach is also known as _eager reliable broadcast_ . Although it guarantees that all non-faulty processes eventually receive the message, it’s costly as it requires sending the message 𝑁[2] times for a group of 𝑁 processes. 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0115-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0115-03.png)
 
 
 Figure 11.2: Eager reliable broadcast 
@@ -54,7 +54,7 @@ Although reliable broadcast protocols guarantee that messages are delivered to a
 98 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0116-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0116-02.png)
 
 
 Figure 11.3: Gossip broadcast ensures that messages are delivered in the same order to all processes. As discussed earlier, a fault-tolerant implementation requires consensus. 
@@ -77,7 +77,7 @@ Using a broadcast protocol that doesn’t deliver messages in the same order acr
 (see Fig 11.4). One way to reconcile conflicting writes is to use consensus to make a decision that all replicas need to agree with. 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0117-03.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0117-03.png)
 
 
 Figure 11.4: The same object is updated simultaneously by different clients at different replicas, leading to conflicts. 
@@ -138,13 +138,13 @@ The main issue with LWW registers is that conflicting updates that happen concur
 102 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0120-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0120-02.png)
 
 
 Figure 11.5: Last-writer wins register operation returns the union of all concurrent updates (see Fig 11.6). 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0120-05.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0120-05.png)
 
 
 Figure 11.6: Multi-value register 
@@ -174,7 +174,7 @@ Typically W and R are configured to be majority quorums, i.e., quorums that cont
 104 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0122-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0122-02.png)
 
 
 Figure 11.7: Intersecting write and read quorums 
@@ -258,7 +258,7 @@ When a client sends a write to its local replica, it adds a copy of
 When a replica receives a replication message for a write, it doesn’t apply it locally immediately. Instead, it first checks whether the write’s dependencies have been committed locally. If not, it waits until the required versions appear. Finally, once all dependencies have been committed, the replication message is applied locally. This behavior guarantees causal consistency (see Fig 11.8). 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0127-04.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0127-04.png)
 
 
 Figure 11.8: A causally consistent implementation of a key-value store 

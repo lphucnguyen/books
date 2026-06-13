@@ -99,7 +99,7 @@ Although this approach works, it’s not resilient to failures. If one of the tw
 175 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0193-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0193-02.png)
 
 
 Figure 18.1: DNS load balancing time to propagate to the clients, since DNS entries are cached, as discussed in chapter 4. 
@@ -139,7 +139,7 @@ A network load balancer can be built using commodity machines
 177 
 
 
-![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022-.pdf-0195-02.png)
+![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0195-02.png)
 
 
 Figure 18.2: Transport layer load balancing and scaled out using a combination of _Anycast_[11] and _ECMP_[12] . Load balancer instances announce themselves to the data center’s edge routers with the same Anycast VIP and identical BGP weight. Using an Anycast IP is a neat trick that allows multiple machines to share the same IP address and have routers send traffic to the one with the lowest BGP weight. If all the instances have the same identical BGP weight, routers use equal-cost multi-path routing (consistent hashing) to ensure that the packets of a specific connection are generally routed to the same load balancer instance. 

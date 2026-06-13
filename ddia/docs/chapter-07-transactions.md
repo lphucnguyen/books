@@ -101,7 +101,7 @@ _Isolation_ in the sense of ACID means that concurrently executing transactions 
 i. Joe Hellerstein has remarked that the C in ACID was “tossed in to make the acronym work” in Härder and Reuter’s paper [7], and that it wasn’t considered important at the time. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0248-00.png)
+![](../images/Designing_Data_Intensive_Applications-0248-00.png)
 
 
 _Figure 7-1. A race condition between two clients concurrently incrementing a counter._ 
@@ -167,7 +167,7 @@ In Figure 7-2, user 2 experiences an anomaly: the mailbox listing shows an unrea
 > ii. Arguably, an incorrect counter in an email application is not a particularly critical problem. Alternatively, think of a customer account balance instead of an unread counter, and a payment transaction instead of an email. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0251-00.png)
+![](../images/Designing_Data_Intensive_Applications-0251-00.png)
 
 
 _Figure 7-2. Violating isolation: one transaction reads another transaction’s uncommitted writes (a “dirty read”)._ 
@@ -175,7 +175,7 @@ _Figure 7-2. Violating isolation: one transaction reads another transaction’s 
 Figure 7-3 illustrates the need for atomicity: if an error occurs somewhere over the course of the transaction, the contents of the mailbox and the unread counter might become out of sync. In an atomic transaction, if the update to the counter fails, the transaction is aborted and the inserted email is rolled back. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0251-03.png)
+![](../images/Designing_Data_Intensive_Applications-0251-03.png)
 
 
 _Figure 7-3. Atomicity ensures that if an error occurs any prior writes from that transaction are undone, to avoid an inconsistent state._ 
@@ -282,7 +282,7 @@ Imagine a transaction has written some data to the database, but the transaction
 Transactions running at the read committed isolation level must prevent dirty reads. This means that any writes by a transaction only become visible to others when that transaction commits (and then all of its writes become visible at once). This is illustrated in Figure 7-4, where user 1 has set _x_ = 3, but user 2’s _get x_ still returns the old value, 2, while user 1 has not yet committed. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0256-09.png)
+![](../images/Designing_Data_Intensive_Applications-0256-09.png)
 
 
 _Figure 7-4. No dirty reads: user 2 sees the new value for x only after user 1’s transaction has committed._ 
@@ -309,7 +309,7 @@ By preventing dirty writes, this isolation level avoids some kinds of concurrenc
 - However, read committed does _not_ prevent the race condition between two counter increments in Figure 7-1. In this case, the second write happens after the first transaction has committed, so it’s not a dirty write. It’s still incorrect, but for a different reason—in “Preventing Lost Updates” on page 242 we will discuss how to make such counter increments safe. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0258-00.png)
+![](../images/Designing_Data_Intensive_Applications-0258-00.png)
 
 
 _Figure 7-5. With dirty writes, conflicting writes from different transactions can be mixed up._ 
@@ -334,7 +334,7 @@ If you look superficially at read committed isolation, you could be forgiven for
 However, there are still plenty of ways in which you can have concurrency bugs when using this isolation level. For example, Figure 7-6 illustrates a problem that can occur with read committed. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0259-04.png)
+![](../images/Designing_Data_Intensive_Applications-0259-04.png)
 
 
 _Figure 7-6. Read skew: Alice observes the database in an inconsistent state._ 
@@ -349,7 +349,7 @@ incoming payment has arrived (with a balance of $500), and the other account aft
 This anomaly is called a _nonrepeatable read_ or _read skew_ : if Alice were to read the balance of account 1 again at the end of the transaction, she would see a different value ($600) than she saw in her previous query. Read skew is considered acceptable under read committed isolation: the account balances that Alice saw were indeed committed at the time when she read them. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0260-02.png)
+![](../images/Designing_Data_Intensive_Applications-0260-02.png)
 
 
 The term _skew_ is unfortunately overloaded: we previously used it in the sense of an _unbalanced workload with hot spots_ (see “Skewed Workloads and Relieving Hot Spots” on page 205), whereas here it means _timing anomaly_ . 
@@ -386,7 +386,7 @@ Figure 7-7 illustrates how MVCC-based snapshot isolation is implemented in Postg
 vii. To be precise, transaction IDs are 32-bit integers, so they overflow after approximately 4 billion transactions. PostgreSQL’s vacuum process performs cleanup which ensures that overflow does not affect the data. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0262-00.png)
+![](../images/Designing_Data_Intensive_Applications-0262-00.png)
 
 
 _Figure 7-7. Implementing snapshot isolation using multi-version objects._ 
@@ -551,7 +551,7 @@ can give up their shifts (e.g., if they are sick themselves), provided that at l
 Now imagine that Alice and Bob are the two on-call doctors for a particular shift. Both are feeling unwell, so they both decide to request leave. Unfortunately, they happen to click the button to go off call at approximately the same time. What happens next is illustrated in Figure 7-8. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0269-02.png)
+![](../images/Designing_Data_Intensive_Applications-0269-02.png)
 
 
 _Figure 7-8. Example of write skew causing an application bug._ 
@@ -731,7 +731,7 @@ In this interactive style of transaction, a lot of time is spent in network comm
 For this reason, systems with single-threaded serial transaction processing don’t allow interactive multi-statement transactions. Instead, the application must submit the entire transaction code to the database ahead of time, as a _stored procedure_ . The differences between these approaches is illustrated in Figure 7-9. Provided that all data required by a transaction is in memory, the stored procedure can execute very fast, without waiting for any network or disk I/O. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0276-03.png)
+![](../images/Designing_Data_Intensive_Applications-0276-03.png)
 
 
 _Figure 7-9. The difference between an interactive transaction and a stored procedure (using the example transaction of Figure 7-8)._ 
@@ -786,7 +786,7 @@ Serial execution of transactions has become a viable way of achieving serializab
 For around 30 years, there was only one widely used algorithm for serializability in databases: _two-phase locking_ (2PL).[xi] 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0279-02.png)
+![](../images/Designing_Data_Intensive_Applications-0279-02.png)
 
 
 ## **2PL is not 2PC** 
@@ -929,7 +929,7 @@ How does the database know if a query result might have changed? There are two c
 Recall that snapshot isolation is usually implemented by multi-version concurrency control (MVCC; see Figure 7-10). When a transaction reads from a consistent snapshot in an MVCC database, it ignores writes that were made by any other transactions that hadn’t yet committed at the time when the snapshot was taken. In Figure 7-10, transaction 43 sees Alice as having `on_call = true` , because transaction 42 (which modified Alice’s on-call status) is uncommitted. However, by the time transaction 43 wants to commit, transaction 42 has already committed. This means that the write that was ignored when reading from the consistent snapshot has now taken effect, and transaction 43’s premise is no longer true. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0285-06.png)
+![](../images/Designing_Data_Intensive_Applications-0285-06.png)
 
 
 _Figure 7-10. Detecting when a transaction reads outdated values from an MVCC snapshot._ 
@@ -944,7 +944,7 @@ Why wait until committing? Why not abort transaction 43 immediately when the sta
 The second case to consider is when another transaction modifies data after it has been read. This case is illustrated in Figure 7-11. 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0286-04.png)
+![](../images/Designing_Data_Intensive_Applications-0286-04.png)
 
 
 _Figure 7-11. In serializable snapshot isolation, detecting when one transaction modifies another transaction’s reads._ 

@@ -207,7 +207,7 @@ The _proxy interface_ usually encapsulates the underlying communication protocol
 _**Communicating using the synchronous Remote procedure invocation pattern**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0103-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0103-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -346,7 +346,7 @@ An RPI proxy that immediately rejects invocations for a timeout period after the
 Consider, for example, the scenario shown in figure 3.2, where the Order Service is unresponsive. A mobile client makes a REST request to an API gateway, which, as discussed in chapter 8, is the entry point into the application for API clients. The API gateway proxies the request to the unresponsive Order Service. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0108-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0108-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -392,7 +392,7 @@ It’s likely that each service’s data isn’t equally important to the client
 _**Interprocess communication in a microservice architecture**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0110-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0110-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -413,7 +413,7 @@ Service instances have dynamically assigned network locations. Moreover, the set
 _**Communicating using the synchronous Remote procedure invocation pattern**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0111-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0111-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -444,7 +444,7 @@ One way to implement service discovery is for the application’s services and t
 _**Interprocess communication in a microservice architecture**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0112-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0112-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -484,7 +484,7 @@ Later in chapter 12 you’ll learn that many modern deployment platforms such as
 The deployment platform includes a service registry that tracks the IP addresses of the deployed services. In this example, a client accesses the Order Service using the 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0114-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0114-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -560,7 +560,7 @@ As figure 3.7 shows, messages are exchanged over channels (www.enterpriseintegra
 _**Communicating using the Asynchronous messaging pattern**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0117-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0117-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -593,7 +593,7 @@ The client and service implement the asynchronous request/response style interac
 **Client sends message containing msgId and a reply channel.** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0118-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0118-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -633,7 +633,7 @@ The specification for a service’s asynchronous API must, as figure 3.9 shows, 
 A service’s asynchronous API consists of operations, invoked by clients, and events, published by the services. They’re documented in different ways. Let’s take a look at each one, starting with operations. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0120-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0120-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -666,7 +666,7 @@ A messaging-based application typically uses a _message broker_ , an infrastruct
 _**Communicating using the Asynchronous messaging pattern**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0121-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0121-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -808,7 +808,7 @@ A common solution, used by modern message brokers like Apache Kafka and AWS Kine
 _**Communicating using the Asynchronous messaging pattern**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0125-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0125-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -849,7 +849,7 @@ Consider, for example, a message handler that authorizes a consumer credit card.
 A simple solution is for a message consumer to track the messages that it has processed using the message id and discard any duplicates. It could, for example, store the message id of each message that it consumed in a database table. Figure 3.12 shows how to do this using a dedicated table. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0126-08.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0126-08.png)
 
 
 **----- Start of picture text -----**<br>
@@ -878,7 +878,7 @@ As a result, an application must use a different mechanism to reliably publish m
 Let’s imagine that your application is using a relational database. A straightforward way to reliably publish messages is to apply the Transactional outbox pattern. This pattern uses a database table as a temporary message queue. As figure 3.13 shows, a service that sends messages has an OUTBOX database table. As part of the database 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0127-09.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0127-09.png)
 
 
 **----- Start of picture text -----**<br>
@@ -930,7 +930,7 @@ PUBLISHING EVENTS BY APPLYING THE TRANSACTION LOG TAILING PATTERN
 A sophisticated solution is for MessageRelay to _tail_ the database transaction log (also called the commit log). Every committed update made by an application is represented as an entry in the database’s transaction log. A transaction log miner can read the transaction log and publish each change as a message to the message broker. Figure 3.14 shows how this approach works. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0129-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0129-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -1060,7 +1060,7 @@ REST is an extremely popular IPC mechanism. You may be tempted to use it for int
 To see why, consider the scenario shown in figure 3.15. The Order Service has a REST API for creating an Order. It invokes the Consumer Service and the Restaurant Service to validate the Order. Both of those services also have REST APIs. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0133-12.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0133-12.png)
 
 
 **----- Start of picture text -----**<br>
@@ -1107,7 +1107,7 @@ _**Using asynchronous messaging to improve availability**_
 This service then asynchronously exchanges messages with other services and eventually sends a reply message to the client. Figure 3.16 shows the design. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0135-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0135-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -1131,7 +1131,7 @@ Consumer Service and Restaurant Service publish events whenever their data chang
 In some situations, replicating data is a useful approach. For example, chapter 5 describes how Order Service replicates data from Restaurant Service so that it can validate and price menu items. One drawback of replication is that it can sometimes require the replication of large amounts of data, which is inefficient. For example, it may not be practical for Order Service to maintain a replica of the data owned by Consumer Service, due to the large number of consumers. Another drawback of 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0136-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0136-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -1166,7 +1166,7 @@ For example, if Order Service uses this approach, it creates an order in a PENDI
 _**Using asynchronous messaging to improve availability**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0137-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0137-02.png)
 
 
 **----- Start of picture text -----**<br>

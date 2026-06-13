@@ -62,7 +62,7 @@ The purpose of each view is as follows:
 - _Implementation view_ —The output of the build system. This view consists of modules, which represent packaged code, and components, which are executable 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0066-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0066-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -132,7 +132,7 @@ The business logic has one or more ports. A _port_ defines a set of operations a
 _**What is the microservice architecture exactly?**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0069-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0069-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -172,7 +172,7 @@ Later in this chapter, I describe what is meant by _business capability_ . The c
 _**What is the microservice architecture exactly?**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0071-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0071-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -195,7 +195,7 @@ Each service in a microservice architecture has its own architecture and, potent
 **Defines operations** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0072-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0072-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -240,21 +240,21 @@ The microservice architecture structures an application as a set of small, loose
 How should we define a microservice architecture? As with any software development effort, the starting points are the written requirements, hopefully domain experts, and perhaps an existing application. Like much of software development, defining an architecture is more art than science. This section describes a simple, three-step process, shown in figure 2.5, for defining an application’s architecture. It’s important to remember, though, that it’s not a process you can follow mechanically. It’s likely to be iterative and involve a lot of creativity. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0074-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0074-04.png)
 
 
 **----- Start of picture text -----**<br>
 The starting point are the requirements,<br>such as the user stories.<br>**----- End of picture text -----**<br>
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0074-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0074-05.png)
 
 
 **----- Start of picture text -----**<br>
 A system operation represents<br>an external request.<br>**----- End of picture text -----**<br>
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0074-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0074-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -290,7 +290,7 @@ _**Decomposition strategies**_
 that provide a vocabulary with which to describe the system operations. The second step identifies the system operations and describes each one’s behavior in terms of the domain model. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0076-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0076-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -340,7 +340,7 @@ Given an order that is in the PENDING_ACCEPTANCE state and a courier that is ava
 This scenario suggests the existence of Courier and Delivery classes. The end result after a few iterations of analysis will be a domain model that consists, unsurprisingly, of those classes and others, such as MenuItem and Address. Figure 2.7 is a class diagram that shows the key classes. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0077-17.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0077-17.png)
 
 
 **----- Start of picture text -----**<br>
@@ -526,7 +526,7 @@ The decision of which level of the capability hierarchy to map to services, beca
 _**Defining an application’s microservice architecture**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0083-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0083-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -568,7 +568,7 @@ _**Defining an application’s microservice architecture**_
 DDD calls the scope of a domain model a _bounded context_ . A bounded context includes the code artifacts that implement the model. When using the microservice architecture, each bounded context is a service or possibly a set of services. We can create a microservice architecture by applying DDD and defining a service for each subdomain. Figure 2.9 shows how the subdomains map to services, each with its own domain model. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0085-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0085-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -665,7 +665,7 @@ As you can see, the Order class has fields and methods corresponding to order pr
 _**Defining an application’s microservice architecture**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0089-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0089-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -681,7 +681,7 @@ Another solution is to encapsulate the Order database in an Order Service, which
 A much better approach is to apply DDD and treat each service as a separate subdomain with its own domain model. This means that each of the services in the FTGO application that has anything to do with orders has its own domain model with its version of the Order class. A great example of the benefit of multiple domain models is the Delivery Service. Its view of an Order, shown in figure 2.11, is extremely simple: pickup address, pickup time, delivery address, and delivery time. Moreover, rather than call it an Order, the Delivery Service uses the more appropriate name of Delivery. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0090-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0090-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -695,7 +695,7 @@ The Delivery Service isn’t interested in any of the other attributes of an ord
 The Kitchen Service also has a much simpler view of an order. Its version of an Order is called a Ticket. As figure 2.12 shows, a Ticket simply consist of a status, the requestedDeliveryTime, a prepareByTime, and a list of line items that tell the restaurant what to prepare. It’s unconcerned with the consumer, payment, delivery, and so on. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0090-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0090-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -707,7 +707,7 @@ Figure 2.12 The **Kitchen Service** domain model
 The Order service has the most complex view of an order, shown in figure 2.13. Even though it has quite a few fields and methods, it’s still much simpler than the original version. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0090-09.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0090-09.png)
 
 
 **----- Start of picture text -----**<br>

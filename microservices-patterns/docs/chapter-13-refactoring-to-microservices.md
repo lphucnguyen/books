@@ -64,7 +64,7 @@ Instead of doing a big bang rewrite, you should, as figure 13.1 shows, increment
 **The strangler application grows larger over time.** 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0461-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0461-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -155,7 +155,7 @@ That’s because the essence of a microservice architecture is a set of loosely 
 _**Strategies for refactoring a monolith to microservices**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0465-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0465-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -180,7 +180,7 @@ One strategy for shrinking a monolithic application is to split the presentation
 There is usually a clean separation between the presentation logic and the business and data access logic. The business tier has a coarse-grained API consisting of one or more facades that encapsulate the business logic. This API is a natural seam along which you can split the monolith into two smaller applications, as shown in figure 13.3. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0466-08.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0466-08.png)
 
 
 **----- Start of picture text -----**<br>
@@ -219,7 +219,7 @@ Extracting services is challenging. You need to determine how to split the monol
 Extracting a service is often time consuming, especially because the monolith’s code base is likely to be messy. Consequently, you need to carefully think about which 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0468-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0468-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -247,14 +247,14 @@ _**Strategies for refactoring a monolith to microservices**_
 In order to extract a service, you need to extract its domain model out of the monolith’s domain model. You’ll need to perform major surgery to split the domain models. One challenge you’ll encounter is eliminating object references that would otherwise span service boundaries. It’s possible that classes that remain in the monolith will reference classes that have been moved to the service or vice versa. For example, imagine that, as figure 13.5 shows, you extract Order Service, and as a result its Order class references the monolith’s Restaurant class. Because a service instance is typically a process, it doesn’t make sense to have object references that cross service boundaries. Somehow you need to eliminate these types of object reference. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0469-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0469-04.png)
 
 
 **----- Start of picture text -----**<br>
 Extracted service<br>**----- End of picture text -----**<br>
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0469-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0469-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -266,7 +266,7 @@ Figure 13.5 The **Order** domain class has a reference to a **Restaurant** class
 One good way to solve this problem is to think in terms of DDD aggregates, described in chapter 5. _Aggregates_ reference each other using primary keys rather than object references. You would, therefore, think of the Order and Restaurant classes as aggregates and, as figure 13.6 shows, replace the reference to Restaurant in the Order class with a restaurantId field that stores the primary key value. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0469-08.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0469-08.png)
 
 
 **----- Start of picture text -----**<br>
@@ -303,7 +303,7 @@ We can use a similar approach when extracting services from the monolith. For ex
 Preserving the structure of the Order entity by replicating data from Delivery Service significantly reduces the amount of work we need to do immediately. Over time, we can migrate code that uses the delivery-related Order entity fields or ORDERS table columns to Delivery Service. What’s more, it’s possible that we never need to 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0471-05.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0471-05.png)
 
 
 **----- Start of picture text -----**<br>
@@ -348,7 +348,7 @@ One important concern is maintaining data consistency between the service and mo
 The interaction between a service and the monolith is, as described earlier, facilitated by integration glue code. Figure 13.8 shows the structure of the integration glue. It consists of adapters in the service and monolith that communicate using some kind of IPC mechanism. Depending on the requirements, the service and monolith might interact over REST or they might use messaging. They might even communicate using multiple IPC mechanisms. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0473-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0473-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -393,7 +393,7 @@ An important design decision you must make when designing the integration glue i
 If one party needs to query data owned by the other party, there are several options. One option is, as figure 13.9 shows, for the adapter that implements the repository interface to invoke an API of the data provider. This API will typically use a request/response interaction style, such as REST or gRPC. For example, Delayed Delivery Service might retrieve the customer contact info by invoking a REST API implemented by the FTGO monolith. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0475-07.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0475-07.png)
 
 
 **----- Start of picture text -----**<br>
@@ -410,7 +410,7 @@ An important benefit of querying data by invoking a query API is its simplicity.
 An alternative approach is for the data consumer to maintain a replica of the data, as shown in figure 13.10. The replica is essentially a CQRS view. The data consumer keeps the replica up-to-date by subscribing to domain events published by the data provider. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0476-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0476-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -438,7 +438,7 @@ A software layer that translates between two different domain models in order to
 The goal of an ACL is to prevent a legacy monolith’s domain model from polluting a service’s domain model. It’s a layer of code that translates between the different domain models. For example, as figure 13.11 shows, Delayed Delivery Service has a CustomerContactInfoRepository interface, which defines a findCustomerContactInfo() method that returns CustomerContactInfo. The class that implements the CustomerContactInfoRepository interface must translate between the ubiquitous language of Delayed Delivery Service and that of the FTGO monolith. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0477-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0477-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -453,7 +453,7 @@ The implementation of findCustomerContactInfo() invokes the FTGO monolith to ret
 An event subscriber, which consumes domain events, also has an ACL. Domain events are part of the publisher’s domain model. An event handler must translate domain events to the subscriber’s domain model. For example, as figure 13.12 shows, the FTGO monolith publishes Order domain events. Delivery Service has an event handler that subscribes to those events. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0478-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0478-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -652,7 +652,7 @@ Fortunately, there’s a straightforward way to solve this problem that only req
 shows how this works. The login handler returns an additional cookie, which in this example I call USERINFO, that contains user information, such as the user ID and roles. The browser includes that cookie in every request. The API gateway extracts the information from the cookie and includes it in the HTTP requests that it makes to a service. As a result, each service has access to the needed user information. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0484-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0484-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -733,7 +733,7 @@ Delayed Order Service doesn’t own the Order and Restaurant entities. Instead, 
 _**Implementing a new feature as a service: handling misdelivered orders**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0487-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0487-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -754,7 +754,7 @@ Figure 13.15 shows the design of the integration glue. The FTGO monolith publish
 endpoint for querying the customer contact information. Delivery Service calls this endpoint when it needs to notify a user that their order cannot be delivered on time. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0488-03.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0488-03.png)
 
 
 **----- Start of picture text -----**<br>
@@ -831,7 +831,7 @@ Quite often what’s extracted into a service is, as mentioned in section 13.2.3
 _**Breaking apart the monolith: extracting delivery management**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0491-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0491-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -846,7 +846,7 @@ Figure 13.16 Delivery management is entangled with order management within the F
 The proposed new Delivery Service is responsible for scheduling, rescheduling, and canceling deliveries. Figure 13.17 shows a high-level view of the architecture of the FTGO application after extracting Delivery Service. The architecture consists of the FTGO monolith and Delivery Service. They collaborate using the integration glue, which consists of APIs in both the service and monolith. Delivery Service has its own domain model and database. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0492-04.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0492-04.png)
 
 
 **----- Start of picture text -----**<br>
@@ -882,7 +882,7 @@ IDENTIFYING WHICH ENTITIES AND THEIR FIELDS ARE PART OF DELIVERY MANAGEMENT
 The first step in the process of designing Delivery Service is to carefully review the delivery management code and identify the participating entities and their fields. Figure 13.18 shows the entities and fields that are part of delivery management. Some fields are inputs to the delivery-scheduling algorithm, and others are the outputs. The figure shows which of those fields are also used by other functionality implemented by the monolith. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0493-08.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0493-08.png)
 
 
 **----- Start of picture text -----**<br>
@@ -914,7 +914,7 @@ Delivery Service is not a standalone service. Let’s look at the design of the 
 _**Breaking apart the monolith: extracting delivery management**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0495-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0495-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -934,7 +934,7 @@ Let’s look at the design of each part of the integration glue, starting with D
 Delivery Service must provide an API that enables the monolith to schedule, revise, and cancel deliveries. As you’ve seen throughout this book, the preferred approach is to use asynchronous messaging, because it promotes loose coupling and increases availability. One approach is for Delivery Service to subscribe to Order domain events published by the monolith. Depending on the type of the event, it creates, 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0496-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0496-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -971,7 +971,7 @@ In many ways, implementing Delivery Service is the easier part of the extraction
 The first step is to encapsulate the delivery management code with a Java interface corresponding to the messaging-based API defined earlier. This interface, shown in figure 13.21, defines methods for scheduling, rescheduling, and canceling deliveries. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0497-10.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0497-10.png)
 
 
 **----- Start of picture text -----**<br>
@@ -990,7 +990,7 @@ The DeliveryService interface is a coarse-grained interface that’s well suited
 Next, as figure 13.22 shows, we need to identify all the places in the FTGO monolith that invoke delivery management and change them to use the DeliveryService interface. This may take some time and is one of the most challenging aspects of extracting a service from the monolith. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0498-06.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0498-06.png)
 
 
 **----- Start of picture text -----**<br>
@@ -1009,7 +1009,7 @@ The final step is to replace the DeliveryServiceImpl class with a proxy that sen
 _**Breaking apart the monolith: extracting delivery management**_ 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0499-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0499-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -1243,7 +1243,7 @@ XML message 71
 ZeroMQ 91 Zipkin 373 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0521-00.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0521-00.png)
 
 
 **----- Start of picture text -----**<br>
@@ -1253,7 +1253,7 @@ Process:<br>DevOps/continuous delivery/deployment<br>Enables Enables<br>Rapid, f
 The rapid, frequent, and reliable delivery of large, complex applications requires a combination of DevOps, which includes continuous delivery/deployment, small, autonomous teams, and the microservice architecture. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0521-02.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0521-02.png)
 
 
 **----- Start of picture text -----**<br>
@@ -1288,7 +1288,7 @@ Microservices Patterns teaches you how to develop and deploy production-quality 
 Written for enterprise developers familiar with standard enterprise application architecture. Examples are in Java. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0522-12.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0522-12.png)
 
 
 **----- Start of picture text -----**<br>
@@ -1310,10 +1310,10 @@ Chris Richardson is a Java Champion, a JavaOne rock star, author of Manning’s 
 To download their free eBook in PDF, ePub, and Kindle formats, owners of this book should visit manning.com/books/microservices-patterns 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0522-20.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0522-20.png)
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library-.pdf-0522-21.png)
+![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0522-21.png)
 
 
 **M A N N I N G** 

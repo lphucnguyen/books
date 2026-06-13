@@ -1,5 +1,5 @@
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0001-00.png)
+![](../images/Designing_Data_Intensive_Applications-0001-00.png)
 
 
 ## Designing Data-Intensive A lications pp 
@@ -241,7 +241,7 @@ Most of what we discuss in this book has already been said elsewhere in some for
 ## **O’Reilly Safari** 
 
 
-![](../images/Designing_Data_Intensive_Applications.pdf-0019-05.png)
+![](../images/Designing_Data_Intensive_Applications-0019-05.png)
 
 
 _Safari_ (formerly Safari Books Online) is a membership-based training and reference platform for enterprise, government, educators, and individuals. 
