@@ -391,3 +391,9 @@ body{
     border-left:none
   }
 }
+
+/* TOC indentation for h1, h2, h3 */
+.toc-h1 { padding-left: 0; font-weight: 700; }
+.toc-h2 { padding-left: 1rem; }
+.toc-h3 { padding-left: 2rem; }
+

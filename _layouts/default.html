@@ -125,7 +125,7 @@
 
             // TOC Generation
             const tocContainer = document.getElementById('toc-widget');
-            const headings = document.querySelectorAll('.markdown-body h2, .markdown-body h3');
+            const headings = document.querySelectorAll('.markdown-body h1, .markdown-body h2, .markdown-body h3');
 
             if (headings.length === 0) {
                 tocContainer.innerHTML = '<p style="color: var(--text-muted);">No table of contents.</p>';
@@ -135,7 +135,7 @@
                     if (!h.id) {
                         h.id = h.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                     }
-                    const levelClass = h.tagName.toLowerCase() === 'h3' ? 'toc-h3' : 'toc-h2';
+                    let levelClass = 'toc-h2';\\n                    if (h.tagName.toLowerCase() === 'h1') {\\n                        levelClass = 'toc-h1';\\n                    } else if (h.tagName.toLowerCase() === 'h3') {\\n                        levelClass = 'toc-h3';\\n                    }
                     tocHTML += `<li class="${levelClass}"><a href="#${h.id}">${h.innerText}</a></li>`;
                 });
                 tocHTML += '</ul>';
