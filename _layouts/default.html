@@ -8,22 +8,50 @@
 </head>
 <body>
     <header>
-        <h1>{{ site.title | default: "Tech Books Library" }}</h1>
+        <div class="header-container">
+            <div class="logo">📚 {{ site.title | default: "Tech Books Library" }}</div>
+            <div class="header-links"><a href="https://github.com/" target="_blank">GitHub</a></div>
+        </div>
     </header>
     <div class="layout-wrapper">
         <aside class="left-sidebar">
             <h3>Điều hướng</h3>
             <ul>
                 <li><a href="{{ '/' | relative_url }}">Trang chủ</a></li>
+                <li><a href="#">Sách DDIA</a></li>
+                <li><a href="#">Sách Event-Driven</a></li>
             </ul>
         </aside>
         <main class="main-content">
             {{ content }}
         </main>
         <aside class="right-sidebar">
-            <h3>Thông tin thêm</h3>
-            <p>Phần này dành cho mục lục (TOC) hoặc Widget.</p>
+            <h3>Trong trang này</h3>
+            <div class="toc-widget">
+                <!-- TOC sẽ được tạo tự động qua JavaScript -->
+            </div>
         </aside>
     </div>
+    <footer>
+        <p>&copy; 2026 Tech Books Library. Built with Jekyll.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const tocContainer = document.querySelector('.toc-widget');
+            const headings = document.querySelectorAll('.main-content h2, .main-content h3');
+            if (headings.length === 0) {
+                tocContainer.innerHTML = '<p class="text-muted">Không có mục lục.</p>';
+                return;
+            }
+            let tocHTML = '<ul class="toc-list">';
+            headings.forEach(h => {
+                if (!h.id) h.id = h.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                tocHTML += `<li class="toc-${h.tagName.toLowerCase()}"><a href="#${h.id}">${h.innerText}</a></li>`;
+            });
+            tocHTML += '</ul>';
+            tocContainer.innerHTML = tocHTML;
+        });
+    </script>
 </body>
 </html>

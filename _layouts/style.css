@@ -1,57 +1,224 @@
+/* Khai báo biến màu sắc để dễ dàng tùy chỉnh Theme */
+:root {
+    --primary-color: #0366d6;
+    --primary-hover: #005cc5;
+    --bg-main: #f6f8fa;
+    --bg-surface: #ffffff;
+    --text-main: #24292e;
+    --text-muted: #586069;
+    --border-color: #e1e4e8;
+    --header-bg: #24292e;
+    --radius: 8px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+}
+
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f6f8fa;
-    color: #24292e;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-size: 16px;
 }
 
 header {
-    background-color: #24292e;
+    background-color: var(--header-bg);
     color: #ffffff;
-    padding: 20px;
-    text-align: center;
+    padding: 12px 20px;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-container .logo {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.header-container a {
+    color: #ffffff;
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.header-container a:hover {
+    opacity: 1;
 }
 
 /* Khung chứa nội dung chính */
 .layout-wrapper {
     display: flex;
-    flex-wrap: wrap;
-    max-width: 1200px;
+    flex-wrap: nowrap; /* Ngăn không cho rớt dòng ở màn hình lớn */
+    max-width: 1300px;
     margin: 20px auto;
-    gap: 20px;
-    padding: 0 15px;
+    gap: 30px;
+    padding: 0 20px;
+    flex: 1;
 }
 
 /* Định dạng thanh bên (Sidebar) */
 .left-sidebar, .right-sidebar {
-    flex: 1 1 200px;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 6px;
-    border: 1px solid #e1e4e8;
+    flex: 0 0 240px; /* Cố định chiều rộng sidebar */
+    position: sticky;
+    top: 80px; /* Cố định sidebar khi cuộn chuột, chừa chỗ cho header */
+    align-self: flex-start;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+.left-sidebar h3, .right-sidebar h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-top: 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+/* Trang trí Menu Điều Hướng */
+.left-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.left-sidebar ul li {
+    margin-bottom: 8px;
+}
+
+.left-sidebar ul li a {
+    text-decoration: none;
+    color: var(--text-main);
+    display: block;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.left-sidebar ul li a:hover {
+    background-color: #ebf0f4;
+    color: var(--primary-color);
+}
+
+/* Trang trí Widget Mục Lục (TOC) */
+.toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc-list li {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.toc-h3 {
+    padding-left: 15px; /* Thụt lề cho thẻ h3 */
+    font-size: 0.9em;
+}
+
+.toc-list a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: color 0.2s ease;
+}
+
+.toc-list a:hover {
+    color: var(--primary-color);
 }
 
 /* Định dạng vùng nội dung ở giữa */
 .main-content {
-    flex: 3 1 500px;
-    background: #ffffff;
-    padding: 30px;
+    flex: 1; /* Chiếm toàn bộ không gian còn lại */
+    min-width: 0; /* Ngăn lỗi tràn nội dung flexbox */
+    background: var(--bg-surface);
+    padding: 50px 60px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Định dạng các thẻ tiêu đề trong bài viết Markdown */
+.main-content h1, .main-content h2 {
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 0.3em;
+    margin-top: 1.5em;
+    margin-bottom: 16px;
+}
+
+.main-content p {
+    margin-bottom: 1.2em;
+}
+
+/* Làm đẹp khối mã (Code Blocks) */
+pre, code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    background-color: var(--bg-main);
     border-radius: 6px;
-    border: 1px solid #e1e4e8;
-    overflow-x: auto;
+}
+
+pre {
+    padding: 16px;
+    overflow: auto;
+    border: 1px solid var(--border-color);
+}
+
+code {
+    padding: 0.2em 0.4em;
+    font-size: 85%;
+}
+
+pre code {
+    padding: 0;
+    font-size: 100%;
+    background-color: transparent;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+    font-size: 0.9em;
 }
 
 /* Xử lý Responsive trên điện thoại/Tablet */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
+    .layout-wrapper {
+        flex-wrap: wrap; /* Cho phép rớt cột trên màn hình nhỏ */
+        padding: 0 15px;
+    }
     .left-sidebar, .main-content, .right-sidebar {
-        flex: 1 1 100%; /* Cấu trúc dàn thành 1 cột */
+        flex: 1 1 100%;
+        position: static; /* Tắt sticky trên mobile */
+        max-height: none;
+        overflow-y: visible;
     }
     .main-content {
         order: -1; /* Đẩy nội dung chính lên đầu tiên trên điện thoại */
+        padding: 25px 20px;
     }
 }
