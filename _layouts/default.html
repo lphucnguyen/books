@@ -175,6 +175,34 @@
       html {
         scroll-behavior: smooth;
       }
+      /* Toggle button styles */
+      .toggle-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #0366d6;
+        z-index: 1100;
+        padding: 5px;
+        display: none;
+      }
+      @media (max-width: 992px) {
+        .toggle-btn {
+          display: block;
+        }
+      }
+      body.sidebar-hidden .sidebar-left,
+      body.sidebar-hidden .sidebar-right {
+        display: none;
+      }
+      body.sidebar-hidden .main-content {
+        flex: auto;
+        width: 100%;
+        margin-right: 0;
+      }
     </style>
   </head>
 
@@ -204,6 +232,7 @@
         <header>
           <h1>{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
           <h2>{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
+          <button id="toggleSidebar" class="toggle-btn" aria-label="Toggle sidebar">☰</button>
         </header>
         <section id='downloads' class='clearfix'>
           {% if site.show_downloads %}
@@ -336,6 +365,13 @@
           } else {
             tocContainer.innerHTML = '<p>Unable to locate main content.</p>';
           }
+        }
+      // Sidebar toggle button
+        const toggleBtn = document.getElementById('toggleSidebar');
+        if (toggleBtn) {
+          toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('sidebar-hidden');
+          });
         }
       });
     </script>
