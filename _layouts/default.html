@@ -172,7 +172,7 @@
             <div class="dropdown">{{ book.title }}</div>
             <ul class="dropdown-content">
               {% for chapter in book.chapters %}
-              {% comment %} DEBUG: page.url="{{ page.url }}" chapter.url="{{ chapter.url }}" {% endcomment %}
+              <!-- DEBUG: page.url="{{ page.url }}" chapter.url="{{ chapter.url }}" -->
               <li>
                 <a href="{{ chapter.url }}" {% if page.url == chapter.url %}class="active"{% endif %}>
                   {{ chapter.title }}
