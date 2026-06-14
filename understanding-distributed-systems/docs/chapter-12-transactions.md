@@ -1,6 +1,6 @@
-## **Chapter 12** 
+# **Chapter 12** 
 
-## **Transactions** 
+# **Transactions** 
 
 Transactions[1] provide the illusion that either all the operations within a group complete successfully or none of them do, as if the group were a single atomic operation. If you have used a relational database such as MySQL or PostgreSQL in the past, you should be familiar with the concept. 
 
@@ -11,7 +11,7 @@ If your application exclusively updates data within a single relational database
 
 112 
 
-## **12.1 ACID** 
+# **12.1 ACID** 
 
 Consider a money transfer from one bank account to another. If the withdrawal succeeds, but the deposit fails for some reason, the funds need to be deposited back into the source account. In other words, the transfer needs to execute atomically; either both the withdrawal and the deposit succeed, or in case of a failure, neither do. To achieve that, the withdrawal and deposit need to be wrapped in an inseparable unit of change: a _transaction_ . 
 
@@ -32,7 +32,7 @@ In a traditional relational database, a transaction is a group of operations for
 
 Transactions relieve developers from a whole range of possible failure scenarios so that they can focus on the actual application logic rather than handling failures. But to understand how distributed transactions work, we first need to discuss how centralized, nondistributed databases implement transactions. 
 
-## **12.2 Isolation** 
+# **12.2 Isolation** 
 
 The easiest way to guarantee that no transaction interferes with another is to run them serially one after another (e.g., using a global lock). But, of course, that would be extremely inefficient, which is why in practice transactions run concurrently. However, a group of concurrently running transactions accessing the same data can run into all sorts of race conditions, like dirty writes, dirty reads, fuzzy reads, and phantom reads: 
 
@@ -76,7 +76,7 @@ Now that we know what serializability is, the challenge becomes maximizing concu
 
 _rency control protocol_ , and there are two categories of protocols that guarantee serializability: pessimistic and optimistic. 
 
-## **12.2.1 Concurrency control** 
+# **12.2.1 Concurrency control** 
 
 A _pessimistic_ protocol uses locks to block other transactions from accessing an object. The most commonly used protocol is _two-phase locking_[7] (2PL). 2PL has two types of locks, one for reads and one for writes. A read lock can be shared by multiple transactions that access the object in read-only mode, but it blocks transactions trying to acquire a write lock. A write lock can be held only by a single transaction and blocks anyone trying to acquire either a read or write lock on the object. The locks are held by a _lock manager_ that keeps track of the locks granted so far, the transactions that acquired them, and the transactions waiting for them to be released. 
 
@@ -115,7 +115,7 @@ I have deliberately glossed over the details of how these concurrency control pr
 
 That said, there is a limited form of OCC at the level of individual objects that is widely used in distributed applications and that you should know how to implement. The protocol assigns a version number to each object, which is incremented every time the object is updated. A transaction can then read a value from a data store, do some local computation, and finally update the value conditional on the version of the object not having changed. This validation step can be performed atomically using a compare-and-swap operation, which is supported by many data stores.[11] For example, if a transaction reads version 42 of an object, it can later update the object only if the version hasn’t changed. So if the version is the same, the object is updated and the version number is incremented to 43 (atomically). Otherwise, the transaction is aborted and restarted. 
 
-## **12.3 Atomicity** 
+# **12.3 Atomicity** 
 
 When executing a transaction, there are two possible outcomes: it either commits after completing all its operations or aborts due to a failure after executing some operations. When a transaction is aborted, the data store needs to guarantee that all the changes the transaction performed are undone (rolled back). 
 
@@ -130,7 +130,7 @@ To guarantee atomicity (and also durability), the data store records all changes
 
 Unfortunately, this WAL-based recovery mechanism only guarantees atomicity within a single data store. Going back to our original example of sending money from one bank account to another, suppose the two accounts belong to two different banks that use separate data stores. We can’t just run two separate transactions to respectively withdraw and deposit the funds — if the second transaction fails, the system is left in an inconsistent state. What we want is the guarantee that either both transactions succeed and their changes are committed or they fail without any side effects. 
 
-## **12.3.1 Two-phase commit** 
+# **12.3.1 Two-phase commit** 
 
 _Two-phase commit_[13] (2PC) is a protocol used to implement atomic transaction commits across multiple processes. The protocol is split into two phases, _prepare_ and _commit_ . It assumes a process acts as _coordinator_ and orchestrates the actions of the other processes, called _participants_ . For example, the client application that initiates the transaction could act as the coordinator for the protocol. 
 
@@ -164,7 +164,7 @@ If we are willing to increase the complexity of the protocol, we can make it mor
 
 As it turns out, atomically committing a transaction is a form of consensus, called _uniform consensus_ , where all the processes have to agree on a value, even the faulty ones. In contrast, the general form of consensus introduced in section 10.2 only guarantees that all non-faulty processes agree on the proposed value. Therefore, uniform consensus is actually harder[15] than consensus. Nevertheless, as mentioned earlier, general consensus can be used to replicate the state of each process and make the overall protocol more robust to failures. 
 
-## **12.4 NewSQL** 
+# **12.4 NewSQL** 
 
 As a historical side note, the first versions of modern large-scale data stores that came out in the late 2000s used to be referred to as _NoSQL_ stores since their core features were focused entirely on scalability and lacked the guarantees of traditional relational databases, such as ACID transactions. But in recent years, that has started to change as distributed data stores have continued to add features that only traditional databases offered. 
 

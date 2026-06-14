@@ -1,10 +1,10 @@
-## **Chapter 17** 
+# **Chapter 17** 
 
-## **File storage** 
+# **File storage** 
 
 Using a CDN has significantly reduced the number of requests hitting _Cruder_ ’s application server. But there are only so many images, videos, etc., the server can store on its local disk(s) before running out of space. To work around this limit, we can use a managed file store, like AWS S3[1] or Azure Blob Storage[2] , to store large static files. Managed file stores are scalable, highly available, and offer strong durability guarantees. A file uploaded to a managed store can be configured to allow access to anyone who knows its URL, which means we can point the CDN straight at it. This allows us to completely offload the storage and serving of static resources to managed services. 
 
-## **17.1 Blob storage architecture** 
+# **17.1 Blob storage architecture** 
 
 Because distributed file stores are such a crucial component of modern applications, it’s useful to have an idea of how they work underneath. In this chapter, we will dive into the architecture of 
 

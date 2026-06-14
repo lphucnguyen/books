@@ -1,6 +1,6 @@
-## **Chapter 8** 
+# **Chapter 8** 
 
-## **Time** 
+# **Time** 
 
 Time is an essential concept in any software application; even more so in distributed ones. We have seen it play a crucial role in the network stack (e.g., DNS record TTL) and failure detection (timeouts). Another important use of it is for ordering events. 
 
@@ -8,7 +8,7 @@ The flow of execution of a single-threaded application is simple to understand b
 
 It’s challenging to build distributed applications that work as intended without knowing whether one operation happened before another. In this chapter, we will learn about a family of clocks that can be used to work out the order of operations across processes in a distributed system. 
 
-## **8.1 Physical clocks** 
+# **8.1 Physical clocks** 
 
 A process has access to a physical wall-time clock. The most common type is based on a vibrating quartz crystal, which is cheap but not very accurate. Depending on manufacturing differences and 
 
@@ -30,7 +30,7 @@ Since we don’t have a way to synchronize wall-time clocks across processes per
 
 65 currently in a single-threaded process as one must happen before the other. This _happened-before_ relationship creates a _causal_ bond between the two operations, since the one that happens first can have side-effects that affect the operation that comes after it. We can use this intuition to build a different type of clock that isn’t tied to the physical concept of time but rather captures the causal relationship between operations: a logical clock. 
 
-## **8.2 Logical clocks** 
+# **8.2 Logical clocks** 
 
 A _logical clock_ measures the passing of time in terms of logical operations, not wall-clock time. The simplest possible logical clock is a counter, incremented before an operation is executed. Doing so ensures that each operation has a distinct _logical timestamp_ . If two operations execute on the same process, then necessarily one must come before the other, and their logical timestamps will reflect that. But what about operations executed on different processes? 
 
@@ -68,7 +68,7 @@ Regardless of whether ties are broken, the order of logical timestamps doesn’t
 
 67 a different type of logical clock: a _vector clock_ . 
 
-## **8.3 Vector clocks** 
+# **8.3 Vector clocks** 
 
 A _vector clock_[4] is a logical clock that guarantees that if a logical timestamp is less than another, then the former must have happened-before the latter. A vector clock is implemented with an array of counters, one for each process in the system. And, as with Lamport clocks, each process has its local copy. 
 

@@ -20,55 +20,55 @@ Chris Richardson
 **M A N N I N G** 
 
 
-## _List of Patterns_ 
+# _List of Patterns_ 
 
 _Application architecture patterns_ Monolithic architecture (40) Microservice architecture (40) 
 
-## _External API patterns_ 
+# _External API patterns_ 
 
 API gateway (259) Backends for frontends (265) 
 
-## _Decomposition patterns_ 
+# _Decomposition patterns_ 
 
 Decompose by business capability (51) Decompose by subdomain (54) 
 
-## _Messaging style patterns_ 
+# _Messaging style patterns_ 
 
 Messaging (85) Remote procedure invocation (72) _Reliable communications patterns_ Circuit breaker (78) 
 
-## _Testing patterns_ 
+# _Testing patterns_ 
 
 Consumer-driven contract test (302) Consumer-side contract test (303) Service component test (335) 
 
-## _Security patterns_ 
+# _Security patterns_ 
 
 Access token (354) 
 
 _Cross-cutting concerns patterns_ Externalized configuration (361) Microservice chassis (379) 
 
-## _Service discovery patterns_ 
+# _Service discovery patterns_ 
 
 3rd party registration (85) Client-side discovery (83) Self-registration (82) Server-side discovery (85) 
 
-## _Transactional messaging patterns_ 
+# _Transactional messaging patterns_ 
 
 Polling publisher (98) Transaction log tailing (99) Transactional outbox (98) 
 
 _Data consistency patterns_ Saga (114) 
 
-## _Business logic design patterns_ 
+# _Business logic design patterns_ 
 
 Aggregate (150) Domain event (160) Domain model (150) Event sourcing (184) Transaction script (149) 
 
-## _Observability patterns_ 
+# _Observability patterns_ 
 
 Application metrics (373) Audit logging (377) Distributed tracing (370) Exception tracking (376) Health check API (366) Log aggregation (368) 
 
-## _Deployment patterns_ 
+# _Deployment patterns_ 
 
 Deploy a service as a container (393) Deploy a service as a VM (390) Language-specific packaging format (387) Service mesh (380) Serverless deployment (416) Sidecar (410) 
 
-## _Refactoring to microservices patterns_ 
+# _Refactoring to microservices patterns_ 
 
 Anti-corruption layer (447) Strangler application (432) 
 
@@ -111,7 +111,7 @@ _Where you see wrong or inequality or injustice, speak out, because this is your
 — Thurgood Marshall, Justice of the Supreme Court 
 
 
-## _brie contents f_ 
+# _brie contents f_ 
 
 |_1_|■|Escaping monolithic hell<br>1||||||
 |---|---|---|---|---|---|---|---|
@@ -133,11 +133,11 @@ _Where you see wrong or inequality or injustice, speak out, because this is your
 
 
 
-## _contents_ 
+# _contents_ 
 
 _preface xvii acknowledgments xx about this book xxii about the cover illustration xxvi_ 
 
-## _1_ _**Escaping monolithic hell 1**_ 
+# _1_ _**Escaping monolithic hell 1**_ 
 
 1.1 The slow march toward monolithic hell 2 
 
@@ -168,7 +168,7 @@ CONTENTS
 
 _Software development and delivery organization 29_ ■ _Software development and delivery process 30_ ■ _The human side of adopting microservices 31_ 
 
-## _2_ _**Decomposition strategies 33**_ 
+# _2_ _**Decomposition strategies 33**_ 
 
 2.1 What is the microservice architecture exactly? 34 _What is software architecture and why does it matter? 34 Overview of architectural styles 37_ ■ _The microservice architecture is an architectural style 40_ 
 
@@ -192,13 +192,13 @@ CONTENTS
 
 3.4 Using asynchronous messaging to improve availability 103 _Synchronous communication reduces availability 103 Eliminating synchronous interaction 104_ 
 
-## _4_ _**Managing transactions with sagas 110**_ 
+# _4_ _**Managing transactions with sagas 110**_ 
 
 4.1 Transaction management in a microservice architecture 111 _The need for distributed transactions in a microservice architecture 112_ ■ _The trouble with distributed transactions 112_ ■ _Using the Saga pattern to maintain data consistency 114_ 4.2 Coordinating sagas 117 _Choreography-based sagas 118_ ■ _Orchestration-based sagas 121_ 4.3 Handling the lack of isolation 126 _Overview of anomalies 127_ ■ _Countermeasures for handling the lack of isolation 128_ 
 
 4.4 The design of the Order Service and the Create Order Saga 132 _The OrderService class 133_ ■ _The implementation of the Create Order Saga 135_ ■ _The OrderCommandHandlers class 142 The OrderServiceConfiguration class 143_ 
 
-## _5_ _**Designing business logic in a microservice architecture 146**_ 
+# _5_ _**Designing business logic in a microservice architecture 146**_ 
 
 5.1 Business logic organization patterns 147 
 
@@ -218,7 +218,7 @@ _The Ticket aggregate 169_
 
 _The Order Aggregate 175_ ■ _The OrderService class 180_ 
 
-## _6_ _**Developing business logic with event sourcing 183**_ 
+# _6_ _**Developing business logic with event sourcing 183**_ 
 
 6.1 Developing business logic using event sourcing 184 
 
@@ -232,7 +232,7 @@ _How the Eventuate Local event store works 203_ ■ _The Eventuate client framew
 
 _Implementing choreography-based sagas using event sourcing 210 Creating an orchestration-based saga 211_ ■ _Implementing an event sourcing-based saga participant 213_ ■ _Implementing saga orchestrators using event sourcing 216_ 
 
-## _7_ _**Implementing queries in a microservice architecture 220**_ 
+# _7_ _**Implementing queries in a microservice architecture 220**_ 
 
 7.1 Querying using the API composition pattern 221 
 
@@ -254,19 +254,19 @@ _The OrderHistoryEventHandlers module 243 Data modeling and query design with Dy
 CONTENTS 
 
 
-## _8_ _**External API patterns 253**_ 
+# _8_ _**External API patterns 253**_ 
 
 8.1 External API design issues 254 _API design issues for the FTGO mobile client 255_ ■ _API design issues for other kinds of clients 258_ 
 
 8.2 The API gateway pattern 259 _Overview of the API gateway pattern 259_ ■ _Benefits and drawbacks of an API gateway 267_ ■ _Netflix as an example of an API gateway 267_ ■ _API gateway design issues 268_ 8.3 Implementing an API gateway 271 _Using an off-the-shelf API gateway product/service 271 Developing your own API gateway 273_ ■ _Implementing an API gateway using GraphQL 279_ 
 
-## _9_ _**Testing microservices: Part 1 292**_ 
+# _9_ _**Testing microservices: Part 1 292**_ 
 
 9.1 Testing strategies for microservice architectures 294 
 
 _Overview of testing 294_ ■ _The challenge of testing microservices 299_ ■ _The deployment pipeline 305_ 9.2 Writing unit tests for a service 307 _Developing unit tests for entities 309_ ■ _Writing unit tests for value objects 310_ ■ _Developing unit tests for sagas 310_ ■ _Writing unit tests for domain services 312_ ■ _Developing unit tests for controllers 313_ ■ _Writing unit tests for event and message handlers 315_ 
 
-## _10_ _**Testing microservices: Part 2 318**_ 
+# _10_ _**Testing microservices: Part 2 318**_ 
 
 10.1 Writing integration tests 319 
 
@@ -284,13 +284,13 @@ _Designing end-to-end tests 345_ ■ _Writing end-to-end tests 346 Running end-t
 CONTENTS 
 
 
-## _11_ _**Developing production-ready services 348**_ 
+# _11_ _**Developing production-ready services 348**_ 
 
 11.1 Developing secure services 349 
 
 _Overview of security in a traditional monolithic application 350 Implementing security in a microservice architecture 353_ 
 
-## 11.2 Designing configurable services 360 
+# 11.2 Designing configurable services 360 
 
 _Using push-based externalized configuration 362_ ■ _Using pullbased externalized configuration 363_ 
 
@@ -302,7 +302,7 @@ _Using the Health check API pattern 366_ ■ _Applying the Log aggregation patte
 
 _Using a microservice chassis 379_ ■ _From microservice chassis to service mesh 380_ 
 
-## _12_ _**Deploying microservices 383**_ 
+# _12_ _**Deploying microservices 383**_ 
 
 12.1 Deploying services using the Language-specific packaging format pattern 386 
 
@@ -326,7 +326,7 @@ CONTENTS
 
 12.6 Deploying a RESTful service using AWS Lambda and AWS Gateway 419 _The design of the AWS Lambda version of Restaurant Service 419 Packaging the service as ZIP file 424_ ■ _Deploying lambda functions using the Serverless framework 425_ 
 
-## _13_ _**Refactoring to microservices 428**_ 
+# _13_ _**Refactoring to microservices 428**_ 
 
 13.1 Overview of refactoring to microservices 429 
 
@@ -347,7 +347,7 @@ _The design of Delayed Delivery Service 456_ ■ _Designing the integration glue
 _index 473_ 
 
 
-## _re ace p f_ 
+# _re ace p f_ 
 
 One of my favorite quotes is 
 
@@ -385,7 +385,7 @@ PREFACE
 The goal of this book is to answer that question. It will give you a good understanding of the microservice architecture, its benefits and drawbacks, and when to use it. The book describes how to solve the numerous design challenges you’ll face, including how to manage distributed data. It also covers how to refactor a monolithic application to a microservice architecture. But this book is not a microservices manifesto. Instead, it’s organized around a collection of patterns. A pattern is a reusable solution to a problem that occurs in a particular context. The beauty of a pattern is that besides describing the benefits of the solution, it also describes the drawbacks and the issues you must address in order to successfully implement a solution. In my experience, this kind of objectivity when thinking about solutions leads to much better decision making. I hope you’ll enjoy reading this book and that it teaches you how to successfully develop microservices. 
 
 
-## _acknowled ments g_ 
+# _acknowled ments g_ 
 
 Although writing is a solitary activity, it takes a large number of people to turn rough drafts into a finished book. 
 
@@ -405,13 +405,13 @@ ACKNOWLEDGMENTS
 I want to thank my colleagues Andrew, Valentin, Artem, and Stanislav at Eventuate, Inc., for their contributions to the Eventuate product and open source projects. Finally, I’d like to thank my wife, Laura, and my children, Ellie, Thomas, and Janet for their support and understanding over the last 18 months. While I’ve been glued to my laptop, I’ve missed out on going to Ellie’s soccer games, watching Thomas learning to fly on his flight simulator, and trying new restaurants with Janet. Thank you all! 
 
 
-## _about this book_ 
+# _about this book_ 
 
 The goal of this book is to teach you how to successfully develop applications using the microservice architecture. 
 
 Not only does it discuss the benefits of the microservice architecture, it also describes the drawbacks. You’ll learn when you should consider using the monolithic architecture and when it makes sense to use microservices. 
 
-## _Who should read this book_ 
+# _Who should read this book_ 
 
 The focus of this book is on architecture and development. It’s meant for anyone responsible for developing and delivering software, such as developers, architects, CTOs, or VPs of engineering. 
 
@@ -422,7 +422,7 @@ The book focuses on explaining the microservice architecture patterns and other 
 ABOUT THIS BOOK 
 
 
-## _Roadmap_ 
+# _Roadmap_ 
 
 This book consists of 13 chapters: 
 
@@ -459,13 +459,13 @@ discusses the benefits of using a service mesh, a layer of networking software t
 
 As you progress through these chapters, you’ll learn about different aspects of the microservice architecture. 
 
-## _About the code_ 
+# _About the code_ 
 
 This book contains many examples of source code both in numbered listings and inline with normal text. In both cases, source code is formatted in a fixed-width font like this to separate it from ordinary text. Sometimes code is also **in bold** to highlight code that has changed from previous steps in the chapter, such as when a new feature adds to an existing line of code. In many cases, the original source code has been reformatted; the publisher has added line breaks and reworked indentation to accommodate the available page space in the book. In rare cases, even this was not enough, and listings include line-continuation markers (➥). Additionally, comments in the source code have often been removed from the listings when the code is described in the text. Code annotations accompany many of the listings, highlighting important concepts. 
 
 Every chapter, except chapters 1, 2, and 13, contains code from the companion example application. You can find the code for this application in a GitHub repository: https://github.com/microservices-patterns/ftgo-application. 
 
-## _Book forum_ 
+# _Book forum_ 
 
 The purchase of Microservices Patterns includes free access to a private web forum run by Manning Publications where you can make comments about the book, ask technical questions, share your solutions to exercises, and receive help from the author and from other users. To access the forum and subscribe to it, point your web browser to https://forums.manning.com/forums/microservices-patterns. You can also learn more about Manning’s forums and the rules of conduct at https://forums .manning.com/forums/about. 
 
@@ -475,13 +475,13 @@ Manning’s commitment to our readers is to provide a venue where a meaningful d
 ABOUT THIS BOOK 
 
 
-## _Other online resources_ 
+# _Other online resources_ 
 
 Another great resource for learning the microservice architecture is my website http:// microservices.io. 
 
 Not only does it contain the complete pattern language, it also has links to other resources such as articles, presentations, and example code. 
 
-## _About the author_ 
+# _About the author_ 
 
 Chris Richardson is a developer and architect. He is a Java Champion, a JavaOne rock star, and the author of _POJOs in Action_ (Manning, 2006), which describes how to build enterprise Java applications with frameworks such as Spring and Hibernate. 
 
@@ -490,9 +490,9 @@ Chris was also the founder of the original CloudFoundry.com, an early Java PaaS 
 Today, he is a recognized thought leader in microservices and speaks regularly at international conferences. Chris is the creator of Microservices.io, a pattern language for microservices. He provides microservices consulting and training to organizations around the world that are adopting the microservice architecture. Chris is working on his third startup: Eventuate.io, an application platform for developing transactional microservices. 
 
 
-## _about the cover illustration_ 
+# _about the cover illustration_ 
 
-## _Jefferys_ 
+# _Jefferys_ 
 
 The figure on the cover of Microservices Patterns is captioned “Habit of a Morisco Slave in 1568.” The illustration is taken from Thomas Jefferys’ _A Collection of the Dresses of Different Nations, Ancient and Modern_ (four volumes), London, published between 1757 and 1772. The title page states that these are hand-colored copperplate engravings, heightened with gum arabic. 
 

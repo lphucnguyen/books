@@ -1,6 +1,6 @@
-## **Chapter 30** 
+# **Chapter 30** 
 
-## **Continuous delivery and deployment** 
+# **Continuous delivery and deployment** 
 
 Once a change and its newly introduced tests have been merged to a repository, it needs to be released to production. When releasing a change requires a manual process, it won’t happen frequently. This means that several changes, possibly over days or even weeks, end up being batched and released together, increasing the likelihood of the release failing. And when a release fails, it’s harder to pinpoint the breaking change[1] , slowing down the team. Also, the developer who initiated the release needs to keep an eye on it by monitoring dashboards and alerts to ensure that it’s working as expected or roll it back. 
 
@@ -15,7 +15,7 @@ Because releasing changes is one of the main sources of failures, CD requires a 
 
 There is a balance between the safety of a rollout and the time it takes to release a change to production. A good CD pipeline should strive to make a good trade-off between the two. In this chapter, we will explore how. 
 
-## **30.1 Review and build** 
+# **30.1 Review and build** 
 
 At a high level, a code change needs to go through a pipeline of four stages to be released to production: review, build, pre-production rollout, and production rollout. 
 
@@ -53,7 +53,7 @@ like Terraform[3] . This allows the provisioning of infrastructure to be automat
 
 Once a change has been merged into its repository’s main branch, the CD pipeline moves to the build stage, in which the repository’s content is built and packaged into a deployable release artifact. 
 
-## **30.2 Pre-production** 
+# **30.2 Pre-production** 
 
 During this stage, the artifact is deployed and released to a synthetic pre-production environment. Although this environment lacks the realism of production, it’s useful to verify that no hard failures are triggered (e.g., a null pointer exception at startup due to a missing configuration setting) and that end-to-end tests succeed. Because releasing a new version to pre-production requires significantly less time than releasing it to production, bugs can be detected earlier. 
 
@@ -68,7 +68,7 @@ Ideally, the CD pipeline should assess the artifact’s health in pre-production
 
 293 
 
-## **30.3 Production** 
+# **30.3 Production** 
 
 Once an artifact has been rolled out to pre-production successfully, the CD pipeline can proceed to the final stage and release the artifact to production. It should start by releasing it to a small number of production instances at first[5] . The goal is to surface problems that haven’t been detected so far as quickly as possible before they have the chance to cause widespread damage in production. 
 
@@ -76,7 +76,7 @@ If that goes well and all the health checks pass, the artifact is incrementally 
 
 If the service is available in multiple regions, the CD pipeline should first start with a low-traffic region to reduce the impact of a faulty release. Then, releasing the remaining regions should be divided into sequential stages to minimize risks further. Naturally, the more stages there are, the longer the CD pipeline takes to release the artifact to production. One way to mitigate this problem is by increasing the release speed once the early stages complete successfully and enough confidence has been built up. For example, the first stage could release the artifact to a single region, the second to a larger region, and the third to N regions simultaneously. 
 
-## **30.4 Rollbacks** 
+# **30.4 Rollbacks** 
 
 After each step, the CD pipeline needs to assess whether the artifact deployed is healthy and, if not, stop the release and roll it back. A variety of health signals can be used to make that decision, such as the result of end-to-end tests, health metrics like latencies and errors and alerts. 
 

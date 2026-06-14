@@ -1,6 +1,6 @@
-## **Chapter 1** 
+# **Chapter 1** 
 
-## **Introduction** 
+# **Introduction** 
 
 _“A distributed system is one in which the failure of a computer you didn’t even know existed can render your own computer unusable.”_ 
 
@@ -22,7 +22,7 @@ And finally, some applications have performance requirements that would be physi
 
 This book tackles the fundamental challenges that need to be solved to design, build, and operate distributed systems. 
 
-## **1.1 Communication** 
+# **1.1 Communication** 
 
 The first challenge derives from the need for nodes to communicate with each other over the network. For example, when your browser wants to load a website, it resolves the server’s IP address from the URL and sends an HTTP request to it. In turn, the server returns a response with the page’s content. 
 
@@ -32,7 +32,7 @@ How are the request and response messages represented on the wire? What happens 
 
 
 
-## **1.2 Coordination** 
+# **1.2 Coordination** 
 
 Another hard challenge of building distributed systems is that some form of coordination is required to make individual nodes work in unison towards a shared objective. This is particularly challenging to do in the presence of failures. The “two generals” problem is a famous thought experiment that showcases this. 
 
@@ -42,7 +42,7 @@ Well, general 1 could send a message with a proposed time to general 2. But sinc
 
 Because coordination is such a key topic, the second part of the book is dedicated to understanding the fundamental distributed algorithms used to implement it. 
 
-## **1.3 Scalability** 
+# **1.3 Scalability** 
 
 The performance of an application represents how efficiently it can handle _load_ . Intuitively, load is anything that consumes the system’s resources such as CPU, memory, and network bandwidth. Since the nature of load depends on the application’s use cases and architecture, there are different ways to measure it. For example, 
 
@@ -69,7 +69,7 @@ Although procuring additional machines at will may have been daunting a few deca
 
 In Part III of this book, we will explore the core architectural patterns and building blocks of scalable cloud-native applications. 
 
-## **1.4 Resiliency** 
+# **1.4 Resiliency** 
 
 A distributed system is resilient when it can continue to do its job even when failures happen. And at scale, anything that can go wrong will go wrong. Every component has a probability of failing — nodes can crash, network links can be severed, etc. No matter how small that probability is, the more components there are and the more operations the system performs, the higher the number of failures will be. And it gets worse because a failure of one component can increase the probability that another one will fail if the components are not well isolated. 
 
@@ -92,7 +92,7 @@ Availability is often described with nines, a shorthand way of expressing percen
 
 If the system isn’t resilient to failures, its availability will inevitably drop. Because of that, a distributed system needs to embrace failures and be prepared to withstand them using techniques such as redundancy, fault isolation, and self-healing mechanisms, which we will discuss in Part IV, _Resiliency_ . 
 
-## **1.5 Maintainability** 
+# **1.5 Maintainability** 
 
 It’s a well-known fact that the majority of the cost of software is spent after its initial development in maintenance activities, such as fixing bugs, adding new features, and operating it. Thus, we should aspire to make our systems easy to modify, extend and operate so that they are easy to maintain. 
 
@@ -107,7 +107,7 @@ Also, operators need to monitor the system’s health, investigate degradations 
 
 Historically, developers, testers, and operators were part of different teams, but the rise of microservices and DevOps has changed that. Nowadays, the same team that designs and implements a system is also responsible for testing and operating it. That’s a good thing since there is no better way to discover where a system falls short than being on call for it. Part V will explore best practices for testing and operating distributed systems. 
 
-## **1.6 Anatomy of a distributed system** 
+# **1.6 Anatomy of a distributed system** 
 
 Distributed systems come in all shapes and sizes. In this book, we are mainly concerned with backend applications that run on commodity machines and implement some kind of business service. So you could say a distributed system is a group of machines that communicate over network links. However, from a run-time point of view, a distributed system is a group of software processes that communicate via _inter-process communication_ (IPC) mechanisms like HTTP. And from an implementation perspective, a distributed system is a group of loosely-coupled components (services) that communicate via APIs. All these are valid and useful architectural points of view. In the rest of the book, we will switch between them depending on which one is more appropriate to discuss a particular topic. 
 

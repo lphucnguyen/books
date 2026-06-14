@@ -1,6 +1,6 @@
-## **Chapter 11** 
+# **Chapter 11** 
 
-## **Coordination avoidance** 
+# **Coordination avoidance** 
 
 Another way of looking at state machine replication is as a system that requires two main ingredients: 
 
@@ -21,7 +21,7 @@ In this chapter, we will explore a form of replication that doesn’t
 
 96 require a total order but still comes with useful guarantees. But first, we need to talk about broadcast protocols. 
 
-## **11.1 Broadcast protocols** 
+# **11.1 Broadcast protocols** 
 
 Network communication over wide area networks, like the internet, only offers point-to-point (unicast) communication protocols, like TCP. But to deliver a message to a group of processes, a broadcast protocol is needed (multicast). This means we have to somehow build a multicast protocol on top of a unicast one. The challenge here is that multicast needs to support multiple senders and receivers that can crash at any time. 
 
@@ -59,7 +59,7 @@ Although reliable broadcast protocols guarantee that messages are delivered to a
 
 Figure 11.3: Gossip broadcast ensures that messages are delivered in the same order to all processes. As discussed earlier, a fault-tolerant implementation requires consensus. 
 
-## **11.2 Conflict-free replicated data types** 
+# **11.2 Conflict-free replicated data types** 
 
 Now, here’s an idea: if we were to implement replication with a broadcast protocol that doesn’t guarantee total order, we wouldn’t need to serialize writes through a single leader, but instead could allow any replica to accept writes. But since replicas might receive messages in different orders, they will inevitably diverge. So, for the replication to be useful, the divergence can only be temporary, and replicas eventually have to converge to the same state. This is the essence of eventual consistency. 
 
@@ -154,7 +154,7 @@ The beauty of CRDTs is that they compose. So, for example, you can build a conve
 
 103 
 
-## **11.3 Dynamo-style data stores** 
+# **11.3 Dynamo-style data stores** 
 
 Dynamo[8] is arguably the best-known design of an eventually consistent and highly available key-value store. Many other data stores have been inspired by it, like Cassandra[9] and Riak KV[10] . 
 
@@ -185,7 +185,7 @@ _Read repair_ is a mechanism that clients implement to help bring replicas back 
 
 _Replica synchronization_ is a continuous background mechanism that runs on every replica and periodically communicates with others to identify and repair inconsistencies. For example, suppose replica X finds out that it has an older version of key K than replica Y. In that case, it will retrieve the latest version of K from Y. To detect inconsistencies and minimize the amount of data exchanged, replicas can exchange Merkle tree hashes[11] with a gossip protocol. 
 
-## **11.4 The CALM theorem** 
+# **11.4 The CALM theorem** 
 
 At this point, you might be wondering how you can tell whether an application requires coordination, such as consensus, and when it doesn’t. The CALM theorem[12] states that a program has a consistent, coordination-free distributed implementation if and only if it is _monotonic_ . 
 
@@ -212,7 +212,7 @@ In other words, consistency based on reads and writes can limit the solution spa
 
 CALM also identifies programs that can’t be consistent because they are not monotonic. For example, a vanilla register/variable assignment operation is not monotonic as it invalidates whatever value was stored there before. But, by combining the assignment operation with a logical clock, it’s possible to build a monotonic implementation, as we saw earlier when discussing LWW and MV registers. 
 
-## **11.5 Causal consistency** 
+# **11.5 Causal consistency** 
 
 So we understand now how eventual consistency can be used to implement monotonic applications that are consistent, available, 
 
@@ -268,7 +268,7 @@ If a replica fails, the data store continues to be available as any replica can 
 
 110 fail after committing an update locally but before broadcasting it, resulting in data loss. In COPS’ case, this tradeoff is considered acceptable to avoid paying the price of waiting for one or more long-distance requests to remote replicas before acknowledging a client write. 
 
-## **11.6 Practical considerations** 
+# **11.6 Practical considerations** 
 
 To summarize, in the previous chapters we explored different ways to implement replication and learned that there is a tradeoff between consistency and availability/performance. In other words, to build scalable and available systems, coordination needs to be minimized. 
 

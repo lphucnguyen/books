@@ -1,6 +1,6 @@
-## **Chapter 22** 
+# **Chapter 22** 
 
-## **Control planes and data planes** 
+# **Control planes and data planes** 
 
 The API gateway is a single point of failure. If it goes down, then so does _Cruder_ , which is why it needs to be highly available. And because every external request needs to go through it, it must also be scalable. This creates some interesting challenges with regard to external dependencies. 
 
@@ -26,11 +26,11 @@ For example, if the data plane has a theoretical availability of 99.99%, but the
 
 211 
 
-## 0.9999 ⋅0.99 = 0.9899 
+# 0.9999 ⋅0.99 = 0.9899 
 
 In other words, a system can at best be only as available as its least available hard dependency. We can try to make the control plane more reliable, but more importantly, we should ensure that the data plane can withstand control plane failures. If the control plane is temporarily unavailable, the data plane should continue to run with a stale configuration rather than stop. This concept is also referred to as _static stability_ . 
 
-## **22.1 Scale imbalance** 
+# **22.1 Scale imbalance** 
 
 Generally, data planes and control planes tend to have very different scale requirements. This creates a risk as the data plane can overload[2] the control plane. 
 
@@ -77,7 +77,7 @@ Figure 22.2: The intermediate data store absorbs the load of bulk reads, while t
 
 214 
 
-## **22.2 Control theory** 
+# **22.2 Control theory** 
 
 Control theory gives us another[5] way to think about control planes and data planes. In control theory, the goal is to create a controller that monitors a dynamic system, compares its state to the desired one, and applies a corrective action to drive the system closer to it while minimizing any instabilities on the way. 
 

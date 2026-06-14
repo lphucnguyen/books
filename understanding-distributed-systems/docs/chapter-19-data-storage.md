@@ -1,10 +1,10 @@
-## **Chapter 19** 
+# **Chapter 19** 
 
-## **Data storage** 
+# **Data storage** 
 
 Because _Cruder_ is stateless, we were able to scale it out by running multiple application servers behind a load balancer. But as the application handles more load, the number of requests to the relational database increases as well. And since the database is hosted on a single machine, it’s only a matter of time until it reaches its capacity and it starts to degrade. 
 
-## **19.1 Replication** 
+# **19.1 Replication** 
 
 We can increase the read capacity of the database by creating replicas. The most common way of doing that is with a leader-follower topology (see Figure 19.1). In this model, clients send writes (updates, inserts, and deletes) exclusively to the leader, which persists the changes to its write-ahead log. Then, the followers, or replicas, connect to the leader and stream log entries from it, committing them locally. Since log entries have a sequence number, followers can disconnect and reconnect at any time and start from where they left off by communicating to the leader the last sequence number they processed. 
 
@@ -37,7 +37,7 @@ One caveat of replication is that it only helps to scale out reads, not writes. 
 
 184 
 
-## **19.2 Partitioning** 
+# **19.2 Partitioning** 
 
 Partitioning allows us to scale out a database for both reads and writes. Even though traditional (centralized) relational databases generally don’t support it out of the box, we can implement it at the application layer in principle. However, implementing partitioning at the application layer is challenging and adds a lot of complexity to the system. For starters, we need to decide how to partition the data among the database instances and rebalance it when a partition becomes too hot or too big. Once the data is partitioned, queries that span multiple partitions need to be split into sub-queries and their responses have to be combined (think of aggregations or joins). Also, to support atomic transactions across partitions, we need to implement a distributed transaction protocol, like 2PC. Add to all that the requirement to combine partitioning with replication, and you can see how partitioning at the application layer becomes daunting. 
 
@@ -50,7 +50,7 @@ Times have changed, and storage is cheap nowadays, while CPU time isn’t. This 
 
 185 
 
-## **19.3 NoSQL** 
+# **19.3 NoSQL** 
 
 These early solutions didn’t support SQL and more generally only implemented a fraction of the features offered by traditional relational data stores. White papers such as Bigtable[5] and Dynamo[6] revolutionized the industry and started a push towards scalable storage layers, resulting in a plethora of open source solutions inspired by them, like HBase and Cassandra. 
 

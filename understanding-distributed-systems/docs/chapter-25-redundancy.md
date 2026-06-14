@@ -1,6 +1,6 @@
-## **Chapter 25** 
+# **Chapter 25** 
 
-## **Redundancy** 
+# **Redundancy** 
 
 Redundancy, the replication of functionality or state, is arguably the first line of defense against failures. When functionality or state is replicated over multiple nodes and a node fails, the others can take over. Moreover, as discussed in Part III, replication is also a core pattern that enables our applications to scale out horizontally. 
 
@@ -27,7 +27,7 @@ Now, when the load balancer takes one or more unhealthy servers out of the pool,
 
 In stateful services, masking a node failure is a lot more complex since it involves replicating state. We have discussed replication at length in the previous chapters, and it shouldn’t come as a surprise by now that meeting the above requisites is a lot more challenging for a stateful service than for a stateless one. 
 
-## **25.1 Correlation** 
+# **25.1 Correlation** 
 
 Redundancy is only helpful when the redundant nodes can’t fail for the same reason at the same time, i.e., when failures are not correlated. For example, if a faulty memory module causes a server to crash, it’s unlikely other servers will fail simultaneously for the same reason since they are running on different machines. However, if the servers are hosted in the same data center, and a fiber cut or an electrical storm causes a data-center-wide outage, the en245 tire application becomes unavailable no matter how many servers there are. In other words, the failures caused by a data center outage are correlated and limit the application’s availability. So if we want to increase the availability, we have to reduce the correlation between failures by using more than one data center. 
 

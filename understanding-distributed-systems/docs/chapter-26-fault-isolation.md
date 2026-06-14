@@ -1,6 +1,6 @@
-## **Chapter 26** 
+# **Chapter 26** 
 
-## **Fault isolation** 
+# **Fault isolation** 
 
 So far, we have discussed how to address infrastructure faults with redundancy, but there are other kinds of failures that we can’t tolerate with redundancy alone because of their high degree of correlation. 
 
@@ -25,7 +25,7 @@ Figure 26.1: Service instances partitioned into 3 partitions
 
 The use of partitions for fault isolation is also referred to as the _bulkhead pattern_ , named after the compartments of a ship’s hull. If one compartment is damaged and fills up with water, the leak is isolated to that partition and doesn’t spread to the rest of the ship. 
 
-## **26.1 Shuffle sharding** 
+# **26.1 Shuffle sharding** 
 
 The problem with partitioning is that users who are unlucky enough to land on a degraded partition are impacted as well. For stateless services, there is a very simple, yet powerful, variation of partitioning called shuffle sharding[2] that can help mitigate that. 
 
@@ -53,7 +53,7 @@ Figure 26.2: Virtual partitions are far less likely to fully overlap with each o
 
 250 
 
-## **26.2 Cellular architecture** 
+# **26.2 Cellular architecture** 
 
 In the previous examples, we discussed partitioning in the context of stateless services. We can take it up a notch and partition the entire application stack, including its dependencies (load balancers, compute services, storage services, etc.), by user[3] into _cells_[4] . Each cell is completely independent of others, and a gateway service is responsible for routing requests to the right cells. 
 

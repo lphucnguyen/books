@@ -1,12 +1,12 @@
-## **Chapter 24** 
+# **Chapter 24** 
 
-## **Common failure causes** 
+# **Common failure causes** 
 
 We say that a system has a _failure_[1] when it no longer provides a service to its users that meets its specification. A failure is caused by a _fault_ : a failure of an internal component or an external dependency the system depends on. Some faults can be tolerated and have no user-visible impact at all, while others lead to failures. 
 
 To build fault-tolerant applications, we first need to have an idea of what can go wrong. In the next few sections, we will explore some of the most common root causes of failures. By the end of it, you will likely wonder how to tolerate all these different types of faults. The answers will follow in the next few chapters. 
 
-## **24.1 Hardware faults** 
+# **24.1 Hardware faults** 
 
 Any physical part of a machine can fail. HDDs, memory modules, power supplies, motherboards, SSDs, NICs, or CPUs, can all stop working for various reasons. In some cases, hardware faults can cause data corruption as well. If that wasn’t enough, entire data centers can go down because of power cuts or natural disasters. 
 
@@ -17,7 +17,7 @@ Any physical part of a machine can fail. HDDs, memory modules, power supplies, m
 
 As we will discuss later, we can address many of these infrastructure faults with redundancy. You would think that these faults are the main cause for distributed applications failing, but in reality, they often fail for very mundane reasons. 
 
-## **24.2 Incorrect error handling** 
+# **24.2 Incorrect error handling** 
 
 A study from 2014[2] of user-reported failures from five popular distributed data stores found that the majority of catastrophic failures were the result of incorrect handling of non-fatal errors. 
 
@@ -25,7 +25,7 @@ In most cases, the bugs in the error handling could have been detected with simp
 
 In hindsight, this is perhaps not too surprising, given that error handling tends to be an afterthought.[3] Later, in chapter 29, we will take a closer look at best practices for testing large distributed applications. 
 
-## **24.3 Configuration changes** 
+# **24.3 Configuration changes** 
 
 Configuration changes are one of the leading root causes for catastrophic failures[4] . It’s not just misconfigurations that cause problems, but also valid configuration changes to enable rarely-used features that no longer work as expected (or never did). 
 
@@ -44,7 +44,7 @@ What makes configuration changes particularly dangerous is that their effects ca
 
 This is why configuration changes should be version-controlled, tested, and released just like code changes, and their validation should happen preventively when the change happens. In chapter 30, we will discuss safe release practices for code and configuration changes in the context of continuous deployments. 
 
-## **24.4 Single points of failure** 
+# **24.4 Single points of failure** 
 
 A single point of failure (SPOF) is a component whose failure brings the entire system down with it. In practice, systems can have multiple SPOFs. 
 
@@ -67,7 +67,7 @@ Similarly, the TLS certificate used by an application for its HTTP endpoints is 
 
 Ideally, SPOFs should be identified when the system is designed. The best way to detect them is to examine every system component and ask what would happen if it were to fail. Some SPOFs can be architected away, e.g., by introducing redundancy, while others can’t. In that case, the only option left is to reduce the SPOF’s blast radius, i.e., the damage the SPOF inflicts on the system when it fails. Many of the resiliency patterns we will discuss later reduce the blast radius of failures. 
 
-## **24.5 Network faults** 
+# **24.5 Network faults** 
 
 When a client sends a request to a server, it expects to receive a response from it a while later. In the best case, it receives the response shortly after sending the request. If that doesn’t happen, the client has two options: continue to wait or fail the request with a time-out exception or error. As discussed in chapter 7, when the concepts of failure detection and timeouts were introduced, there are many reasons for not getting a prompt response. For example, the server could be very slow or have crashed while processing the request; or maybe the network could be losing a small percentage of packets, causing lots of retransmissions and delays. 
 
@@ -82,7 +82,7 @@ In the next section, we will explore another common cause of gray failures.
 
 237 
 
-## **24.6 Resource leaks** 
+# **24.6 Resource leaks** 
 
 From an observer’s point of view, a very slow process is not very different from one that isn’t running at all — neither can perform useful work. Resource leaks are one of the most common causes of slow processes. 
 
@@ -97,7 +97,7 @@ On top of that, your code isn’t the only thing accessing memory, threads, and 
 
 238 discussed. 
 
-## **24.7 Load pressure** 
+# **24.7 Load pressure** 
 
 Every system has a limit of how much load it can withstand, i.e., its capacity. So when the load directed to the system continues to increase, it’s bound to hit that limit sooner or later. But an organic increase in load, that gives the system the time to scale out accordingly and increase its capacity, is one thing, and a sudden and unexpected flood is another. 
 
@@ -111,7 +111,7 @@ For example, consider the number of requests received by an application in a per
 
 While some load surges can be handled by automation that adds capacity (e.g., autoscaling), others require the system to reject requests to shield it from overloading, using the patterns we will discuss in chapter 28. 
 
-## **24.8 Cascading failures** 
+# **24.8 Cascading failures** 
 
 You would think that if a system has hundreds of processes, it shouldn’t make much of a difference if a small percentage are slow or unreachable. The thing about faults is that they have the potential to spread virally and cascade from one process to the other until the whole system crumbles to its knees. This happens when 
 
@@ -145,7 +145,7 @@ You can see how even after the network fault is gone, the application continues 
 
 A big enough corrective action is usually needed to break the loop, like temporarily blocking traffic from getting to the replicas in the first place. Unfortunately, these failures are very hard to mitigate once they have started, and the best way to prevent them is to stop faults from spreading from one component to another in the first place. 
 
-## **24.9 Managing risk** 
+# **24.9 Managing risk** 
 
 As it should be evident by now, a distributed application needs to accept that faults are inevitable and be prepared to detect, react to, and repair them as they occur. 
 

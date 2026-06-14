@@ -1,6 +1,6 @@
-## **Chapter 34** 
+# **Chapter 34** 
 
-## **Final words** 
+# **Final words** 
 
 Congratulations, you reached the end of the book! I hope you learned something you didn’t know before and perhaps even had a few “aha” moments. Although this is the end of the book, it’s just the beginning of your journey. 
 

@@ -1,6 +1,6 @@
-## **Chapter 13** 
+# **Chapter 13** 
 
-## **Asynchronous transactions** 
+# **Asynchronous transactions** 
 
 2PC is a synchronous blocking protocol — if the coordinator or any of the participants is slow or not not available, the transaction can’t make progress. Because of its blocking nature, 2PC is generally combined with a blocking concurrency control protocol, like 2PL, to provide isolation. That means the participants are holding locks while waiting for the coordinator, blocking other transactions accessing the same objects from making progress. 
 
@@ -13,7 +13,7 @@ To solve this problem, we can look for solutions in the real world. For example,
 
 Now, because a check is just a message, we can generalize this idea with the concept of _persistent_ messages sent over the network, i.e., messages that that are guaranteed to be processed _exactly once_ . In this chapter, we will discuss a few implementations of asynchrounous transactions based on this concept. 
 
-## **13.1 Outbox pattern** 
+# **13.1 Outbox pattern** 
 
 A common pattern[1] in modern applications is to replicate the same data to different data stores tailored to different use cases. For example, suppose we own a product catalog service backed by a relational database, and we decide to offer an advanced full-text search capability in its API. Although some relational databases offer a basic full-text search functionality, a dedicated service such as Elasticsearch[2] is required for more advanced use cases. 
 
@@ -43,7 +43,7 @@ In practice, the relay process doesn’t send messages directly to the
 
 If you squint a little, you will see that what we have just implemented here is conceptually similar to state machine replication, where the state is represented by the products in the catalog, and the replication happens through a log of operations (the outbox table). 
 
-## **13.2 Sagas** 
+# **13.2 Sagas** 
 
 Now suppose we own a travel booking service. To book a trip, the travel service has to atomically book a flight through a dedicated service and a hotel through another. However, either of these services can fail their respective request. If one booking succeeds, but the other fails, then the former needs to be canceled to guarantee atomicity. Hence, booking a trip requires multiple steps to complete, some of which are only required in case of failure. For that reason, we can’t use the simple solution presented earlier. 
 
@@ -89,7 +89,7 @@ There is a caveat, though; if the coordinator crashes after sending a request bu
 
 In practice, you don’t need to build orchestration engines from scratch to implement such workflows, since cloud compute ser133 vices such as AWS Step Functions[11] or Azure Durable Functions[12] make it easy to create managed workflows. 
 
-## **13.3 Isolation** 
+# **13.3 Isolation** 
 
 We started our journey into asynchronous transactions as a way to work around the blocking nature of 2PC. But to do that, we had to sacrifice the isolation guarantee that traditional ACID transactions provide. As it turns out, we can work around the lack of isolation as well. For example, one way to do that is by using _semantic locks_[13] . The idea is that any data the saga modifies is marked with a _dirty flag_ , which is only cleared at the end of the transaction. Another transaction trying to access a dirty record can either fail and roll back its changes or wait until the dirty flag is cleared. 
 
@@ -100,7 +100,7 @@ We started our journey into asynchronous transactions as a way to work around th
 > 13“Semantic ACID properties in multidatabases using remote procedure calls and update propagations,” https://dl.acm.org/doi/10.5555/284472.284478 
 
 
-## **Summary** 
+# **Summary** 
 
 If you pick any textbook about distributed systems or database systems, I guarantee you will find entire chapters dedicated to the topics discussed in this part. In fact, you can find entire books written about them! Although you could argue that it’s unlikely you will ever have to implement core distributed algorithms such as state machine replication from scratch, I feel it’s important to have seen these at least once as it will make you a better “user” of the abstractions they provide. 
 

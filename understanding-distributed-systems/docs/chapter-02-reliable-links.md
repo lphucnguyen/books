@@ -1,6 +1,6 @@
-## **Chapter 2** 
+# **Chapter 2** 
 
-## **Reliable links** 
+# **Reliable links** 
 
 At the internet layer, the communication between two nodes happens by routing packets to their destination from one router to the next. Two ingredients are required for this: a way to address nodes and a mechanism to route packets across routers. 
 
@@ -15,11 +15,11 @@ Now, IP doesn’t guarantee that data sent over the internet will arrive at its 
 
 18 avoid overwhelming the network and the receiver. 
 
-## **2.1 Reliability** 
+# **2.1 Reliability** 
 
 To create the illusion of a reliable channel, TCP partitions a byte stream into discrete packets called segments. The segments are sequentially numbered, which allows the receiver to detect holes and duplicates. Every segment sent needs to be acknowledged by the receiver. When that doesn’t happen, a timer fires on the sending side and the segment is retransmitted. To ensure that the data hasn’t been corrupted in transit, the receiver uses a checksum to verify the integrity of a delivered segment. 
 
-## **2.2 Connection lifecycle** 
+# **2.2 Connection lifecycle** 
 
 A connection needs to be opened before any data can be transmitted on a TCP channel. The operating system manages the connection state on both ends through a _socket_ . The socket keeps track of the state changes of the connection during its lifetime. At a high level, there are three states the connection can be in: 
 
@@ -61,7 +61,7 @@ Moreover, closing a socket doesn’t dispose of it immediately as it
 
 20 transitions to a waiting state ( _TIME_WAIT_ ) that lasts several minutes and discards any segments received during the wait. The wait prevents delayed segments from a closed connection from being considered part of a new connection. But if many connections open and close quickly, the number of sockets in the waiting state will continue to increase until it reaches the maximum number of sockets that can be open, causing new connection attempts to fail. This is another reason why processes typically maintain connection pools to avoid recreating connections repeatedly. 
 
-## **2.3 Flow control** 
+# **2.3 Flow control** 
 
 Flow control is a backoff mechanism that TCP implements to prevent the sender from overwhelming the receiver. The receiver stores incoming TCP segments waiting to be processed by the application into a receive buffer, as shown in Figure 2.2. 
 
@@ -86,7 +86,7 @@ Figure 2.3: The size of the receive buffer is communicated in the headers of ack
 
 This mechanism is not too dissimilar to rate-limiting at the service level, a mechanism that rejects a request when a specific quota is exceeded (see section 28.3). But, rather than rate-limiting on an API key or IP address, TCP is rate-limiting on a connection level. 
 
-## **2.4 Congestion control** 
+# **2.4 Congestion control** 
 
 TCP guards not only against overwhelming the receiver, but also against flooding the underlying network. The sender maintains a so-called _congestion window_ , which represents the total number of outstanding segments that can be sent without an acknowledgment from the other side. The smaller the congestion window is, the fewer bytes can be in flight at any given time, and the less bandwidth is utilized. 
 
@@ -116,7 +116,7 @@ As mentioned earlier, the size of the congestion window defines the maximum numb
 
 The equation[5] shows that bandwidth is a function of latency. TCP will try very hard to optimize the window size since it can’t do anything about the round-trip time. However, that doesn’t always yield the optimal configuration. Due to the way congestion control works, the shorter the round-trip time, the better the underlying network’s bandwidth is utilized. This is more reason to put servers geographically close to the clients. 
 
-## **2.5 Custom protocols** 
+# **2.5 Custom protocols** 
 
 TCP’s reliability and stability come at the price of lower bandwidth and higher latencies than the underlying network can deliver. If we drop the stability and reliability mechanisms that TCP provides, what we get is a simple protocol named _User Datagram Protocol_[6] (UDP) — a connectionless transport layer protocol that can be used as an alternative to TCP. 
 

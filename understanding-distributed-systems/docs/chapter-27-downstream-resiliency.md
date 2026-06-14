@@ -1,10 +1,10 @@
-## **Chapter 27** 
+# **Chapter 27** 
 
-## **Downstream resiliency** 
+# **Downstream resiliency** 
 
 Now that we have discussed how to reduce the impact of faults at the architectural level with redundancy and partitioning, we will dive into tactical resiliency patterns that stop faults from propagating from one component or service to another. In this chapter, we will discuss patterns that protect a service from failures of downstream dependencies. 
 
-## **27.1 Timeout** 
+# **27.1 Timeout** 
 
 When a network call is made, it’s best practice to configure a timeout to fail the call if no response is received within a certain amount of time. If the call is made without a timeout, there is a chance it will never return, and as mentioned in chapter 24, network calls that don’t return lead to resource leaks. Thus, the role of timeouts is to detect connectivity faults and stop them from cascading from one component to another. In general, timeouts are a must-have for operations that can potentially never return, like acquiring a mutex. 
 
@@ -44,7 +44,7 @@ We also want to have good monitoring in place to measure the entire lifecycle of
 
 Ideally, a network call should be wrapped within a library function that sets a timeout and monitors the request so that we don’t have to remember to do this for each call. Alternatively, we can also use a reverse proxy co-located on the same machine, which intercepts remote calls made by our process. The proxy can enforce timeouts and monitor calls, relieving our process ofthis responsibility. We talked about this in section 18.3 when discussing the sidecar pattern and the service mesh. 
 
-## **27.2 Retry** 
+# **27.2 Retry** 
 
 We know by now that a client should configure a timeout when making a network request. But what should it do when the request fails or times out? The client has two options at that point: it can either fail fast or retry the request. If a short-lived connectivity issue caused the failure or timeout, then retrying after some _backoff time_ has a high probability of succeeding. However, if the downstream service is overwhelmed, retrying immediately after 
 
@@ -53,7 +53,7 @@ We know by now that a client should configure a timeout when making a network re
 
 256 will only worsen matters. This is why retrying needs to be slowed down with increasingly longer delays between the individual retries until either a maximum number of retries is reached or enough time has passed since the initial request. 
 
-## **27.2.1 Exponential backoff** 
+# **27.2.1 Exponential backoff** 
 
 To set the delay between retries, we can use a _capped exponential function_ , where the delay is derived by multiplying the initial backoff duration by a constant that increases exponentially after each attempt, up to some maximum value (the cap): delay = 𝑚𝑖𝑛(cap, initial-backoff ⋅2[attempt] ) 
 
@@ -78,7 +78,7 @@ Figure 27.1: Retry storm request into a _retry queue_ . The same process, or pos
 
 Just because a network call can be retried doesn’t mean it should be. If the error is not short-lived, for example, because the process is not authorized to access the remote endpoint, it makes no sense to retry the request since it will fail again. In this case, the process should fail fast and cancel the call right away. And as discussed in chapter 5.7, we should also understand the consequences of retrying a network call that isn’t idempotent and whose side effects can affect the application’s correctness. 
 
-## **27.2.2 Retry amplification** 
+# **27.2.2 Retry amplification** 
 
 Suppose that handling a user request requires going through a chain of three services. The user’s client calls service A, which calls service B, which in turn calls service C. If the intermediate request from service B to service C fails, should B retry the request or not? Well, if B does retry it, A will perceive a longer execution time for its request, making it more likely to hit A’s timeout. If that happens, A retries the request, making it more likely for the client to hit its timeout and retry. 
 
@@ -95,7 +95,7 @@ Figure 27.2: Retry amplification in action
 
 And if the pressure gets bad enough, this behavior can easily overload downstream services. That’s why, when we have long dependency chains, we should consider retrying at a single level of the chain and failing fast in all the others. 
 
-## **27.3 Circuit breaker** 
+# **27.3 Circuit breaker** 
 
 Suppose a service uses timeouts to detect whether a downstream dependency is unavailable and retries to mitigate transient failures. If the failures aren’t transient and the downstream dependency remains unresponsive, what should it do then? If the service keeps retrying failed requests, it will necessarily become slower for its clients. In turn, this slowness can spread to the rest of the system. 
 

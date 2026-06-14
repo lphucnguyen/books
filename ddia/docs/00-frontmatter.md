@@ -2,7 +2,7 @@
 ![](../images/Designing_Data_Intensive_Applications-0001-00.png)
 
 
-## Designing Data-Intensive A lications pp 
+# Designing Data-Intensive A lications pp 
 
 THE BIG IDEAS BEHIND RELIABLE, SCALABLE, AND MAINTAINABLE SYSTEMS 
 
@@ -11,12 +11,12 @@ Martin Kleppmann
 
 **Designing Data-Intensive Applications** _**The Big Ideas Behind Reliable, Scalable, and Maintainable Systems**_ 
 
-## _**Martin Kleppmann**_ 
+# _**Martin Kleppmann**_ 
 
 **Beijing Boston Farnham Sebastopol Tokyo** 
 
 
-## **Designing Data-Intensive Applications** 
+# **Designing Data-Intensive Applications** 
 
 by Martin Kleppmann 
 
@@ -34,7 +34,7 @@ O’Reilly books may be purchased for educational, business, or sales promotiona
 
 March 2017: First Edition 
 
-## **Revision History for the First Edition** 
+# **Revision History for the First Edition** 
 
 2017-03-01: First Release 
 
@@ -55,7 +55,7 @@ _Computing is pop culture. […] Pop culture holds a disdain for history. Pop cu
 - —Alan Kay, in interview with _Dr Dobb’s Journal_ (2012) 
 
 
-## **Table of Contents** 
+# **Table of Contents** 
 
 **Preface. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  xiii** 
 
@@ -91,7 +91,7 @@ Relational Versus Document Databases Today                                      
 
 
 
-## **Part II. Distributed Data** 
+# **Part II. Distributed Data** 
 
 **5. Replication. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  151** Leaders and Followers                                                                                                 152 Synchronous Versus Asynchronous Replication                                                153 Setting Up New Followers                                                                                      155 Handling Node Outages                                                                                         156 Implementation of Replication Logs                                                                     158 Problems with Replication Lag                                                                                  161 Reading Your Own Writes                                                                                     162 Monotonic Reads                                                                                                     164 Consistent Prefix Reads                                                                                          165 Solutions for Replication Lag                                                                                 167 Multi-Leader Replication                                                                                           168 Use Cases for Multi-Leader Replication                                                               168 Handling Write Conflicts                                                                                       171 Multi-Leader Replication Topologies                                                                   175 Leaderless Replication                                                                                                 177 Writing to the Database When a Node Is Down                                                177 Limitations of Quorum Consistency                                                                    181 Sloppy Quorums and Hinted Handoff                                                                 183 Detecting Concurrent Writes                                                                                 184 Summary                                                                                                                       192 **6. Partitioning. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  199** Partitioning and Replication                                                                                      200 Partitioning of Key-Value Data                                                                                 201 Partitioning by Key Range                                                                                      202 Partitioning by Hash of Key                                                                                   203 Skewed Workloads and Relieving Hot Spots                                                       205 Partitioning and Secondary Indexes                                                                         206 Partitioning Secondary Indexes by Document                                                    206 Partitioning Secondary Indexes by Term                                                             208 Rebalancing Partitions                                                                                                209 Strategies for Rebalancing                                                                                       210 Operations: Automatic or Manual Rebalancing                                                 213 Request Routing                                                                                                           214 Parallel Query Execution                                                                                        216 Summary                                                                                                                       216 **7. Transactions. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  221** The Slippery Concept of a Transaction                                                                    222 
 
@@ -148,7 +148,7 @@ The Meaning of ACID                                                             
 
 
 
-## **Preface** 
+# **Preface** 
 
 If you have worked in software engineering in recent years, especially in server-side and backend systems, you have probably been bombarded with a plethora of buzzwords relating to storage and processing of data. NoSQL! Big Data! Web-scale! Sharding! Eventual consistency! ACID! CAP theorem! Cloud services! MapReduce! Real-time! 
 
@@ -184,7 +184,7 @@ We will dig into the internals of those systems, tease apart their key algorithm
 
 After reading this book, you will be in a great position to decide which kind of technology is appropriate for which purpose, and understand how tools can be combined to form the foundation of a good application architecture. You won’t be ready to build your own database storage engine from scratch, but fortunately that is rarely necessary. You will, however, develop a good intuition for what your systems are doing under the hood so that you can reason about their behavior, make good design decisions, and track down any problems that may arise. 
 
-## **Who Should Read This Book?** 
+# **Who Should Read This Book?** 
 
 If you develop applications that have some kind of server/backend for storing or processing data, and your applications use the internet (e.g., web applications, mobile apps, or internet-connected sensors), then this book is for you. 
 
@@ -206,7 +206,7 @@ If any of the following are true for you, you’ll find this book valuable:
 
 Sometimes, when discussing scalable data systems, people make comments along the lines of, “You’re not Google or Amazon. Stop worrying about scale and just use a relational database.” There is truth in that statement: building for scale that you don’t need is wasted effort and may lock you into an inflexible design. In effect, it is a form of premature optimization. However, it’s also important to choose the right tool for the job, and different technologies each have their own strengths and weaknesses. As we shall see, relational databases are important but not the final word on dealing with data. 
 
-## **Scope of This Book** 
+# **Scope of This Book** 
 
 This book does not attempt to give detailed instructions on how to install or use specific software packages or APIs, since there is already plenty of documentation for those things. Instead we discuss the various principles and trade-offs that are fundamental to data systems, and we explore the different design decisions taken by different products. 
 
@@ -220,7 +220,7 @@ Many of the technologies described in this book fall within the realm of the _Bi
 
 This book has a bias toward free and open source software (FOSS), because reading, modifying, and executing source code is a great way to understand how something works in detail. Open platforms also reduce the risk of vendor lock-in. However, where appropriate, we also discuss proprietary software (closed-source software, software as a service, or companies’ in-house software that is only described in literature but not released publicly). 
 
-## **Outline of This Book** 
+# **Outline of This Book** 
 
 This book is arranged into three parts: 
 
@@ -234,11 +234,11 @@ more detail on the problems with distributed systems (Chapter 8) and what it mea
 
 3. In Part III, we discuss systems that derive some datasets from other datasets. Derived data often occurs in heterogeneous systems: when there is no one database that can do everything well, applications need to integrate several different databases, caches, indexes, and so on. In Chapter 10 we start with a batch processing approach to derived data, and we build upon it with stream processing in Chapter 11. Finally, in Chapter 12 we put everything together and discuss approaches for building reliable, scalable, and maintainable applications in the future. 
 
-## **References and Further Reading** 
+# **References and Further Reading** 
 
 Most of what we discuss in this book has already been said elsewhere in some form or another—in conference presentations, research papers, blog posts, code, bug trackers, mailing lists, and engineering folklore. This book summarizes the most important ideas from many different sources, and it includes pointers to the original literature throughout the text. The references at the end of each chapter are a great resource if you want to explore an area in more depth, and most of them are freely available online. 
 
-## **O’Reilly Safari** 
+# **O’Reilly Safari** 
 
 
 ![](../images/Designing_Data_Intensive_Applications-0019-05.png)
@@ -252,7 +252,7 @@ For more information, please visit _http://oreilly.com/safari_ .
 
 
 
-## **How to Contact Us** 
+# **How to Contact Us** 
 
 Please address comments and questions concerning this book to the publisher: 
 
@@ -270,7 +270,7 @@ Follow us on Twitter: _http://twitter.com/oreillymedia_
 
 Watch us on YouTube: _http://www.youtube.com/oreillymedia_ 
 
-## **Acknowledgments** 
+# **Acknowledgments** 
 
 This book is an amalgamation and systematization of a large number of other people’s ideas and knowledge, combining experience from both academic research and industrial practice. In computing we tend to be attracted to things that are new and shiny, but I think we have a huge amount to learn from things that have been done before. This book has over 800 references to articles, blog posts, talks, documentation, and more, and they have been an invaluable learning resource for me. I am very grateful to the authors of this material for sharing their knowledge. 
 

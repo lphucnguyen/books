@@ -1,6 +1,6 @@
-## **Chapter 9** 
+# **Chapter 9** 
 
-## **Leader election** 
+# **Leader election** 
 
 There are times when a single process in the system needs to have special powers, like accessing a shared resource or assigning work to others. To grant a process these powers, the system needs to elect a _leader_ among a set of _candidate processes_ , which remains in charge until it relinquishes its role or becomes otherwise unavailable. When that happens, the remaining processes can elect a new leader among themselves. 
 
@@ -9,7 +9,7 @@ A leader election algorithm needs to guarantee that there is at most one leader 
 
 72 
 
-## **9.1 Raft leader election** 
+# **9.1 Raft leader election** 
 
 Raft[1] ’s leader election algorithm is implemented as a state machine in which any process is in one of three states (see Figure 9.1): 
 
@@ -36,7 +36,7 @@ The process remains in the candidate state until one of three things happens: it
 
 - **A period of time goes by with no winner** — It’s unlikely but possible that multiple followers become candidates simultaneously, and none manages to receive a majority of votes; this is referred to as a split vote. The candidate will eventually time out and start a new election when that happens. The election timeout is picked randomly from a fixed interval to reduce the likelihood of another split vote in the next election. 
 
-## **9.2 Practical considerations** 
+# **9.2 Practical considerations** 
 
 There are other leader election algorithms out there, but Raft’s implementation is simple to understand and also widely used in practice, which is why I chose it for this book. In practice, you will rarely, if ever, need to implement leader election from scratch. A good reason for doing that would be if you needed a solution with zero external dependencies[3] . Instead, you can use any _fault-tolerant_ key-value store that offers a linearizable[4] _compare-and-swap_[5] operation with an expiration time (TTL). 
 
@@ -70,11 +70,11 @@ The expiration logic can also be implemented on the client side,
 
 You might think that’s enough to guarantee there can’t be more than one leader at any given time. But, unfortunately, that’s not the case. To see why suppose multiple processes need to update a file on a shared file store, and we want to guarantee that only one at a time can access it to avoid race conditions. Now, suppose we use a lease to lock the critical section. Each process tries to acquire the lease, and the one that does so successfully reads the file, updates it in memory, and writes it back to the store: 
 
-## **if** lease.acquire(): 
+# **if** lease.acquire(): 
 
 **try** : content = store.read(filename) new_content = update(content) store.write(filename, new_content) 
 
-## **except** : 
+# **except** : 
 
 lease.release() 
 

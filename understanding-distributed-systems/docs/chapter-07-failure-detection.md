@@ -1,6 +1,6 @@
-## **Chapter 7** 
+# **Chapter 7** 
 
-## **Failure detection** 
+# **Failure detection** 
 
 Several things can go wrong when a client sends a request to a server. In the best case, the client sends a request and receives a response. But what if no response comes back after some time? In that case, it’s impossible to tell whether the server is just very slow, it crashed, or a message couldn’t be delivered because of a network issue (see Figure 7.1). 
 

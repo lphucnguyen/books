@@ -1,6 +1,6 @@
-## **Chapter 33** 
+# **Chapter 33** 
 
-## **Manageability** 
+# **Manageability** 
 
 Operators use observability tools to understand the behavior of their application, but they also need a way to modify the behavior without code changes. One example of this is releasing a new version of an application to production, which we discussed earlier. Another example is changing the way an application behaves by modifying its configuration. 
 
@@ -26,7 +26,7 @@ Once it’s possible to change configuration settings dynamically, new features 
 4“A/B testing,” https://en.wikipedia.org/wiki/A/B_testing 
 
 
-## **Summary** 
+# **Summary** 
 
 If you have spent even a few months in a team that operates a production service, you should be very familiar with the topics discussed in this part. Although we would all love to design new large-scale systems and move on, the reality is that the majority of the time is spent in maintenance activities, such as fixing bugs, adding new features to existing services, and operating production services. 
 

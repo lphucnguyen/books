@@ -1,6 +1,6 @@
-## **Chapter 31** 
+# **Chapter 31** 
 
-## **Monitoring** 
+# **Monitoring** 
 
 Monitoring is primarily used to detect failures that impact users in production and to trigger notifications (or alerts) to the human operators responsible for the system. Another important use case for monitoring is to provide a high-level overview of the system’s health via dashboards. 
 
@@ -17,7 +17,7 @@ _thetics_[2] ) that send test requests to external API endpoints and monitor how
 
 For example, if the DNS server of a service were down, the issue would be visible to synthetics, since they wouldn’t be able to resolve its IP address. However, the service itself would think everything was fine, and it was just getting fewer requests than usual. 
 
-## **31.1 Metrics** 
+# **31.1 Metrics** 
 
 A _metric_ is a time series of raw measurements (samples) of resource usage (e.g., CPU utilization) or behavior (e.g., number of requests that failed), where each sample is represented by a floating-point number and a timestamp. 
 
@@ -42,7 +42,7 @@ _# Is the id valid?_
 
 - _# How long has the resource been in the cache?_ 
 
-## **if** resource **is not** None: 
+# **if** resource **is not** None: 
 
 **return** resource resource = self._repository.get(id) 
 
@@ -56,7 +56,7 @@ self._cache[id] = resource
 
 _# What's the size of the cache?_ 
 
-## **return** resource 
+# **return** resource 
 
 _# How long did it take for the handler to run?_ 
 
@@ -75,7 +75,7 @@ Now, suppose we want to record the number of requests the handler failed to serv
 
 300 
 
-## } 
+# } 
 
 The agent batches these events and emits them periodically to a remote telemetry service, which persists them in a dedicated data store for event logs. For example, this is the approach taken by Azure Monitor’s log-based metrics[5] . 
 
@@ -98,7 +98,7 @@ We can take this idea one step further and also reduce ingestion costs by having
 
 Because metrics are mainly used for alerting and visualization purposes, they are usually persisted in a pre-aggregated form in a data store specialized for efficient time series storage[7] . 
 
-## **31.2 Service-level indicators** 
+# **31.2 Service-level indicators** 
 
 As noted before, one of the main use cases for metrics is alerting. But that doesn’t mean we should create alerts for every possible metric — for example, it’s useless to be alerted in the middle of the night because a service had a big spike in memory consumption a few minutes earlier. 
 
@@ -144,7 +144,7 @@ Also, long-tail latencies can dramatically impact a service. For example, suppos
 
 Measuring long-tail latencies and keeping them in check doesn’t just make our users happy but also drastically improves the resiliency of our systems while reducing their operational costs. Intuitively, by reducing the long-tail latency (worst-case scenario), we also happen to improve the average-case scenario. 
 
-## **31.3 Service-level objectives** 
+# **31.3 Service-level objectives** 
 
 A _service-level objective_ (SLO) defines a range of acceptable values for an SLI within which the service is considered to be in a healthy state (see Figure 31.2). An SLO sets the expectation to the service’s users of how it should behave when it’s functioning correctly. Service owners can also use SLOs to define a service-level agreement (SLA) with their users — a contractual agreement that dictates what happens when an SLO isn’t met, generally resulting in financial consequences. 
 
@@ -173,7 +173,7 @@ SLOs need to be agreed on with multiple stakeholders. If the error budget is bei
 
 It’s worth mentioning that users can become over-reliant on the actual behavior of our service rather than its documented SLA. To prevent that, we can periodically inject controlled failures[12] in production — also known as chaos testing. These controlled failures ensure the dependencies can cope with the targeted service level and are not making unrealistic assumptions. As an added benefit, they also help validate that resiliency mechanisms work as expected. 
 
-## **31.4 Alerts** 
+# **31.4 Alerts** 
 
 Alerting is the part of a monitoring system that triggers an action when a specific condition happens, like a metric crossing a threshold. Depending on the severity and the type of the alert, the action can range from running some automation, like restarting a service instance, to ringing the phone of a human operator who is on call. In the rest of this section, we will mostly focus on the latter case. 
 
@@ -197,7 +197,7 @@ We can improve the alert’s precision by increasing the amount of time the cond
 
 To improve recall, we can have multiple alerts with different thresholds. For example, a burn rate below 2 could be classified as a low-severity alert to be investigated during working hours, while a burn rate over 10 could trigger an automated call to an engineer. The SRE workbook has some great examples[13] of how to configure alerts based on burn rates. While the majority of alerts should be based on SLOs, some should trigger for known failure modes that we haven’t had the time to design or debug away. For example, suppose we know a service suffers from a memory leak that has led to an incident in the past, but we haven’t yet managed to track down the root cause. In this case, as a temporary mitigation, we could define an alert that triggers an automated restart when a service instance is running out of memory. 
 
-## **31.5 Dashboards** 
+# **31.5 Dashboards** 
 
 After alerting, the other main use case for metrics is to power realtime dashboards that display the overall health of a system. Unfortunately, dashboards can easily become a dumping ground for charts that end up being forgotten, have questionable usefulness, or are just plain confusing. Good dashboards don’t happen by coincidence. In this section, we will discuss some of the best practices for creating useful dashboards. 
 
@@ -205,7 +205,7 @@ When creating a dashboard, the first decision we have to make is to decide who t
 
 The categories of dashboards presented here (see Figure 31.3) are by no means standard but should give you an idea of how to organize dashboards. 
 
-## **SLO dashboard** 
+# **SLO dashboard** 
 
 > 13“Alerting on SLOs,” https://sre.google/workbook/alerting-on-slos/ 
 
@@ -222,7 +222,7 @@ Figure 31.3: Dashboards should be tailored to their audience.
 
 The SLO summary dashboard is designed to be used by various stakeholders from across the organization to gain visibility into the system’s health as represented by its SLOs. During an incident, this dashboard quantifies the impact the incident is having on the users. 
 
-## **Public API dashboard** 
+# **Public API dashboard** 
 
 This dashboard displays metrics about the system’s public API endpoints, which helps operators identify problematic paths during an incident. For each endpoint, the dashboard exposes several metrics related to request messages, request handling, and response messages, like: 
 
@@ -234,13 +234,13 @@ saging broker, request size statistics, authentication issues, etc.
 
 - Counts per response type, size of responses, etc. 
 
-## **Service dashboard** 
+# **Service dashboard** 
 
 A service dashboard displays service-specific implementation details, which require an in-depth understanding of its inner workings. Unlike the previous dashboards, this one is primarily used by the team that owns the service. Beyond service-specific metrics, a service dashboard should also contain metrics of upstream dependencies like load balancers and messaging queues and downstream dependencies like data stores. 
 
 This dashboard offers a first entry point into what’s going on within the service when debugging. As we will later learn when discussing observability, this high-level view is just the starting point. The operator typically drills down into the metrics by segmenting them further and eventually reaches for raw logs and traces to get more detail. 
 
-## **31.5.1 Best practices** 
+# **31.5.1 Best practices** 
 
 As new metrics are added and old ones removed, charts and dashboards need to be modified and kept in sync across multiple environments (e.g., pre-production and production). The most effective way to achieve that is by defining dashboards and charts with a domain-specific language and version-controlling them just like code. This allows dashboards to be updated from the same pull request that contains related code changes without manually updating dashboards, which is error-prone. 
 
@@ -268,7 +268,7 @@ Metrics that are only emitted when an error condition occurs can be hard to inte
 
 312 
 
-## **31.6 Being on call** 
+# **31.6 Being on call** 
 
 A healthy on-call rotation is only possible when services are built from the ground up with reliability and operability in mind. By making the developers responsible for operating what they build, they are incentivized to reduce the operational toll to a minimum. They are also in the best position to be on call since they are intimately familiar with the system’s architecture, brick walls, and trade-offs. 
 

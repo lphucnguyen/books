@@ -135,7 +135,12 @@
                     if (!h.id) {
                         h.id = h.innerText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                     }
-                    let levelClass = 'toc-h2';\\n                    if (h.tagName.toLowerCase() === 'h1') {\\n                        levelClass = 'toc-h1';\\n                    } else if (h.tagName.toLowerCase() === 'h3') {\\n                        levelClass = 'toc-h3';\\n                    }
+                    let levelClass = 'toc-h2';
+                    if (h.tagName.toLowerCase() === 'h1') {
+                        levelClass = 'toc-h1';
+                    } else if (h.tagName.toLowerCase() === 'h3') {
+                        levelClass = 'toc-h3';
+                    }
                     tocHTML += `<li class="${levelClass}"><a href="#${h.id}">${h.innerText}</a></li>`;
                 });
                 tocHTML += '</ul>';

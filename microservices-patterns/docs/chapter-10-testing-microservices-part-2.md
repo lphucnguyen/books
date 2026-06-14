@@ -1,6 +1,6 @@
-## _Testing microservices: Part 2_ 
+# _Testing microservices: Part 2_ 
 
-## _This chapter covers_ 
+# _This chapter covers_ 
 
 - Techniques for testing services in isolation 
 
@@ -20,7 +20,7 @@ entire application. End-to-end tests are at the top of the test pyramid and shou
 
 Let’s start by taking a look at how to write integration tests. 
 
-## _10.1 Writing integration tests_ 
+# _10.1 Writing integration tests_ 
 
 Services typically interact with other services. For example, Order Service, as figure 10.1 shows, interacts with several services. Its REST API is consumed by API Gateway, and its domain events are consumed by services, including Order History Service. Order Service uses several other services. It persists Orders in MySQL. It also sends commands to and consumes replies from several other services, such as Kitchen Service. 
 
@@ -75,7 +75,7 @@ The contracts are used to test both the consumer and the provider, which ensures
 
 Later in this section, I describe examples of these types of tests—but first let’s look at how to write persistence tests. 
 
-## _10.1.1 Persistence integration tests_ 
+# _10.1.1 Persistence integration tests_ 
 
 Services typically store data in a database. For instance, Order Service persists aggregates, such as Order, in MySQL using JPA. Similarly, Order History Service maintains a CQRS view in AWS DynamoDB. The unit tests we wrote earlier only test in-memory objects. In order to be confident that a service works correctly, we must write persistence integration tests, which verify that a service’s database access logic works as expected. In the case of Order Service, this means testing the JPA repositories, such as OrderRepository. 
 
@@ -141,7 +141,7 @@ On the provider side, Spring Cloud Contract generates a test class called HttpTe
 
 Let’s take a closer look at how this works, starting with an example contract. 
 
-## AN EXAMPLE CONTRACT FOR A REST API 
+# AN EXAMPLE CONTRACT FOR A REST API 
 
 A REST contract, such as the one shown in listing 10.2, specifies an HTTP request, which is sent by the REST client, and the HTTP response, which the client expects to get back from the REST server. A contract’s request specifies the HTTP method, the path, and optional headers. A contract’s response specifies the HTTP status code, optional headers, and, when appropriate, the expected body. 
 
@@ -196,7 +196,7 @@ CONSUMER-SIDE INTEGRATION TEST FOR API GATEWAY’S ORDERSERVICEPROXY
 
 API Gateway’s OrderServiceProxy invokes the GET /orders/{orderId} endpoint. Listing 10.4 shows the OrderServiceProxyIntegrationTest test class, which verifies that it conforms to the contracts. This class is annotated with @AutoConfigureStubRunner, provided by Spring Cloud Contract. It tells Spring Cloud Contract to run the WireMock server on a random port and configure it using the specified contracts. OrderServiceProxyIntegrationTest configures OrderServiceProxy to make requests to the WireMock port. 
 
-## Listing 10.4 A consumer-side integration test for **API Gateway** 's **OrderServiceProxy** 
+# Listing 10.4 A consumer-side integration test for **API Gateway** 's **OrderServiceProxy** 
 
 **Obtain the randomly assigned port Tell Spring Cloud Contract that WireMock is running on. to configure WireMock with Order Service’s contracts.** 
 
@@ -233,7 +233,7 @@ Each test method invokes OrderServiceProxy and verifies that either it returns t
 
 Let’s now look at how to do the same kind of testing for services that interact using messaging. 
 
-## _10.1.3 Integration testing publish/subscribe-style interactions_ 
+# _10.1.3 Integration testing publish/subscribe-style interactions_ 
 
 Services often publish domain events that are consumed by one or more other services. Integration testing must verify that the publisher and its consumers agree on the message channel and the structure of the domain events. Order Service, for example, publishes Order* events whenever it creates or updates an Order aggregate. Order History Service is one of the consumers of those events. We must, therefore, write tests that verify that these services can interact. 
 
@@ -242,9 +242,9 @@ Figure 10.4 shows the approach to integration testing publish/subscribe interact
 
 _**Writing integration tests**_ 
 
-## **Class under test** 
+# **Class under test** 
 
-## **Class under test** 
+# **Class under test** 
 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0357-04.png)
@@ -315,7 +315,7 @@ OrderDomainEventPublisher(DomainEventPublisher eventPublisher) { return new Orde
 
 This test class configures OrderDomainEventPublisher with in-memory messaging stubs. orderCreated() is invoked by the test method generated from the contract shown earlier in listing 10.5. It invokes OrderDomainEventPublisher to publish an OrderCreated event. The test method attempts to receive this event and then verifies that it matches the event specified in the contract. Let’s now look at the corresponding consumer-side tests. 
 
-## CONSUMER-SIDE CONTRACT TEST FOR THE ORDER HISTORY SERVICE 
+# CONSUMER-SIDE CONTRACT TEST FOR THE ORDER HISTORY SERVICE 
 
 Order History Service consumes events published by Order Service. As I described in chapter 7, the adapter class that handles these events is the OrderHistoryEventHandlers class. Its event handlers invoke OrderHistoryDao to update the CQRS view. Listing 10.7 shows the consumer-side integration test. It creates an OrderHistoryEventHandlers injected with a mock OrderHistoryDao. Each test method first invokes Spring Cloud to publish the event defined in the contract and then verifies that OrderHistoryEventHandlers invokes OrderHistoryDao correctly. 
 
@@ -336,7 +336,7 @@ Listing 10.7 The consumer-side integration test for the **OrderHistoryEventHandl
 
 The shouldHandleOrderCreatedEvent() test method tells Spring Cloud Contract to publish the OrderCreated event. It then verifies that OrderHistoryEventHandlers invoked orderHistoryDao.addOrder(). Testing both the domain event’s publisher and consumer using the same contracts ensures that they agree on the API. Let’s now look at how to do integration test services that interact using asynchronous request/response. 
 
-## _10.1.4 Integration contract tests for asynchronous request/response interactions_ 
+# _10.1.4 Integration contract tests for asynchronous request/response interactions_ 
 
 Publish/subscribe isn’t the only kind of messaging-based interaction style. Services also interact using asynchronous request/response. For example, in chapter 4 we saw that Order Service implements sagas that send command messages to various services, such as Kitchen Service, and processes the reply messages. 
 
@@ -361,7 +361,7 @@ The consumer-side test verifies that the command message proxy class sends corre
 
 The provider-side tests are code-generated by Spring Cloud Contract. Each test method corresponds to a contract. It sends the contract’s input message as a command message and verifies that the reply message matches the contract’s output message. Let’s look at the details, starting with the contract. 
 
-## EXAMPLE ASYNCHRONOUS REQUEST/RESPONSE CONTRACT 
+# EXAMPLE ASYNCHRONOUS REQUEST/RESPONSE CONTRACT 
 
 Listing 10.8 shows the contract for one interaction. It consists of an input message and an output message. Both messages specify a message channel, message body, and message headers. The naming convention is from the provider’s perspective. The input message’s messageFrom element specifies the channel that the message is read from. 
 
@@ -404,13 +404,13 @@ The shouldSuccessfullyCreateTicket() test method sends a CreateTicket command me
 
 Let’s now look at how to write provider-side integration tests. 
 
-## WRITING PROVIDER-SIDE, CONSUMER-DRIVEN CONTRACT TESTS FOR ASYNCHRONOUS REQUEST/RESPONSE INTERACTIONS 
+# WRITING PROVIDER-SIDE, CONSUMER-DRIVEN CONTRACT TESTS FOR ASYNCHRONOUS REQUEST/RESPONSE INTERACTIONS 
 
 A provider-side integration test must verify that the provider handles a command message by sending the correct reply. Spring Cloud Contract generates test classes that have a test method for each contract. Each test method sends the contract’s input message and verifies that the reply matches the contract’s output message. 
 
 The provider-side integration tests for Kitchen Service test KitchenServiceCommandHandler. The KitchenServiceCommandHandler class handles a message by invoking KitchenService. The following listing shows the AbstractKitchenServiceConsumerContractTest class, which is the base class for the Spring Cloud Contractgenerated tests. It creates a KitchenServiceCommandHandler injected with a mock KitchenService. 
 
-## Listing 10.10 Superclass of provider-side, consumer-driven contract tests for **Kitchen Service** 
+# Listing 10.10 Superclass of provider-side, consumer-driven contract tests for **Kitchen Service** 
 
 @RunWith(SpringRunner.class) 
 
@@ -438,17 +438,17 @@ new TicketDetails(Collections.emptyList())));
 
 } 
 
-## } 
+# } 
 
 KitchenServiceCommandHandler invokes KitchenService with arguments that are derived from a contract’s input message and creates a reply message that’s derived from the return value. The test class’s setup() method configures the mock KitchenService to return the values that match the contract’s output message 
 
 Integration tests and unit tests verify the behavior of individual parts of a service. The integration tests verify that services can communicate with their clients and dependencies. The unit tests verify that a service’s logic is correct. Neither type of test runs the entire service. In order to verify that a service as a whole works, we’ll move up the pyramid and look at how to write component tests. 
 
-## _10.2 Developing component tests_ 
+# _10.2 Developing component tests_ 
 
 So far, we’ve looked at how to test individual classes and clusters of classes. But imagine that we now want to verify that Order Service works as expected. In other words, we want to write the service’s acceptance tests, which treat it as a black box and verify its behavior through its API. One approach is to write what are essentially end-to-end tests and deploy Order Service and all of its transitive dependencies. As you should know by now, that’s a slow, brittle, and expensive way to test a service. 
 
-## Pattern: Service component test 
+# Pattern: Service component test 
 
 Test a service in isolation. See http://microservices.io/patterns/testing/servicecomponent-test.html. 
 
@@ -468,7 +468,7 @@ Stub<br>dependency 1<br>End-to-end<br>Component Tests Servi ce Stub<br>Component
 
 Figure 10.6 A component test tests a service in isolation. It typically uses stubs for the service’s dependencies. 
 
-## _10.2.1 Defining acceptance tests_ 
+# _10.2.1 Defining acceptance tests_ 
 
 Acceptance tests are business-facing tests for a software component. They describe the desired externally visible behavior from the perspective of the component’s clients rather than in terms of the internal implementation. These tests are derived from user stories or use cases. For example, one of the key stories for Order Service is the Place Order story: 
 
@@ -491,7 +491,7 @@ We could translate each scenario into Java code. An easier option, though, is to
 
 _**Developing component tests**_ 
 
-## _10.2.2 Writing acceptance tests using Gherkin_ 
+# _10.2.2 Writing acceptance tests using Gherkin_ 
 
 Writing acceptance tests in Java is challenging. There’s a risk that the scenarios and the Java tests diverge. There’s also a disconnect between the high-level scenarios and the Java tests, which consist of low-level implementation details. Also, there’s a risk that a scenario lacks precision or is ambiguous and can’t be translated into Java code. A much better approach is to eliminate the manual translation step and write executable scenarios. 
 
@@ -557,21 +557,21 @@ But before getting into the details of how to write step classes, let’s explor
 _**Developing component tests**_ 
 
 
-## _10.2.3 Designing component tests_ 
+# _10.2.3 Designing component tests_ 
 
 Imagine you’re implementing the component tests for Order Service. Section 10.2.2 shows how to specify the desired behavior using Gherkin and execute it using Cucumber. But before a component test can execute the Gherkin scenarios, it must first run Order Service and set up the service’s dependencies. You need to test Order Service in isolation, so the component test must configure stubs for several services, including Kitchen Service. It also needs to set up a database and the messaging infrastructure. There are a few different options that trade off realism with speed and simplicity. 
 
-## IN-PROCESS COMPONENT TESTS 
+# IN-PROCESS COMPONENT TESTS 
 
 One option is to write in-process component tests. An _in-process component test_ runs the service with in-memory stubs and mocks for its dependencies. For example, you can write a component test for a Spring Boot-based service using the Spring Boot testing framework. A test class, which is annotated with @SpringBootTest, runs the service in the same JVM as the test. It uses dependency injection to configure the service to use mocks and stubs. For instance, a test for Order Service would configure it to use an in-memory JDBC database, such as H2, HSQLDB, or Derby, and in-memory stubs for Eventuate Tram. In-process tests are simpler to write and faster, but have the downside of not testing the deployable service. 
 
-## OUT-OF-PROCESS COMPONENT TESTING 
+# OUT-OF-PROCESS COMPONENT TESTING 
 
 A more realistic approach is to package the service in a production-ready format and run it as a separate process. For example, chapter 12 explains that it’s increasingly common to package services as Docker container images. An _out-of-process component test_ uses real infrastructure services, such as databases and message brokers, but uses stubs for any dependencies that are application services. For example, an out-of-process component test for FTGO Order Service would use MySQL and Apache Kafka, and stubs for services including Consumer Service and Accounting Service. Because Order Service interacts with those services using messaging, these stubs would consume messages from Apache Kafka and send back reply messages. 
 
 A key benefit of out-of-process component testing is that it improves test coverage, because what’s being tested is much closer to what’s being deployed. The drawback is that this type of test is more complex to write, slower to execute, and potentially more brittle than an in-process component test. You also have to figure out how to stub the application services. Let’s look at how to do that. 
 
-## HOW TO STUB SERVICES IN OUT-OF-PROCESS COMPONENT TESTS 
+# HOW TO STUB SERVICES IN OUT-OF-PROCESS COMPONENT TESTS 
 
 The service under test often invokes dependencies using interaction styles that involve sending back a response. Order Service, for example, uses asynchronous request/ response and sends command messages to various services. API Gateway uses HTTP, which is a request/response interaction style. An out-of-process test must configure stubs for these kinds of dependencies, which handle requests and send back replies. 
 
@@ -589,13 +589,13 @@ A test can, for example, configure an HTTP stub using the WireMock stubbing DSL.
 
 Now that we’ve looked at how to design component tests, let’s consider how to write component tests for the FTGO Order Service. 
 
-## _10.2.4 Writing component tests for the FTGO Order Service_ 
+# _10.2.4 Writing component tests for the FTGO Order Service_ 
 
 As you saw earlier in this section, there are a few different ways to implement component tests. This section describes the component tests for Order Service that use the out-of-process strategy to test the service running as a Docker container. You’ll see how the tests use a Gradle plugin to start and stop the Docker container. I discuss how to use Cucumber to execute the Gherkin-based scenarios that define the desired behavior for Order Service. 
 
 Figure 10.7 shows the design of the component tests for Order Service. OrderServiceComponentTest is the test class that runs Cucumber: 
 
-## @RunWith(Cucumber.class) 
+# @RunWith(Cucumber.class) 
 
 @CucumberOptions(features = "src/component-test/resources/features") public class OrderServiceComponentTest { } 
 
@@ -616,7 +616,7 @@ src/component-test/resources/<br>createorder.feature<br>As a consumer of the Ord
 
 Figure 10.7 The component tests for **Order Service** use the Cucumber testing framework to execute tests scenarios written using Gherkin acceptance testing DSL. The tests use Docker to run **Order Service** along with its infrastructure services, such as Apache Kafka and MySQL. 
 
-## THE ORDERSERVICECOMPONENTTESTSTEPDEFINITIONS CLASS 
+# THE ORDERSERVICECOMPONENTTESTSTEPDEFINITIONS CLASS 
 
 The OrderServiceComponentTestStepDefinitions class is the heart of the tests. This class defines the meaning of each step in Order Service’s component tests. The following listing shows the usingCreditCard() method, which defines the meaning of the Given using … credit card step. 
 
@@ -698,13 +698,13 @@ _**Testing microservices: Part 2**_
 
 .... 
 
-## } 
+# } 
 
 The verifyEventPublished() method uses the MessageTracker class, a test helper class that records the events that have been published during the test. This class and SagaParticipantStubManager are instantiated by the TestConfiguration @Configuration class. 
 
 Now that we’ve looked at the step definitions, let’s look at how to run the component tests. 
 
-## RUNNING THE COMPONENT TESTS 
+# RUNNING THE COMPONENT TESTS 
 
 Because these tests are relatively slow, we don’t want to run them as part of ./gradlew test. Instead, we’ll put the test code in a separate src/component-test/java directory and run them using ./gradlew componentTest. Take a look at the ftgo-order-service/ build.gradle file to see the Gradle configuration. 
 
@@ -712,11 +712,11 @@ The tests use Docker to run Order Service and its dependencies. As described in 
 
 We can use the Gradle Docker Compose plugin to run the containers before executing the tests and stop the containers once the tests complete: 
 
-## apply plugin: 'docker-compose' 
+# apply plugin: 'docker-compose' 
 
 dockerCompose.isRequiredBy(componentTest) componentTest.dependsOn(assemble) 
 
-## dockerCompose { 
+# dockerCompose { 
 
 startedServices = [ 'ftgo-order-service'] } 
 
@@ -740,7 +740,7 @@ Those commands, which take a couple of minutes, perform the following actions:
 
 Now that we’ve looked at how to test a service in isolation, we’ll see how to test the entire application. 
 
-## _10.3 Writing end-to-end tests_ 
+# _10.3 Writing end-to-end tests_ 
 
 Component testing tests each service separately. End-to-end testing, though, tests the entire application. As figure 10.8 shows, end-to-end testing is the top of the test pyramid. That’s because these kinds of tests are—say it with me now—slow, brittle, and time consuming to develop. 
 
@@ -756,12 +756,12 @@ Figure 10.8 End-to-end tests are at the top of the test pyramid. They are slow, 
 
 End-to-end tests have a large number of moving parts. You must deploy multiple services and their supporting infrastructure services. As a result, end-to-end tests are slow. Also, if your test needs to deploy a large number of services, there’s a good chance one of them will fail to deploy, making the tests unreliable. Consequently, you should minimize the number of end-to-end tests. 
 
-## _10.3.1 Designing end-to-end tests_ 
+# _10.3.1 Designing end-to-end tests_ 
 
 As I’ve explained, it’s best to write as few of these as possible. A good strategy is to write user journey tests. A _user journey test_ corresponds to a user’s journey through the system. For example, rather than test create order, revise order, and cancel order separately, you can write a single test that does all three. This approach significantly reduces the number of tests you must write and shortens the test execution time. 
 
 
-## _10.3.2 Writing end-to-end tests_ 
+# _10.3.2 Writing end-to-end tests_ 
 
 End-to-end tests are, like the acceptance tests covered in section 10.2, business-facing tests. It makes sense to write them in a high-level DSL that’s understood by the business people. You can, for example, write the end-to-end tests using Gherkin and execute them using Cucumber. The following listing shows an example of such a test. It’s similar to the acceptance tests we looked at earlier. The main difference is that rather than a single Then, this test has multiple actions. 
 
@@ -771,7 +771,7 @@ Feature: Place Revise and Cancel As a consumer of the Order Service I should be 
 
 This scenario places an order, revises it, and then cancels it. Let’s look at how to run it. 
 
-## _10.3.3 Running end-to-end tests_ 
+# _10.3.3 Running end-to-end tests_ 
 
 End-to-end tests must run the entire application, including any required infrastructure services. As you saw in earlier in section 10.2, the Gradle Docker Compose plugin provides a convenient way to do this. Instead of running a single application service, though, the Docker Compose file runs all the application’s services. 
 
@@ -784,7 +784,7 @@ That may not seem like a long time, but this is a relatively simple application 
 
 _**Summary**_ 
 
-## _Summary_ 
+# _Summary_ 
 
 - Use contracts, which are example messages, to drive the testing of interactions between services. Rather than write slow-running tests that run both services and their transitive dependencies, write tests that verify that the adapters of both services conform to the contracts. 
 

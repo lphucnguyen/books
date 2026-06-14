@@ -1,13 +1,13 @@
-## **Part II** 
+# **Part II** 
 
 **Coordination** 
 
 
-## **Introduction** 
+# **Introduction** 
 
 _“Here is a Raft joke. It is really a Paxos joke, but easier to follow.”_ 
 
-## – Aleksey Charapko 
+# – Aleksey Charapko 
 
 So far, we have learned how to get processes to communicate reliably and securely with each other. We didn’t go into all this trouble just for the sake of it, though. Our ultimate goal is to build a distributed application made of a group of processes that gives its users the illusion they are interacting with one coherent node. Although achieving a perfect illusion is not always possible or desirable, some degree of coordination is always needed to build a distributed application. 
 

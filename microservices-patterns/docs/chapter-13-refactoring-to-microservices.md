@@ -1,6 +1,6 @@
-## _Refactoring to microservices_ 
+# _Refactoring to microservices_ 
 
-## _This chapter covers_ 
+# _This chapter covers_ 
 
 - When to migrate a monolithic application to a microservice architecture 
 
@@ -24,13 +24,13 @@ your monolith into microservices by developing what’s known as a strangler app
 
 I begin this chapter by describing the motivations for refactoring a monolith to a microservice architecture. I then describe how to develop the strangler application by implementing new functionality as services and extracting services from the monolith. Next, I cover various design topics, including how to integrate the monolith and services, how to maintain database consistency across the monolith and services, and how to handle security. I end the chapter by describing a couple of example services. One service is Delayed Order Service, which implements brand new functionality. The other service is Delivery Service, which is extracted from the monolith. Let’s start by taking a look at the concept of refactoring to a microservice architecture. 
 
-## _13.1 Overview of refactoring to microservices_ 
+# _13.1 Overview of refactoring to microservices_ 
 
 Put yourself in Mary’s shoes. You’re responsible for the FTGO application, a large and old monolithic application. The business is extremely frustrated with engineering’s inability to deliver features rapidly and reliably. FTGO appears to be suffering from a classic case of monolithic hell. Microservices seem, at least on the surface, to be the answer. Should you propose diverting development resources away from feature development to migrating to a microservice architecture? 
 
 I start this section by discussing why you should consider refactoring to microservices. I also discuss why it’s important to be sure that your software development problems are because you’re in monolithic hell rather than in, for example, a poor software development process. I then describe strategies for incrementally refactoring your monolith to a microservice architecture. Next, I discuss the importance of delivering improvements earlier and often in order to maintain the support of the business. I then describe why you should avoid investing in a sophisticated deployment infrastructure until you’ve developed a few services. Finally, I describe the various strategies you can use to introduce services into your architecture, including implementing new features as services and extracting services from the monolith. 
 
-## _13.1.1 Why refactor a monolith?_ 
+# _13.1.1 Why refactor a monolith?_ 
 
 The microservice architecture has, as described in chapter 1, numerous benefits. It has much better maintainability, testability, and deployability, so it accelerates development. The microservice architecture is more scalable and improves fault isolation. It’s also much easier to evolve your technology stack. But refactoring a monolith to 
 
@@ -47,7 +47,7 @@ If you’re in monolithic hell, it’s likely that you already have at least one
 
 It’s important to be sure that these problems are there because you’ve outgrown your architecture. A common reason for slow delivery and buggy releases is a poor software development process. For example, if you’re still relying on manual testing, then adopting automated testing alone can significantly increase development velocity. Similarly, you can sometimes solve scalability problems without changing your architecture. You should first try simpler solutions. If, and only if, you still have software delivery problems should you then migrate to the microservice architecture. Let’s look at how to do that. 
 
-## _13.1.2 Strangling the monolith_ 
+# _13.1.2 Strangling the monolith_ 
 
 The process of transforming a monolithic application into microservices is a form of application modernization (https://en.wikipedia.org/wiki/Software_modernization). _Application modernization_ is the process of converting a legacy application to one having a modern architecture and technology stack. Developers have been modernizing applications for decades. As a result, there is wisdom accumulated through experience we can use when refactoring an application into a microservice architecture. The most important lesson learned over the years is to not do a big bang rewrite. 
 
@@ -78,13 +78,13 @@ Martin Fowler refers to this application modernization strategy as the Strangler
 
 order to reach the sunlight above the forest canopy. Often the tree dies, because either it’s killed by the vine or it dies of old age, leaving a tree-shaped vine. 
 
-## Pattern: Strangler application 
+# Pattern: Strangler application 
 
 Modernize an application by incrementally developing a new (strangler) application around the legacy application. See http://microservices.io/patterns/refactoring/ strangler-application.html. 
 
 The refactoring process typically takes months, or years. For example, according to Steve Yegge (https://plus.google.com/+RipRowan/posts/eVeouesvaVX) it took Amazon.com a couple of years to refactor its monolith. In the case of a very large system, you may never complete the process. You could, for example, get to a point where you have tasks that are more important than breaking up the monolith, such as implementing revenue-generating features. If the monolith isn’t an obstacle to ongoing development, you may as well leave it alone. 
 
-## DEMONSTRATE VALUE EARLY AND OFTEN 
+# DEMONSTRATE VALUE EARLY AND OFTEN 
 
 An important benefit of incrementally refactoring to a microservice architecture is that you get an immediate return on your investment. That’s very different than a big bang rewrite, which doesn’t deliver any benefit until it’s complete. When incrementally refactoring the monolith, you can develop each new service using a new technology stack and a modern, high-velocity, DevOps-style development and delivery process. As a result, your team’s delivery velocity steadily increases over time. 
 
@@ -92,7 +92,7 @@ What’s more, you can migrate the high-value areas of your application to micro
 
 Another benefit of being able to deliver value earlier is that it helps maintain the business’s support for the migration effort. Their ongoing support is essential, because the refactoring effort will mean that less time is spent on developing features. Some organizations have difficulty eliminating technical debt because past attempts were too ambitious and didn’t provide much benefit. As a result, the business becomes reluctant to invest in further cleanup efforts. The incremental nature of refactoring to microservices means that the development team is able to demonstrate value early and often. 
 
-## MINIMIZE CHANGES TO THE MONOLITH 
+# MINIMIZE CHANGES TO THE MONOLITH 
 
 A recurring theme in this chapter is that you should avoid making widespread changes to the monolith when migrating to a microservice architecture. It’s inevitable 
 
@@ -112,7 +112,7 @@ As tempting as it seems to build out this infrastructure up front, I recommend o
 
 Let’s now look at the strategies you can use for migrating to a microservice architecture. 
 
-## _13.2 Strategies for refactoring a monolith to microservices_ 
+# _13.2 Strategies for refactoring a monolith to microservices_ 
 
 There are three main strategies for strangling the monolith and incrementally replacing it with microservices: 
 
@@ -129,13 +129,13 @@ third strategy, because it’s how functionality is migrated from the monolith i
 
 Let’s take a look at each of these strategies, starting with implementing new features as services. 
 
-## _13.2.1 Implement new features as services_ 
+# _13.2.1 Implement new features as services_ 
 
 The Law of Holes states that “if you find yourself in a hole, stop digging” (https:// en.m.wikipedia.org/wiki/Law_of_holes). This is great advice to follow when your monolithic application has become unmanageable. In other words, if you have a large, complex monolithic application, don’t implement new features by adding code to the monolith. That will make your monolith even larger and more unmanageable. Instead, you should implement new features as services. 
 
 This is a great way to begin migrating your monolithic application to a microservice architecture. It reduces the growth rate of the monolith. It accelerates the development of the new features, because you’re doing development in a brand new code base. It also quickly demonstrates the value of adopting the microservice architecture. 
 
-## INTEGRATING THE NEW SERVICE WITH THE MONOLITH 
+# INTEGRATING THE NEW SERVICE WITH THE MONOLITH 
 
 Figure 13.2 shows the application’s architecture after implementing a new feature as a service. Besides the new service and monolith, the architecture includes two other elements that integrate the service into the application: 
 
@@ -167,7 +167,7 @@ Figure 13.2 A new feature is implemented as a service that’s part of the stran
 Implementing new features as services accelerates the development of those features. It’s a good way to quickly demonstrate the value of the microservice architecture. It also reduces the monolith’s growth rate. But ultimately, you need to break apart the monolith using the two other strategies. You need to migrate functionality to the strangler application by extracting functionality from the monolith into services. You might also be able to improve development velocity by splitting the monolith horizontally. Let’s look at how to do that. 
 
 
-## _13.2.2 Separate presentation tier from the backend_ 
+# _13.2.2 Separate presentation tier from the backend_ 
 
 One strategy for shrinking a monolithic application is to split the presentation layer from the business logic and data access layers. A typical enterprise application consists of the following layers: 
 
@@ -198,7 +198,7 @@ Splitting the monolith in this way has two main benefits. It enables you to deve
 
 But this strategy is only a partial solution. It’s very likely that at least one or both of the resulting applications will still be an unmanageable monolith. You need to use the third strategy to replace the monolith with services. 
 
-## _13.2.3 Extract business capabilities into services_ 
+# _13.2.3 Extract business capabilities into services_ 
 
 Implementing new features as services and splitting the frontend web application from the backend will only get you so far. You’ll still end up doing a lot of development in the monolithic code base. If you want to significantly improve your application’s architecture and increase your development velocity, you need to break apart the monolith by incrementally migrating business capabilities from the monolith to services. For example, section 13.5 describes how to extract delivery management from the FTGO monolith into a new Delivery Service. When you use this strategy, over time the number of business capabilities implemented by the services grows, and the monolith gradually shrinks. 
 
@@ -242,7 +242,7 @@ Let’s look at each one, starting with splitting the domain model.
 _**Strategies for refactoring a monolith to microservices**_ 
 
 
-## SPLITTING THE DOMAIN MODEL 
+# SPLITTING THE DOMAIN MODEL 
 
 In order to extract a service, you need to extract its domain model out of the monolith’s domain model. You’ll need to perform major surgery to split the domain models. One challenge you’ll encounter is eliminating object references that would otherwise span service boundaries. It’s possible that classes that remain in the monolith will reference classes that have been moved to the service or vice versa. For example, imagine that, as figure 13.5 shows, you extract Order Service, and as a result its Order class references the monolith’s Restaurant class. Because a service instance is typically a process, it doesn’t make sense to have object references that cross service boundaries. Somehow you need to eliminate these types of object reference. 
 
@@ -280,7 +280,7 @@ One issue with replacing object references with primary keys is that although th
 
 Extracting a service is often much more involved than moving entire classes into a service. An even greater challenge with splitting a domain model is extracting functionality that’s embedded in a class that has other responsibilities. This problem often occurs in god classes, described in chapter 2, that have an excessive number of responsibilities. For example, the Order class is one of the god classes in the FTGO application. It implements multiple business capabilities, including order management, delivery management, and so on. Later in section 13.5, I discuss how extracting the delivery management into a service involves extracting a Delivery class from the Order class. The Delivery entity implements the delivery management functionality that was previously bundled with other functionality in the Order class. 
 
-## REFACTORING THE DATABASE 
+# REFACTORING THE DATABASE 
 
 Splitting a domain model involves more than just changing code. Many classes in a domain model are persistent. Their fields are mapped to a database schema. Consequently, when you extract a service from the monolith, you’re also moving data. You need to move tables from the monolith’s database to the service’s database. 
 
@@ -288,7 +288,7 @@ Also, when you split an entity you need to split the corresponding database tabl
 
 The book _Refactoring Databases_ by Scott W. Ambler and Pramod J. Sadalage (AddisonWesley, 2011) describes a set of refactorings for a database schema. For example, it describes the _Split Table_ refactoring, which splits a table into two or more tables. Many of the technique in that book are useful when extracting services from the monolith. One such technique is the idea of replicating data in order to allow you to incrementally update clients of the database to use the new schema. We can adapt that idea to reduce the scope of the changes you must make to the monolith when extracting a service. 
 
-## REPLICATE DATA TO AVOID WIDESPREAD CHANGES 
+# REPLICATE DATA TO AVOID WIDESPREAD CHANGES 
 
 As mentioned, extracting a service requires you to change to the monolith’s domain model. For example, you replace object references with primary keys and split classes. These types of changes can ripple through the code base and require you to make widespread changes to the monolith. For example, if you split the Order entity and extract a Delivery entity, you’ll have to change every place in the code that references the fields that have been moved. Making these kinds of changes can be extremely time consuming and can become a huge barrier to breaking up the monolith. 
 
@@ -315,7 +315,7 @@ Figure 13.7 Minimize the scope of the changes to the FTGO monolith by replicatin
 
 make that change in the monolith. If that code is subsequently extracted into a service, then the service can access Delivery Service. 
 
-## WHAT SERVICES TO EXTRACT AND WHEN 
+# WHAT SERVICES TO EXTRACT AND WHEN 
 
 As I mentioned, breaking apart the monolith is time consuming. It diverts effort away from implementing features. As a result, you must carefully decide the sequence in which you extract services. You need to focus on extracting services that give the largest benefit. What’s more, you want to continually demonstrate to the business that there’s value in migrating to a microservice architecture. 
 
@@ -339,7 +339,7 @@ You can use these criteria to add refactoring tasks to your application’s back
 _**Designing how the service and the monolith collaborate**_ 
 
 
-## _13.3 Designing how the service and the monolith collaborate_ 
+# _13.3 Designing how the service and the monolith collaborate_ 
 
 A service is rarely standalone. It usually needs to collaborate with the monolith. Sometimes a service needs to access data owned by the monolith or invoke its operations. For example, Delayed Delivery Service, described in detail in section 13.4.1, requires access to the monolith’s orders and customer contact info. The monolith might also need to access data owned by the service or invoke its operations. For example, later in section 13.5, when discussing how to extract delivery management into a service, I describe how the monolith needs to invoke Delivery Service. 
 
@@ -362,11 +362,11 @@ For example, Delayed Delivery Service uses both REST and domain events. It retri
 
 In this section, I first describe the design of the integration glue. I talk about the problems it solves and the different implementation options. After that I describe transaction management strategies, including the use of sagas. I discuss how sometimes the requirement to maintain data consistency changes the order in which you extract services. Let’s first look at the design of the integration glue. 
 
-## _13.3.1 Designing the integration glue_ 
+# _13.3.1 Designing the integration glue_ 
 
 When implementing a feature as a service or extracting a service from the monolith, you must develop the integration glue that enables a service to collaborate with the monolith. It consists of code in both the service and monolith that uses some kind of IPC mechanism. The structure of the integration glue depends on the type of IPC mechanism that is used. If, for example, the service invokes the monolith using REST, then the integration glue consists of a REST client in the service and web controllers in the monolith. Alternatively, if the monolith subscribes to domain events published by the service, then the integration glue consists of an event-publishing adapter in the service and event handlers in the monolith. 
 
-## DESIGNING THE INTEGRATION GLUE API 
+# DESIGNING THE INTEGRATION GLUE API 
 
 The first step in designing the integration glue is to decide what APIs it provides to the domain logic. There are a couple of different styles of interface to choose from, depending on whether you’re querying data or updating data. Let’s say you’re working on Delayed Delivery Service, which needs to retrieve customer contact info from the monolith. The service’s business logic doesn’t need to know the IPC mechanism that the integration glue uses to retrieve the information. Therefore, that mechanism should be encapsulated by an interface. Because Delayed Delivery Service is querying data, it makes sense to define a CustomerContactInfoRepository: interface CustomerContactInfoRepository { 
 
@@ -386,7 +386,7 @@ The monolith’s business logic invokes this API without knowing how it’s impl
 
 Now that we’ve seen interface design, let’s look at interaction styles and IPC mechanisms. 
 
-## PICKING AN INTERACTION STYLE AND IPC MECHANISM 
+# PICKING AN INTERACTION STYLE AND IPC MECHANISM 
 
 An important design decision you must make when designing the integration glue is selecting the interaction styles and IPC mechanisms that enable the service and the monolith to collaborate. As described in chapter 3, there are several interaction styles and IPC mechanisms to choose from. Which one you should use depends on what one _party_ —the service or monolith—needs in order to query or update the other party. 
 
@@ -423,7 +423,7 @@ Using a replica has several benefits. It avoids the overhead of repeatedly query
 
 Now that we’ve discussed how to do queries, let’s consider how to do updates. One challenge with performing updates is the need to maintain data consistency across the service and monolith. The party making the update request (the requestor) has updated or needs to update its database. So it’s essential that both updates happen. The solution is for the service and monolith to communicate using transactional messaging implemented by a framework, such as Eventuate Tram. In simple scenarios, the requestor can send a notification message or publish an event to trigger an update. In more complex scenarios, the requestor must use a saga to maintain data consistency. Section 13.3.2 discusses the implications of using sagas. 
 
-## IMPLEMENTING AN ANTI-CORRUPTION LAYER 
+# IMPLEMENTING AN ANTI-CORRUPTION LAYER 
 
 Imagine you’re implementing a new feature as a brand new service. You’re not constrained by the monolith’s code base, so you can use modern development techniques 
 
@@ -431,7 +431,7 @@ Imagine you’re implementing a new feature as a brand new service. You’re not
 _**Designing how the service and the monolith collaborate**_
 such as DDD and develop a pristine new domain model. Also, because the FTGO monolith’s domain is poorly defined and somewhat out-of-date, you’ll probably model concepts differently. As a result, your service’s domain model will have different class names, field names, and field values. For example, Delayed Delivery Service has a Delivery entity with narrowly focused responsibilities, whereas the FTGO monolith has an Order entity with an excessive number of responsibilities. Because the two domain models are different, you must implement what DDD calls an _anti-corruption layer_ (ACL) in order for the service to communicate with the monolith. 
 
-## Pattern: Anti-corruption layer 
+# Pattern: Anti-corruption layer 
 
 A software layer that translates between two different domain models in order to prevent concepts from one model polluting another. See https://microservices.io/ patterns/refactoring/anti-corruption-layer.html. 
 
@@ -466,7 +466,7 @@ The event handler must translate domain events from the monolith’s domain lang
 
 It’s not just services that use an anti-corruption layer. A monolith also uses an ACL when invoking the service and when subscribing to domain events published by a service. For example, the FTGO monolith schedules a delivery by sending a notification message to Delivery Service. It sends the notification by invoking a method on the DeliveryService interface. The implementation class translates its parameters into a message that Delivery Service understands. 
 
-## HOW THE MONOLITH PUBLISHES AND SUBSCRIBES TO DOMAIN EVENTS 
+# HOW THE MONOLITH PUBLISHES AND SUBSCRIBES TO DOMAIN EVENTS 
 
 Domain events are an important collaboration mechanism. It’s straightforward for a newly developed service to publish and consume events. It can use one of the mechanisms described in chapter 3, such as the Eventuate Tram framework. A service might even publish events using event sourcing, described in chapter 6. It’s potentially challenging, though, to change the monolith to publish and consume events. Let’s look at why. 
 
@@ -484,14 +484,14 @@ Fortunately, it’s usually easier for the monolith to subscribe to domain event
 
 Now that we’ve looked at how to design the integration glue that enables a service and the monolith to collaborate, let’s look at another challenge you might face when migrating to microservices: maintaining data consistency across a service and a monolith. 
 
-## _13.3.2 Maintaining data consistency across a service and a monolith_ 
+# _13.3.2 Maintaining data consistency across a service and a monolith_ 
 
 When you develop a service, you might find it challenging to maintain data consistency across the service and the monolith. A service operation might need to update data in the monolith, or a monolith operation might need to update data in the service. For example, imagine you extracted Kitchen Service from the monolith. You would need to change the monolith’s order-management operations, such as createOrder() and cancelOrder(), to use sagas in order to keep the Ticket consistent with the Order. 
 
 The problem with using sagas, however, is that the monolith might not be a willing participant. As described in chapter 4, sagas must use compensating transactions to undo changes. Create Order Saga, for example, includes a compensating transaction that marks an Order as rejected if it’s rejected by Kitchen Service. The problem with compensating transactions in the monolith is that you might need to make numerous and time-consuming changes to the monolith in order to support them. The monolith might also need to implement countermeasures to handle the lack of isolation between sagas. The cost of these code changes can be a huge obstacle to extracting a service. 
 
 
-## Key saga terminology 
+# Key saga terminology 
 
 I cover sagas in chapter 4. Here are some key terms: 
 
@@ -586,7 +586,7 @@ The monolith’s transaction is the saga’s pivot transaction—the point of no
 
 If all the sagas that you need to write when extracting a service have this structure, you’ll need to make far fewer changes to the monolith. What’s more, it’s possible to carefully sequence the extraction of services to ensure that the monolith’s transactions are either pivot transactions or retriable transactions. Let’s look at how to do that. 
 
-## SEQUENCING THE EXTRACTION OF SERVICES TO AVOID IMPLEMENTING COMPENSATING TRANSACTIONS IN THE MONOLITH 
+# SEQUENCING THE EXTRACTION OF SERVICES TO AVOID IMPLEMENTING COMPENSATING TRANSACTIONS IN THE MONOLITH 
 
 As we just saw, extracting Kitchen Service requires the monolith to implement compensating transactions, whereas extracting Order Service doesn’t. This suggests that the order in which you extract services matters. By carefully ordering the extraction of services, you can potentially avoid having to make widespread modifications to the monolith to support compensatable transactions. We can ensure that the monolith’s transactions are either pivot transactions or retriable transactions. For example, if we first extract Order Service from the FTGO monolith and then extract Consumer Service, extracting Kitchen Service will be straightforward. Let’s take a closer look at how to do that. 
 
@@ -642,7 +642,7 @@ We can even continue to refactor the monolith by extracting Accounting Service. 
 
 As you can see, by carefully sequencing the extractions, you can avoid using sagas that require making complex changes to the monolith. Let’s now look at how to handle security when migrating to a microservice architecture. 
 
-## _13.3.3 Handling authentication and authorization_ 
+# _13.3.3 Handling authentication and authorization_ 
 
 Another design issue you need to tackle when refactoring a monolithic application to a microservice architecture is adapting the monolith’s security mechanism to support the services. Chapter 11 describes how to handle security in a microservice architecture. A microservices-based application uses tokens, such as JSON Web tokens (JWT), to pass around user identity. That’s quite different than a typical traditional, monolithic application that uses in-memory session state and passes around the user identity using a thread local. The challenge when transforming a monolithic application to a microservice architecture is that you need to support both the monolithic and JWT-based security mechanisms simultaneously. 
 
@@ -675,7 +675,7 @@ The sequence of events is as follows:
 
 Let’s look at LoginHandler and API Gateway in more detail. 
 
-## THE MONOLITH’S LOGINHANDLER SETS THE USERINFO COOKIE 
+# THE MONOLITH’S LOGINHANDLER SETS THE USERINFO COOKIE 
 
 LoginHandler processes the POST of the user’s credentials. It authenticates the user and stores information about the user in the session. It’s often implemented by a 
 
@@ -685,7 +685,7 @@ _**Implementing a new feature as a service: handling misdelivered orders**_
 
 security framework, such as Spring Security or Passport for NodeJS. If the application is configured to use the default in-memory session, the HTTP response sets a session cookie, such as JSESSIONID. In order to support the migration to microservices, LoginHandler must also set the USERINFO cookie containing the JWT that describes the user. 
 
-## THE API GATEWAY MAPS THE USERINFO COOKIE TO THE AUTHORIZATION HEADER 
+# THE API GATEWAY MAPS THE USERINFO COOKIE TO THE AUTHORIZATION HEADER 
 
 The API gateway, as described in chapter 8, is responsible for request routing and API composition. It handles each request by making one or more requests to the monolith and the services. When the API gateway invokes a service, it validates the USERINFO cookie and passes it to the service in the HTTP request’s Authorization header. By mapping the cookie to the Authorization header, the API gateway ensures that it passes the user identity to the service in a standard way that’s independent of the type of client. 
 
@@ -693,11 +693,11 @@ Eventually, we’ll most likely extract login and user management into services.
 
 Now that we’ve looked at how to handle security when refactoring to microservices, let’s see an example of implementing a new feature as a service. 
 
-## _13.4 Implementing a new feature as a service: handling misdelivered orders_ 
+# _13.4 Implementing a new feature as a service: handling misdelivered orders_ 
 
 Let’s say you’ve been tasked with improving how FTGO handles misdelivered orders. A growing number of customers have been complaining about how customer service handles orders not being delivered. The majority of orders are delivered on time, but from time to time orders are either delivered late or not at all. For example, the courier gets delayed by unexpectedly bad traffic, so the order is picked up and delivered late. Or perhaps by the time the courier arrives at the restaurant, it’s closed, and the delivery can’t be made. To make matters worse, the first time customer service hears about the misdelivery is when they receive an angry email from an unhappy customer. 
 
-## A true story: My missing ice cream 
+# A true story: My missing ice cream 
 
 One Saturday night I was feeling lazy and placed an order using a well-known food delivery app to have ice cream delivered from Smitten. It never showed up. The only communication from the company was an email the next morning saying my order had been canceled. I also got a voicemail from a very confused customer service agent who clearly didn’t know what she was calling about. Perhaps the call was prompted by one of my tweets describing what happened. Clearly, the delivery company had not established any mechanisms for properly handling inevitable mistakes. 
 
@@ -721,7 +721,7 @@ This new feature is fairly simple. The new code must track the state of each Ord
 
 But how—or perhaps more precisely, _where_ —should you implement this new feature? One approach is to implement a new module in the monolith. The problem there is that developing and testing this code will be difficult. What’s more, this approach increases the size of the monolith and thereby makes monolith hell even worse. Remember the Law of Holes from earlier: when you’re in a hole, it’s best to stop digging. Rather than make the monolith larger, a much better approach is to implement these new features as a service. 
 
-## _13.4.1 The design of Delayed Delivery Service_ 
+# _13.4.1 The design of Delayed Delivery Service_ 
 
 We’ll implement this feature as a service called Delayed Order Service. Figure 13.14 shows the FTGO application’s architecture after implementing this service. The application consists of the FTGO monolith, the new Delayed Delivery Service, and an API Gateway. Delayed Delivery Service has an API that defines a single query operation called getDelayedOrders(), which returns the currently delayed or undeliverable orders. API Gateway routes the getDelayedOrders() request to the service and all other requests to the monolith. The integration glue provides Delayed Order Service with access to the monolith’s data. 
 
@@ -744,7 +744,7 @@ Figure 13.14 The design of **Delayed Delivery Service** . The integration glue p
 
 Let’s look at the design of the integration glue that provides Delayed Order Service access to the monolith’s data. 
 
-## _13.4.2 Designing the integration glue for Delayed Delivery Service_ 
+# _13.4.2 Designing the integration glue for Delayed Delivery Service_ 
 
 Even though a service that implements a new feature defines its own entity classes, it usually accesses data that’s owned by the monolith. Delayed Delivery Service is no exception. It has a DelayedOrderNotification entity, which represents a notification that it has sent to the consumer. But as I just mentioned, its Order and Restaurant entities replicate data from the FTGO monolith. It also needs to query user contact information in order to notify the user. Consequently, we need to implement integration glue that enables Delivery Service to access the monolith’s data. 
 
@@ -765,7 +765,7 @@ Figure 13.15 The integration glue provides **Delayed Delivery Service** with acc
 
 Let’s look at the design of each part of the integration, starting with the REST API for retrieving customer contact information. 
 
-## QUERYING CUSTOMER CONTACT INFORMATION USING CUSTOMERCONTACTINFOREPOSITORY 
+# QUERYING CUSTOMER CONTACT INFORMATION USING CUSTOMERCONTACTINFOREPOSITORY 
 
 As described in section 13.3.1, there are a couple of different ways that a service such as Delayed Delivery Service could read the monolith’s data. The simplest option is for Delayed Order Service to retrieve data using the monolith’s query API. This approach makes sense when retrieving the User contact information. There aren’t any latency or performance, issues because Delayed Delivery Service rarely needs to retrieve a user’s contact information, and the amount of data is quite small. 
 
@@ -789,7 +789,7 @@ Implementing a new feature such as delayed order management as a standalone serv
 
 Unfortunately, you can’t implement all changes as new services. Quite often you must make extensive changes to the monolith to implement new features or change existing features. Any development involving the monolith will mostly likely be slow and painful. If you want to accelerate the delivery of these features, you must break up the monolith by migrating functionality from the monolith into services. Let’s look at how to do that. 
 
-## _13.5 Breaking apart the monolith: extracting delivery management_ 
+# _13.5 Breaking apart the monolith: extracting delivery management_ 
 
 To accelerate the delivery of features that are implemented by a monolith, you need to break up the monolith into services. For example, let’s imagine that you want to enhance FTGO delivery management by implementing a new routing algorithm. A major obstacle to developing delivery management is that it’s entangled with order management and is part of the monolithic code base. Developing, testing, and deploying delivery management is likely to be slow. In order to accelerate its development, you need to extract delivery management into a Delivery Service. 
 
@@ -801,7 +801,7 @@ I start this section by describing delivery management and how it’s currently 
 
 Let’s begin by reviewing the existing design. 
 
-## _13.5.1 Overview of existing delivery management functionality_ 
+# _13.5.1 Overview of existing delivery management functionality_ 
 
 Delivery management is responsible for scheduling the couriers that pick up orders at restaurants and deliver them to consumers. Each courier has a plan that is a schedule of pickup and deliver actions. A _pickup_ action tells the Courier to pick up an order from a restaurant at a particular time. A _deliver_ action tells the Courier to deliver an order to a consumer. The plans are revised whenever orders are placed, canceled, or revised, and as the location and availability of couriers changes. 
 
@@ -841,7 +841,7 @@ Order operations: Courier operations:<br>acceptOrder() updateCourierLocation()<b
 Figure 13.16 Delivery management is entangled with order management within the FTGO monolith. consider the Courier-related commands and queries to be part of delivery management. After all, delivery management creates the courier plans and is the primary consumer of the Courier location and availability information. But in order to minimize the development effort, we’ll leave those operations in the monolith and just extract the core of the algorithm. Consequently, the first iteration of Delivery Service won’t expose a publicly accessible API. Instead, it will only be invoked by the monolith. Next, let’s explore the design of Delivery Service. 
 
 
-## _13.5.2 Overview of Delivery Service_ 
+# _13.5.2 Overview of Delivery Service_ 
 
 The proposed new Delivery Service is responsible for scheduling, rescheduling, and canceling deliveries. Figure 13.17 shows a high-level view of the architecture of the FTGO application after extracting Delivery Service. The architecture consists of the FTGO monolith and Delivery Service. They collaborate using the integration glue, which consists of APIs in both the service and monolith. Delivery Service has its own domain model and database. 
 
@@ -871,7 +871,7 @@ _**Breaking apart the monolith: extracting delivery management**_
 
 Delivery Service and the FTGO monolith to collaborate. But first, let’s look at the design of Delivery Service’s domain model. 
 
-## _13.5.3 Designing the Delivery Service domain model_ 
+# _13.5.3 Designing the Delivery Service domain model_ 
 
 To be able to extract delivery management, we first need to identify the classes that implement it. Once we’ve done that, we can decide which classes to move to Delivery Service to form its domain logic. In some cases, we’ll need to split classes. We’ll also need to decide which data to replicate between the service and the monolith. 
 
@@ -894,7 +894,7 @@ Figure 13.18 The entities and fields that are accessed by delivery management an
 The delivery scheduling algorithm reads various attributes including the Order’s restaurant, promisedDeliveryTime, and deliveryAddress, and the Courier’s location, availability, and current plans. It updates the Courier’s plans, the Order’s scheduledPickupTime, and scheduledDeliveryTime. As you can see, the fields used by delivery management are also used by the monolith. 
 
 
-## DECIDING WHICH DATA TO MIGRATE TO DELIVERY SERVICE 
+# DECIDING WHICH DATA TO MIGRATE TO DELIVERY SERVICE 
 
 Now that we’ve identified which entities and fields participate in delivery management, the next step is to decide which of them we should move to the service. In an ideal scenario, the data accessed by the service is used exclusively by the service, so we could simply move that data to the service and be done. Sadly, it’s rarely that simple, and this situation is no exception. All the entities and fields used by the delivery management are also used by other functionality implemented by the monolith. 
 
@@ -902,7 +902,7 @@ As a result, when determining which data to move to the service, we need to keep
 
 The essential responsibility of Delivery Service is managing courier plans and updating the Order’s scheduledPickupTime and scheduledDeliveryTime fields. It makes sense, therefore, for it to own those fields. We could also move the Courier.location and Courier.availability fields to Delivery Service. But because we’re trying to make the smallest possible change, we’ll leave those fields in the monolith for now. 
 
-## THE DESIGN OF THE DELIVERY SERVICE DOMAIN LOGIC 
+# THE DESIGN OF THE DELIVERY SERVICE DOMAIN LOGIC 
 
 Figure 13.19 shows the design of the Delivery Service’s domain model. The core of the service consists of domain classes such as Delivery and Courier. The DeliveryServiceImpl class is the entry point into the delivery management business logic. It implements the DeliveryService and CourierService interfaces, which are invoked by DeliveryServiceEventsHandler and DeliveryServiceNotificationsHandlers, described later in this section. 
 
@@ -923,13 +923,13 @@ Delivery Service<br>DeliveryService<br>NotificationHandlers<br>«interface»<br>
 
 Figure 13.19 The design of the **Delivery Service** 's domain model 
 
-## _13.5.4 The design of the Delivery Service integration glue_ 
+# _13.5.4 The design of the Delivery Service integration glue_ 
 
 The FTGO monolith needs to invoke Delivery Service to manage deliveries. The monolith also needs to exchange data with Delivery Service. This collaboration is enabled by the integration glue. Figure 13.20 shows the design of the Delivery Service integration glue. Delivery Service has a delivery management API. It also publishes Delivery and Courier domain events. The FTGO monolith publishes Courier domain events. 
 
 Let’s look at the design of each part of the integration glue, starting with Delivery Service’s API for managing deliveries. 
 
-## THE DESIGN OF THE DELIVERY SERVICE API 
+# THE DESIGN OF THE DELIVERY SERVICE API 
 
 Delivery Service must provide an API that enables the monolith to schedule, revise, and cancel deliveries. As you’ve seen throughout this book, the preferred approach is to use asynchronous messaging, because it promotes loose coupling and increases availability. One approach is for Delivery Service to subscribe to Order domain events published by the monolith. Depending on the type of the event, it creates, 
 
@@ -954,7 +954,7 @@ Delivery Service needs to access the Courier location and availability data, whi
 
 _**Breaking apart the monolith: extracting delivery management**_ 
 
-## HOW THE FTGO MONOLITH ACCESSES THE DELIVERY SERVICE DATA 
+# HOW THE FTGO MONOLITH ACCESSES THE DELIVERY SERVICE DATA 
 
 The FTGO monolith needs to read the data that’s been moved to Delivery Service, such as the Courier plans. In theory, the monolith could query the service, but that requires extensive changes to the monolith. For the time being, it’s easier to leave the monolith’s domain model and database schema unchanged and replicate data from the service back to the monolith. 
 
@@ -962,11 +962,11 @@ The easiest way to accomplish that is for Delivery Service to publish Courier an
 
 Now that we’ve looked at how the FTGO monolith and Delivery Service interact, let’s see how to change the monolith. 
 
-## _13.5.5 Changing the FTGO monolith to interact with Delivery Service_ 
+# _13.5.5 Changing the FTGO monolith to interact with Delivery Service_ 
 
 In many ways, implementing Delivery Service is the easier part of the extraction process. Modifying the FTGO monolith is much more difficult. Fortunately, replicating data from the service back to the monolith reduces the size of the change. But we still need to change the monolith to manage deliveries by invoking Delivery Service. Let’s look at how to do that. 
 
-## DEFINING A DELIVERYSERVICE INTERFACE 
+# DEFINING A DELIVERYSERVICE INTERFACE 
 
 The first step is to encapsulate the delivery management code with a Java interface corresponding to the messaging-based API defined earlier. This interface, shown in figure 13.21, defines methods for scheduling, rescheduling, and canceling deliveries. 
 
@@ -985,7 +985,7 @@ Eventually, we’ll implement this interface with a proxy that sends messages to
 
 The DeliveryService interface is a coarse-grained interface that’s well suited to being implemented by an IPC mechanism. It defines schedule(), reschedule(), and cancel() methods, which correspond to the notification message types defined earlier. 
 
-## REFACTORING THE MONOLITH TO CALL THE DELIVERYSERVICE INTERFACE 
+# REFACTORING THE MONOLITH TO CALL THE DELIVERYSERVICE INTERFACE 
 
 Next, as figure 13.22 shows, we need to identify all the places in the FTGO monolith that invoke delivery management and change them to use the DeliveryService interface. This may take some time and is one of the most challenging aspects of extracting a service from the monolith. 
 
@@ -1001,7 +1001,7 @@ Figure 13.22 The second step is to change the FTGO monolith to invoke delivery m
 
 It certainly helps if the monolith is written in a statically typed language, such as Java, because the tools do a better job of identifying dependencies. If not, then hopefully you have some automated tests with sufficient coverage of the parts of the code that need to be changed. 
 
-## IMPLEMENTING THE DELIVERYSERVICE INTERFACE 
+# IMPLEMENTING THE DELIVERYSERVICE INTERFACE 
 
 The final step is to replace the DeliveryServiceImpl class with a proxy that sends notification messages to the standalone Delivery Service. But rather than discard the existing implementation right away, we’ll use a design, shown in figure 13.23, that enables the monolith to dynamically switch between the existing implementation and Delivery Service. We’ll implement the DeliveryService interface with a class that uses a dynamic feature toggle to determine whether to invoke the existing implementation or Delivery Service. 
 
@@ -1020,7 +1020,7 @@ Figure 13.23 The final step is to implement **DeliveryService** with a proxy cla
 
 Using a feature toggle significantly reduces the risk of rolling out Delivery Service. We can deploy Delivery Service and test it. And then, once we’re sure it works, we can flip the toggle to route traffic to it. If we then discover that Delivery Service isn’t working as expected, we can switch back to the old implementation. 
 
-## About feature toggles 
+# About feature toggles 
 
 _Feature toggles_ , or _feature flags_ , let you deploy code changes without necessarily releasing them to users. They also enable you to dynamically change the behavior of the application by deploying new code. This article by Martin Fowler provides an excellent overview of the topic: https://martinfowler.com/articles/feature-toggles .html. 
 
@@ -1031,7 +1031,7 @@ Delivery Service and Delayed Order Service are examples of the services that the
 
 After implementing Order History Service, the FTGO team can then extract the services in the order described in section 13.3.2: Order Service, Consumer Service, Kitchen Service, and so on. As the FTGO team extracts each service, the maintainability and testability of their application gradually improves, and their development velocity increases. 
 
-## _Summary_ 
+# _Summary_ 
 
 - Before migrating to a microservice architecture, it’s important to be sure that your software delivery problems are a result of having outgrown your monolithic architecture. You might be able to accelerate delivery by improving your software development process. 
 
@@ -1057,13 +1057,13 @@ _**Summary**_
 - When refactoring to a microservice architecture, you need to simultaneously support the monolithic application’s existing security mechanism, which is often based on an in-memory session, and the token-based security mechanism used by the services. Fortunately, a simple solution is to modify the monolith’s login handler to generate a cookie containing a security token, which is then forwarded to the services by the API gateway. 
 
 
-## _index_ 
+# _index_ 
 
-## Numerics 
+# Numerics 
 
 2PC (two-phase commit) 112 3rd party registration pattern 84–85, 108 4+1 view model of software architecture 35–37 500 status code, HTTP 367 
 
-## A 
+# A 
 
 AbstractAutowiringHttpRequestHandler class 423 AbstractHttpHandler class 423 accept() method 165, 172 acceptance tests 335–338 defining 336 executing specifications using Cucumber 338 writing using Gherkin 337–338 acceptOrder() method 460 Access Token 28, 354, 357 ACD (Atomicity, Consistency, Durability) 111 ACID (Atomicity, Consistency, Isolation, Durability) transactions 98, 110 ACLs (access control lists) 350 ActiveMQ message broker 92 add() method 310 addOrder() method 249–250 AggregateRepository class 206–208 aggregates 147, 374, 439 consistency boundaries 155 creating, finding, and updating 207–208 defining aggregate commands 207 defining with ReflectiveMutableCommandProcessingAggregate class 206–207 designing business logic with 159–160 event sourcing aggregate history 186, 199–200 aggregate methods and events 189–191 event sourcing-based Order aggregate 191–193 persisting aggregates using events 186–188 event sourcing and aggregate history 199–200 explicit boundaries 154–155 granularity 158 identifying 155 Order aggregate 175–180 methods 177–180 state machine 176–177 structure of 175–176 rules for 155–157 Ticket aggregate 169–173 behavior of 170–171 KitchenService domain service 171–172 KitchenServiceCommandHandler class 172–173 structure of Ticket class 170 traditional persistence and aggregate history 186 aliases 285 Alternative pattern 22 AMI (Amazon Machine Image) 390 anomalies 126 Anti-corruption layer pattern 447 AOP (aspect-oriented programming) 373, 378 Apache Flume 370 Apache Kafka 92 Apache Openwhisk 416 Apache Shiro 351 API composition pattern 221–228 benefits and drawbacks of 227–228 increased overhead 227 lack of transactional data consistency 228 risk of reduced availability 227–228 
 
@@ -1079,14 +1079,14 @@ Asynchronous messaging pattern _(continued)_ libraries and frameworks for 100–
 
 OrderHistoryDaoDynamoDb class 249–252 addOrder() method 249–250 findOrderHistory() method 251–252 idempotentUpdate() method 250–251 notePickedUp() method 250 OrderHistoryEventHandlers module 243–244 AWS Gateway, deploying RESTful services using 419–426 deploying lambda functions using Serverless framework 425–426 design of Restaurant Service 419–423 packaging service as ZIP file 424 AWS Lambda benefits of lambda functions 418 developing lambda functions 417 drawbacks of lambda functions 419 invoking lambda functions 417–418 defining scheduled lambda functions 418 handling events 418 handling HTTP requests 417 invoking lambda functions using web service requests 418 overview of 416 RESTful services 419–426 deploying lambda functions using Serverless framework 425–426 design of Restaurant Service 419–423 packaging service as ZIP file 424 aws.region property 363 Axon 202 Azure functions, Microsoft 416 
 
-## B 
+# B 
 
 Backends for frontends (BFF) pattern 264–266 batching 288 @Before setUp() method 309 beforeHandling() method 423 Big Ball of Mud pattern 2 big bang rewrite 430 binary message formats 72 bounded context 55 broker-based messaging 90–94 benefits and drawbacks of 93–94 implementing message channels using 93 overview of 92 brokerless messaging 91–92 Browser API module 264 business capability 40 business logic 146–219 adding audit logging code to 378 domain events 160–168 consuming 167–168 defined 161 event enrichment 161–162 
 
 
 INDEX business logic _(continued)_ generating 164–165 identifying 162–163 publishing 166–167 reasons to publish 160–161 domain model design 152–160 aggregates 154–160 problem with fuzzy boundaries 153–154 event sourcing 184–202 benefits of 199–200 drawbacks of 200–202 event publishing 194–195 evolving domain events 198–199 handling concurrent updates using optimistic locking 193–194 idempotent message processing 197 overview of 186–193 snapshots, improving performance with 195–196 traditional persistence 185–186 event store implementation 202–209 Eventuate client framework for Java 205–209 Eventuate Local event store 203–205 Kitchen Service business logic 168–173 Order Service business logic 173–182 Order aggregate 175–180 OrderService class 180–182 organization patterns 147–152 Domain model pattern 150–151 domain-driven design 151–152 Transaction script pattern 149–150 sagas and event sourcing together 209–218 creating orchestration-based saga 211–212 implementing choreography-based sagas using event sourcing 210 implementing event sourcing-based saga participant 213–216 implementing saga orchestrators using event sourcing 216–218 Business logic design patterns Aggregate 147, 152–160 Domain event 160 Domain model 150–151 Event sourcing 184 Transaction script 149–150 business logic layer 38, 436 by value countermeasure 131–132 
 
-## C 
+# C 
 
 caching 262, 288 cancel() operation 177 cancelOrder() method 460 CAP theorem 113 CCP (Common Closure Principle) 56 centralized sessions 354 change failure rate 31 choreography 111 choreography-based sagas 118–121 benefits and drawbacks of 121 implementing Create Order saga 118–119 implementing using event sourcing 210 reliable event-based communication 120–121 CI (Continuous Integration) 6, 306, 357 Circuit breaker pattern 77–80 developing robust RPI proxies 79 recovering from unavailable services 79–80 Client concept 358 Client-side discovery pattern 82–83 command message 86 Command query responsibility segregation. _See_ CQRS pattern command/reply-based messaging 102–103 commands 41 commit tests stage 306 committed records 130 Common Closure Principle (CCP) 56–57 communication flexible 93 secure interprocess 350 communication patterns 23–25 commutative update countermeasure 130 compensatable transactions 116, 128, 450 compensating transaction 450 compile-time tests 297 component tests 306, 339–340 for FTGO Order Service OrderServiceComponentTestStepDefinitions class 341–344 running 344–345 writing 340–345 in-process component tests 339 out-of-process component tests 339–340 condition expression 248 Conduit 381 ConfigMap 402 configurable services 360–364 pull-based externalized configuration 363–364 push-based externalized configuration 362–363 @ConfigurationProperties class 276 consumer contract testing 301–303 for asynchronous request/response interaction 332–335 for messaging APIs 305 for publish/subscribe-style interactions 328–330 for REST-based request/response style interactions 324–326 consumer group 94 consumer-driven contract test 28, 302 
 
@@ -1095,7 +1095,7 @@ INDEX consumerId parameter 229 consumer-provider relationship 301 consumer-side 
 
 CRUD (create, update, and delete) operations 232 Cucumber framework 338 CustomerContactInfoRepository interface 445, 458 
 
-## D 
+# D 
 
 DAO (data access object) 39, 149, 239 data access logic layer 436 data consistency 449–453 API composition pattern and 228 maintaining across services 58 refactoring to microservices sagas and compensatable transactions 451–452 sequencing extraction of services 452–453 supporting compensatable transactions 450–451 Saga pattern 25–26, 114–117 data consistency patterns 25 Saga pattern 25–26, 114–117 DataLoader module 288 DDD (domain-driven design) 24, 34 DDD aggregate pattern 152–160 Debezium 100 Decompose by business capability pattern 51–54 decomposition 52–54 identifying business capabilities 51–52 purpose of business capabilities 51 decomposition 33–64 Decompose by subdomain 54 defining application’s microservice architecture 44–64 defining service APIs 61–64 guidelines for decomposition 56–57 identifying system operations 45–50 obstacles to decomposition 57–61 service definition with Decompose by business capability pattern 51–54 service definition with Decompose by subdomain pattern 54–55 guidelines for 56–57 Common Closure Principle 56–57 Single Responsibility Principle 56 obstacles to 57–61 god classes 58–61 maintaining data consistency across services 58 network latency 57 obtaining consistent view of data 58 synchronous interprocess communication 57 patterns Decompose by business capability 24, 51–54 Decompose by subdomain 24, 54 
 
@@ -1107,18 +1107,18 @@ Delayed Delivery Service changing FTGO monolith to interact with 467–470 defin
 
 INDEX domain model _(continued)_ Delivery Service 463–464 deciding which data to migrate 464 design of domain logic 464 identifying which entities and fields are part of delivery management 463 problem with fuzzy boundaries 153–154 splitting 439–440 domain services KitchenService 171–172 unit tests for 312–313 domain-driven design (DDD) 24, 34 DSL (domain-specific language) 303 DTP (Distributed Transaction Processing) 112 dumb pipes 14 duplicate messages 95–97 tracking messages and discarding duplicates 96–97 writing idempotent message handlers 96 DynamoDB streams 100 
 
-## E 
+# E 
 
 edge functions 271 Elastic Beanstalk 391 Elasticsearch 370 @EnableGateway annotation 279 end-to-end tests 345–346 designing 345 running 346 writing 346 Enterprise Service Bus (ESB) 264 entities, unit tests for 309–310 Entity object, DDD 151 enums 283 ESB (Enterprise Service Bus) 264 event. _See_ Domain events event handlers events generated by AWS services 418 idempotent 240–241 unit tests for 315–317 event message 86 event publishing 194–195 Asynchronous messaging pattern 89–90, 98–100, 102 domain events 160–168 consuming 167–168 defined 161 event enrichment 161–162 generating and publishing 164–167 identifying 162–163 reasons for 160–161 event sourcing 194–195, 199 traditional persistence and 186 using polling 194–195 using transaction log tailing 195 event sourcing 184–202 audit logging 378 benefits of 199–200 avoids O/R impedance mismatch problem 200 preserves aggregate history 199–200 reliable domain event publishing 199 time machine for developers 200 concurrent updates and optimistic locking 193–194 drawbacks of 200–202 complexity 200 deleting data 201 evolving events 201 learning curve 200 querying event store 202 event publishing 194–195 using polling 194–195 using transaction log tailing 195 evolving domain events 198–199 event schema evolution 198–199 managing schema changes through upcasting 199 idempotent message processing 197 with NoSQL-based event store 197 with RDBMS-based event store 197 overview of 186–193 aggregate methods required to generate events 189–191 event sourcing-based Order aggregate 191–193 events representing state changes 188 persisting aggregates using events 186–188 sagas and 209–218 creating orchestration-based saga 211–212 implementing choreography-based sagas using event sourcing 210 implementing event sourcing-based saga participant 213–216 implementing saga orchestrators using event sourcing 216–218 snapshots and performance improvement 195–196 trouble with traditional persistence 185–186 audit logging 186 event publishing bolted to business logic 186 lack of aggregate history 186 Object-Relational impedance mismatch 185–186 Event Store 202 event store implementation 202–209 Eventuate client framework for Java 205–209 AggregateRepository class 207–208 defining aggregate commands 207 
 
 
 INDEX event store implementation _(continued)_ defining aggregates with ReflectiveMutableCommandProcessingAggregate class 206–207 defining domain events 207 subscribing to domain events 208–209 Eventuate Local event store 203–205 consuming events by subscribing to event broker 205 event relay propagates events from database to message broker 205 schema 203–205 event storming 162 event-driven I/O 269 @EventHandlerMethod annotation 208 events. _See_ Domain events @EventSubscriber annotation 208 Eventuate framework 101, 202, 205–209 and updating aggregates with the AggregateRepository class 207–208 defining aggregate commands 207 defining aggregates with ReflectiveMutableCommandProcessingAggregate class 206–207 defining domain events 207 subscribing to domain events 208–209 Eventuate Local event store 203–205 consuming events by subscribing to event broker 205 event relay propagates events from database to message broker 205 schema 203–205 Eventuate Tram 100, 166 Eventuate Tram Saga framework 140–142 Exception tracking pattern 28, 366, 376–377 Express framework 289–290 external API patterns 253–291 API gateway 76, 227, 254, 259–272 API gateway implementation 271–291 using GraphQL 279–291 using Netflix Zuul 273 using off-the-shelf products/services 271–272 using Spring Cloud Gateway 273–275 API gateway pattern 76, 227, 254, 259–271 benefits of 267 design issues 268–271 drawbacks of 267 Netflix example 267–268 overview of 259–266 Backends for frontends 254, 262, 264–266 design issues 254–259 browser-based JavaScript applications 258 FTGO mobile client 255–258 third-party applications 258–259 web applications 258 externalized configuration 361 pull-based 363–364 push-based 262–263 Externalized Configuration pattern 28, 361 
 
-## F 
+# F 
 
 Factory object, DDD 151 fault isolation 6 feature flags 469 feature toggles 469 filter expression 247 filter parameter 229 find() operation 204 findAvailableRestaurants() query operation 231 findCustomerContactInfo() method 447 findOrder() operation 221–222, 224 findOrderHistory() query operation 229–231, 251–252 defining index for 245–247 implementing 247 FindRestaurantRequestHandler class 421–422 Fission framework 416 Fluentd 370 Flume 370 fold operation 187 FTGO application API design issues for mobile client 255–258 changing monolith to interact with Delivery Service 467–470 component tests for Order Service 340–345 deploying with Kubernetes 399–415 API gateway 405–406 Restaurant Service 402–405 service meshes 407–415 zero-downtime deployments 406–407 microservice architecture of 12–13 monolithic architecture of 3–4 ftgo-db-secret 404 FtgoGraphQLClient class 290 functional decomposition 10 fuzzy boundaries 153–154 
 
-## G 
+# G 
 
 GDPR (General Data Protection Regulation) 201 generalization pattern 22 GET REST endpoint 271 getDelayedOrders() method 456 getOrderDetails() query 368 Gherkin executing specifications using Cucumber 338 writing acceptance tests 337–338 Go Kit 380 god classes 58–61 
 
@@ -1127,11 +1127,11 @@ INDEX
 
 GoLang (Go language) 4, 380 Google Cloud functions 416 graph-based schema 280 GraphQL 279, 281–291 connecting schema to data 285–287 defining schema 282–284 executing queries 284–285 integrating Apollo GraphQL server with Express 289–290 load optimization using batching and caching 288 writing client 290–291 gRPC 76–77 
 
-## H 
+# H 
 
 handleHttpRequest() method 421 handleRequest() method 417 health check 82, 365 Health check API pattern 27, 366–368 implementing endpoint 367–368 invoking endpoint 368 hexagonal architecture 3, 38–40 high-level design patterns 20 Honeybadger 377 HttpServletResponse 422 Humble, Jez 30 
 
-## I 
+# I 
 
 idempotent message processing 96, 197 CQRS views 240–241 event sourcing-based saga participant 213 with NoSQL-based event store 197 with RDBMS-based event store 197 idempotentUpdate() method 250–251 IDL (interface definition language) 69 -ilities 8, 34, 37 Implementation view 35 inbound adapters 3, 38 infrastructure patterns 23–24 init system, Linux 390 in-memory security context 353 instrumentation libraries 373 integration glue 444–449 designing API for 444–445 for Delayed Delivery Service 457–459, 465–467 CustomerContactInfoRepository interface 458 design of API 465–466 how Delivery Service accesses FTGO data 466 how FTGO accesses data 467 publishing and consuming Order and Restaurant domain events 458–459 how monolith publishes and subscribes to domain events 448–449 implementing anti-corruption layer 446–448 picking interaction style and IPC mechanism 445–446 integration tests 319–335 asynchronous request/response interactions 330–335 example contract 331–332 tests for asynchronous request/response interaction 332–335 persistence integration tests 321–322 publish/subscribe-style interactions 326–330 contract for publishing OrderCreated event 327–328 tests for Order History Service 329–330 tests for Order Service 328–329 REST-based request/response style interactions 322–326 example contract 324 tests for API gateway OrderServiceProxy 325–326 tests for Order Service 324–325 interaction styles 67–68, 87–89 asynchronous 104–105 one-way notifications 89 publish/async responses 89 publish/subscribe 89 request/response and asynchronous request/ response 87–88 selecting 445–446 interface definition language (IDL) 69 invariants 153 IPC (interprocess communication) 24, 65, 93–109 overview of 66–72 defining APIs 68–69 evolving APIs 69–71 interaction styles 67–68 message formats 71–72 using asynchronous Messaging pattern 85–103 competing receivers and message ordering 94–95 creating API specification 89–90 duplicate messages 95–97 improving availability 103–108 interaction styles 87–89 libraries and frameworks for 100–103 message brokers 90–94 overview of 86–87 transactional messaging 97–100 using synchronous Remote procedure invocation pattern 72–85 Circuit breaker pattern 77–80 gRPC 76–77 REST 73–76 service discovery 80–85 
 
@@ -1140,30 +1140,30 @@ INDEX
 
 Istio 381 deploying services 410–412 Envoy proxy 410 service meshes 408–410 
 
-## J 
+# J 
 
 java -jar command 395 Jenkins 306 JSESSIONID cookie 351 JSON message 71 JUL (java.util.logging) 369 JWT (JSON Web Token) 28, 356–357 
 
-## K 
+# K 
 
 Kafka 92 key condition expression 247 Kibana 370 Kitchen Service business logic 168–173 Ticket aggregate 169–173 KitchenServiceCommandHandler class 172–173 KitchenServiceProxy class 139 Kong package 272 kubectl apply command 404 kubectl apply -f command 406 Kubernetes 399–415 deploying API gateway 405–406 deploying Restaurant Service 402–405 overview of 399–402 architecture 400–402 key concepts 402 service meshes 407–415 deploying services 410–412 deploying v2 of Consumer Service 414 Istio 408–412 routing production traffic to v2 415 routing rules to route to v1 version 412–413 routing test traffic to v2 414 zero-downtime deployments 406–407 
 
-## L 
+# L 
 
 Lagom 202 lambda functions 271, 416 benefits of 418 deploying using Serverless framework 425–426 developing 417 drawbacks of 419 invoking 417–418 defining scheduled lambda functions 418 handling events generated by AWS services 418 handling HTTP requests 417 using web service request 418 Language-specific packaging format pattern 386–390 benefits of 388–389 efficient resource utilization 389 fast deployment 389 drawbacks of 389–390 automatically determining where to place service instances 390 lack of encapsulation of technology stack 389 lack of isolation 390 no ability to constrain resources consumed 389 latency 419 layered architectural style 37–38 layered file system 397 lead time 31, 293 lines of code (LOC) application 5 LinkedIn Databus 100 Linkerd 381 livenessProbe 404 LoadBalancer service 405 LOC (lines of code) application 5 Log aggregation pattern 27, 365, 368–370 log aggregation infrastructure 370 log generation 369–370 log4j 369 Logback 369 Logical view 35 LoginHandler 352, 454–455 Logstash 370 loose coupling 93, 121 lost updates 127 
 
-## M 
+# M 
 
 MAJOR part, Semvers 70 makeContextWithDependencies() function 290 manual sidecar injection 411 Martin, Robert C. 57 master machine 400 mean time to recover 31 Memento pattern 196 message brokers 85, 90–94 benefits and drawbacks of 93–94 implementing message channels using 93 overview of 92 message buffering 93 message channels 86–87, 93 message handler adapter class 86 message handlers, unit tests for 315–317 message identifier 88 message ordering 94–95 message sender adapter class 86 
 
 
 INDEX messaging. _See_ Asynchronous messaging pattern Messaging style patterns. _See_ Asynchronous messaging pattern metrics collection 262 Micro framework 380 micrometer-registry-prometheus library 375 microservice architecture 8–14, 34, 43 as form of modularity 11–12 benefits of 14–17 continuous delivery and deployment of large, complex applications 15 fault isolation improvement 16 independently scalable services 16 new technology experimentation and adoption 16–17 small, easily maintained services 15 defining 44–64 decomposition guidelines 56–57 defining service APIs 61–64 identifying system operations 45–50 obstacles to decomposing an application into services 57–61 service definition with Decompose by business capability pattern 51–54 service definition with Decompose by subdomain pattern 54–55 drawbacks of 17–19 adoption timing 18–19 challenge of finding right services 17 complex distributed systems 17–18 deployment coordination 18 each service has own database 12 FTGO application 12–13 loose coupling, defined 42–43 not silver bullet 19–20 relationships between process, organization, and 29–32 human side of adopting microservices 31–32 software development and delivery organization 29–30 software development and delivery process 30–31 relative unimportance of size of service 43 role of shared libraries 43 scale cube 8–11 X-axis scaling 9 Y-axis scaling 10–11 Z-axis scaling 9–10 service-oriented architecture versus 13–14 services, defined 41–42 software architecture 34–37 4+1 view model of 35–37 definition of 35 relevance of 37 transaction management 111–117 maintaining data consistency 114–117 need for distributed transactions 112 trouble with distributed transactions 112–114 Microservice chassis pattern 28, 378–382 service meshes 380–382 using 379–380 MINOR part, Semvers 70 Mixer 409 Mobile API module 264 Mockito 305 mocks 296 modularity, microservice architecture as form of 11–12 Mono abstraction 277 monolithic architecture 1–32, 40 benefits of 4 causes of monolithic hell 4–7 intimidation due to complexity 4–5 long and arduous path from commit to deployment 5–6 reliability challenges 6 scaling challenges 6 slow development 5 technology stack obsolescence 6–7 FTGO monolithic architecture 3–4 multiply() method 310 MyBATIS 185 
 
-## N 
+# N 
 
 Netflix Falcor 281 Netflix Hystrix 79 Netflix Zuul 273 Netflix, as API gateway 267–268 network latency 57 network timeouts 79 NodePort service 406 nodes 280, 400 nonblocking I/O 268 nonfunctional requirements 8 non-key attributes 246 NoSQL-based event store creating saga orchestrator when using 211–212 idempotent message processing when using 197 SQL versus 237–238 notePickedUp() method 250 
 
-## O 
+# O 
 
 O/R (Object-Relational) impedance mismatch 185–186, 200 OAuth 2.0 protocol 357–360 object-oriented design pattern 20 object-oriented programming (OOP) 149 
 
@@ -1182,11 +1182,11 @@ INDEX patterns and pattern language _(continued)_ Decompose by subdomain 54 Depl
 
 INDEX publish/subscribe-style interaction implementing 89 integration tests for 326–330 contract for publishing OrderCreated event 327–328 tests for Order History Service 329–330 tests for Order Service 328–329 publish-subscribe channel 87 pull model of externalized configuration 361, 375 push model of externalized configuration 361, 375 
 
-## Q 
+# Q 
 
 quality attributes 8, 34, 37 quality of service 8, 37 queries 41 query arguments 286 query() operation 246, 249 querying patterns 220–252 API composition pattern 26, 64, 79, 221–228 benefits and drawbacks of 227–228 design issues 225–227 findOrder() query operation 221–222, 224 overview of 222–224 CQRS pattern 26, 63, 160, 184, 221, 228–236 benefits of 235–236 drawbacks of 236 motivations for using 229–232 overview of 232–235 
 
-## R 
+# R 
 
 RabbitMQ 92 rate limiting 262 RDBMS-based event store creating saga orchestrator when using 211 idempotent message processing with 197 reactive programming model 227 readinessProbe 404, 407 receiving port interface 86 reduce operation 187 refactoring 428–471 application modernization 430–432 demonstrating value 432 designing how service and monolith collaborate 443–455 authentication and authorization 453–455 data consistency 449–453 integration glue 444–449 extracting delivery management 459–470 changing FTGO monolith to interact with Delivery Service 467–470 designing Delivery Service domain model 463–464 designing Delivery Service integration glue 465–467 existing delivery functionality 460–461 overview of Delivery Service 462–463 implementing new features as services 455–459 design for Delayed Delivery Service 456–457 integration glue for Delayed Delivery Service 457–459 minimizing changes 432–433 overview of 429–433 reasons for 429–430 strategies for 433–442 extracting business capabilities into services 437–442 implementing new features as services 434–435 separating presentation tier from backend 436–437 technical deployment infrastructure 433 Refactoring to microservices patterns Anti-corruption layer 446–447 Strangler application 431–432 ReflectiveMutableCommandProcessingAggregate class 206–207 Refresh Token concept 358 Releasing services 408 Reliable communications pattern Circuit breaker 77–80, 108 Remote procedure invocation (RPI) pattern 72–85 Circuit breaker pattern 77–80 developing robust RPI proxies 79 recovering from unavailable services 79–80 gRPC 76–77 REST 73–76 benefits and drawbacks of 75–76 fetching multiple resources in single request 74–75 mapping operations to HTTP verbs 75 REST maturity model 74 specifying REST APIs 74 service discovery 80–85 overview of 81 using application-level service discovery patterns 81–83 using platform-provided service discovery patterns 83–85 reply channel header 88–89 Repository object, DDD 152 request attribute 10 request logging 262 request/async response-style API 90 request/response interactions 87–89 asynchronous 87–88 integration tests for REST-based 322–326 
 
@@ -1195,7 +1195,7 @@ INDEX
 
 RequestHandler interface 417 reread value countermeasure 131 Resource Server concept 358 REST 73–76 benefits and drawbacks of 75–76 fetching multiple resources in single request 74–75 mapping operations to HTTP verbs 75 REST maturity model 74 specifying REST APIs 74 Rest Assured Mock MVC 314 Restaurant domain events 458–459 Restaurant Service creating services 404–405 deploying 402–405 design of 419–423 AbstractAutowiringHttpRequestHandler class 423 AbstractHttpHandler class 423 FindRestaurantRequestHandler class 421–422 REST-based request/response style interactions, integration tests for 322–326 example contract 324 tests for API gateway OrderServiceProxy 325–326 tests for Order Service 324–325 RESTful services 419–426 deploying lambda functions using Serverless framework 425–426 design of Restaurant Service 419–423 packaging service as ZIP file 424 retriable transactions 117, 129, 450 revise() method 179 
 
-## S 
+# S 
 
 Saas (Software-as-a-Service) 5 saga orchestration package 140 Saga pattern 26 SagaOrchestratorCreated event 216 SagaOrchestratorUpdated event 216 SagaReplyRequested pseudo event 213 sagas 17, 58, 106, 110–145, 209–218, 450 coordinating 117–125 choreography-based sagas 118–121 orchestration-based sagas 121–125 Create Order saga 135–142 CreateOrderSaga orchestrator 136–138 CreateOrderSagaState class 138 Eventuate Tram Saga framework 140–142 KitchenServiceProxy class 139 
 
@@ -1213,15 +1213,15 @@ SES (Simple Email Service) 2 SessionBasedSecurityInterceptor 352 sessions 351 se
 
 INDEX 
 
-## T 
+# T 
 
 telemetry 409 test cases 294 test double 296 test pyramid 298–299 test quadrant 297–298 @Test shouldCalculateTotal() method 309 @Test shouldCreateOrder() method 312 test suites 294 testing 292–347 acceptance tests 335–338 defining 336 writing using Gherkin 337–338 challenge of 299–305 consumer contract testing 301–303 consumer contract testing for messaging APIs 305 Spring Cloud Contract 303–305 component tests 339–340 for FTGO Order Service 340–345 in-process component tests 339 out-of-process component tests 339–340 Consumer-driven contract test 28, 301–302 Consumer-side contract test 28, 303 deployment pipeline 305–307 end-to-end tests 345–346 designing 345 running 346 writing 346 integration tests 319–335 contract tests for asynchronous request/ response interactions 330–335 persistence integration tests 321–322 publish/subscribe-style interactions 326–330 REST-based request/response style interactions 322–326 overview of 294–299 automated tests 295–296 different types of tests 297 mocks and stubs 296 test pyramid 298–299 test quadrant 297–298 Service component test 28, 335 unit tests 307–317 for controllers 313–315 for domain services 312–313 for entities 309–310 for event and message handlers 315–317 for sagas 310–312 for value objects 310 testuser header 414 text-based message formats 71–72 Ticket aggregate 169–173 behavior of 170–171 KitchenService domain service 171–172 KitchenServiceCommandHandler class 172–173 structure of Ticket class 170 tight coupling 121 timeouts 79 TLS (Transport Layer Security) 350 tokens 356 Traefik 272 traffic management 408 transaction log tailing 99–100, 195 transaction management 111–117 maintaining data consistency 114–117 need for distributed transactions 112 trouble with distributed transactions 112–114 _See also_ sagas Transaction script pattern 149–150 @Transactional annotation 111 transactional messaging 97–100 Polling publisher pattern 98–99 Transaction log tailing pattern 99–100 Transactional outbox pattern 97–98, 109 using database table as message queue 97–98 transparent tokens 356 Transport Layer Security (TLS) 350 two-phase commit (2PC) 112 
 
-## U 
+# U 
 
 Ubiquitous Language 54 unit tests 307–317 for controllers 313–315 for domain services 312–313 for entities 309–310 for event and message handlers 315–317 for sagas 310–312 for value objects 310 upcasting 199 UPDATE statement 193 update() method 204, 207, 215 UpdateItem() operation 248 USERINFO cookie LoginHandler and 454–455 mapping to Authorization header 455 
 
-## V 
+# V 
 
 Value object, DDD 151 value objects, unit tests for 310 version file countermeasure 131 
 
@@ -1230,15 +1230,15 @@ INDEX
 
 VIP (virtual IP) address 83 VirtualService 413 VMs (virtual machines) 26 
 
-## W 
+# W 
 
 WAR (Web Application Archive) file 2 WebSockets 257 
 
-## X 
+# X 
 
 XML message 71 
 
-## Z 
+# Z 
 
 ZeroMQ 91 Zipkin 373 
 
@@ -1265,15 +1265,15 @@ The microservice architecture structures an application as a set of loosely coup
 
 SOFTWARE DEVELOPMENT 
 
-## Microservices Patterns 
+# Microservices Patterns 
 
-## Chris Richardson 
+# Chris Richardson 
 
 uccessfully developing microservices-based applications requires mastering a new set of architectural insights and S practices. In this unique book, microservice architecture pioneer and Java Champion Chris Richardson collects, catalogues, and explains 44 patterns that solve problems such as service decomposition, transaction management, querying, and inter-service communication. 
 
 Microservices Patterns teaches you how to develop and deploy production-quality microservices-based applications. This invaluable set of design patterns builds on decades of distributed system experience, adding new patterns for writing services and composing them into systems that scale and perform reliably under real-world conditions. More than just a patterns catalog, this practical guide offers experience-driven advice to help you design, implement, test, and deploy your microservices-based application. 
 
-## What’s Inside 
+# What’s Inside 
 
 - How (and why!) to use the microservice architecture 
 

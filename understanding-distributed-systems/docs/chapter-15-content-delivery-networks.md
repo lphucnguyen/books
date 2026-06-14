@@ -1,12 +1,12 @@
-## **Chapter 15** 
+# **Chapter 15** 
 
-## **Content delivery networks** 
+# **Content delivery networks** 
 
 A CDN is an overlay network of geographically distributed caching servers (reverse proxies) architected around the design limitations of the network protocols that run the internet. 
 
 When using a CDN, clients hit URLs that resolve to caching servers that belong to the CDN. When a CDN server receives a request, it checks whether the requested resource is cached locally. If not, the CDN server transparently fetches it from the _origin server_ (i.e., our application server) using the original URL, caches the response locally, and returns it to the client. AWS CloudFront[1] and Akamai[2] are examples of well-known CDN services. 
 
-## **15.1 Overlay network** 
+# **15.1 Overlay network** 
 
 You would think that the main benefit of a CDN is caching, but it’s actually the underlying network substrate. The public internet is composed of thousands of networks, and its core routing protocol, BGP, was not designed with performance in mind. It primarily 
 
@@ -40,7 +40,7 @@ Figure 15.1: A CDN reduces the round trip time of network calls for clients and 
 
 The overlay network can also be used to speed up the delivery of dynamic resources that cannot be cached. In this capacity, the CDN becomes the frontend for the application, shielding it against distributed denial-of-service (DDoS) attacks[5] . 
 
-## **15.2 Caching** 
+# **15.2 Caching** 
 
 A CDN can have multiple content caching layers. The top layer is made of edge clusters deployed at different geographical locations, as mentioned earlier. But infrequently accessed content might not be available at the edge, in which case the edge servers must fetch it from the origin server. Thanks to the overlay network, the content can be fetched more efficiently and reliably than what the public internet would allow. 
 

@@ -1,6 +1,6 @@
-## **Chapter 23** 
+# **Chapter 23** 
 
-## **Messaging** 
+# **Messaging** 
 
 Suppose _Cruder_ has an endpoint that allows users to upload a video and encode it in different formats and resolutions tailored to specific devices (TVs, mobile phones, tablets, etc.). When the API gateway receives a request from a client, it uploads the video to a file store, like S3, and sends a request to an encoding service to process the file. 
 
@@ -23,7 +23,7 @@ Figure 23.1: The message consumer (an inbound adapter) is part of the API surfac
 
 After the API gateway has uploaded the video to the file store, it writes a message to the channel with a link to the uploaded file and responds with _202 Accepted_ , signaling to the client that the request has been accepted for processing but hasn’t completed yet. Eventually, the encoding service will read the message from the channel and process it. Because the request is deleted from the channel only when it’s successfully processed, the request will eventually be picked up again and retried if the encoding service fails to han219 
 
-## dle it. 
+# dle it. 
 
 Decoupling the API gateway (producer) from the encoding service (consumer) with a channel provides many benefits. The producer can send requests to the consumer even if the consumer is temporarily unavailable. Also, requests can be load-balanced across a pool of consumer instances, making it easy to scale out the consuming side. And because the consumer can read from the channel at its own pace, the channel smooths out load spikes, preventing it from getting overloaded. 
 
@@ -35,7 +35,7 @@ Unsurprisingly, introducing a message channel adds complexity. The message broke
 
 Because messaging is a core pattern of distributed systems, we will take a closer look at it in this chapter, starting with the most common communication styles it enables. 
 
-## **One-way messaging** 
+# **One-way messaging** 
 
 
 220 
@@ -48,13 +48,13 @@ In this messaging style, the producer writes a message to a pointto-point channe
 
 Figure 23.2: One-way messaging style 
 
-## **Request-response messaging** 
+# **Request-response messaging** 
 
 This messaging style is similar to the direct request-response style we are familiar with, albeit with the difference that the request and response messages flow through channels. The consumer has a point-to-point request channel from which it reads messages, while every producer has its dedicated response channel (see Figure 23.3). 
 
 When a producer writes a message to the request channel, it decorates it with a request ID and a reference to its response channel. Then, after a consumer has read and processed the message, it writes a reply to the producer’s response channel, tagging it with the request’s ID, which allows the producer to identify the request it belongs to. 
 
-## **Broadcast messaging** 
+# **Broadcast messaging** 
 
 In this messaging style, the producer writes a message to a publishsubscribe channel to broadcast it to all consumer instances (see Figure 23.4). This style is generally used to notify a group of processes that a specific event has occurred. For example, we have already encountered this pattern when discussing the outbox pattern in section 13.1. 
 
@@ -73,7 +73,7 @@ Figure 23.3: Request-response messaging style
 
 Figure 23.4: Broadcast messaging style 
 
-## **23.1 Guarantees** 
+# **23.1 Guarantees** 
 
 A message channel is implemented by a messaging service, or broker, like AWS SQS[1] or Kafka, which buffers messages and decouples the producer from the consumer. Different message brokers offer different guarantees depending on the tradeoffs their implementations make. For example, you would think that a channel should respect the insertion order of its messages, but you will find that some implementations, like SQS standard queues[2] , don’t offer any strong ordering guarantees. Why is that? 
 
@@ -119,7 +119,7 @@ Because there are so many different ways to implement channels, in the rest of t
 
 The above guarantees are similar to the ones offered by managed services such as Amazon’s SQS and Azure Queue Storage[5] . 
 
-## **23.2 Exactly-once processing** 
+# **23.2 Exactly-once processing** 
 
 As mentioned before, a consumer instance has to delete a message from the channel once it’s done processing it so that another instance won’t read it. If the consumer instance deletes the message before processing it, there is a risk it could crash after deleting the message but before processing it, causing the message to be lost for good. On the other hand, if the consumer instance deletes the message only after processing it, there is a risk that it crashes after processing the message but before deleting it, causing the same message to be read again later on. 
 
@@ -132,7 +132,7 @@ Because of that, there is no such thing[6] as _exactly-once message delivery_ . 
 
 224 
 
-## **23.3 Failures** 
+# **23.3 Failures** 
 
 When a consumer instance fails to process a message, the visibility timeout triggers, and the message is eventually delivered to another instance. What happens if processing a specific message consistently fails with an error, though? To guard against the message being picked up repeatedly in perpetuity, we need to limit the maximum number of times the same message can be read from the channel. 
 
@@ -142,7 +142,7 @@ Once we have a way to count the number of times a message has been retried, we s
 
 This way, messages that consistently fail are not lost forever but merely put on the side so that they don’t pollute the main channel, wasting the consumer’s resources. A human can then inspect these messages to debug the failure, and once the root cause has been identified and fixed, move them back to the main channel to be reprocessed. 
 
-## **23.4 Backlogs** 
+# **23.4 Backlogs** 
 
 One of the main advantages of using a message broker is that it makes the system more robust to outages. This is because the producer can continue writing messages to a channel even if the consumer is temporarily degraded or unavailable. As long as the arrival rate of messages is lower than or equal to their deletion rate, 
 
@@ -161,7 +161,7 @@ There are several reasons for backlogs, for example:
 
 To detect and monitor backlogs, we can measure the average time a message waits in the channel to be read for the first time. Typically, brokers attach a timestamp of when the message was first written to it. The consumer can use that timestamp to compute how long the message has been waiting in the channel by comparing it to the timestamp taken when the message was read. Although the two timestamps have been generated by two physical clocks that aren’t perfectly synchronized (see section 8.1), this measure generally provides a good warning sign of backlogs. 
 
-## **23.5 Fault isolation** 
+# **23.5 Fault isolation** 
 
 A single producer instance that emits “poisonous” messages that repeatedly fail to be processed can degrade the consumer and potentially create a backlog because these messages are processed multiple times before they end up in the dead-letter channel. Therefore, it’s important to find ways to deal with poisonous messages before that happens. 
 
@@ -171,7 +171,7 @@ A single producer instance that emits “poisonous” messages that repeatedly f
 If messages are decorated with an identifier of the source that generated them, the consumer can treat them differently. For example, suppose messages from a specific user fail consistently. In that case, the consumer could decide to write these messages to an alternate low-priority channel and remove them from the main channel without processing them. The consumer reads from the slow channel but does so less frequently than the main channel, isolating the damage a single bad user can inflict to the others. 
 
 
-## **Summary** 
+# **Summary** 
 
 Building scalable applications boils down to exploiting three orthogonal patterns: 
 

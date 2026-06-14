@@ -1,6 +1,6 @@
-## _Developing roduction-read services p y_ 
+# _Developing roduction-read services p y_ 
 
-## _This chapter covers:_ 
+# _This chapter covers:_ 
 
 - Developing secure services 
 
@@ -38,7 +38,7 @@ I begin this chapter by describing how to implement security in a microservice a
 
 Let’s first look at security. 
 
-## _11.1 Developing secure services_ 
+# _11.1 Developing secure services_ 
 
 Cybersecurity has become a critical issue for every organization. Almost every day there are headlines about how hackers have stolen a company’s data. In order to develop secure software and stay out of the headlines, an organization needs to tackle a diverse range of security issues, including physical security of the hardware, encryption of data in transit and at rest, authentication and authorization, and policies for patching software vulnerabilities. Most of these issues are the same regardless of whether you’re using a monolithic or microservice architecture. This section focuses on how the microservice architecture impacts security at the application level. 
 
@@ -59,7 +59,7 @@ I begin by first describing how security is implemented in the FTGO monolith app
 
 Let’s start by reviewing how the monolithic FTGO application handles security. 
 
-## _11.1.1 Overview of security in a traditional monolithic application_ 
+# _11.1.1 Overview of security in a traditional monolithic application_ 
 
 The FTGO application has several kinds of human users, including consumers, couriers, and restaurant staff. They access the application using browser-based web applications and mobile applications. All FTGO users must log in to access the application. Figure 11.1 shows how the clients of the monolithic FTGO application authenticate and make requests. 
 
@@ -87,7 +87,7 @@ POST /login<br>id=...<br>password=...<br>Browser HTTP/1.1 200 OK FTGO<br>or mobi
 
 Figure 11.1 A client of the FTGO application first logs in to obtain a session token, which is often a cookie. The client includes the session token in each subsequent request it makes to the application. 
 
-## Using a security framework 
+# Using a security framework 
 
 Implementing authentication and authorization correctly is challenging. It’s best to use a proven security framework. Which framework to use depends on your application’s technology stack. Some popular frameworks include the following: 
 
@@ -112,7 +112,7 @@ framework uses the standard Java EE approach of storing the security context in 
 Log in with user ID<br>and password. Return session cookie.<br>FTGO application<br>POST /login Retrieves user information<br>Login from database<br>userId-Jane&password=.. handler<br>Jane<br>User<br>Initializes<br>database<br>Establishes<br>Session<br>Login-based HTTP/1.1 200 OKSe t -cookie: JSESSIONID=... UserId: janerules: [CONSUMER] UserId: janeSecurity context<br>client ... ... rules: [CONSUMER]<br>...<br>Reads<br>Establishes Reads<br>GET /orders/order-xyz SessionBased<br>Cookie: JSESSIONID=... Security OrderDetails<br>RequestHandler<br>Interceptor<br>**----- End of picture text -----**<br>
 
 
-## **Provides session cookie** 
+# **Provides session cookie** 
 
 Figure 11.2 When a client of the FTGO application makes a login request, **Login Handler** authenticates the user, initializes the session user information, and returns a session token cookie, which securely identifies the session. Next, when the client makes a request containing the session token, **SessionBasedSecurityInterceptor** retrieves the user information from the specified session and establishes the security context. Request handlers, such as **OrderDetailsRequestHandler** , retrieve the user information from the security context. 
 
@@ -140,7 +140,7 @@ The security design used by the monolithic FTGO application is only one possible
 
 You can sometimes eliminate the server-side session entirely. For example, many applications have API clients that provide their credentials, such as an API key and secret, in every request. As a result, there’s no need to maintain a server-side session. Alternatively, the application can store session state in the session token. Later in this section, I describe one way to use a session token to store the session state. But let’s begin by looking at the challenges of implementing security in a microservice architecture. 
 
-## _11.1.2 Implementing security in a microservice architecture_ 
+# _11.1.2 Implementing security in a microservice architecture_ 
 
 A microservice architecture is a distributed architecture. Each external request is handled by the API gateway and at least one service. Consider, for example, the getOrderDetails() query, discussed in chapter 8. The API gateway handles this query by invoking several services, including Order Service, Kitchen Service, and Accounting Service. Each service must implement some aspects of security. For instance, Order Service must only allow a consumer to see their orders, which requires a combination of authentication and authorization. In order to implement security in a microservice architecture we need to determine who is responsible for authenticating the user and who is responsible for authorization. 
 
@@ -155,7 +155,7 @@ user identity. In a microservice architecture, we need a different mechanism for
 
 Let’s begin our exploration of security in a microservice architecture by looking at how to handle authentication. 
 
-## HANDLING AUTHENTICATION IN THE API GATEWAY 
+# HANDLING AUTHENTICATION IN THE API GATEWAY 
 
 There are a couple of different ways to handle authentication. One option is for the individual services to authenticate the user. The problem with this approach is that it permits unauthenticated requests to enter the internal network. It relies on every development team correctly implementing security in all of their services. As a result, there’s a significant risk of an application containing security vulnerabilities. 
 
@@ -165,7 +165,7 @@ A better approach is for the API gateway to authenticate a request before forwar
 
 Figure 11.3 shows how this approach works. Clients authenticate with the API gateway. API clients include credentials in each request. Login-based clients POST the user’s credentials to the API gateway’s authentication and receive a session token. Once the API gateway has authenticated a request, it invokes one or more services. 
 
-## Pattern: Access token 
+# Pattern: Access token 
 
 The API gateway passes a token containing information about the user, such as their identity and their roles, to the services that it invokes. See http://microservices.io/ patterns/security/access-token.html. 
 
@@ -175,7 +175,7 @@ A service invoked by the API gateway needs to know the principal making the requ
 _**Developing secure services**_ 
 
 
-## **API clients supply credentials in the Authorization header.** 
+# **API clients supply credentials in the Authorization header.** 
 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0385-03.png)
@@ -206,7 +206,7 @@ The sequence of events for login-based clients is as follows:
 A little later in this chapter, I describe how to implement tokens, but let’s first look at the other main aspect of security: authorization. 
 
 
-## HANDLING AUTHORIZATION 
+# HANDLING AUTHORIZATION 
 
 Authenticating a client’s credentials is important but insufficient. An application must also implement an authorization mechanism that verifies that the client is allowed to perform the requested operation. For example, in the FTGO application the getOrderDetails() query can only be invoked by the consumer who placed the Order (an example of instance-based security) and a customer service agent who is helping the consumer. 
 
@@ -216,7 +216,7 @@ One drawback of implementing authorization in the API gateway is that it risks c
 
 The other place to implement authorization is in the services. A service can implement role-based authorization for URLs and for service methods. It can also implement ACLs to manage access to aggregates. Order Service can, for example, implement the role-based and ACL-based authorization mechanism for controlling access to orders. Other services in the FTGO application implement similar authorization logic. 
 
-## USING JWTS TO PASS USER IDENTITY AND ROLES 
+# USING JWTS TO PASS USER IDENTITY AND ROLES 
 
 When implementing security in a microservice architecture, you need to decide which type of token an API gateway should use to pass user information to the services. There are two types of tokens to choose from. One option is to use _opaque_ tokens, which are typically UUIDs. The downside of opaque tokens is that they reduce performance and availability and increase latency. That’s because the recipient of such a token must make a synchronous RPC call to a security service to validate the token and retrieve the user information. 
 
@@ -235,7 +235,7 @@ Fortunately, you don’t need to develop this kind of security infrastructure. Y
 
 Although the original focus of OAuth 2.0 was authorizing access to public cloud services, you can also use it for authentication and authorization in your application. Let’s take a quick look at how a microservice architecture might use OAuth 2.0. 
 
-## About OAuth 2.0 
+# About OAuth 2.0 
 
 OAuth 2.0 is a complex topic. In this chapter, I can only provide a brief overview and describe how it can be used in a microservice architecture. For more information on OAuth 2.0, check out the online book _OAuth 2.0 Servers_ by Aaron Parecki (www.oauth.com). Chapter 7 of _Spring Microservices in Action_ (Manning, 2017) also covers this topic (https://livebook.manning.com/#!/book/spring-microservices-inaction/chapter-7/). 
 
@@ -262,7 +262,7 @@ The sequence of events shown in figure 11.4 is as follows:
 
 - 2 The API gateway makes an OAuth 2.0 Password Grant request (www.oauth.com/ oauth2-servers/access-tokens/password-grant/) to the OAuth 2.0 authentication server. 
 
-## **Password grant request** 
+# **Password grant request** 
 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0388-11.png)
@@ -284,7 +284,7 @@ _**Developing secure services**_
 
 An OAuth 2.0-based API gateway can authenticate session-oriented clients by using an OAuth 2.0 access token as a session token. What’s more, when the access token expires, it can obtain a new access token using the refresh token. Figure 11.5 shows how an API gateway can use OAuth 2.0 to handle session-oriented clients. An API client initiates a session by POSTing its credentials to the API gateway’s /login endpoint. The API gateway returns an access token and a refresh token to the client. The API client then supplies both tokens when it makes requests to the API gateway. 
 
-## **Password grant request** 
+# **Password grant request** 
 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0389-06.png)
@@ -323,7 +323,7 @@ An important benefit of using OAuth 2.0 is that it’s a proven security standar
 
 Now that we’ve looked at how to make services secure, let’s see how to make them configurable. 
 
-## _11.2 Designing configurable services_ 
+# _11.2 Designing configurable services_ 
 
 Imagine that you’re responsible for Order History Service. As figure 11.6 shows, the service consumes events from Apache Kafka and reads and writes AWS DynamoDB table items. In order for this service to run, it needs various configuration properties, including the network location of Apache Kafka and the credentials and network location for AWS DynamoDB. 
 
@@ -351,7 +351,7 @@ Apache Kafka<br>bootstrap.servers=kafka1:9092<br>Apache ..<br>Kafka «Order even
 
 Figure 11.6 **Order History Service** uses Apache Kafka and AWS DynamoDB. It needs to be configured with each service’s network location, credentials, and so on. select the appropriate set at runtime. That’s because doing so would introduce a security vulnerability and limit where it can be deployed. Additionally, sensitive data such as credentials should be stored securely using a secrets storage mechanism, such as Hashicorp Vault (www.vaultproject.io) or AWS Parameter Store (https://docs.aws .amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html). Instead, you should supply the appropriate configuration properties to the service at runtime by using the Externalized configuration pattern. 
 
-## Pattern: Externalized configuration 
+# Pattern: Externalized configuration 
 
 Supply configuration property values, such as database credentials and network location, to a service at runtime. See http://microservices.io/patterns/externalizedconfiguration.html. 
 
@@ -364,7 +364,7 @@ An externalized configuration mechanism provides the configuration property valu
 We’ll look at each approach, starting with the push model. 
 
 
-## _11.2.1 Using push-based externalized configuration_ 
+# _11.2.1 Using push-based externalized configuration_ 
 
 The push model relies on the collaboration of the deployment environment and the service. The deployment environment supplies the configuration properties when it creates a service instance. It might, as figure 11.7 shows, pass the configuration properties as environment variables. Alternatively, the deployment environment may supply the configuration properties using a configuration file. The service instance then reads the configuration properties when it starts up. 
 
@@ -408,7 +408,7 @@ The Spring Framework initializes the awsRegion field to the value of the aws.reg
 
 The push model is an effective and widely used mechanism for configuring a service. One limitation, however, is that reconfiguring a running service might be challenging, if not impossible. The deployment infrastructure might not allow you to change the externalized configuration of a running service without restarting it. You can’t, for example, change the environment variables of a running process. Another limitation is that there’s a risk of the configuration property values being scattered throughout the definition of numerous services. As a result, you may want to consider using a pull-based model. Let’s look at how it works. 
 
-## _11.2.2 Using pull-based externalized configuration_ 
+# _11.2.2 Using pull-based externalized configuration_ 
 
 In the pull model, a service instance reads its configuration properties from a configuration server. Figure 11.8 shows how it works. On startup, a service instance queries the configuration service for its configuration. The configuration properties for accessing the configuration server, such as its network location, are provided to the service instance via a push-based configuration mechanism, such as environment variables. 
 
@@ -444,7 +444,7 @@ The primary drawback of using a configuration server is that unless it’s provi
 
 Now that we’ve looked at how to design configurable services, let’s talk about how to design observable services. 
 
-## _11.3 Designing observable services_ 
+# _11.3 Designing observable services_ 
 
 Let’s say you’ve deployed the FTGO application into production. You probably want to know what the application is doing: requests per second, resource utilization, and 
 
@@ -485,13 +485,13 @@ A distinctive feature of most of these patterns is that each pattern has a devel
 
 Let’s take a look at each of these patterns, starting with the Health check API pattern. 
 
-## _11.3.1 Using the Health check API pattern_ 
+# _11.3.1 Using the Health check API pattern_ 
 
 Sometimes a service may be running but unable to handle requests. For instance, a newly started service instance may not be ready to accept requests. The FTGO Consumer Service, for example, takes around 10 seconds to initialize the messaging and database adapters. It would be pointless for the deployment infrastructure to route HTTP requests to a service instance until it’s ready to process them. 
 
 Also, a service instance can fail without terminating. For example, a bug might cause an instance of Consumer Service to run out of database connections and be unable to access the database. The deployment infrastructure shouldn’t route requests to a service instance that has failed yet is still running. And, if the service instance does not recover, the deployment infrastructure must terminate it and create a new instance. 
 
-## Pattern: Health check API 
+# Pattern: Health check API 
 
 A service exposes a health check API endpoint, such as GET /health, which returns the health of the service. See http://microservices.io/patterns/observability/healthcheck-api.html. 
 
@@ -517,7 +517,7 @@ Health Check Request Handler might simply return an empty HTTP response with the
 
 There are two issues you need to consider when using health checks. The first is the implementation of the endpoint, which must report back on the health of the service instance. The second issue is how to configure the deployment infrastructure to invoke the health check endpoint. Let’s first look at how to implement the endpoint. 
 
-## IMPLEMENTING THE HEALTH CHECK ENDPOINT 
+# IMPLEMENTING THE HEALTH CHECK ENDPOINT 
 
 The code that implements the health check endpoint must somehow determine the health of the service instance. One simple approach is to verify that the service instance can access its external infrastructure services. How to do this depends on the 
 
@@ -528,15 +528,15 @@ A great example of a health check library is Spring Boot Actuator. As mentioned 
 
 You can also customize this behavior by implementing additional health checks for your service. You implement a custom health check by defining a class that implements the HealthIndicator interface. This interface defines a health() method, which is called by the implementation of the /actuator/health endpoint. It returns the outcome of the health check. 
 
-## INVOKING THE HEALTH CHECK ENDPOINT 
+# INVOKING THE HEALTH CHECK ENDPOINT 
 
 A health check endpoint isn’t much use if nobody calls it. When you deploy your service, you must configure the deployment infrastructure to invoke the endpoint. How you do that depends on the specific details of your deployment infrastructure. For example, as described in chapter 3, you can configure some service registries, such as Netflix Eureka, to invoke the health check endpoint in order to determine whether traffic should be routed to the service instance. Chapter 12 discusses how to configure Docker and Kubernetes to invoke a health check endpoint. 
 
-## _11.3.2 Applying the Log aggregation pattern_ 
+# _11.3.2 Applying the Log aggregation pattern_ 
 
 Logs are a valuable troubleshooting tool. If you want to know what’s wrong with your application, a good place to start is the log files. But using logs in a microservice architecture is challenging. For example, imagine you’re debugging a problem with the getOrderDetails() query. As described in chapter 8, the FTGO application implements this query using API composition. As a result, the log entries you need are scattered across the log files of the API gateway and several services, including Order Service and Kitchen Service. 
 
-## Pattern: Log aggregation 
+# Pattern: Log aggregation 
 
 Aggregate the logs of all services in a centralized database that supports searching and alerting. See http://microservices.io/patterns/observability/application-logging .html. 
 
@@ -558,7 +558,7 @@ Figure 11.11 The log aggregation infrastructure ships the logs of each service i
 
 The logging pipeline and server are usually the responsibility of operations. But service developers are responsible for writing services that generate useful logs. Let’s first look at how a service generates a log. 
 
-## HOW A SERVICE GENERATES A LOG 
+# HOW A SERVICE GENERATES A LOG 
 
 As a service developer, there are a couple of issues you need to consider. First you need to decide which logging library to use. The second issue is where to write the log entries. Let’s first look at the logging library. 
 
@@ -569,7 +569,7 @@ You also need to decide where to log. Traditionally, you would configure the log
 
 described in chapter 12, this is often not the best approach. In some environments, such as AWS Lambda, there isn’t even a “permanent” filesystem to write the logs to! Instead, your service should log to stdout. The deployment infrastructure will then decide what to do with the output of your service. 
 
-## THE LOG AGGREGATION INFRASTRUCTURE 
+# THE LOG AGGREGATION INFRASTRUCTURE 
 
 The logging infrastructure is responsible for aggregating the logs, storing them, and enabling the user to search them. One popular logging infrastructure is the ELK stack. ELK consists of three open source products: 
 
@@ -583,11 +583,11 @@ Other open source log pipelines include Fluentd and Apache Flume. Examples of lo
 
 Let’s now look at distributed tracing, which is another way of understanding the behavior of a microservices-based application. 
 
-## _11.3.3 Using the Distributed tracing pattern_ 
+# _11.3.3 Using the Distributed tracing pattern_ 
 
 Imagine you’re a FTGO developer who is investigating why the getOrderDetails() query has slowed down. You’ve ruled out the problem being an external networking issue. The increased latency must be caused by either the API gateway or one of the services it has invoked. One option is to look at each service’s average response time. The trouble with this option is that it’s an average across requests rather than the timing breakdown for an individual request. Plus more complex scenarios might involve many nested service invocations. You may not even be familiar with all services. As a result, it can be challenging to troubleshoot and diagnose these kinds of performance problems in a microservice architecture. 
 
-## Pattern: Distributed tracing 
+# Pattern: Distributed tracing 
 
 Assign each external request a unique ID and record how it flows through the system from one service to the next in a centralized server that provides visualization and analysis. See http://microservices.io/patterns/observability/distributed-tracing.html. 
 
@@ -646,21 +646,21 @@ tracing information, such as the current trace ID and the parent span ID, to out
 
 Let’s take a look at the instrumentation library and the distribution tracing server, beginning with the library. 
 
-## USING AN INSTRUMENTATION LIBRARY 
+# USING AN INSTRUMENTATION LIBRARY 
 
 The instrumentation library builds the tree of spans and sends them to the distributed tracing server. The service code could call the instrumentation library directly, but that would intertwine the instrumentation logic with business and other logic. A cleaner approach is to use interceptors or aspect-oriented programming (AOP). 
 
 A great example of an AOP-based framework is Spring Cloud Sleuth. It uses the Spring Framework’s AOP mechanism to automagically integrate distributed tracing into the service. As a result, you have to add Spring Cloud Sleuth as a project dependency. Your service doesn’t need to call a distributed tracing API except in those cases that aren’t handled by Spring Cloud Sleuth. 
 
-## ABOUT THE DISTRIBUTED TRACING SERVER 
+# ABOUT THE DISTRIBUTED TRACING SERVER 
 
 The instrumentation library sends the spans to a distributed tracing server. The distributed tracing server stitches the spans together to form complete traces and stores them in a database. One popular distributed tracing server is Open Zipkin. Zipkin was originally developed by Twitter. Services can deliver spans to Zipkin using either HTTP or a message broker. Zipkin stores the traces in a storage backend, which is either a SQL or NoSQL database. It has a UI that displays traces, as shown earlier in figure 11.12. AWS X-ray is another example of a distributed tracing server. 
 
-## _11.3.4 Applying the Application metrics pattern_ 
+# _11.3.4 Applying the Application metrics pattern_ 
 
 A key part of the production environment is monitoring and alerting. As figure 11.14 shows, the monitoring system gathers metrics, which provide critical information about the health of an application, from every part of the technology stack. Metrics range from infrastructure-level metrics, such as CPU, memory, and disk utilization, to application-level metrics, such as service request latency and number of requests executed. Order Service, for example, gathers metrics about the number of placed, approved, and rejected orders. The metrics are collected by a metrics service, which provides visualization and alerting. 
 
-## Pattern: Application metrics 
+# Pattern: Application metrics 
 
 Services report metrics to a central server that provides aggregation, visualization, and alerting. 
 
@@ -688,7 +688,7 @@ Many aspects of monitoring are the responsibility of operations. But a service d
 
 Let’s first look at how a service collects metrics. 
 
-## COLLECTING SERVICE-LEVEL METRICS 
+# COLLECTING SERVICE-LEVEL METRICS 
 
 How much work you need to do to collect metrics depends on the frameworks that your application uses and the metrics you want to collect. A Spring Boot-based service can, for example, gather (and expose) basic metrics, such as JVM metrics, by including 
 
@@ -702,7 +702,7 @@ Listing 11.1 **OrderService** tracks the number of orders placed, approved, and 
 
 **Increments the approvedOrders counter when an counter when an order has been approved Increments the rejectedOrders counter when an order has been rejected** 
 
-## DELIVERING METRICS TO THE METRICS SERVICE 
+# DELIVERING METRICS TO THE METRICS SERVICE 
 
 A service delivers metrics to the Metrics Service in one of two ways: push or pull. With the _push_ model, a service instance sends the metrics to the Metrics Service by invoking an API. AWS Cloudwatch metrics, for example, implements the push model. 
 
@@ -725,7 +725,7 @@ The Prometheus server periodically polls this endpoint to retrieve metrics. Once
 
 Application metrics provide valuable insights into your application’s behavior. Alerts triggered by metrics enable you to quickly respond to a production issue, perhaps before it impacts users. Let’s now look at how to observe and respond to another source of alerts: exceptions. 
 
-## _11.3.5 Using the Exception tracking pattern_ 
+# _11.3.5 Using the Exception tracking pattern_ 
 
 A service should rarely log an exception, and when it does, it’s important that you identify the root cause. The exception might be a symptom of a failure or a programming bug. The traditional way to view exceptions is to look in the logs. You might even configure the logging server to alert you if an exception appears in the log file. There are, however, several problems with this approach: 
 
@@ -735,7 +735,7 @@ A service should rarely log an exception, and when it does, it’s important tha
 
 - There are likely to be duplicate exceptions, but there’s no automatic mechanism to treat them as one. 
 
-## Pattern: Exception tracking 
+# Pattern: Exception tracking 
 
 Services report exceptions to a central service that de-duplicates exceptions, generates alerts, and manages the resolution of exceptions. See http://microservices.io/ patterns/observability/audit-logging.html. 
 
@@ -756,7 +756,7 @@ User<br>View & manage Notify<br>Order Service<br>Exception tracking Report excep
 
 Figure 11.15 A service reports exceptions to an exception tracking service, which de-duplicates exceptions and alerts developers. It has a UI for viewing and managing exceptions. 
 
-## Exception tracking services 
+# Exception tracking services 
 
 There are several exception tracking services. Some, such as Honeybadger (www .honeybadger.io), are purely cloud-based. Others, such as Sentry.io (https://sentry.io/ welcome/), also have an open source version that you can deploy on your own infrastructure. These services receive exceptions from your application and generate alerts. They provide a console for viewing exceptions and managing their resolution. An exception tracking service typically provides client libraries in a variety of languages. 
 
@@ -764,11 +764,11 @@ The Exception tracking pattern is a useful way to quickly identify and respond t
 
 It’s also important to track user behavior. Let’s look at how to do that. 
 
-## _11.3.6 Applying the Audit logging pattern_ 
+# _11.3.6 Applying the Audit logging pattern_ 
 
 The purpose of audit logging is to record each user’s actions. An audit log is typically used to help customer support, ensure compliance, and detect suspicious behavior. Each audit log entry records the identity of the user, the action they performed, and the business object(s). An application usually stores the audit log in a database table. 
 
-## Pattern: Audit logging 
+# Pattern: Audit logging 
 
 Record user actions in a database in order to help customer support, ensure compliance, and detect suspicious behavior. See http://microservices.io/patterns/ observability/audit-logging.html. 
 
@@ -783,26 +783,26 @@ There are a few different ways to implement audit logging:
 
 Let’s look at each option. 
 
-## ADD AUDIT LOGGING CODE TO THE BUSINESS LOGIC 
+# ADD AUDIT LOGGING CODE TO THE BUSINESS LOGIC 
 
 The first and most straightforward option is to sprinkle audit logging code throughout your service’s business logic. Each service method, for example, can create an audit log entry and save it in the database. The drawback with this approach is that it intertwines auditing logging code and business logic, which reduces maintainability. The other drawback is that it’s potentially error prone, because it relies on the developer writing audit logging code. 
 
-## USE ASPECT-ORIENTED PROGRAMMING 
+# USE ASPECT-ORIENTED PROGRAMMING 
 
 The second option is to use AOP. You can use an AOP framework, such as Spring AOP, to define advice that automatically intercepts each service method call and persists an audit log entry. This is a much more reliable approach, because it automatically records every service method invocation. The main drawback of using AOP is that the advice only has access to the method name and its arguments, so it might be challenging to determine the business object being acted upon and generate a businessoriented audit log entry. 
 
-## USE EVENT SOURCING 
+# USE EVENT SOURCING 
 
 The third and final option is to implement your business logic using event sourcing. As mentioned in chapter 6, _event sourcing_ automatically provides an audit log for create and update operations. You need to record the identity of the user in each event. One limitation with using event sourcing, though, is that it doesn’t record queries. If your service must create log entries for queries, then you’ll have to use one of the other options as well. 
 
-## _11.4 Developing services using the Microservice chassis pattern_ 
+# _11.4 Developing services using the Microservice chassis pattern_ 
 
 This chapter has described numerous concerns that a service must implement, including metrics, reporting exceptions to an exception tracker, logging and health checks, externalized configuration, and security. Moreover, as described in chapter 3, a service may also need to handle service discovery and implement circuit breakers. That’s not something you’d want to set up from scratch each time you implement a new service. If you did, it would potentially be days, if not weeks, before you wrote your first line of business logic. 
 
 
 _**Developing services using the Microservice chassis pattern**_ 
 
-## Pattern: Microservice chassis 
+# Pattern: Microservice chassis 
 
 Build services on a framework or collection of frameworks that handle cross-cutting concerns, such as exception tracking, logging, health checks, externalized configuration, and distributed tracing. See http://microservices.io/patterns/microservicechassis.html. 
 
@@ -822,7 +822,7 @@ In this section, I first describe the concept of a microservice chassis and sugg
 
 Let’s first look at the idea of a microservice chassis. 
 
-## _11.4.1 Using a microservice chassis_ 
+# _11.4.1 Using a microservice chassis_ 
 
 A microservices chassis is a framework or set of frameworks that handle numerous concerns including the following: 
 
@@ -845,11 +845,11 @@ The FTGO application uses Spring Boot and Spring Cloud as the microservice chass
 
 One drawback of using a microservice chassis is that you need one for every language/platform combination that you use to develop services. Fortunately, it’s likely that many of the functions implemented by a microservice chassis will instead be implemented by the infrastructure. For example, as described in chapter 3, many deployment environments handle service discovery. What’s more, many of the networkrelated functions of a microservice chassis will be handled by what’s known as a service mesh, an infrastructure layer running outside of the services. 
 
-## _11.4.2 From microservice chassis to service mesh_ 
+# _11.4.2 From microservice chassis to service mesh_ 
 
 A microservice chassis is a good way to implement various cross-cutting concerns, such as circuit breakers. But one obstacle to using a microservice chassis is that you need one for each programming language you use. For example, Spring Boot and Spring Cloud are useful if you’re a Java/Spring developer, but they aren’t any help if you want to write a NodeJS-based service. 
 
-## Pattern: Service mesh 
+# Pattern: Service mesh 
 
 Route all network traffic in and out of services through a networking layer that implements various concerns, including circuit breakers, distributed tracing, service discovery, load balancing, and rule-based traffic routing. See http://microservices.io/ patterns/deployment/service-mesh.html. 
 
@@ -859,7 +859,7 @@ An emerging alternative that avoids this problem is to implement some of this fu
 _**Developing services using the Microservice chassis pattern**_ 
 
 
-## **Fewer functions** 
+# **Fewer functions** 
 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0411-03.png)
@@ -892,7 +892,7 @@ The service mesh concept is an extremely promising idea. It frees the developer 
 
 route traffic enables you to separate deployment from release. It gives you the ability to deploy a new version of a service into production but only release it to certain users, such as internal test users. Chapter 12 discusses this concept further when describing how to deploy services using Kubernetes. 
 
-## _Summary_ 
+# _Summary_ 
 
 - It’s essential that a service implements its functional requirements, but it must also be secure, configurable, and observable. 
 

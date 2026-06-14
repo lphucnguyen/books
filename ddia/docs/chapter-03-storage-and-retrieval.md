@@ -1,4 +1,4 @@
-## **CHAPTER 3 Storage and Retrieval** 
+# **CHAPTER 3 Storage and Retrieval** 
 
 _Wer Ordnung hält, ist nur zu faul zum Suchen. (If you keep things tidily ordered, you’re just too lazy to go searching.)_ 
 
@@ -17,7 +17,7 @@ However, first we’ll start this chapter by talking about storage engines that 
 
 storage engines: _log-structured_ storage engines, and _page-oriented_ storage engines such as B-trees. 
 
-## **Data Structures That Power Your Database** 
+# **Data Structures That Power Your Database** 
 
 Consider the world’s simplest database, implemented as two Bash functions: 
 
@@ -88,7 +88,7 @@ An index is an _additional_ structure that is derived from the primary data. Man
 This is an important trade-off in storage systems: well-chosen indexes speed up read queries, but every index slows down writes. For this reason, databases don’t usually index everything by default, but require you—the application developer or database administrator—to choose indexes manually, using your knowledge of the application’s typical query patterns. You can then choose the indexes that give your application the greatest benefit, without introducing more overhead than necessary. 
 
 
-## **Hash Indexes** 
+# **Hash Indexes** 
 
 Let’s start with indexes for key-value data. This is not the only kind of data you can index, but it’s very common, and it’s a useful building block for more complex indexes. 
 
@@ -129,26 +129,26 @@ Each segment now has its own in-memory hash table, mapping keys to file offsets.
 
 Lots of detail goes into making this simple idea work in practice. Briefly, some of the issues that are important in a real implementation are: 
 
-## _File format_ 
+# _File format_ 
 
 CSV is not the best format for a log. It’s faster and simpler to use a binary format that first encodes the length of a string in bytes, followed by the raw string (without need for escaping). 
 
-## _Deleting records_ 
+# _Deleting records_ 
 
 If you want to delete a key and its associated value, you have to append a special deletion record to the data file (sometimes called a _tombstone_ ). When log segments are merged, the tombstone tells the merging process to discard any previous values for the deleted key. 
 
-## _Crash recovery_ 
+# _Crash recovery_ 
 
 If the database is restarted, the in-memory hash maps are lost. In principle, you can restore each segment’s hash map by reading the entire segment file from beginning to end and noting the offset of the most recent value for every key as you go along. However, that might take a long time if the segment files are large, which would make server restarts painful. Bitcask speeds up recovery by storing 
 
 
 a snapshot of each segment’s hash map on disk, which can be loaded into memory more quickly. 
 
-## _Partially written records_ 
+# _Partially written records_ 
 
 The database may crash at any time, including halfway through appending a record to the log. Bitcask files include checksums, allowing such corrupted parts of the log to be detected and ignored. 
 
-## _Concurrency control_ 
+# _Concurrency control_ 
 
 As writes are appended to the log in a strictly sequential order, a common implementation choice is to have only one writer thread. Data file segments are append-only and otherwise immutable, so they can be read concurrently by multiple threads. 
 
@@ -169,7 +169,7 @@ However, the hash table index also has limitations:
 In the next section we will look at an indexing structure that doesn’t have those limitations. 
 
 
-## **SSTables and LSM-Trees** 
+# **SSTables and LSM-Trees** 
 
 In Figure 3-3, each log-structured storage segment is a sequence of key-value pairs. These pairs appear in the order that they were written, and values later in the log take precedence over values for the same key earlier in the log. Apart from that, the order of key-value pairs in the file does not matter. 
 
@@ -203,7 +203,7 @@ You still need an in-memory index to tell you the offsets for some of the keys, 
 > i. If all keys and values had a fixed size, you could use binary search on a segment file and avoid the inmemory index entirely. However, they are usually variable-length in practice, which makes it difficult to tell where one record ends and the next one starts if you don’t have an index. 
 
 
-## **Constructing and maintaining SSTables** 
+# **Constructing and maintaining SSTables** 
 
 Fine so far—but how do you get your data to be sorted by key in the first place? Our incoming writes can occur in any order. 
 
@@ -221,7 +221,7 @@ We can now make our storage engine work as follows:
 
 This scheme works very well. It only suffers from one problem: if the database crashes, the most recent writes (which are in the memtable but not yet written out to disk) are lost. In order to avoid that problem, we can keep a separate log on disk to which every write is immediately appended, just like in the previous section. That log is not in sorted order, but that doesn’t matter, because its only purpose is to restore the memtable after a crash. Every time the memtable is written out to an SSTable, the corresponding log can be discarded. 
 
-## **Making an LSM-tree out of SSTables** 
+# **Making an LSM-tree out of SSTables** 
 
 The algorithm described here is essentially what is used in LevelDB [6] and RocksDB [7], key-value storage engine libraries that are designed to be embedded into other applications. Among other things, LevelDB can be used in Riak as an alternative to Bitcask. Similar storage engines are used in Cassandra and HBase [8], both of which were inspired by Google’s Bigtable paper [9] (which introduced the terms _SSTable_ and _memtable_ ). 
 
@@ -232,7 +232,7 @@ log-structured filesystems [11]. Storage engines that are based on this principl
 
 Lucene, an indexing engine for full-text search used by Elasticsearch and Solr, uses a similar method for storing its _term dictionary_ [12, 13]. A full-text index is much more complex than a key-value index but is based on a similar idea: given a word in a search query, find all the documents (web pages, product descriptions, etc.) that mention the word. This is implemented with a key-value structure where the key is a word (a _term_ ) and the value is the list of IDs of all the documents that contain the word (the _postings list_ ). In Lucene, this mapping from term to postings list is kept in SSTable-like sorted files, which are merged in the background as needed [14]. 
 
-## **Performance optimizations** 
+# **Performance optimizations** 
 
 As always, a lot of detail goes into making a storage engine perform well in practice. For example, the LSM-tree algorithm can be slow when looking up keys that do not exist in the database: you have to check the memtable, then the segments all the way back to the oldest (possibly having to read from disk for each one) before you can be sure that the key does not exist. In order to optimize this kind of access, storage engines often use additional _Bloom filters_ [15]. (A Bloom filter is a memory-efficient data structure for approximating the contents of a set. It can tell you if a key does not appear in the database, and thus saves many unnecessary disk reads for nonexistent keys.) 
 
@@ -240,7 +240,7 @@ There are also different strategies to determine the order and timing of how SST
 
 Even though there are many subtleties, the basic idea of LSM-trees—keeping a cascade of SSTables that are merged in the background—is simple and effective. Even when the dataset is much bigger than the available memory it continues to work well. Since data is stored in sorted order, you can efficiently perform range queries (scanning all keys above some minimum and up to some maximum), and because the disk writes are sequential the LSM-tree can support remarkably high write throughput. 
 
-## **B-Trees** 
+# **B-Trees** 
 
 The log-structured indexes we have discussed so far are gaining acceptance, but they are not the most common type of index. The most widely used indexing structure is quite different: the _B-tree_ . 
 
@@ -281,7 +281,7 @@ This algorithm ensures that the tree remains _balanced_ : a B-tree with _n_ keys
 ii. Inserting a new key into a B-tree is reasonably intuitive, but deleting one (while keeping the tree balanced) is somewhat more involved [2]. 
 
 
-## **Making B-trees reliable** 
+# **Making B-trees reliable** 
 
 The basic underlying write operation of a B-tree is to overwrite a page on disk with new data. It is assumed that the overwrite does not change the location of the page; i.e., all references to that page remain intact when the page is overwritten. This is in stark contrast to log-structured indexes such as LSM-trees, which only append to files (and eventually delete obsolete files) but never modify files in place. 
 
@@ -293,7 +293,7 @@ In order to make the database resilient to crashes, it is common for B-tree impl
 
 An additional complication of updating pages in place is that careful concurrency control is required if multiple threads are going to access the B-tree at the same time —otherwise a thread may see the tree in an inconsistent state. This is typically done by protecting the tree’s data structures with _latches_ (lightweight locks). Logstructured approaches are simpler in this regard, because they do all the merging in the background without interfering with incoming queries and atomically swap old segments for new segments from time to time. 
 
-## **B-tree optimizations** 
+# **B-tree optimizations** 
 
 As B-trees have been around for so long, it’s not surprising that many optimizations have been developed over the years. To mention just a few: 
 
@@ -307,7 +307,7 @@ As B-trees have been around for so long, it’s not surprising that many optimiz
 
 - B-tree variants such as _fractal trees_ [22] borrow some log-structured ideas to reduce disk seeks (and they have nothing to do with fractals). 
 
-## **Comparing B-Trees and LSM-Trees** 
+# **Comparing B-Trees and LSM-Trees** 
 
 Even though B-tree implementations are generally more mature than LSM-tree implementations, LSM-trees are also interesting due to their performance characteristics. As a rule of thumb, LSM-trees are typically faster for writes, whereas B-trees are thought to be faster for reads [23]. Reads are typically slower on LSM-trees because they have to check several different data structures and SSTables at different stages of compaction. 
 
@@ -316,7 +316,7 @@ However, benchmarks are often inconclusive and sensitive to details of the workl
 > iii. This variant is sometimes known as a B[+] tree, although the optimization is so common that it often isn’t distinguished from other B-tree variants. 
 
 
-## **Advantages of LSM-trees** 
+# **Advantages of LSM-trees** 
 
 A B-tree index must write every piece of data at least twice: once to the write-ahead log, and once to the tree page itself (and perhaps again as pages are split). There is also overhead from having to write an entire page at a time, even if only a few bytes in that page changed. Some storage engines even overwrite the same page twice in order to avoid ending up with a partially updated page in the event of a power failure [24, 25]. 
 
@@ -330,7 +330,7 @@ LSM-trees can be compressed better, and thus often produce smaller files on disk
 
 On many SSDs, the firmware internally uses a log-structured algorithm to turn random writes into sequential writes on the underlying storage chips, so the impact of the storage engine’s write pattern is less pronounced [19]. However, lower write amplification and reduced fragmentation are still advantageous on SSDs: representing data more compactly allows more read and write requests within the available I/O bandwidth. 
 
-## **Downsides of LSM-trees** 
+# **Downsides of LSM-trees** 
 
 A downside of log-structured storage is that the compaction process can sometimes interfere with the performance of ongoing reads and writes. Even though storage engines try to perform compaction incrementally and without affecting concurrent 
 
@@ -345,7 +345,7 @@ An advantage of B-trees is that each key exists in exactly one place in the inde
 
 B-trees are very ingrained in the architecture of databases and provide consistently good performance for many workloads, so it’s unlikely that they will go away anytime soon. In new datastores, log-structured indexes are becoming increasingly popular. There is no quick and easy rule for determining which type of storage engine is better for your use case, so it is worth testing empirically. 
 
-## **Other Indexing Structures** 
+# **Other Indexing Structures** 
 
 So far we have only discussed key-value indexes, which are like a _primary key_ index in the relational model. A primary key uniquely identifies one row in a relational table, or one document in a document database, or one vertex in a graph database. Other records in the database can refer to that row/document/vertex by its primary key (or ID), and the index is used to resolve such references. 
 
@@ -356,7 +356,7 @@ mand, and they are often crucial for performing joins efficiently. For example, 
 
 A secondary index can easily be constructed from a key-value index. The main difference is that keys are not unique; i.e., there might be many rows (documents, vertices) with the same key. This can be solved in two ways: either by making each value in the index a list of matching row identifiers (like a postings list in a full-text index) or by making each key unique by appending a row identifier to it. Either way, both B-trees and log-structured indexes can be used as secondary indexes. 
 
-## **Storing values within the index** 
+# **Storing values within the index** 
 
 The key in an index is the thing that queries search for, but the value can be one of two things: it could be the actual row (document, vertex) in question, or it could be a reference to the row stored elsewhere. In the latter case, the place where rows are stored is known as a _heap file_ , and it stores data in no particular order (it may be append-only, or it may keep track of deleted rows in order to overwrite them with new data later). The heap file approach is common because it avoids duplicating data when multiple secondary indexes are present: each index just references a location in the heap file, and the actual data is kept in one place. 
 
@@ -369,7 +369,7 @@ A compromise between a clustered index (storing all row data within the index) a
 
 As with any kind of duplication of data, clustered and covering indexes can speed up reads, but they require additional storage and can add overhead on writes. Databases also need to go to additional effort to enforce transactional guarantees, because applications should not see inconsistencies due to the duplication. 
 
-## **Multi-column indexes** 
+# **Multi-column indexes** 
 
 The indexes discussed so far only map a single key to a value. That is not sufficient if we need to query multiple columns of a table (or multiple fields in a document) simultaneously. 
 
@@ -391,7 +391,7 @@ An interesting idea is that multi-dimensional indexes are not just for geographi
 
 index on ( _date_ , _temperature_ ) in order to efficiently search for all the observations during the year 2013 where the temperature was between 25 and 30 ℃ . With a onedimensional index, you would have to either scan over all the records from 2013 (regardless of temperature) and then filter them by temperature, or vice versa. A 2D index could narrow down by timestamp and temperature simultaneously. This technique is used by HyperDex [36]. 
 
-## **Full-text search and fuzzy indexes** 
+# **Full-text search and fuzzy indexes** 
 
 All the indexes discussed so far assume that you have exact data and allow you to query for exact values of a key, or a range of values of a key with a sort order. What they don’t allow you to do is search for _similar_ keys, such as misspelled words. Such _fuzzy_ querying requires different techniques. 
 
@@ -401,7 +401,7 @@ As mentioned in “Making an LSM-tree out of SSTables” on page 78, Lucene uses
 
 Other fuzzy search techniques go in the direction of document classification and machine learning. See an information retrieval textbook for more detail [e.g., 40]. 
 
-## **Keeping everything in memory** 
+# **Keeping everything in memory** 
 
 The data structures discussed so far in this chapter have all been answers to the limitations of disks. Compared to main memory, disks are awkward to deal with. With both magnetic disks and SSDs, data on disk needs to be laid out carefully if you want good performance on reads and writes. However, we tolerate this awkwardness because disks have two significant advantages: they are durable (their contents are not lost if the power is turned off), and they have a lower cost per gigabyte than RAM. 
 
@@ -424,7 +424,7 @@ approach still requires indexes to fit entirely in memory, though (like the Bitc
 
 Further changes to storage engine design will probably be needed if _non-volatile memory_ (NVM) technologies become more widely adopted [46]. At present, this is a new area of research, but it is worth keeping an eye on in the future. 
 
-## **Transaction Processing or Analytics?** 
+# **Transaction Processing or Analytics?** 
 
 In the early days of business data processing, a write to the database typically corresponded to a _commercial transaction_ taking place: making a sale, placing an order with a supplier, paying an employee’s salary, etc. As databases expanded into areas that didn’t involve money changing hands, the term _transaction_ nevertheless stuck, referring to a group of reads and writes that form a logical unit. 
 
@@ -460,7 +460,7 @@ _Table 3-1. Comparing characteristics of transaction processing versus analytic 
 
 At first, the same databases were used for both transaction processing and analytic queries. SQL turned out to be quite flexible in this regard: it works well for OLTPtype queries as well as OLAP-type queries. Nevertheless, in the late 1980s and early 1990s, there was a trend for companies to stop using their OLTP systems for analytics purposes, and to run the analytics on a separate database instead. This separate database was called a _data warehouse_ . 
 
-## **Data Warehousing** 
+# **Data Warehousing** 
 
 An enterprise may have dozens of different transaction processing systems: systems powering the customer-facing website, controlling point of sale (checkout) systems in physical stores, tracking inventory in warehouses, planning routes for vehicles, managing suppliers, administering employees, etc. Each of these systems is complex and needs a team of people to maintain it, so the systems end up operating mostly autonomously from each other. 
 
@@ -486,7 +486,7 @@ A big advantage of using a separate data warehouse, rather than querying OLTP sy
 
 In the rest of this chapter we will look at storage engines that are optimized for analytics instead. 
 
-## **The divergence between OLTP databases and data warehouses** 
+# **The divergence between OLTP databases and data warehouses** 
 
 The data model of a data warehouse is most commonly relational, because SQL is generally a good fit for analytic queries. There are many graphical data analysis tools that generate SQL queries, visualize the results, and allow analysts to explore the data (through operations such as _drill-down_ and _slicing and dicing_ ). 
 
@@ -496,7 +496,7 @@ Some databases, such as Microsoft SQL Server and SAP HANA, have support for tran
 
 Data warehouse vendors such as Teradata, Vertica, SAP HANA, and ParAccel typically sell their systems under expensive commercial licenses. Amazon RedShift is a hosted version of ParAccel. More recently, a plethora of open source SQL-onHadoop projects have emerged; they are young but aiming to compete with commercial data warehouse systems. These include Apache Hive, Spark SQL, Cloudera Impala, Facebook Presto, Apache Tajo, and Apache Drill [52, 53]. Some of them are based on ideas from Google’s Dremel [54]. 
 
-## **Stars and Snowflakes: Schemas for Analytics** 
+# **Stars and Snowflakes: Schemas for Analytics** 
 
 As explored in Chapter 2, a wide range of different data models are used in the realm of transaction processing, depending on the needs of the application. On the other hand, in analytics, there is much less diversity of data models. Many data warehouses are used in a fairly formulaic style, known as a _star schema_ (also known as _dimensional modeling_ [55]). 
 
@@ -527,7 +527,7 @@ A variation of this template is known as the _snowflake schema_ , where dimensio
 
 In a typical data warehouse, tables are often very wide: fact tables often have over 100 columns, sometimes several hundred [51]. Dimension tables can also be very wide, as they include all the metadata that may be relevant for analysis—for example, the `dim_store` table may include details of which services are offered at each store, whether it has an in-store bakery, the square footage, the date when the store was first opened, when it was last remodeled, how far it is from the nearest highway, etc. 
 
-## **Column-Oriented Storage** 
+# **Column-Oriented Storage** 
 
 If you have trillions of rows and petabytes of data in your fact tables, storing and querying them efficiently becomes a challenging problem. Dimension tables are usually much smaller (millions of rows), so in this section we will concentrate primarily on storage of facts. 
 
@@ -574,7 +574,7 @@ _Figure 3-10. Storing relational data by column, rather than by row._
 
 The column-oriented storage layout relies on each column file containing the rows in the same order. Thus, if you need to reassemble an entire row, you can take the 23rd entry from each of the individual column files and put them together to form the 23rd row of the table. 
 
-## **Column Compression** 
+# **Column Compression** 
 
 Besides only loading those columns from disk that are required for a query, we can further reduce the demands on disk throughput by compressing data. Fortunately, column-oriented storage often lends itself very well to compression. 
 
@@ -613,17 +613,17 @@ There are also various other compression schemes for different kinds of data, bu
 ![](../images/Designing_Data_Intensive_Applications-0121-03.png)
 
 
-## **Column-oriented storage and column families** 
+# **Column-oriented storage and column families** 
 
 Cassandra and HBase have a concept of _column families_ , which they inherited from Bigtable [9]. However, it is very misleading to call them column-oriented: within each column family, they store all columns from a row together, along with a row key, and they do not use column compression. Thus, the Bigtable model is still mostly row-oriented. 
 
-## **Memory bandwidth and vectorized processing** 
+# **Memory bandwidth and vectorized processing** 
 
 For data warehouse queries that need to scan over millions of rows, a big bottleneck is the bandwidth for getting data from disk into memory. However, that is not the only bottleneck. Developers of analytical databases also worry about efficiently using the bandwidth from main memory into the CPU cache, avoiding branch mispredictions and bubbles in the CPU instruction processing pipeline, and making use of single-instruction-multi-data (SIMD) instructions in modern CPUs [59, 60]. 
 
 Besides reducing the volume of data that needs to be loaded from disk, columnoriented storage layouts are also good for making efficient use of CPU cycles. For example, the query engine can take a chunk of compressed column data that fits comfortably in the CPU’s L1 cache and iterate through it in a tight loop (that is, with no function calls). A CPU can execute such a loop much faster than code that requires a lot of function calls and conditions for each record that is processed. Column compression allows more rows from a column to fit in the same amount of L1 cache. Operators, such as the bitwise _AND_ and _OR_ described previously, can be designed to operate on such chunks of compressed column data directly. This technique is known as _vectorized processing_ [58, 49]. 
 
-## **Sort Order in Column Storage** 
+# **Sort Order in Column Storage** 
 
 In a column store, it doesn’t necessarily matter in which order the rows are stored. It’s easiest to store them in the order in which they were inserted, since then inserting a new row just means appending to each of the column files. However, we can choose to impose an order, like we did with SSTables previously, and use that as an indexing mechanism. 
 
@@ -640,14 +640,14 @@ Another advantage of sorted order is that it can help with compression of column
 
 That compression effect is strongest on the first sort key. The second and third sort keys will be more jumbled up, and thus not have such long runs of repeated values. Columns further down the sorting priority appear in essentially random order, so they probably won’t compress as well. But having the first few columns sorted is still a win overall. 
 
-## **Several different sort orders** 
+# **Several different sort orders** 
 
 A clever extension of this idea was introduced in C-Store and adopted in the commercial data warehouse Vertica [61, 62]. Different queries benefit from different sort orders, so why not store the same data sorted in _several different_ ways? Data needs to be replicated to multiple machines anyway, so that you don’t lose data if one machine fails. You might as well store that redundant data sorted in different ways so that when you’re processing a query, you can use the version that best fits the query pattern. 
 
 Having multiple sort orders in a column-oriented store is a bit similar to having multiple secondary indexes in a row-oriented store. But the big difference is that the roworiented store keeps every row in one place (in the heap file or a clustered index), and secondary indexes just contain pointers to the matching rows. In a column store, there normally aren’t any pointers to data elsewhere, only columns containing values. 
 
 
-## **Writing to Column-Oriented Storage** 
+# **Writing to Column-Oriented Storage** 
 
 These optimizations make sense in data warehouses, because most of the load consists of large read-only queries run by analysts. Column-oriented storage, compression, and sorting all help to make those read queries faster. However, they have the downside of making writes more difficult. 
 
@@ -657,7 +657,7 @@ Fortunately, we have already seen a good solution earlier in this chapter: LSM-t
 
 Queries need to examine both the column data on disk and the recent writes in memory, and combine the two. However, the query optimizer hides this distinction from the user. From an analyst’s point of view, data that has been modified with inserts, updates, or deletes is immediately reflected in subsequent queries. 
 
-## **Aggregation: Data Cubes and Materialized Views** 
+# **Aggregation: Data Cubes and Materialized Views** 
 
 Not every data warehouse is necessarily a column store: traditional row-oriented databases and a few other architectures are also used. However, columnar storage can be significantly faster for ad hoc analytical queries, so it is rapidly gaining popularity [51, 63]. 
 
@@ -691,7 +691,7 @@ the total sales per store yesterday, you just need to look at the totals along t
 
 The disadvantage is that a data cube doesn’t have the same flexibility as querying the raw data. For example, there is no way of calculating which proportion of sales comes from items that cost more than $100, because the price isn’t one of the dimensions. Most data warehouses therefore try to keep as much raw data as possible, and use aggregates such as data cubes only as a performance boost for certain queries. 
 
-## **Summary** 
+# **Summary** 
 
 In this chapter we tried to get to the bottom of how databases handle storage and retrieval. What happens when you store data in a database, and what does the database do when you query for the data again later? 
 
@@ -718,7 +718,7 @@ As an application developer, if you’re armed with this knowledge about the int
 
 Although this chapter couldn’t make you an expert in tuning any one particular storage engine, it has hopefully equipped you with enough vocabulary and ideas that you can make sense of the documentation for the database of your choice. 
 
-## **References** 
+# **References** 
 
 [1] Alfred V. Aho, John E. Hopcroft, and Jeffrey D. Ullman: _Data Structures and Algorithms_ . Addison-Wesley, 1983. ISBN: 978-0-201-00023-8 
 

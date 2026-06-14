@@ -1,6 +1,6 @@
-## **Chapter 20** 
+# **Chapter 20** 
 
-## **Caching** 
+# **Caching** 
 
 Suppose a significant fraction of requests that _Cruder_ sends to its data store consists of a small pool of frequently accessed entries. In that case, we can improve the application’s performance and reduce the load on the data store by introducing a cache. A _cache_ is a high-speed storage layer that temporarily buffers responses from an _origin_ , like a data store, so that future requests can be served directly from it. It only provides best-effort guarantees, since its state is disposable and can be rebuilt from the origin. We have already seen some applications of caching when discussing the DNS protocol or CDNs. 
 
@@ -11,7 +11,7 @@ As a general rule of thumb, the higher up in the call stack caching is used, the
 
 192 e.g., the data store in our case, can’t withstand the load without the cache fronting it. If the access pattern suddenly changes, leading to cache misses, or the cache becomes unavailable, you don’t want your application to fall over (but it’s okay for it to become slower). 
 
-## **20.1 Policies** 
+# **20.1 Policies** 
 
 When a cache miss occurs, the missing object has to be requested from the origin, which can happen in two ways: 
 
@@ -30,7 +30,7 @@ The expiration doesn’t need to occur immediately, and it can be deferred to th
 
 An expiry policy based on TTL is a workaround for _cache invalidation_ , which is very hard to implement in practice[1] . For example, if you were to cache the result of a database query, every time any of the data touched by that query changes (which could span thousands of records or more), the cached result would need to be invalidated somehow. 
 
-## **20.2 Local cache** 
+# **20.2 Local cache** 
 
 The simplest way to implement a cache is to co-locate it with the client. For example, the client could use a simple in-memory hash table or an embeddable key-value store, like RocksDB[2] , to cache responses (see Figure 20.1). 
 
@@ -53,7 +53,7 @@ Additionally, as the number of clients grows, the number of requests to the orig
 
 Clients can reduce the impact of a thundering herd by _coalescing_ requests for the same object. The idea is that, at any given time, there should be at most one outstanding request per client to fetch a specific object. 
 
-## **20.3 External cache** 
+# **20.3 External cache** 
 
 An external cache is a service dedicated to caching objects, typically in memory. Because it’s shared across clients, it addresses some of the drawbacks of local caches at the expense of greater complexity and cost (see Figure 20.2). For example, Redis[3] or Memcached[4] are popular caching services, also available as managed services on AWS and Azure. 
 

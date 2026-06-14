@@ -1,6 +1,6 @@
-## **Chapter 10** 
+# **Chapter 10** 
 
-## **Replication** 
+# **Replication** 
 
 Data replication is a fundamental building block of distributed systems. One reason for replicating data is to increase availability. If some data is stored exclusively on a single process, and that process goes down, the data won’t be accessible anymore. However, if the data is replicated, clients can seamlessly switch to a copy. Another reason for replication is to increase scalability and performance; the more replicas there are, the more clients can access the data concurrently. 
 
@@ -21,7 +21,7 @@ For example, consider the problem of implementing a faulttolerant key-value stor
 
 In the next section, we will take a deeper look at Raft’s replication protocol. It’s a challenging read that requires to pause and think, but I can assure you it’s well worth the effort, especially if you haven’t seen a replication protocol before. 
 
-## **10.1 State machine replication** 
+# **10.1 State machine replication** 
 
 When the system starts up, a leader is elected using Raft’s leader election algorithm discussed in chapter 9, which doesn’t require 
 
@@ -68,7 +68,7 @@ If a follower that was temporarily unavailable comes back online, it will eventu
 
 When the _AppendEntries_ request is rejected, the leader retries the request, this time including the last two log entries — this is why we referred to the request as _AppendEntries_ and not as _AppendEntry_ . If that fails, the leader retries sending the last three log entries and so forth.[4] The goal is for the leader to find the latest log entry where the two logs agree, delete any entries in the follower’s log after that point, and append to the follower’s log all of the leader’s entries after it. 
 
-## **10.2 Consensus** 
+# **10.2 Consensus** 
 
 By solving state machine replication, we actually found a solution to _consensus_[5] — a fundamental problem studied in distributed systems research in which a group of processes has to decide a value 
 
@@ -79,7 +79,7 @@ By solving state machine replication, we actually found a solution to _consensus
 
 82 
 
-## so that: 
+# so that: 
 
 - every non-faulty process eventually agrees on a value; 
 
@@ -108,7 +108,7 @@ For example, one of the most common uses of consensus is for coordination purpos
 
 83 ordination services that replicate their state for fault-tolerance using consensus. A coordination service exposes a hierarchical, keyvalue store through its API, and also allows clients to watch for changes to keys. So, for example, acquiring a lease can be implemented by having a client attempt to create a key with a specific TTL. If the key already exists, the operation fails guaranteeing that only one client can acquire the lease. 
 
-## **10.3 Consistency models** 
+# **10.3 Consistency models** 
 
 We discussed state machine replication with the goal of implementing a data store that can withstand failures and scale out to serve a larger number of requests. Now that we know how to build a replicated data store in principle, let’s take a closer look at what happens when a client sends a request to it. In an ideal world, the request executes instantaneously, as shown in Figure 10.2. 
 
@@ -138,7 +138,7 @@ Intuitively, there is a tradeoff between how consistent the observers’ views o
 
 85 the help of _consistency models_[11] , which formally define the possible views the observers can have of the system’s state. 
 
-## **10.3.1 Strong consistency** 
+# **10.3.1 Strong consistency** 
 
 If clients send writes and reads exclusively to the leader, then every request appears to take place atomically at a very specific point in time as if there were a single copy of the data. No matter how many replicas there are or how far behind they are lagging, as long as the clients always query the leader directly, there is a single copy of the data from their point of view. 
 
@@ -159,7 +159,7 @@ Since a request becomes visible to all other participants between its invocation
 
 Unfortunately, the leader can’t serve reads directly from its local state because by the time it receives a request from a client, it might no longer be the leader; so, if it were to serve the request, the system wouldn’t be strongly consistent. The presumed leader first needs to contact a majority of replicas to confirm whether it still is the leader. Only then is it allowed to execute the request and send back a response to the client. Otherwise, it transitions to the follower state and fails the request. This confirmation step considerably increases the time required to serve a read. 
 
-## **10.3.2 Sequential consistency** 
+# **10.3.2 Sequential consistency** 
 
 So far, we have discussed serializing all reads through the leader. But doing so creates a single chokepoint, limiting the system’s throughput. On top of that, the leader needs to contact a majority of followers to handle a read, which increases the time it takes to process a request. To increase the read performance, we could also allow the followers to handle requests. 
 
@@ -184,7 +184,7 @@ Figure 10.5: Although followers have a different view of the system’s state, t
 
 A producer/consumer system synchronized with a queue is an example of this model; a producer writes items to the queue, which a consumer reads. The producer and the consumer see the items in the same order, but the consumer lags behind the producer. 
 
-## **10.3.3 Eventual consistency** 
+# **10.3.3 Eventual consistency** 
 
 Although we managed to increase the read throughput, we had to pin clients to followers — if a follower becomes unavailable, the client loses access to the store. We could increase the availability by allowing the client to query any follower. But this comes at a steep price in terms of consistency. For example, say there are two followers, 1 and 2, where follower 2 lags behind follower 1. If a client queries follower 1 and then follower 2, it will see an earlier state, which can be very confusing. The only guarantee the client 
 
@@ -193,7 +193,7 @@ Although we managed to increase the read throughput, we had to pin clients to fo
 
 It’s challenging to build applications on top of an eventually consistent data store because the behavior is different from what we are used to when writing single-threaded applications. As a result, subtle bugs can creep up that are hard to debug and reproduce. Yet, in eventual consistency’s defense, not all applications require linearizability. For example, an eventually consistent store is perfectly fine if we want to keep track of the number of users visiting a website, since it doesn’t really matter if a read returns a number that is slightly out of date. 
 
-## **10.3.4 The CAP theorem** 
+# **10.3.4 The CAP theorem** 
 
 When a network partition happens, parts of the system become disconnected from each other. For example, some clients might no longer be able to reach the leader. The system has two choices when this happens; it can either: 
 
@@ -229,7 +229,7 @@ Another way to interpret the PACELC theorem is that there is a tradeoff between 
 
 90 to move coordination away from the critical path. For example, earlier we discussed that for a read to be strongly consistent, the leader has to contact a majority of followers. That coordination tax is paid for each read! In the next section, we will explore a different replication protocol that moves this cost away from the critical path. 
 
-## **10.4 Chain replication** 
+# **10.4 Chain replication** 
 
 Chain replication[21] is a widely used replication protocol that uses a very different topology from leader-based replication protocols like Raft. In chain replication, processes are arranged in a chain. The leftmost process is referred to as the chain’s _head_ , while the rightmost one is the chain’s _tail_ . 
 
@@ -274,7 +274,7 @@ However, there is a price to pay in terms of write latency. Since an update need
 
 93 
 
-## progress. 
+# progress. 
 
 That said, chain replication allows write requests to be pipelined, which can significantly improve throughput. Moreover, read throughput can be further increased by distributing reads across replicas while still guaranteeing linearizability. The idea is for replicas to store multiple versions of an object, each including a version number and a dirty flag. Replicas mark an update as dirty as it propagates from the head to the tail. Once the tail receives it, it’s considered committed, and the tail sends an acknowledgment back along the chain. When a replica receives an acknowledgment, it marks the corresponding version as clean. Now, when a replica receives a read request for an object, it will immediately serve it if the latest version is clean. If not, it first contacts the tail to request the latest committed version (see Fig 10.7). 
 

@@ -1,6 +1,6 @@
-## **Chapter 6** 
+# **Chapter 6** 
 
-## **System models** 
+# **System models** 
 
 To reason about distributed systems, we need to define precisely what can and can’t happen. A _system model_ encodes expectations about the behavior of processes, communication links, and timing; think of it as a set of assumptions that allow us to reason about distributed systems by ignoring the complexity of the actual technologies used to implement them. 
 

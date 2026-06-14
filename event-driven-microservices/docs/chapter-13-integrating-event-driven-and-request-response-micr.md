@@ -1,4 +1,4 @@
-## **CHAPTER 13 Integrating Event-Driven and Request-Response Microservices** 
+# **CHAPTER 13 Integrating Event-Driven and Request-Response Microservices** 
 
 As powerful as event-driven microservice patterns are, they cannot serve all of the business needs of an organization. Request-response endpoints provide the means to serve important data in real time, particularly when you are: 
 
@@ -18,27 +18,27 @@ Event-driven patterns still play a large role in this domain, and integrating th
 
 For the purposes of this chapter, the term _request-response services_ refers to services that communicate with each other directly, typically through a synchronous API. Two services communicating via HTTP is a prime example of request-response communication. 
 
-## **Handling External Events** 
+# **Handling External Events** 
 
 Due to history, precedence, familiarity, convenience, and a whole host of other reasons, external events are predominantly sent from the outside via a request-response API. While it is possible to expose an event broker and its streams to an external 
 
 
 client, it is largely unreasonable to do so, as you would need to resolve a number of issues relating to access and security. And that is fine. Request-response APIs work wonderfully for these scenarios, just as they have for many decades before. There are two main types of externally generated events to consider. 
 
-## **Autonomously Generated Events** 
+# **Autonomously Generated Events** 
 
 The first type of events are those sent from client to server _autonomously_ by your products. These requests are usually defined as a metric or measurement from the product, such as information about what a user is doing, periodic measurements of activity, or sensor readings of some sort. Collectively known as _analytical events_ , these describe measurements and statements of fact about the operation of the product (“Example: Overloading event definitions” on page 48 shows such an event in action). An application installed on a customer’s cell phone is a good example of an external event source. Consider a media streaming service like Netflix, where analytical events can be independently sent back to measure things such as which movies you have started and how much of them you’ve watched. Any request from an external product, based on actions originating from that product, counts as an externally generated event. 
 
 Now, you may be wondering if, say, requests to load the next 60s of the current movie count as an externally generated event. Absolutely, they do. But the real question to ask is, “Are these events important enough to the business such that they must go into their own event stream for additional processing?” In many cases the answer is no, and you would not collect and store those events in an event stream. But for those cases where the answer is yes, you can simply parse the request into an event and route it into its own event stream. 
 
-## **Reactively Generated Events** 
+# **Reactively Generated Events** 
 
 The second type of externally generated event is a _reactive_ event, which is generated _in response_ to a request from one of your services. Your service composes a request, sends it to the endpoint, and awaits a response. In some cases, it’s really only important that the request is received, and the requesting client doesn’t need any other details from the response. For example, if you need to issue requests to send advertisement emails, collecting the response from the third-party service handling the requests may not be useful if turned into events. Once the request is successfully issued (HTTP 202 response), you can assume that the third-party email application will make it happen. Collecting the responses and converting them into events may not be necessary if there is no action to take from the results. 
 
 
 On the other hand, your business requirements may expect significant detail from the response of the request. A prime example of this is the use of a third-party payment service, where the input event states the amount that is due to be paid by the customer. The response payload from the third-party API is _extremely_ important, as it specifies whether the payment succeeded or not, any error messages, and any additional details such as a unique, traceable number indicating the payment information. This data is important to put into an event stream, as it allows downstream accounting services to reconcile accounts payable with received payments. 
 
-## **Handling Autonomously Generated Analytical Events** 
+# **Handling Autonomously Generated Analytical Events** 
 
 Analytical events may be bundled together and periodically sent in a batch or they may be sent as they occur. In either case, they will be sent to a request-response API, where they can then be routed on to the appropriate event streams. This is illustrated in Figure 13-1, where an external client application sends analytical events to an event receiver service that routes them to the correct output event stream. 
 
@@ -73,7 +73,7 @@ Think of external event sources as a set of microservice instances. Each instanc
 
 Finally, it’s important to sort the incoming events into their own defined event streams based on their schemas and event definitions. Separate these events according to business purposes just as you would the event streams of any other microservice. 
 
-## **Integrating with Third-Party Request-Response APIs** 
+# **Integrating with Third-Party Request-Response APIs** 
 
 Event-driven microservices often need to communicate with third-party APIs via request-response protocols. The request-response pattern fits in nicely with eventdriven processing; the request and response are treated simply as a remote function call. The microservice calls the API based on the event-driven logic and awaits the reply. Upon receipt of the reply, the microservice parses it, ensures it adheres to an expected schema, and continues applying business logic as though it were any other event. A generalized example of this process is shown in Figure 13-3. 
 
@@ -125,12 +125,12 @@ There are also a number of drawbacks to this approach. As discussed in Chapter 6
 
 Finally, consider the frequency at which you make requests to an endpoint. For instance, say that you discover a bug in your microservice and need to rewind the input stream for reprocessing. Event-driven microservices typically consume and process events as fast as they can execute the code, which could lead to a massive surge in requests going to the external API. This can cause the remote service to fail or perhaps reactively block traffic coming from your IP addresses, resulting in many failed requests and tight retry loops by your microservice. You can somewhat address this issue by using quotas (see “Quotas” on page 241) to limit consumption and processing rates, but it will also require tight throttling by the microservice handling the requests. In the case of an external API outside of your organization’s control, the throttling responsibility may lie with you and may need to be implemented in your microservice. This is particularly common when the external API is capable of providing high-volume burst service, but charges you disproportionately for the volume exceeding the baseline, as can be the case with some logging and metric services. 
 
-## **Processing and Serving Stateful Data** 
+# **Processing and Serving Stateful Data** 
 
 You can also create event-driven microservices that provide a request-response endpoint for the random access of state by using the EDM principles discussed so far in this book. The microservice consumes events from input event streams, processes them, applies any business logic, and stores state either internally or externally according to application needs. The request-response API, which is often contained within the application (more on this later in the chapter), provides access to these underlying state stores. This approach can be broken down into two major sections: serving state from internal state stores, and serving state from external state stores. 
 
 
-## **Serving Real-Time Requests with Internal State Stores** 
+# **Serving Real-Time Requests with Internal State Stores** 
 
 Microservices can serve the results sourced from their internal state, as demonstrated in Figure 13-4. The client’s request is delivered to a load balancer that routes the request on to one of the underlying microservice instances. In this case, there is only one microservice instance, and since it is materializing all of the state data for this application, all of its application data is available within the instance. This state is materialized via the consumption of the two input event streams (A and B), with the changelog backed up to the event broker. 
 
@@ -195,7 +195,7 @@ The smart load balancer applies the partitioner logic to obtain the partition ID
 
 Using a smart load balancer is just a best effort to reduce latency. Due to race conditions and dynamic rebalancing of internal state stores, each microservice instance must still be able to redirect incorrectly forwarded requests. 
 
-## **Serving Real-Time Requests with External State Stores** 
+# **Serving Real-Time Requests with External State Stores** 
 
 Serving from an external state store has two advantages over the internal state store approach. For one, all state is available to each instance, meaning that the request does not need to be forwarded to the microservice instance hosting the data as per the internal storage model. Second, consumer group rebalances also don’t require the microservice to rematerialize the internal state in the new instance, since again, all state is maintained external to the instance. This allows the microservice to provide seamless scaling and zero-downtime options that can be difficult to provide with internal state stores. 
 
@@ -205,7 +205,7 @@ Serving from an external state store has two advantages over the internal state 
 
 Ensure that state is accessed via the request-response API of the microservice and _not_ through a direct coupling with the state store. Failure to do so introduces a shared data store, resulting in tight coupling between services, and makes changes difficult and risky. 
 
-## **Serving requests via the materializing event-driven microservice** 
+# **Serving requests via the materializing event-driven microservice** 
 
 Each microservice instance consumes and processes events from its input event streams and materializes the data to the external state store. Each instance also provides the request-response API for serving the materialized data back to the requesting client. This pattern, shown in Figure 13-8, mirrors that of serving state from an internal state store. Note that each microservice instance can serve the entire domain of keyed data from the state store and thus can handle any request passed to it. 
 
@@ -220,7 +220,7 @@ Both input event stream processing and request-response serving capacity scale b
 One of the main advantages of this pattern is that it doesn’t require much in the way of deployment coordination. This is a single all-in-one microservice that can continue to serve state from the external state store regardless of the current instance count. 
 
 
-## **Serving requests via a separate microservice** 
+# **Serving requests via a separate microservice** 
 
 In this pattern, the request-response API is completely separate from the executable of the event-driven microservice that materializes the state to the external state store. The request-response API remains independent from the event processor, though both have the same bounded context and deployment patterns. This pattern is exemplified in Figure 13-9. You can see how the requests are served via a single REST API endpoint, while events are processed using two event processing instances. 
 
@@ -245,7 +245,7 @@ The main disadvantages of this pattern are complexity and risk. Coordinating cha
 
 All that being said, this is still a useful pattern for serving data in real time, and it is often successfully used in production. Careful management of deployments and comprehensive integration testing is key for ensuring success. 
 
-## **Handling Requests Within an Event-Driven Workflow** 
+# **Handling Requests Within an Event-Driven Workflow** 
 
 Request-response APIs form the basis of communications between many systems, and as a result, you need to ensure that your applications can handle these data inputs in a way that integrates with event-driven microservice principles. One way to handle requests is just as you would with any non-event-driven system: perform the requested operation immediately and return the response to the client. Alternately, you can also _convert_ the request into an event, inject it into its own event stream, and process it just as any other event in the system. Finally, the microservice may also perform a mix of these operations, by turning only requests that are important to the business into events (that can be shared outside the bounded context), while handling other requests synchronously. Figure 13-10 illustrates this concept, which will be expanded on shortly in “Example: Newspaper publishing workflow (approval pattern)” on page 225. 
 
@@ -264,7 +264,7 @@ an event and published to a corresponding event stream, prior to the event-drive
 
 The major benefit of first writing to the event stream is that it provides a durable record of the event, and allows any service to materialize off of that data. The biggest tradeoff, however, is the latency incurred, and that the service must wait for the result to be materialized into the data store to be used (eventually-consistent read-afterwrite). One way to mitigate this delay is to keep the value in memory after successfully writing it to the object stream, allowing you to use it in application-side operations. This will not, however, work for operations that require the data to be present in the database (e.g., `join` s), as the event must be materialized first. 
 
-## **Processing Events for User Interfaces** 
+# **Processing Events for User Interfaces** 
 
 A user interface (UI) is the means by which people interact with the bounded context of a service. Request-response frameworks are exceedingly common for a UI application, with many options and languages available to serve users’ needs. Integrating these frameworks into the event-driven domain is important for unlocking their intrinsic value. 
 
@@ -297,7 +297,7 @@ Intermittent network failures causing request retries can introduce duplicate ev
 
 This next example demonstrates some of the benefits of converting requests directly to events prior to processing. 
 
-## **Example: Newspaper publishing workflow (approval pattern)** 
+# **Example: Newspaper publishing workflow (approval pattern)** 
 
 A newspaper publisher has an application that manages the layout of its publications. Each publication relies upon customizable templates to determine how and where articles and advertisements are placed. 
 
@@ -393,7 +393,7 @@ Value: {
 
 Advertisers are provided with a UI for approving their advertisement size and placement. This service is responsible for determining _which_ advertisements require approval and which do not, and for cutting up the PDF into appropriate pieces for the advertiser to view. It is important to not leak information about news stories or competitors’ advertisements. Approval events are written to an advertiser’s approval stream, similar to that of the editor: 
 
-## `//Advertiser approval event` 
+# `//Advertiser approval event` 
 
 ```
 Key: String pn_key          //Populated newspaper key
@@ -413,7 +413,7 @@ You may have noticed that the advertiser approvals are keyed on `pn_key` and tha
 One benefit of having populated newspaper, editor approval, and advertiser approval as events is that together they form the canonical narrative of newspapers, rejections, comments, and approvals. You can audit this narrative at any point in time to see the history of submissions and approvals, and pinpoint where things may have gone wrong. Another benefit is that by writing directly to events, the approval microservice can use a pure stream processing library, like Apache Kafka or Samza, to materialize the state directly from the event stream whenever the application starts up. There is no need to create an external state store for managing this data. 
 
 
-## **Separating the editor and advertiser approval services** 
+# **Separating the editor and advertiser approval services** 
 
 Business requirements demand that the editor approval service and advertiser approval service be separated. Each of these serves a related, though separate, business context. In particular, the advertiser components of the currently combined service are responsible for: 
 
@@ -478,7 +478,7 @@ Value: {
 This ad-approval summary event definition demonstrates the encapsulation of advertiser approval state into the advertiser approval service. The editor can make decisions on the approval of the newspaper based on the statuses of the ad-approval summary event, without having to manage or handle any of the work of obtaining those results. 
 
 
-## **Micro-Frontends in Request-Response Applications** 
+# **Micro-Frontends in Request-Response Applications** 
 
 Frontend and backend services coordinate in three primary ways to bring business value to users. Monolithic backends are common in many organizations of any size. Microservice backends have become more popular with the growing adoption of microservices, both synchronous and event-driven. In both of these first two approaches, the frontend and backend services are owned and operated by separate teams, such that the end-to-end business functionality crosses team boundaries. In contrast, a microfrontends approach aligns implementations completely on business concerns, from backend to frontend. These three approaches are illustrated in Figure 13-14. 
 
@@ -503,26 +503,26 @@ A major downside of the microservice backend approach is that it still depends h
 
 The third approach, the microfrontend, splits up the monolithic frontend into a series of independent components, each backed by supporting backend microservices. 
 
-## **The Benefits of Microfrontends** 
+# **The Benefits of Microfrontends** 
 
 Microfrontend patterns match up very well with event-driven microservice backends, and inherit many of their advantages, such as modularity; separation of business concerns; autonomous teams; and deployment, language, and code-base independence. 
 
 Let’s look at some of the other notable benefits of microfrontends. 
 
-## **Composition-Based Microservices** 
+# **Composition-Based Microservices** 
 
 Microfrontends are a compositional pattern, meaning you can add services as needed to an existing UI. Notably, microfrontends pair extremely well with event-driven backends, which are also intrinsically composition-based. Event streams enable the microservice to pull in the events and entities needed to support the backend bounded context. The backend service can construct the necessary state and apply business logic specifically for the business needs of the product provided by the microfrontend. The state store implementation can be selected to specifically suit the requirements of the service. This form of composition provides tremendous flexibility in how frontend services can be built, as you’ll see in “Example: Experience Search and Review Application” on page 234. 
 
-## **Easy Alignment to Business Requirements** 
+# **Easy Alignment to Business Requirements** 
 
 By aligning microfrontends strictly on business bounded contexts, just as you’d do with other microservices operating in the backend, you can trace specific business requirements directly to their implementations. This way, you can easily inject experimental products into an application without adversely affecting the codebase of existing core services. And should their performance or user uptake not be as expected, you can just as easily remove them. This alignment and isolation ensures that product requirements from various workflows do not bleed into one another. 
 
 
-## **Drawbacks of Microfrontends** 
+# **Drawbacks of Microfrontends** 
 
 While microfrontends enable separation of business concerns, you have to account for features that you may take for granted in a monolithic frontend, such as consistent UI elements and total control over each element’s layout. Microfrontends also inherit some of the issues common to all microservices, such as potential for duplicated code and the operational concerns of managing and deploying microservices. This section covers a few microfrontend-specific considerations. 
 
-## **Potentially Inconsistent UI Elements and Styling** 
+# **Potentially Inconsistent UI Elements and Styling** 
 
 It’s important that the applications’ visual style remains consistent, and this can be challenging when a frontend experience is composed of many independent microfrontends. Each microfrontend is another potential point of failure—that is, where the UI design might be inconsistent with the desired user experience. One method to remedy this is to provide a strong style guide, in conjunction with a lean library of common UI elements to be used in each microfrontend. 
 
@@ -536,14 +536,14 @@ Ensure common UI element libraries are free of any boundedcontext-specific busin
 
 Finally, making changes to the common UI elements of the application may require that each microfrontend be recompiled and redeployed. This can be operationally expensive, as each microfrontend team will need to update its application, test to ensure that the UI adheres to the new requirements, and verify that it integrates as expected with the UI layer that stitches it together (more on this next). This expense is somewhat mitigated by the infrequency of sweeping UI changes. 
 
-## **Varying Microfrontend Performance** 
+# **Varying Microfrontend Performance** 
 
 Microfrontends, as pieces of a composite framework, can be problematic at times. These separate frontends may load at different rates, or worse, may not load anything at all during a failure. You must ensure that the composite frontend can handle these 
 
 
 scenarios gracefully and still provide a consistent experience for the parts of it that are still working. For example, you may want to use spinning “loading” signs for elements that are still awaiting results from slow microfrontends. Stitching these microfrontends together is an exercise in proper UI design, but the deeper details and nuances of this process are beyond the scope of this book. 
 
-## **Example: Experience Search and Review Application** 
+# **Example: Experience Search and Review Application** 
 
 “An experience is something you’ll never forget!” claim the makers of the application, which connects vacationers with local guides, attractions, entertainment, and culinary delights. Users can search for local experiences, obtain details and contact information, and leave reviews. 
 
@@ -593,7 +593,7 @@ In this new version, the search microservice consumes events from the user profi
 
 Finally, note that all necessary data for both the old and new versions are sourced from the exact same event streams. Because these event streams are the single source of truth you can change the application backends without having to worry about maintaining a specific state store implementation or about migrating data. This is in stark contrast to a monolithic backend, where the database also plays the role of data communication layer and cannot be easily swapped out. The combination of an event-driven backend paired with a microfrontend is limited only by the granularity and detail of the available event data. 
 
-## **Summary** 
+# **Summary** 
 
 This chapter has covered the integration of event-driven microservices with requestresponse APIs. External systems predominantly communicate via request-response APIs, be they human or machine driven, and their requests and responses may have to be converted into events. Machine input can be schematized ahead of time, to emit events that can be collected server-side via the request-response API. Third-party APIs typically require parsing and wrapping the responses into their own event definition and tend to be more brittle with change. 
 

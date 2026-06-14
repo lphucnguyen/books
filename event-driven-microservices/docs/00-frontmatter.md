@@ -1,16 +1,16 @@
-## **Building Event-Driven Microservices** Leveraging Organizational Data at Scale 
+# **Building Event-Driven Microservices** Leveraging Organizational Data at Scale 
 
 Adam Bellemare 
 
 
-## **Building Event-Driven Microservices** _**Leveraging Organizational Data at Scale**_ 
+# **Building Event-Driven Microservices** _**Leveraging Organizational Data at Scale**_ 
 
-## _**Adam Bellemare**_ 
+# _**Adam Bellemare**_ 
 
 **Beijing Boston Farnham Sebastopol Tokyo** 
 
 
-## **Building Event-Driven Microservices** 
+# **Building Event-Driven Microservices** 
 
 by Adam Bellemare 
 
@@ -28,7 +28,7 @@ O’Reilly books may be purchased for educational, business, or sales promotiona
 
 August 2020: First Edition 
 
-## **Revision History for the First Edition** 
+# **Revision History for the First Edition** 
 
 2020-07-02: First Release 
 
@@ -41,7 +41,7 @@ The views expressed in this work are those of the author, and do not represent t
 978-1-492-05789-5 [LSI] 
 
 
-## **Table of Contents** 
+# **Table of Contents** 
 
 **Preface. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  xiii 1. Why Event-Driven Microservices. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  1** What Are Event-Driven Microservices?                                                                         2 Introduction to Domain-Driven Design and Bounded Contexts                              3 Leveraging Domain Models and Bounded Contexts                                                4 Aligning Bounded Contexts with Business Requirements                                       5 Communication Structures                                                                                              6 Business Communication Structures                                                                          7 Implementation Communication Structures                                                             7 Data Communication Structures                                                                                 8 Conway’s Law and Communication Structures                                                         9 Communication Structures in Traditional Computing                                             10 Option 1: Make a New Service                                                                                   10 Option 2: Add It to the Existing Service                                                                   11 Pros and Cons of Each Option                                                                                   11 The Team Scenario, Continued                                                                                  13 Conflicting Pressures                                                                                                   13 Event-Driven Communication Structures                                                                   13 Events Are the Basis of Communication                                                                  14 Event Streams Provide the Single Source of Truth                                                  14 Consumers Perform Their Own Modeling and Querying                                     14 Data Communication Is Improved Across the Organization                                15 Accessible Data Supports Business Communication Changes                              15 Asynchronous Event-Driven Microservices                                                                15 Example Team Using Event-Driven Microservices                                                 16 Synchronous Microservices                                                                                           17 
 
@@ -79,7 +79,7 @@ Testing Using a Shared Environment                                              
 
 
 
-## **Preface** 
+# **Preface** 
 
 I wrote this book to be the book that I wish I’d had when I started out on my journey into the world of event-driven microservices. This book is a culmination of my own personal experiences, discussions with others, and the countless blogs, books, posts, talks, conferences, and documentation related to one part or another of the eventdriven microservice world. I found that many of the works I read mentioned eventdriven architectures either only in passing or with insufficient depth. Some covered only a specific aspect of the architecture and, while helpful, provided only a small piece of the puzzle. Other works proved to be reductive and dismissive, asserting that event-driven systems are really only useful for one system to send an asynchronous message directly to another as a replacement for synchronous request-response systems. As this book details, there is far more to event-driven architectures than this. 
 
@@ -89,23 +89,23 @@ The technologies that support event-driven microservices have a significant impa
 
 
 
-## **Conventions Used in This Book** 
+# **Conventions Used in This Book** 
 
 The following typographical conventions are used in this book: 
 
-## _Italic_ 
+# _Italic_ 
 
 Indicates new terms, URLs, email addresses, filenames, and file extensions. 
 
-## `Constant width` 
+# `Constant width` 
 
 Used for program listings, as well as within paragraphs to refer to program elements such as variable or function names, databases, data types, environment variables, statements, and keywords. 
 
-## **`Constant width bold`** 
+# **`Constant width bold`** 
 
 Shows commands or other text that should be typed literally by the user. 
 
-## _`Constant width italic`_ 
+# _`Constant width italic`_ 
 
 Shows text that should be replaced with user-supplied values or by values determined by context. 
 
@@ -127,7 +127,7 @@ This element signifies a general note.
 
 This element indicates a warning or caution. 
 
-## **O’Reilly Online Learning** 
+# **O’Reilly Online Learning** 
 
 
 ![](../images/Event-Driven_Microservices-0016-17.png)
@@ -139,7 +139,7 @@ For more than 40 years, _O’Reilly Media_ has provided technology and business 
 
 Our unique network of experts and innovators share their knowledge and expertise through books, articles, and our online learning platform. O’Reilly’s online learning platform gives you on-demand access to live training courses, in-depth learning paths, interactive coding environments, and a vast collection of text and video from O’Reilly and 200+ other publishers. For more information, visit _http://oreilly.com_ . 
 
-## **How to Contact Us** 
+# **How to Contact Us** 
 
 Please address comments and questions concerning this book to the publisher: 
 
@@ -157,7 +157,7 @@ Follow us on Twitter: _http://twitter.com/oreillymedia_
 
 Watch us on YouTube: _http://youtube.com/oreillymedia_ 
 
-## **Acknowledgments** 
+# **Acknowledgments** 
 
 I’d like to express my respect and gratitude for the people at Confluent, who, along with inventing Apache Kafka, are some of the first people who particularly “get it” when it comes to event-driven architectures. I have been fortunate enough to have one of their members, Ben Stopford (lead technologist, Office of the CTO), provide ample and valuable feedback. Scott Morrison, CTO of PHEMI Systems, has also provided me with valuable insights, feedback, and recommendations. I offer my thanks and gratitude to both Scott and Ben for helping make this book what it is today. As primary proofreaders and technical experts, they have helped me refine ideas, challenged me to improve the content quality, prevented me from promoting incorrect information, and helped me tell the story of event-driven architectures. 
 

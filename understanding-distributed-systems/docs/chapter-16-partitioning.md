@@ -1,6 +1,6 @@
-## **Chapter 16** 
+# **Chapter 16** 
 
-## **Partitioning** 
+# **Partitioning** 
 
 When an application’s data keeps growing in size, its volume will eventually become large enough that it can’t fit on a single machine. To work around that, it needs to be split into partitions, or _shards_ , small enough to fit into individual nodes. As an additional benefit, the system’s capacity for handling requests increases as well, since the load of accessing the data is spread over more nodes. 
 
@@ -34,7 +34,7 @@ Now that we have an idea of what partitioning is and why it’s useful, let’s 
 
 157 partitions. 
 
-## **16.1 Range partitioning** 
+# **16.1 Range partitioning** 
 
 Range partitioning splits the data by key range into lexicographically sorted partitions, as shown in Figure 16.2. To make range scans fast, each partition is generally stored in sorted order on disk. 
 
@@ -57,7 +57,7 @@ One solution is to create a lot more partitions than necessary when the system i
 
 The alternative is to create partitions on demand, also referred to as _dynamic partitioning_ . The system starts with a single partition, and when it grows above a certain size or becomes too hot, the partition is split into two sub-partitions, each containing approximately half of the data, and one of the sub-partitions is transferred to a new node. Similarly, when two adjacent partitions become small or “cold” enough, they can be merged into a single one. 
 
-## **16.2 Hash partitioning** 
+# **16.2 Hash partitioning** 
 
 Let’s take a look at an alternative way of mapping data to partitions. The idea is to use a hash function that deterministically maps a key (string) to a seemingly random number (a hash) within a certain range (e.g., 0 and 2[64] −1). This guarantees that the keys’ hashes are distributed uniformly across the range. 
 

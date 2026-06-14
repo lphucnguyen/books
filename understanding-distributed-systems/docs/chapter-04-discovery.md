@@ -1,6 +1,6 @@
-## **Chapter 4** 
+# **Chapter 4** 
 
-## **Discovery** 
+# **Discovery** 
 
 So far, we have explored how to create a reliable and secure channel between two processes running on different machines. However, to create a new connection with a remote process, we must first discover its IP address somehow. The most common way of doing that is via the phone book of the internet: the _Domain Name System_[1] (DNS) — a distributed, hierarchical, and eventually consistent key-value store. 
 

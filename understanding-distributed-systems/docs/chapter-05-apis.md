@@ -1,6 +1,6 @@
-## **Chapter 5** 
+# **Chapter 5** 
 
-## **APIs** 
+# **APIs** 
 
 Now that we know how a client can discover the IP address of a server and create a reliable and secure communication link with it, we want the client to invoke operations offered by the server. To that end, the server uses an adapter — which defines its application programming interface (API) — to translate messages received from the communication link to interface calls implemented by its business logic (see Figure 1.2). 
 
@@ -33,7 +33,7 @@ A popular set of design principles for designing elegant and scalable HTTP APIs 
 
 Given the ubiquity of RESTful HTTP APIs, we will walk through the process of creating an HTTP API in the rest of the chapter. 
 
-## **5.1 HTTP** 
+# **5.1 HTTP** 
 
 _HTTP_[6] is a request-response protocol used to encode and transport information between a client and a server. In an _HTTP transaction_ , the client sends a _request message_ to the server’s API endpoint, and the server replies back with a _response message_ , as shown in Figure 5.1. 
 
@@ -71,7 +71,7 @@ HTTP 3[9] is the latest iteration of the HTTP standard, which is based on UDP an
 
 This book uses the HTTP 1.1 standard for illustration purposes since its plain text format is easier to display. Moreover, HTTP 1.1 is still widely used. 
 
-## **5.2 Resources** 
+# **5.2 Resources** 
 
 Suppose we would like to implement a service to manage the product catalog of an e-commerce application. The service must allow customers to browse the catalog and administrators to create, update, or delete products. Although that sounds simple, in order to expose this service via HTTP, we first need to understand how to model APIs with HTTP. 
 
@@ -113,7 +113,7 @@ Naming resources is only one part of the equation; we also have to serialize the
 
 } 
 
-## **5.3 Request methods** 
+# **5.3 Request methods** 
 
 HTTP requests can create, read, update, and delete (CRUD) resources using request _methods_ . When a client makes a request to a server for a particular resource, it specifies which method to use. You can think of a request method as the verb or action to use on a resource. 
 
@@ -145,7 +145,7 @@ Request methods can be categorized based on whether they are safe and whether th
 |DELETE|No|Yes|
 
 
-## **5.4 Response status codes** 
+# **5.4 Response status codes** 
 
 After the server has received a request, it needs to process it and send a response back to the client. The HTTP response contains a _status code_[12] to communicate to the client whether the request succeeded or not. Different status code ranges have different meanings. 
 
@@ -176,13 +176,13 @@ Status codes between 500 and 599 are reserved for server errors. A request that 
 
 - _503 (Service Unavailable)_ — The server is currently unable to handle the request due to a temporary overload or scheduled maintenance. 
 
-## **5.5 OpenAPI** 
+# **5.5 OpenAPI** 
 
 Now that we understand how to model an API with HTTP, we can write an adapter that handles HTTP requests by calling the business logic of the catalog service. For example, suppose the service is defined by the following interface: 
 
-## **interface** CatalogService 
+# **interface** CatalogService 
 
-## { 
+# { 
 
 List<Product> GetProducts(...); Product GetProduct(...); void AddProduct(...); void DeleteProduct(...); void UpdateProduct(...) 
 
@@ -210,7 +210,7 @@ For example, this is how part of the _/products_ endpoint of the catalog service
 
 Although this is a very simple example and we won’t go deeper into OpenAPI, it should give you an idea of its expressiveness. With this definition, we can then run a tool to generate the API’s documentation, boilerplate adapters, and client SDKs. 
 
-## **5.6 Evolution** 
+# **5.6 Evolution** 
 
 An API starts out as a well-designed interface[15] . Slowly but surely, it will have to change to adapt to new use cases. The last thing we want to do when evolving an API is to introduce a breaking change that requires all clients to be modified at once, some of which we might have no control over. 
 
@@ -225,7 +225,7 @@ Changing the schema of request or response messages in a backward-incompatible w
 
 REST APIs should be versioned to support breaking changes, e.g., by prefixing a version number in the URLs ( _/v1/products/_ ). However, as a general rule of thumb, APIs should evolve in a backward-compatible way unless there is a very good reason. Although backward-compatible APIs tend not to be particularly elegant, they are practical. 
 
-## **5.7 Idempotency** 
+# **5.7 Idempotency** 
 
 When an API request times out, the client has no idea whether the server actually received the request or not. For example, the server could have processed the request and crashed right before sending a response back to the client. 
 
@@ -249,7 +249,7 @@ Now here comes the tricky part. Suppose the server adds the request identifier t
 
 48 
 
-## 
+# 
 
 If the request identifiers and the resources managed by the server are stored in the same database, we can guarantee atomicity with ACID transactions[19] . In other words, we can wrap the product creation and request identifier log within the same database transaction in the POST handler. However, if the handler needs to make external calls to other services to handle the request, the implementation becomes a lot more challenging[20] , since it requires some form of coordination. Later, in chapter 13.2, we will learn how to do just that. 
 
@@ -277,7 +277,7 @@ How should the server deal with the request in step 3? From client’s A perspec
 To summarize, an idempotent API makes it a lot easier to implement clients that are robust to failures, since they can assume that requests can be retried on failure without worrying about all the possible edge cases. 
 
 
-## **Summary** 
+# **Summary** 
 
 Communicating over networks is what makes a system distributed. It’s all too easy to ignore the “leaking” complexity that goes into it, since modern programming languages and frameworks make it look like invoking a remote API is no different from calling a local function. I know I did at first and eventually learned this lesson after spending days investigating weird degradations that ultimately turned out to be caused by exhausted socket pools or routers dropping packets. 
 

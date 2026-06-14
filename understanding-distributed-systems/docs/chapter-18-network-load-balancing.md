@@ -1,6 +1,6 @@
-## **Chapter 18** 
+# **Chapter 18** 
 
-## **Network load balancing** 
+# **Network load balancing** 
 
 By offloading requests to the file store and the CDN, _Cruder_ is able to serve significantly more requests than before. But the free lunch is only going to last so long. Because there is a single application server, it will inevitably fall over if the number of requests directed at it keeps increasing. To avoid that, we can create multiple application servers, each running on a different machine, and have a _load balancer_ distribute requests to them. The thinking is that if one server has a certain capacity, then, in theory, two servers should have twice that capacity. This is an example of the more general scalability pattern we referred to as scaling out or scaling horizontally. 
 
@@ -17,7 +17,7 @@ The reason why a load balancer increases the theoretical availability is that in
 
 For example, if we have two servers behind a load balancer and each has an availability of 99%, then the application has a theoretical availability of 99.99%: 
 
-## 1 −(0.01 ⋅0.01) = 0.9999 
+# 1 −(0.01 ⋅0.01) = 0.9999 
 
 Intuitively, the nines of independent servers sum up.[2] Thus, in the previous example, we have two independent servers with two nines each, for a total of four nines of availability. Of course, this number is only theoretical because, in practice, the load balancer doesn’t remove faulty servers from the pool immediately. The formula also naively assumes that the failure rates are independent, which might not be the case. Case in point: when a faulty server is 
 
@@ -30,7 +30,7 @@ Intuitively, the nines of independent servers sum up.[2] Thus, in the previous e
 
 In the following sections, we will take a closer look at some of the core features offered by a load balancer. 
 
-## **Load balancing** 
+# **Load balancing** 
 
 The algorithms used for routing requests can vary from roundrobin to consistent hashing to ones that take into account the servers’ load. 
 
@@ -40,7 +40,7 @@ Using cached or otherwise delayed metrics to distribute requests to servers can 
 
 As it turns out, randomly distributing requests to servers without accounting for their load achieves a better load distribution. Does that mean that load balancing using delayed load metrics is not possible? There is a way, but it requires combining load metrics with the power of randomness. The idea is to randomly pick two servers from the pool and route the request to the least-loaded one of the two. This approach works remarkably well in practice[3] . 
 
-## **Service discovery** 
+# **Service discovery** 
 
 > 3“The power of two random choices,” https://brooker.co.za/blog/2012/01/1 7/two-random.html 
 
@@ -53,7 +53,7 @@ A more flexible solution is to have a fault-tolerant coordination service, like,
 
 Adding and removing servers dynamically from the load balancer’s pool is a key functionality cloud providers use to implement autoscaling[4] , i.e., the ability to spin up and tear down servers based on load. 
 
-## **Health checks** 
+# **Health checks** 
 
 A load balancer uses health checks to detect when a server can no longer serve requests and needs to be temporarily removed from the pool. There are fundamentally two categories of health checks: passive and active. 
 
@@ -85,7 +85,7 @@ To implement this behavior, a server could have a separate background thread —
 
 Of course, the watchdog’s implementation needs to be well-tested and monitored since a bug could cause servers to restart continuously. That said, I find it uncanny how this simple pattern can make an application a lot more robust to gray failures. 
 
-## **18.1 DNS load balancing** 
+# **18.1 DNS load balancing** 
 
 Now that we are familiar with the job description of a load balancer, let’s take a closer look at how it can be implemented. While you won’t have to build your own load balancer given the abundance of off-the-shelf solutions available, it’s important to have a basic knowledge of how a load balancer works. Because every request needs to go through it, it contributes to your applications’ performance and availability. 
 
@@ -106,7 +106,7 @@ Figure 18.1: DNS load balancing time to propagate to the clients, since DNS entr
 
 The one use case where DNS is used in practice to load-balance is for distributing traffic to different data centers located in different regions ( _global DNS load balancing_ ). We have already encountered a use for this when discussing CDNs. 
 
-## **18.2 Transport layer load balancing** 
+# **18.2 Transport layer load balancing** 
 
 A more flexible load-balancing solution can be implemented with a load balancer that operates at the TCP level of the network stack (aka L4 load balancer[7] ) through which all the traffic between 
 
@@ -155,7 +155,7 @@ Since _Cruder_ is hosted in the cloud, we can leverage one of the
 
 Although load balancing connections at the TCP level is very fast, the drawback is that the load balancer is just shuffling bytes around without knowing what they actually mean. Therefore, L4 load balancers generally don’t support features that require higher-level network protocols, like terminating TLS connections. A load balancer that operates at a higher level of the network stack is required to support these advanced use cases. 
 
-## **18.3 Application layer load balancing** 
+# **18.3 Application layer load balancing** 
 
 An application layer load balancer (aka L7 load balancer[15] ) is an HTTP reverse proxy that distributes requests over a pool of servers. The load balancer receives an HTTP request from a client, inspects it, and sends it to a backend server. 
 

@@ -1,6 +1,6 @@
-## **Chapter 29** 
+# **Chapter 29** 
 
-## **Testing** 
+# **Testing** 
 
 The longer it takes to detect a bug, the more expensive it becomes to fix. A software test can verify that some part of the application works as intended, catching bugs early in the process. But the real benefit that comes from testing shows up only later when developers want to make changes to the existing implementation (e.g., bug fixes, refactorings, and new features) without breaking the expected behaviors. Tests also act as always up-to-date documentation and improve the quality of public interfaces since developers have to put themselves in the users’ shoes to test them effectively. 
 
@@ -13,7 +13,7 @@ Although tests can’t guarantee that code is bug-free, they certainly do a good
 
 280 if you want to be confident that your implementation behaves in a certain way, you have to add a test for it. 
 
-## **29.1 Scope** 
+# **29.1 Scope** 
 
 Tests come in different shapes and sizes. To begin with, we need to distinguish between the code paths a test is actually testing (aka system under test or SUT) from the ones that are being run. The SUT represents the scope of the test. It determines whether the test is categorized as a unit test, an integration test, or an end-to-end test. 
 
@@ -42,7 +42,7 @@ One way to minimize the number of end-to-end tests is to frame them as user jour
 
 As the scope of a test increases, it becomes more brittle, slow, and costly. Intermittently failing tests are nearly as bad as no tests at all, as developers stop trusting them and eventually ignore their failures. When possible, it’s preferable to have tests with smaller scope as they tend to be more reliable, faster, and cheaper. A good trade-off is to have a large number of unit tests, a smaller fraction of integration tests, and even fewer end-to-end tests (see Figure 29.1). 
 
-## **29.2 Size** 
+# **29.2 Size** 
 
 The size of a test[4] reflects how much computing resources it needs to run, like the number of nodes. Generally, that depends on how realistic the environment is where the test runs. Although 
 
@@ -78,7 +78,7 @@ The problem with test doubles is that they don’t resemble how the real impleme
 
 For integration tests, a good compromise is to combine mocking with contract tests[5] . A _contract test_ defines a request for an external dependency with the corresponding expected response. Then the test uses this contract to mock the dependency. For example, a contract for a REST API consists of an HTTP request and response. To ensure that the contract is valid and doesn’t break in the future, the test suite of the external dependency uses the same contract definition to simulate the client request and ensure that the expected response is returned. 
 
-## **29.3 Practical considerations** 
+# **29.3 Practical considerations** 
 
 As with everything else, testing requires making trade-offs. Suppose we want to end-to-end test the behavior of a specific API endpoint exposed by a service. The service talks to: 
 
@@ -108,7 +108,7 @@ Here is a more nuanced example in which it’s a lot riskier to go for a smaller
 
 285 expected. This warrants the use of an end-to-end test that runs in production periodically and uses live services rather than test doubles. 
 
-## **29.4** 
+# **29.4** 
 
 Software tests are not the only way to catch bugs early. Taking the time to write a high-level description of how a system behaves, i.e., a _specification_ , allows subtle bugs and architecture shortcomings to be detected before writing a single line of code. 
 

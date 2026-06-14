@@ -1,6 +1,6 @@
-## **Chapter 21** 
+# **Chapter 21** 
 
-## **Microservices** 
+# **Microservices** 
 
 If _Cruder_ is successful in the market, we can safely assume that we will continue to add more components to it to satisfy an evergrowing list of business requirements, as shown in Figure 21.1. 
 
@@ -31,11 +31,11 @@ Each team is also free in principle to adopt the tech stack and hardware that fi
 
 This architectural style is also referred to as the _microservice architecture_ . The term _micro_ is misleading, though — there doesn’t have to be anything micro about services.[2] If a service doesn’t do much, it only adds operational overhead and complexity. As a rule of thumb, APIs should have a small surface area and encapsulate a significant amount of functionality.[3] 
 
-## **21.1 Caveats** 
+# **21.1 Caveats** 
 
 To recap, splitting an application into services adds a great deal of complexity to the overall system, which is only worth paying if it can be amortized across many development teams. Let’s take a closer look at why that is. 
 
-## **Tech stack** 
+# **Tech stack** 
 
 While nothing forbids each microservice to use a different tech stack, doing so makes it more difficult for a developer to move 
 
@@ -50,34 +50,34 @@ While nothing forbids each microservice to use a different tech stack, doing so 
 
 It’s only reasonable, then, to enforce a certain degree of standardization. One way to do that, while still allowing some degree of freedom, is to loosely encourage specific technologies by providing a great development experience for the teams that stick with the recommended portfolio of languages and technologies. 
 
-## **Communication** 
+# **Communication** 
 
 Remote calls are expensive and introduce non-determinism. Much of what is described in this book is about dealing with the complexity of distributed processes communicating over the network. That said, a monolith doesn’t live in isolation either, since it serves external requests and likely depends on third-party APIs as well, so these issues need to be tackled there as well, albeit on a smaller scale. 
 
-## **Coupling** 
+# **Coupling** 
 
 Microservices should be loosely coupled so that a change in one service doesn’t require changing others. When that’s not the case, you can end up with a dreaded distributed monolith, which has all the downsides of a monolith while being an order of magnitude more complex due to its distributed nature. 
 
 There are many causes of tight coupling, like fragile APIs that require clients to be updated whenever they change, shared libraries that have to be updated in lockstep across multiple services, or the use of static IP addresses to reference external services. 
 
-## **Resource provisioning** 
+# **Resource provisioning** 
 
 To support a large number of independent services, it should be simple to provision new machines, data stores, and other commodity resources — you don’t want every team to come up with their own way of doing it. And, once these resources have been provisioned, they have to be configured. To pull this off efficiently, a 
 
 
 201 fair amount of automation is needed. 
 
-## **Testing** 
+# **Testing** 
 
 While testing individual microservices is not necessarily more challenging than testing a monolith, testing the integration of microservices is a lot harder. This is because very subtle and unexpected behaviors will emerge only when services interact with each other at scale in production. 
 
-## **Operations** 
+# **Operations** 
 
 Just like with resource provisioning, there should be a common way of continuously delivering and deploying new builds safely to production so that each team doesn’t have to reinvent the wheel. 
 
 Additionally, debugging failures, performance degradations, and bugs is a lot more challenging with microservices, as you can’t just load the whole application onto your local machine and step through it with a debugger. This is why having a good observability platform becomes crucial. 
 
-## **Eventual consistency** 
+# **Eventual consistency** 
 
 As a side effect of splitting an application into separate services, the data model no longer resides in a single data store. However, as we have learned in previous chapters, atomically updating data spread in different data stores, and guaranteeing strong consistency, is slow, expensive, and hard to get right. Hence, this type of architecture usually requires embracing eventual consistency. 
 
@@ -88,7 +88,7 @@ So to summarize, it’s generally best to start with a monolith and decompose it
 
 202 
 
-## **21.2 API gateway** 
+# **21.2 API gateway** 
 
 After decomposing _Cruder_ into a group of services, we need to rethink how the outside world communicates with the application. For example, a client might need to perform multiple requests to different services to fetch all the information it needs to complete a specific operation. This can be expensive on mobile devices, where every network request consumes precious battery life. 
 
@@ -96,15 +96,15 @@ Moreover, clients need to be aware of implementation details, such as the DNS na
 
 As is common in computer science, we can solve almost any problem by adding a layer of indirection. We can hide the internal APIs behind a public one that acts as a facade, or proxy, for the internal services (see Figure 21.3). The service that exposes this public API is called the _API gateway_ (a reverse proxy). 
 
-## **21.2.1 Core responsibilities** 
+# **21.2.1 Core responsibilities** 
 
 Let’s have a look at some of the most common responsibilities of an API gateway. 
 
-## **Routing** 
+# **Routing** 
 
 The most obvious function of an API gateway is routing inbound requests to internal services. One way to implement that is with the help of a routing map, which defines how the public API maps to the internal APIs. This mapping allows internal APIs to change without breaking external clients. For example, suppose there is a 1:1 mapping between a specific public endpoint and an internal one — if in the future the internal endpoint changes, the external clients can continue to use the public endpoint as if nothing had changed. 
 
-## **Composition** 
+# **Composition** 
 
 
 203 
@@ -122,7 +122,7 @@ Composing APIs is not simple. The availability of the composed API decreases as 
 
 204 somehow. 
 
-## **Translation** 
+# **Translation** 
 
 The API gateway can translate from one IPC mechanism to another. For example, it can translate a RESTful HTTP request into an internal gRPC call. 
 
@@ -132,7 +132,7 @@ To meet these different and competing requirements, the gateway can provide diff
 
 This approach reduces the development time as there is no need to introduce different APIs for different use cases, and clients are free to specify what they need. There is still an API, though; it just happens that it’s described with a graph schema, and the gateway allows to perform restricted queries on it. GraphQL[5] is the most popular technology in this space at the time of writing. 
 
-## **21.2.2 Cross-cutting concerns** 
+# **21.2.2 Cross-cutting concerns** 
 
 As the API gateway is a reverse proxy, it can also implement crosscutting functionality that otherwise would have to be part of each service. For example, it can cache frequently accessed resources or rate-limit requests to protect the internal services from being overwhelmed. 
 
@@ -162,7 +162,7 @@ Another common mechanism for authentication is the use of API keys. An _API key_
 
 We have barely scratched the surface of the topic, and there are entire books[7] written on the subject that you can read to learn more about it. 
 
-## **21.2.3 Caveats** 
+# **21.2.3 Caveats** 
 
 One of the drawbacks of using an API gateway is that it can become a development bottleneck. Since it’s tightly coupled with the APIs of the internal services it’s shielding, whenever an internal 
 

@@ -1,10 +1,10 @@
-## **Chapter 28** 
+# **Chapter 28** 
 
-## **Upstream resiliency** 
+# **Upstream resiliency** 
 
 The previous chapter discussed patterns that protect services against downstream failures, like failures to reach an external dependency. In this chapter, we will shift gears and discuss mechanisms to protect against upstream pressure.[1] 
 
-## **28.1 Load shedding** 
+# **28.1 Load shedding** 
 
 A server has very little control over how many requests it receives at any given time. The operating system has a connection queue per port with a limited capacity that, when reached, causes new connection attempts to be rejected immediately. But typically, under extreme load, the server crawls to a halt before that limit is reached as it runs out of resources like memory, threads, sockets, or files. This causes the response time to increase until eventually, the server becomes unavailable to the outside world. 
 
@@ -21,7 +21,7 @@ When the server detects that it’s overloaded, it can reject incoming requests 
 
 Unfortunately, rejecting a request doesn’t completely shield the server from the cost of handling it. Depending on how the rejection is implemented, the server might still have to pay the price of opening a TLS connection and reading the request just to reject it. Hence, load shedding can only help so much, and if load keeps increasing, the cost of rejecting requests will eventually take over and degrade the server. 
 
-## **28.2 Load leveling** 
+# **28.2 Load leveling** 
 
 There is an alternative to load shedding, which can be exploited when clients don’t expect a prompt response. The idea is to introduce a messaging channel between the clients and the service. The channel decouples the load directed to the service from its capacity, allowing it to process requests at its own pace. 
 
@@ -38,7 +38,7 @@ Load-shedding and load leveling don’t address an increase in load
 
 Figure 28.1: The channel smooths out the load for the consuming service. directly but rather protect a service from getting overloaded. To handle more load, the service needs to be scaled out. This is why these protection mechanisms are typically combined with autoscaling[3] , which detects that the service is running hot and automatically increases its scale to handle the additional load. 
 
-## **28.3 Rate-limiting** 
+# **28.3 Rate-limiting** 
 
 Rate-limiting, or throttling, is a mechanism that rejects a request when a specific quota is exceeded. A service can have multiple quotas, e.g., for the number of requests or bytes received within a time interval. Quotas are typically applied to specific users, API keys, or IP addresses. 
 
@@ -64,7 +64,7 @@ Although rate-limiting has some similarities with load shedding, they are differ
 
 265 the global state of the system, like the total number of requests concurrently processed for a specific API key across all service instances. And because there is a global state involved, some form of coordination is required. 
 
-## **28.3.1 Single-process implementation** 
+# **28.3.1 Single-process implementation** 
 
 The distributed implementation of rate-limiting is interesting in its own right, and it’s well worth spending some time discussing it. We will start with a single-process implementation first and then extend it to a distributed one. 
 
@@ -110,7 +110,7 @@ We only have to store as many buckets as the sliding window can overlap with at 
 
 To summarize, this approach requires two counters per API key, which is much more efficient in terms of memory than the naive implementation storing a list of requests per API key. 
 
-## **28.3.2 Distributed implementation** 
+# **28.3.2 Distributed implementation** 
 
 When more than one process accepts requests, the local state is no longer good enough, as the quota needs to be enforced on the total 
 
@@ -133,7 +133,7 @@ What happens if the data store is down? Remember the CAP theorem’s essence: wh
 
 Figure 28.5: Servers batch bucket updates in memory for some time, and flush them asynchronously to the data store at the end of it. quests based on the last state read from the store.[4] 
 
-## **28.4 Constant work** 
+# **28.4 Constant work** 
 
 When overload, configuration changes, or faults force an application to behave differently from usual, we say the application has a multi-modal behavior. Some of these _modes_ might trigger rare bugs, conflict with mechanisms that assume the happy path, and more generally make life harder for operators, since their mental model of how the application behaves is no longer valid. Thus, as a general rule of thumb, we should strive to minimize the number of modes. 
 
@@ -144,7 +144,7 @@ For example, simple key-value stores are favored over relational databases in da
 
 270 
 
-## there won’t be any surprises. 
+# there won’t be any surprises. 
 
 A common reason for a system to change behavior is overload, which can cause the system to become slower and degrade at the worst possible time. Ideally, the worst- and average-case behavior shouldn’t differ. One way to achieve that is by exploiting the _constant work pattern_ , which keeps the work per unit time constant. 
 
@@ -170,7 +170,7 @@ Another advantage of this approach is that it’s robust against a whole variety
 To sum up, performing constant work is more expensive than doing just the necessary work. Still, it’s often worth considering it, given the increase in reliability and reduction in complexity it enables. 
 
 
-## **Summary** 
+# **Summary** 
 
 As the number of components or operations in a system increases, so does the number of failures, and eventually, anything that can happen will happen. In my team, we humorously refer to this as “cruel math.” 
 

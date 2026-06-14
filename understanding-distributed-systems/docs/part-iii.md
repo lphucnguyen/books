@@ -1,9 +1,9 @@
-## **Part III** 
+# **Part III** 
 
 **Scalability** 
 
 
-## **Introduction** 
+# **Introduction** 
 
 _“Treat servers like cattle, not pets.”_ 
 

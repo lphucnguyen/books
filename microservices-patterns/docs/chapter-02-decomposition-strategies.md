@@ -1,6 +1,6 @@
-## _Decom osition strate ies p g_ 
+# _Decom osition strate ies p g_ 
 
-## _This chapter covers_ 
+# _This chapter covers_ 
 
 - Understanding software architecture and why it’s important 
 
@@ -17,7 +17,7 @@ In this chapter, you’ll learn how to define a microservice architecture for an
 
 I begin this chapter by defining the microservice architecture in terms of software architecture concepts. After that, I describe a process for defining a microservice architecture for an application starting from its requirements. I discuss strategies for decomposing an application into a collection of services, obstacles to it, and how to overcome them. Let’s start by examining the concept of software architecture. 
 
-## _2.1 What is the microservice architecture exactly?_ 
+# _2.1 What is the microservice architecture exactly?_ 
 
 Chapter 1 describes how the key idea of the microservice architecture is functional decomposition. Instead of developing one large application, you structure the application as a set of services. On one hand, describing the microservice architecture as a kind of functional decomposition is useful. But on the other hand, it leaves several questions unanswered, including how does the microservice architecture relate to the broader concepts of software architecture? What’s a service? And how important is the size of a service? 
 
@@ -25,7 +25,7 @@ In order to answer those questions, we need to take a step back and look at what
 
 I begin this section by describing the concept of _software architecture_ and why it’s important. Next, I discuss the idea of an architectural style. Then I define the microservice architecture as a particular architectural style. Let’s start by looking at the concept of software architecture. 
 
-## _2.1.1 What is software architecture and why does it matter?_ 
+# _2.1.1 What is software architecture and why does it matter?_ 
 
 Architecture is clearly important. There are at least two conferences dedicated to the topic: O’Reilly Software Architecture Conference (https://conferences.oreilly.com/ software-architecture) and the SATURN conference (https://resources.sei.cmu.edu/ news-events/events/saturn/). Many developers have the goal of becoming an architect. But what is architecture and why does it matter? 
 
@@ -35,7 +35,7 @@ _**What is the microservice architecture exactly?**_
 
 To answer that question, I first define what is meant by the term _software architecture_ . After that, I discuss how an application’s architecture is multidimensional and is best described using a collection of views or blueprints. I then describe that software architecture matters because of its impact on the application’s software quality attributes. 
 
-## A DEFINITION OF SOFTWARE ARCHITECTURE 
+# A DEFINITION OF SOFTWARE ARCHITECTURE 
 
 There are numerous definitions of software architecture. For example, see https:// en.wikiquote.org/wiki/Software_architecture to read some of them. My favorite definition comes from Len Bass and colleagues at the Software Engineering Institute (www.sei.cmu.edu), who played a key role in establishing software architecture as a discipline. They define software architecture as follows: 
 
@@ -51,7 +51,7 @@ That’s obviously a quite abstract definition. But its essence is that an appli
 
 It’s the decomposition into parts and the relationships between those parts that determine the application’s _-ilities_ . 
 
-## THE 4+1 VIEW MODEL OF SOFTWARE ARCHITECTURE 
+# THE 4+1 VIEW MODEL OF SOFTWARE ARCHITECTURE 
 
 More concretely, an application’s architecture can be viewed from multiple perspectives, in the same way that a building’s architecture can be viewed from structural, plumbing, electrical, and other perspectives. Phillip Krutchen wrote a classic paper describing the 4+1 view model of software architecture, “Architectural Blueprints— The ‘4+1’ View Model of Software Architecture” (www.cs.ubc.ca/~gregor/teaching/ papers/4+1view-architecture.pdf). The 4+1 model, shown in Figure 2.1, defines four different views of a software architecture. Each describes a particular aspect of the architecture and consists of a particular set of software elements and relationships between them. 
 
@@ -83,13 +83,13 @@ The 4+1 view model is an excellent way to describe an applications’s architect
 _**What is the microservice architecture exactly?**_
 illustrate how the elements of a view collaborate. Let’s now look at why architecture is important. 
 
-## WHY ARCHITECTURE MATTERS 
+# WHY ARCHITECTURE MATTERS 
 
 An application has two categories of requirements. The first category includes the _functional_ requirements, which define what the application must do. They’re usually in the form of use cases or user stories. Architecture has very little to do with the functional requirements. You can implement functional requirements with almost any architecture, even a big ball of mud. 
 
 Architecture is important because it enables an application to satisfy the second category of requirements: its _quality of service_ requirements. These are also known as _quality attributes_ and are the so-called _-ilities_ . The quality of service requirements define the runtime qualities such as scalability and reliability. They also define development time qualities including maintainability, testability, and deployability. The architecture you choose for your application determines how well it meets these quality requirements. 
 
-## _2.1.2 Overview of architectural styles_ 
+# _2.1.2 Overview of architectural styles_ 
 
 In the physical world, a building’s architecture often follows a particular style, such as Victorian, American Craftsman, or Art Deco. Each style is a package of design decisions that constrains a building’s features and building materials. The concept of architectural style also applies to software. David Garlan and Mary Shaw (An Introduction to Software Architecture, January 1994, https://www.cs.cmu.edu/afs/cs/project/ able/ftp/intro_softarch/intro_softarch.pdf), pioneers in the discipline of software architecture, define an architectural style as follows: 
 
@@ -97,7 +97,7 @@ _An architectural style, then, defines a family of such systems in terms of a pa
 
 A particular architectural style provides a limited palette of elements (components) and relations (connectors) from which you can define a view of your application’s architecture. An application typically uses a combination of architectural styles. For example, later in this section I describe how the monolithic architecture is an architectural style that structures the implementation view as a single (executable/deployable) component. The microservice architecture structures an application as a set of loosely coupled services. 
 
-## THE LAYERED ARCHITECTURAL STYLE 
+# THE LAYERED ARCHITECTURAL STYLE 
 
 The classic example of an architectural style is the layered architecture. A _layered architecture_ organizes software elements into layers. Each layer has a well-defined set of responsibilities. A layered architecture also constraints the dependencies between the layers. A layer can only depend on either the layer immediately below it (if strict layering) or any of the layers below it. 
 
@@ -122,7 +122,7 @@ Also, the layered architecture misrepresents the dependencies in a well-designed
 
 Let’s look at an alternative architecture that overcomes these drawbacks: the hexagonal architecture. 
 
-## ABOUT THE HEXAGONAL ARCHITECTURE STYLE 
+# ABOUT THE HEXAGONAL ARCHITECTURE STYLE 
 
 _Hexagonal architecture_ is an alternative to the layered architectural style. As figure 2.2 shows, the hexagonal architecture style organizes the logical view in a way that places the business logic at the center. Instead of the presentation layer, the application has one or more _inbound adapters_ that handle requests from the outside by invoking the business logic. Similarly, instead of a data persistence tier, the application has one or more _outbound adapters_ that are invoked by the business logic and invoke external applications. A key characteristic and benefit of this architecture is that the business logic doesn’t depend on the adapters. Instead, they depend upon it. 
 
@@ -156,13 +156,13 @@ The layered and hexagonal architectures are both examples of architectural style
 
 I’ve discussed the 4+1 view model and architectural styles, so I can now define monolithic and microservice architecture. They’re both architectural styles. Monolithic architecture is an architectural style that structures the implementation view as a single component: a single executable or WAR file. This definition says nothing about the other views. A monolithic application can, for example, have a logical view that’s organized along the lines of a hexagonal architecture. 
 
-## Pattern: Monolithic architecture 
+# Pattern: Monolithic architecture 
 
 Structure the application as a single executable/deployable component. See http:// microservices.io/patterns/ monolithic.html. 
 
 The microservice architecture is also an architectural style. It structures the implementation view as a set of multiple components: executables or WAR files. The components are services, and the connectors are the communication protocols that enable those services to collaborate. Each service has its own logical view architecture, which is typically a hexagonal architecture. Figure 2.3 shows a possible microservice architecture for the FTGO application. The services in this architecture correspond to business capabilities, such as Order management and Restaurant management. 
 
-## Pattern: Microservice architecture 
+# Pattern: Microservice architecture 
 
 Structure the application as a collection of loosely coupled, independently deployable services. See http://microservices.io/patterns/microservices.html. 
 
@@ -183,7 +183,7 @@ Figure 2.3 A possible microservice architecture for the FTGO application. It con
 
 A key constraint imposed by the microservice architecture is that the services are loosely coupled. Consequently, there are restrictions on how the services collaborate. In order to explain those restrictions, I’ll attempt to define the term _service_ , describe what it means to be loosely coupled, and tell you why this matters. 
 
-## WHAT IS A SERVICE? 
+# WHAT IS A SERVICE? 
 
 A _service_ is a standalone, independently deployable software component that implements some useful functionality. Figure 2.4 shows the external view of a service, which in this example is the Order Service. A service has an API that provides its clients access to its functionality. There are two types of operations: commands and queries. The API consists of commands, queries, and events. A command, such as createOrder(), performs actions and updates data. A query, such as findOrderById(), retrieves data. A service also publishes events, such as OrderCreated, which are consumed by its clients. 
 
@@ -206,7 +206,7 @@ Figure 2.4 A service has an API that encapsulates the implementation. The API de
 
 Later in chapter 12, when I discuss deployment technologies, you’ll see that the implementation view of a service can take many forms. The component might be a standalone process, a web application or OSGI bundle running in a container, or a serverless cloud function. An essential requirement, however, is that a service has an API and is independently deployable. 
 
-## WHAT IS LOOSE COUPLING? 
+# WHAT IS LOOSE COUPLING? 
 
 An important characteristic of the microservice architecture is that the services are loosely coupled (https://en.wikipedia.org/wiki/Loose_coupling). All interaction with a service happens via its API, which encapsulates its implementation details. This enables the implementation of the service to change without impacting its clients. Loosely coupled services are key to improving an application’s development time attributes, including its maintainability and testability. They are much easier to understand, change, and test. 
 
@@ -218,7 +218,7 @@ _**What is the microservice architecture exactly?**_
 
 spend time coordinating with developers working on other services. Not sharing database tables also improves runtime isolation. It ensures, for example, that one service can’t hold database locks that block another service. Later on, though, you’ll learn that one downside of not sharing databases is that maintaining data consistency and querying across services are more complex. 
 
-## THE ROLE OF SHARED LIBRARIES 
+# THE ROLE OF SHARED LIBRARIES 
 
 Developers often package functionality in a library (module) so that it can be reused by multiple applications without duplicating code. After all, where would we be today without Maven or npm repositories? You might be tempted to also use shared libraries in microservice architecture. On the surface, it looks like a good way to reduce code duplication in your services. But you need to ensure that you don’t accidentally introduce coupling between your services. 
 
@@ -226,7 +226,7 @@ Imagine, for example, that multiple services need to update the Order business o
 
 You should strive to use libraries for functionality that’s unlikely to change. For example, in a typical application it makes no sense for every service to implement a generic Money class. Instead, you should create a library that’s used by the services. 
 
-## THE SIZE OF A SERVICE IS MOSTLY UNIMPORTANT 
+# THE SIZE OF A SERVICE IS MOSTLY UNIMPORTANT 
 
 One problem with the term _microservice_ is that the first thing you hear is _micro_ . This suggests that a service should be very small. This is also true of other size-based terms such as miniservice or nanoservice. In reality, size isn’t a useful metric. 
 
@@ -235,7 +235,7 @@ A much better goal is to define a well-designed service to be a service capable 
 The microservice architecture structures an application as a set of small, loosely coupled services. As a result, it improves the development time attributes—maintainability, testability, deployability, and so on—and enables an organization to develop better software faster. It also improves an application’s scalability, although that’s not the main goal. To develop a microservice architecture for your application, you need to identify the services and determine how they collaborate. Let’s look at how to do that. 
 
 
-## _2.2 Defining an application’s microservice architecture_ 
+# _2.2 Defining an application’s microservice architecture_ 
 
 How should we define a microservice architecture? As with any software development effort, the starting points are the written requirements, hopefully domain experts, and perhaps an existing application. Like much of software development, defining an architecture is more art than science. This section describes a simple, three-step process, shown in figure 2.5, for defining an application’s architecture. It’s important to remember, though, that it’s not a process you can follow mechanically. It’s likely to be iterative and involve a lot of creativity. 
 
@@ -279,7 +279,7 @@ There are several obstacles to decomposition. The first is network latency. You 
 
 This section first describes how to identity an application’s operations. After that, we’ll look at strategies and guidelines for decomposing an application into services, and at obstacles to decomposition and how to address them. Finally, I’ll describe how to define each service’s API. 
 
-## _2.2.1 Identifying the system operations_ 
+# _2.2.1 Identifying the system operations_ 
 
 The first step in defining an application’s architecture is to define the system operations. The starting point is the application’s requirements, including user stories and their associated user scenarios (note that these are different from the architectural scenarios). The system operations are identified and defined using the two-step process shown in figure 2.6. This process is inspired by the object-oriented design process covered in Craig Larman’s book _Applying UML and Patterns_ (Prentice Hall, 2004) (see www.craiglarman.com/wiki/index.php?title=Book_Applying_UML_and_Patterns for details). The first step creates the high-level domain model consisting of the key classes 
 
@@ -303,7 +303,7 @@ The domain model is derived primarily from the nouns of the user stories, and th
 
 Let’s look at how to define a high-level domain model. After that I’ll define the system operations in terms of the domain model. 
 
-## CREATING A HIGH-LEVEL DOMAIN MODEL 
+# CREATING A HIGH-LEVEL DOMAIN MODEL 
 
 The first step in the process of defining the system operations is to sketch a highlevel domain model for the application. Note that this domain model is much simpler than what will ultimately be implemented. The application won’t even have a single domain model because, as you’ll soon learn, each service has its own domain model. Despite being a drastic simplification, a high-level domain model is useful at this stage because it defines the vocabulary for describing the behavior of the system operations. 
 
@@ -372,7 +372,7 @@ The responsibilities of each class are as follows:
 
 A class diagram such as the one in figure 2.7 illustrates one aspect of an application’s architecture. But it isn’t much more than a pretty picture without the scenarios to animate it. The next step is to define the system operations, which correspond to architectural scenarios. 
 
-## DEFINING SYSTEM OPERATIONS 
+# DEFINING SYSTEM OPERATIONS 
 
 Once you’ve defined a high-level domain model, the next step is to identify the requests that the application must handle. The details of the UI are beyond the scope of this book, but you can imagine that in each user scenario, the UI will make requests to the backend business logic to retrieve and update data. FTGO is primarily a web application, which means that most requests are HTTP-based, but it’s possible that some clients might use messaging. Instead of committing to a specific protocol, therefore, it makes sense to use the more abstract notion of a system operation to represent requests. 
 
@@ -453,19 +453,19 @@ Let’s look at the first strategy, which defines services corresponding to busi
 _**Defining an application’s microservice architecture**_ 
 
 
-## _2.2.2 Defining services by applying the Decompose by business capability pattern_ 
+# _2.2.2 Defining services by applying the Decompose by business capability pattern_ 
 
 One strategy for creating a microservice architecture is to decompose by business capability. A concept from business architecture modeling, a _business capability_ is something that a business does in order to generate value. The set of capabilities for a given business depends on the kind of business. For example, the capabilities of an insurance company typically include Underwriting, Claims management, Billing, Compliance, and so on. The capabilities of an online store include Order management, Inventory management, Shipping, and so on. 
 
-## Pattern: Decompose by business capability 
+# Pattern: Decompose by business capability 
 
 Define services corresponding to business capabilities. See http://microservices.io/ patterns/decomposition/decompose-by-business-capability.html. 
 
-## BUSINESS CAPABILITIES DEFINE WHAT AN ORGANIZATION DOES 
+# BUSINESS CAPABILITIES DEFINE WHAT AN ORGANIZATION DOES 
 
 An organization’s business capabilities capture _what_ an organization’s business is. They’re generally stable, as opposed to _how_ an organization conducts its business, which changes over time, sometimes dramatically. That’s especially true today, with the rapidly growing use of technology to automate many business processes. For example, it wasn’t that long ago that you deposited checks at your bank by handing them to a teller. It then became possible to deposit checks using an ATM. Today you can conveniently deposit most checks using your smartphone. As you can see, the Deposit check business capability has remained stable, but the manner in which it’s done has drastically changed. 
 
-## IDENTIFYING BUSINESS CAPABILITIES 
+# IDENTIFYING BUSINESS CAPABILITIES 
 
 An organization’s business capabilities are identified by analyzing the organization’s purpose, structure, and business processes. Each business capability can be thought of as a service, except it’s business-oriented rather than technical. Its specification consists of various components, including inputs, outputs, and service-level agreements. For example, the input to an Insurance underwriting capability is the consumer’s application, and the outputs include approval and price. 
 
@@ -510,7 +510,7 @@ On interesting aspect of this capability hierarchy is that there are three resta
 
 Next we’ll look at how to use business capabilities to define services. 
 
-## FROM BUSINESS CAPABILITIES TO SERVICES 
+# FROM BUSINESS CAPABILITIES TO SERVICES 
 
 Once you’ve identified the business capabilities, you then define a service for each capability or group of related capabilities. Figure 2.8 shows the mapping from capabilities to services for the FTGO application. Some top-level capabilities, such as the Accounting capability, are mapped to services. In other cases, sub-capabilities are mapped to services. 
 
@@ -549,11 +549,11 @@ point where it becomes worthwhile to split it into multiple services. What’s m
 
 Let’s take a look at another way to decompose an application that is based on domain-driven design. 
 
-## _2.2.3 Defining services by applying the Decompose by sub-domain pattern_ 
+# _2.2.3 Defining services by applying the Decompose by sub-domain pattern_ 
 
 DDD, as described in the excellent book Domain-driven design by Eric Evans (Addison-Wesley Professional, 2003), is an approach for building complex software applications that is centered on the development of an object-oriented domain model. A _domain mode_ captures knowledge about a domain in a form that can be used to solve problems within that domain. It defines the vocabulary used by the team, what DDD calls the _Ubiquitous Language_ . The domain model is closely mirrored in the design and implementation of the application. DDD has two concepts that are incredibly useful when applying the microservice architecture: subdomains and bounded contexts. 
 
-## Pattern: Decompose by subdomain 
+# Pattern: Decompose by subdomain 
 
 Define services corresponding to DDD subdomains. See http://microservices.io /patterns/decomposition/decompose-by-subdomain.html. 
 
@@ -582,29 +582,29 @@ DDD and the microservice architecture are in almost perfect alignment. The DDD c
 Decompose by subdomain and Decompose by business capability are the two main patterns for defining an application’s microservice architecture. There are, however, some useful guidelines for decomposition that have their roots in object-oriented design. Let’s take a look at them. 
 
 
-## _2.2.4 Decomposition guidelines_ 
+# _2.2.4 Decomposition guidelines_ 
 
 So far in this chapter, we’ve looked at the main ways to define a microservice architecture. We can also adapt and use a couple of principles from object-oriented design when applying the microservice architecture pattern. These principles were created by Robert C. Martin and described in his classic book _Designing Object Oriented C++ Applications Using The Booch Method_ (Prentice Hall, 1995). The first principle is the Single Responsibility Principle (SRP), for defining the responsibilities of a class. The second principle is the Common Closure Principle (CCP), for organizing classes into packages. Let’s take a look at these principles and see how they can be applied to the microservice architecture. 
 
-## SINGLE RESPONSIBILITY PRINCIPLE 
+# SINGLE RESPONSIBILITY PRINCIPLE 
 
 One of the main goals of software architecture and design is determining the responsibilities of each software element. The Single Responsibility Principle is as follows: 
 
 _A class should have only one reason to change._ 
 
-## Robert C. Martin 
+# Robert C. Martin 
 
 Each responsibility that a class has is a potential reason for that class to change. If a class has multiple responsibilities that change independently, the class won’t be stable. By following the SRP, you define classes that each have a single responsibility and hence a single reason for change. 
 
 We can apply SRP when defining a microservice architecture and create small, cohesive services that each have a single responsibility. This will reduce the size of the services and increase their stability. The new FTGO architecture is an example of SRP in action. Each aspect of getting food to a consumer—order taking, order preparation, and delivery—is the responsibility of a separate service. 
 
-## COMMON CLOSURE PRINCIPLE 
+# COMMON CLOSURE PRINCIPLE 
 
 The other useful principle is the Common Closure Principle: 
 
 _The classes in a package should be closed together against the same kinds of changes. A change that affects a package affects all the classes in that package._ 
 
-## Robert C. Martin 
+# Robert C. Martin 
 
 The idea is that if two classes change in lockstep because of the same underlying reason, then they belong in the same package. Perhaps, for example, those classes implement a different aspect of a particular business rule. The goal is that when that business rule changes, developers only need to change code in a small number of packages (ideally only one). Adhering to the CCP significantly improves the maintainability of an application. 
 
@@ -618,7 +618,7 @@ SRP and CCP are 2 of the 11 principles developed by Bob Martin. They’re partic
 
 Decomposition by business capability and by subdomain along with SRP and CCP are good techniques for decomposing an application into services. In order to apply them and successfully develop a microservice architecture, you must solve some transaction management and interprocess communication issues. 
 
-## _2.2.5 Obstacles to decomposing an application into services_ 
+# _2.2.5 Obstacles to decomposing an application into services_ 
 
 On the surface, the strategy of creating a microservice architecture by defining services corresponding to business capabilities or subdomains looks straightforward. You may, however, encounter several obstacles: 
 
@@ -634,26 +634,26 @@ On the surface, the strategy of creating a microservice architecture by defining
 
 Let’s take a look at each obstacle, starting with network latency. 
 
-## NETWORK LATENCY 
+# NETWORK LATENCY 
 
 _Network latency_ is an ever-present concern in a distributed system. You might discover that a particular decomposition into services results in a large number of round-trips between two services. Sometimes, you can reduce the latency to an acceptable amount by implementing a batch API for fetching multiple objects in a single round trip. But in other situations, the solution is to combine services, replacing expensive IPC with language-level method or function calls. 
 
-## SYNCHRONOUS INTERPROCESS COMMUNICATION REDUCES AVAILABILITY 
+# SYNCHRONOUS INTERPROCESS COMMUNICATION REDUCES AVAILABILITY 
 
 Another problem is how to implement interservice communication in a way that doesn’t reduce availability. For example, the most straightforward way to implement the createOrder() operation is for the Order Service to synchronously invoke the other services using REST. The drawback of using a protocol like REST is that it reduces the availability of the Order Service. It won’t be able to create an order if any of those other services are unavailable. Sometimes this is a worthwhile trade-off, but in chapter 3 you’ll learn that using asynchronous messaging, which eliminates tight coupling and improves availability, is often a better choice. 
 
 
-## MAINTAINING DATA CONSISTENCY ACROSS SERVICES 
+# MAINTAINING DATA CONSISTENCY ACROSS SERVICES 
 
 Another challenge is maintaining data consistency across services. Some system operations need to update data in multiple services. For example, when a restaurant accepts an order, updates must occur in both the Kitchen Service and the Delivery Service. The Kitchen Service changes the status of the Ticket. The Delivery Service schedules delivery of the order. Both of these updates must be done atomically. 
 
 The traditional solution is to use a two-phase, commit-based, distributed transaction management mechanism. But as you’ll see in chapter 4, this is not a good choice for modern applications, and you must use a very different approach to transaction management, a saga. A _saga_ is a sequence of local transactions that are coordinated using messaging. Sagas are more complex than traditional ACID transactions but they work well in many situations. One limitation of sagas is that they are eventually consistent. If you need to update some data atomically, then it must reside within a single service, which can be an obstacle to decomposition. 
 
-## OBTAINING A CONSISTENT VIEW OF THE DATA 
+# OBTAINING A CONSISTENT VIEW OF THE DATA 
 
 Another obstacle to decomposition is the inability to obtain a truly consistent view of data across multiple databases. In a monolithic application, the properties of ACID transactions guarantee that a query will return a consistent view of the database. In contrast, in a microservice architecture, even though each service’s database is consistent, you can’t obtain a globally consistent view of the data. If you need a consistent view of some data, then it must reside in a single service, which can prevent decomposition. Fortunately, in practice this is rarely a problem. 
 
-## GOD CLASSES PREVENT DECOMPOSITION 
+# GOD CLASSES PREVENT DECOMPOSITION 
 
 Another obstacle to decomposition is the existence of so-called god classes. _God classes_ are the bloated classes that are used throughout an application (http://wiki.c2.com/ ?GodClass). A god class typically implements business logic for many different aspects of the application. It normally has a large number of fields mapped to a database table with many columns. Most applications have at least one of these classes, each representing a concept that’s central to the domain: accounts in banking, orders in e-commerce, policies in insurance, and so on. Because a god class bundles together state and behavior for many different aspects of an application, it’s an insurmountable obstacle to splitting any business logic that uses it into services. 
 
@@ -728,7 +728,7 @@ As well as creating technical challenges, having multiple domain models also imp
 
 We’ll now look at how to define the service APIs. 
 
-## _2.2.6 Defining service APIs_ 
+# _2.2.6 Defining service APIs_ 
 
 So far, we have a list of system operations and a list of a potential services. The next step is to define each service’s API: its operations and events. A service API operation exists for one of two reasons: some operations correspond to system operations. They are invoked by external clients and perhaps by other services. The other operations exist to support collaboration between services. These operations are only invoked by other services. 
 
@@ -736,7 +736,7 @@ A service publishes events primarily to enable it to collaborate with other serv
 
 The starting point for defining the service APIs is to map each system operation to a service. After that, we decide whether a service needs to collaborate with others to implement a system operation. If collaboration is required, we then determine what APIs those other services must provide in order to support the collaboration. Let’s begin by looking at how to assign system operations to services. 
 
-## ASSIGNING SYSTEM OPERATIONS TO SERVICES 
+# ASSIGNING SYSTEM OPERATIONS TO SERVICES 
 
 The first step is to decide which service is the initial entry point for a request. Many system operations neatly map to a service, but sometimes the mapping is less obvious. Consider, for example, the noteUpdatedLocation() operation, which updates the courier location. On one hand, because it’s related to couriers, this operation should be assigned to the Courier service. On the other hand, it’s the Delivery Service that needs the courier location. In this case, assigning an operation to a service that needs the information provided by the operation is a better choice. In other situations, 
 
@@ -754,7 +754,7 @@ Table 2.2 Mapping system operations to services in the FTGO application
 
 After having assigned operations to services, the next step is to decide how the services collaborate in order to handle each system operation. 
 
-## DETERMINING THE APIS REQUIRED TO SUPPORT COLLABORATION BETWEEN SERVICES 
+# DETERMINING THE APIS REQUIRED TO SUPPORT COLLABORATION BETWEEN SERVICES 
 
 Some system operations are handled entirely by a single service. For example, in the FTGO application, the Consumer Service handles the createConsumer() operation entirely by itself. But other system operations span multiple services. The data needed to handle one of these requests might, for instance, be scattered around multiple services. For example, in order to implement the createOrder() operation, the Order Service must invoke the following services in order to verify its preconditions and make the post-conditions become true: 
 
@@ -793,7 +793,7 @@ data scattered across multiple services, a saga is also a way to implement a sel
 
 Chapter 8 describes the concept of an API gateway, which exposes an API to external clients. An API gateway might implement a query operation using the API composition pattern, described in chapter 7, rather than simply route it to the service. Logic in the API gateway gathers the data needed by the query by calling multiple services and combining the results. In this situation, the system operation is assigned to the API gateway rather than a service. The services need to implement the query operations needed by the API gateway. 
 
-## _Summary_ 
+# _Summary_ 
 
 - Architecture determines your application’s _-ilities_ , including maintainability, testability, and deployability, which directly impact development velocity. 
 

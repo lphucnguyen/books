@@ -1,10 +1,10 @@
-## **Chapter 3** 
+# **Chapter 3** 
 
-## **Secure links** 
+# **Secure links** 
 
 We now know how to reliably send bytes from one process to another over the network. The problem is that these bytes are sent in the clear, and a middleman could intercept the communication. To protect against that, we can use the _Transport Layer Security_[1] (TLS) protocol. TLS runs on top of TCP and encrypts the communication channel so that application layer protocols, like HTTP, can leverage it to communicate securely. In a nutshell, TLS provides _encryption_ , _authentication_ , and _integrity_ . 
 
-## **3.1 Encryption** 
+# **3.1 Encryption** 
 
 Encryption guarantees that the data transmitted between a client and a server is obfuscated and can only be read by the communicating processes. 
 
@@ -19,7 +19,7 @@ Although asymmetric encryption is slow and expensive, it’s only used to create
 
 Encrypting in-flight data has a CPU penalty, but it’s negligible since modern processors have dedicated cryptographic instructions. Therefore, TLS should be used for all communications, even those not going through the public internet. 
 
-## **3.2 Authentication** 
+# **3.2 Authentication** 
 
 Although we have a way to obfuscate data transmitted across the wire, the client still needs to authenticate the server to verify it’s who it claims to be. Similarly, the server might want to authenticate the identity of the client. 
 
@@ -51,7 +51,7 @@ When a TLS connection is opened, the server sends the full certificate chain to 
 
 One of the most common mistakes when using TLS is letting a certificate expire. When that happens, the client won’t be able to verify the server’s identity, and opening a connection to the remote process will fail. This can bring an entire application down as clients can no longer connect with it. For this reason, automation to monitor and auto-renew certificates close to expiration is well worth the investment. 
 
-## **3.3 Integrity** 
+# **3.3 Integrity** 
 
 Even if the data is obfuscated, a middleman could still tamper with it; for example, random bits within the messages could be swapped. To protect against tampering, TLS verifies the integrity of the data by calculating a message digest. A secure hash function is used to create a message authentication code[5] (HMAC). When a process receives a message, it recomputes the digest of the message and checks whether it matches the digest included in the message. If not, then the message has either been corrupted during transmission or has been tampered with. In this case, the message is dropped. 
 
@@ -64,7 +64,7 @@ The TLS HMAC protects against data corruption as well, not just tampering. You m
 
 29 it fails to detect errors for roughly 1 in 16 million to 10 billion packets. With packets of 1 KB, this is expected to happen once per 16 GB to 10 TB transmitted. 
 
-## **3.4 Handshake** 
+# **3.4 Handshake** 
 
 When a new TLS connection is established, a handshake between the client and server occurs during which: 
 
