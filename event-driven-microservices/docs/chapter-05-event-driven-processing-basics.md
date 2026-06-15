@@ -1,4 +1,4 @@
-# **CHAPTER 5 Event-Driven Processing Basics** 
+# Chapter 5. Event-Driven Processing Basics
 
 Most event-driven microservices follow, at a minimum, the same three steps: 
 
@@ -17,7 +17,7 @@ ConsumerconsumerClient=newconsumerClient(consumerGroupName,...);
 ProducerproducerClient=newproducerClient(...);
 ```
 
-# **`while`** `(` **`true`** `) {` 
+**while (true) {** 
 
 ```
 InputEventevent=consumerClient.pollOneEvent(inputEventStream);
@@ -43,7 +43,7 @@ consumerClient.commitOffsets();
 
 The `processEvent` function is of particular interest. This is where the real eventprocessing work gets done, primarily the application of business logic and which events, if any, to emit. This processing function is best thought of as the entry point to the _processing topology_ of the microservice. From here, data-driven patterns transform and process the data for your bounded context’s business needs. 
 
-# **Composing Stateless Topologies** 
+## Composing Stateless Topologies
 
 Building a microservice topology requires thinking in an event-driven way, as the code executes in response to an event arriving at the consumer input. The topology of the microservice is essentially a sequence of operations to perform on the event. It requires choosing the necessary filters, routers, transformations, materializations, aggregations, and other functions required to perform the necessary business logic of the microservice. Those familiar with functional programming and big data mapreduce-style frameworks may feel quite at home here. For others, this may be a bit of a new concept. 
 
@@ -57,28 +57,28 @@ _Figure 5-1. A simple event processing topology_
 
 The events with key `A` and `C` both traverse the entire topology. They’re both larger than `10.0` , which gets them through stage 1, and stage 2 simply drops the decimal point from the value of the event. The event keyed on `B` , however, is filtered out and dropped because it does not meet the stage 1 criteria. 
 
-# **Transformations** 
+### Transformations
 
 A transform processes a single event and emits zero or more output events. Transforms, as you might guess, provide the bulk of the business logic operations requiring transformations. Events may need to be repartitioned depending on the operations (more on this shortly). Common transformations include, but are not limited to, the following: 
 
-# _Filter_ 
+**Filter** 
 
 Propagate the event if it meets the necessary criteria. Emits zero or one events. 
 
 
-# _Map_ 
+**Map** 
 
 Changes the key and/or value of the event, emitting exactly one event. Note that if you change the key, you may need to repartition to ensure data locality. 
 
-# _MapValue_ 
+**MapValue** 
 
 Change only the value of the event, not the key. Emits exactly one event. Repartitioning will not be required. 
 
-# _Custom transforms_ 
+**Custom transforms** 
 
 Apply custom logic, look up state, and even communicate with other systems synchronously. 
 
-# **Branching and Merging Streams** 
+### Branching and Merging Streams
 
 A consumer application may need to _branch_ event streams—that is, apply a logical operator to an event and then output it to a new stream based on the result. One relatively common scenario is consuming a “firehose” of events and deciding where to route them based on particular properties (e.g., country, time zone, origin, product, or any number of features). A second common scenario is emitting results to different output event streams—for example, outputting events to a dead-letter stream in case of a processing error, instead of dropping them completely. 
 
@@ -90,20 +90,20 @@ Applications may also need to _merge_ streams, where events from multiple input 
 
 If you do end up merging event streams, define a new unified schema representative of the merged event steam domain. If this domain doesn’t make sense, then it may be best to leave the streams unmerged and reconsider your system design. 
 
-# **Repartitioning Event Streams** 
+## Repartitioning Event Streams
 
 Event streams are partitioned according to the event key and the event partitioner logic. For each event, the event partitioner is applied, and a partition is selected for the event to be written to. _Repartitioning_ is the act of producing a new event stream with one or more of the following properties: 
 
 
-# _Different partition count_ 
+**Different partition count** 
 
 Increase an event stream’s partition count to increase downstream parallelism or to match the number of partitions of another stream for copartitioning (covered later in this chapter). 
 
-# _Different event key_ 
+**Different event key** 
 
 Change the event key to ensure that events with the same key are routed to the same partition. 
 
-# _Different event partitioner_ 
+**Different event partitioner** 
 
 Change the logic used to select which partition an event will be written to. 
 
@@ -115,7 +115,7 @@ It’s rare that a purely stateless processor will need to repartition an event 
 
 The partitioner algorithm deterministically maps an event’s key to a specific partition, typically by using a hash function. This ensures that all events with the same key end up in the same partition. 
 
-# **Example: Repartitioning an Event Stream** 
+### Example: Repartitioning an Event Stream
 
 Suppose there is a stream of user data coming in from a web-facing endpoint. The user actions are converted into events, with the payload of the events containing both a user ID and other arbitrary event data, labeled `x` . 
 
@@ -129,11 +129,11 @@ Producing all events for a given key into a single partition provides the basis 
 
 _Figure 5-2. Repartitioning an event stream_ 
 
-# **Copartitioning Event Streams** 
+## Copartitioning Event Streams
 
 _Copartitioning_ is the repartition of an event stream into a new one with the same partition count and partition assignor logic as another stream. This is required when keyed events from one event stream need to be colocated (for data locality) with the events of another stream. This is an important concept for stateful stream processing, as numerous stateful operations (such as streaming joins) require that all events for a given key, regardless of which stream they’re from, be processed through the same node. This is covered in more detail in Chapter 7. 
 
-# **Example: Copartitioning an Event Stream** 
+### Example: Copartitioning an Event Stream
 
 Consider again the repartition example of Figure 5-2. Say that you now need to join the repartitioned user event stream with a user entity stream, keyed on that same ID. These joining of these streams is shown in Figure 5-3. 
 
@@ -145,7 +145,7 @@ Both streams have the same partition count, and both have been partitioned using
 
 _Figure 5-3. Copartitioned user event and user entity streams_ 
 
-# **Assigning Partitions to a Consumer Instance** 
+## Assigning Partitions to a Consumer Instance
 
 Each microservice maintains its own unique consumer group representing the collective offsets of its input event streams. The first consumer instance that comes online will register with the event broker using its consumer group name. Once registered, the consumer instance will then need to be assigned partitions. 
 
@@ -155,7 +155,7 @@ Other event brokers, such as Apache Pulsar, maintain a centralized ownership of 
 
 Work is usually momentarily suspended while partitions are reassigned to avoid assignment race conditions. This ensures that any revoked partitions are no longer being processed by another instance before assignment to the new instance, eliminating any potential duplicate output. 
 
-# **Assigning Partitions with the Partition Assignor** 
+### Assigning Partitions with the Partition Assignor
 
 Multiple instances of a consumer microservice are typically required for processing large volumes of data, whether it’s a dedicated stream-processing framework or a 
 
@@ -164,17 +164,17 @@ basic producer/consumer implementation. A _partition assignor_ ensures that part
 
 This partition assignor is also responsible for reassigning partitions whenever new consumer instances are added or removed from the consumer group. Depending on your event broker selection, this component may be built into the consumer client or maintained within the event broker. 
 
-# **Assigning Copartitioned Partitions** 
+### Assigning Copartitioned Partitions
 
 The partition assignor is also responsible for ensuring that any copartitioning requirements are met. All partitions marked as copartitioned must be assigned to the same single consumer instance. This ensures that a given microservice instance will be assigned the correct subset of event data to perform its business logic. It is good practice to have the partition assignor implementation check to see that the event streams have an equal partition count and throw an exception on inequality. 
 
-# **Partition Assignment Strategies** 
+### Partition Assignment Strategies
 
 The goal of a partition assignment algorithm is to ensure that partitions are evenly distributed across the consumer instances, assuming that the consumer instances are equal in processing capabilities. A partition assignment algorithm may also have secondary goals, such as reducing the number of partitions reassigned during a rebalance. This is particularly important when you are dealing with materialized state sharded across multiple data store instances, as the reassignment of a partition can cause future updates to go to the wrong shard. Chapter 7 explores this concept further with regard to internal state stores. 
 
 There are a number of common strategies for assigning partitions. The default strategy may vary depending on your framework or implementation, but the following three tend to be the most commonly used. 
 
-# **Round-robin assignment** 
+**Round-robin assignment** 
 
 All partitions are tallied into a list and assigned in a round-robin manner to each consumer instance. A separate list is kept for copartitioned streams to ensure proper copartitioned assignment. 
 
@@ -197,21 +197,20 @@ _Figure 5-5. Round-robin partition assignments for four consumer instances_
 C2 is now assigned the copartitioned P2s, as well as stream A’s P2. C3, on the other hand, only has partition P3 from stream A because there are no additional partitions to assign. Adding any further instances will not result in any additional parallelization. 
 
 
-# **Static assignment** 
+**Static assignment** 
 
 Static assignment protocols can be used when specific partitions must be assigned to specific consumers. This option is most useful when large volumes of stateful data are materialized on any given instance, usually for internal state stores. When a consumer instance leaves the consumer group, a static assignor will not reassign the partitions, but will instead wait until the missing consumer instance comes back online. Depending on the implementation, partitions may be dynamically reassigned anyway, should the original consumer fail to rejoin the consumer group within a designated period of time. 
 
-# **Custom assignment** 
+**Custom assignment** 
 
 By leveraging external signals and tooling, custom assignments can be tailored to the needs of the client. For example, assignment could be based on the current lag in the input event streams, ensuring an equal distribution of work across all of your consumer instances. 
 
-# **Recovering from Stateless Processing Instance Failures** 
+## Recovering from Stateless Processing Instance Failures
 
 Recovering from stateless failures is effectively the same as simply adding a new instance to a consumer group. Stateless processors do not require any state restoration, which means they can immediately go back to processing events as soon as they’re assigned partitions and establish their stream time. 
 
-# **Summary** 
+## Summary
 
 The basic stateless event-driven microservice consumes events, processes them, and emits any new subsequent events. Each event is processed independently of the others. Basic transformations allow you to change events into more useful formats, which you can then repartition into a newly keyed event stream with a new partition count. Event streams with the same key, the same partitioner algorithm, and the same partition count are said to be _copartitioned_ , which guarantees data locality for a given consumer instance. The partition assignor is used to ensure that partitions between consumer instances are evenly distributed and that copartitioned event streams are correctly coassigned. 
 
 Copartitioning and partition assignment are important concepts for understanding stateful processing, which is covered in Chapter 7. First, though, you must consider how to handle processing multiple partitions from multiple event streams. Out-oforder events, late events, and the order in which events are selected for processing all have a significant impact on the design of your services. This will be the topic of the next chapter. 
-

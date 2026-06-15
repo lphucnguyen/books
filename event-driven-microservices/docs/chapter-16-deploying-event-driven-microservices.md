@@ -1,39 +1,37 @@
-# **CHAPTER 16** 
-
-# **Deploying Event-Driven Microservices** 
+# Chapter 16. Deploying Event-Driven Microservices
 
 Deploying event-driven microservices can be challenging. As the number of microservices within an organization increases, so does the importance of having standardized deployment processes in place. An organization managing only a few dozen services can get away with a few custom deployment processes, but any organization seriously invested in microservices, event-driven or otherwise, must invest in standardization and streamlining its deployment processes. 
 
-# **Principles of Microservice Deployment** 
+## Principles of Microservice Deployment
 
 There are a number of principles that drive deployment processes: 
 
-# _Give teams deployment autonomy_ 
+_Give teams deployment autonomy_ 
 
 Teams should control their own testing and deployment process and have the autonomy to deploy their microservices at their discretion. 
 
-# _Implement a standardized deployment process_ 
+_Implement a standardized deployment process_ 
 
 The deployment process should be consistent between services. A new microservice should be created with a deployment process already available to it. This is commonly accomplished with a _continuous integration_ framework, as is discussed shortly. 
 
-# _Provide necessary supportive tooling_ 
+_Provide necessary supportive tooling_ 
 
 Deployments may require teams to reset consumer group offsets, purge state stores, check and update schema evolution, and delete internal event streams. Supportive tooling provides these functions to enable further automation of deployment and support team autonomy. 
 
 
-# _Consider event stream reprocessing impacts_ 
+_Consider event stream reprocessing impacts_ 
 
 Reconsuming input event streams can be time-consuming, leading to stale results for downstream consumers. Additionally, this microservice may subsequently generate a large volume of output events, causing another high load for downstream consumers. Very large event streams and those with large amounts of consumers may see nontrivial surges in processing power requirements. You must also consider side effects, particularly those that can be disruptive to customers (e.g., resending multiple years’ worth of promotional emails). 
 
-# _Adhere to service-level agreements (SLAs)_ 
+_Adhere to service-level agreements (SLAs)_ 
 
 Deployments may be disruptive to other services. For instance, rebuilding state stores can result in a significant amount of downtime, while reprocessing input event streams may generate a significant number of events. Ensure that all SLAs are honored during the deployment process. 
 
-# _Minimize dependent service changes_ 
+_Minimize dependent service changes_ 
 
 Deployments may require that other services change their APIs or data models, such as when interacting with a REST API or introducing a domain schema change. These changes should be minimized whenever possible, as they violate the other team’s autonomy for deploying their services only when required by shifting business requirements. 
 
-# _Negotiate breaking changes with downstream consumers_ 
+_Negotiate breaking changes with downstream consumers_ 
 
 Breaking schema changes may be inevitable in some circumstances, requiring the creation of new event streams and a renegotiation of the data contract with downstream consumers. Ensure that these discussions happen before any deployment and that a migration plan for consumers is in place. 
 
@@ -43,12 +41,12 @@ Breaking schema changes may be inevitable in some circumstances, requiring the c
 
 Microservices should be independently deployable, and it is an anti-pattern if they are not. If a particular microservice deployment regularly requires other microservices to synchronize their deployments, it is an indicator that their bounded contexts are ill-defined and should be reviewed. 
 
-# **Architectural Components of Microservice Deployment** 
+## Architectural Components of Microservice Deployment
 
 There are several major components of the microservice deployment architecture, each of which plays a pivotal role. This architecture can be roughly broken down into two main components: the system used to build and deploy the code, and the compute resources used by the microservices. 
 
 
-# **Continuous Integration, Delivery, and Deployment Systems** 
+### Continuous Integration, Delivery, and Deployment Systems
 
 Continuous integration, delivery, and deployment systems allow for microservices to be built, tested, and deployed as code changes are committed to the repository. This is part of the microservice tax that you must pay to successfully manage and deploy microservices at scale. These systems allow microservice owners to decide when to deploy their microservices, which is essential for scaling up the number of microservices used in an organization. 
 
@@ -71,13 +69,13 @@ _Figure 16-1. A CI pipeline showcasing the difference between continuous deliver
 Continuous deployment is difficult to do in practice. Stateful services are particularly challenging, as deployments may require rebuilding state stores and reprocessing event streams, which are especially disruptive to dependent services. 
 
 
-# **Container Management Systems and Commodity Hardware** 
+### Container Management Systems and Commodity Hardware
 
 The container management system (CMS) provides the means of managing, deploying, and controlling the resource use of containerized applications (see “Managing Containers and Virtual Machines” on page 35). The container built during the CI process is deposited into a repository, where it awaits deployment instructions from the CMS. Integration between your CI pipeline and the CMS is essential to a streamlined deployment process and is usually provided by all of the leading CMS providers, as discussed in Chapter 2. 
 
 Commodity hardware is typically used for the deployment of event-driven microservices, as it is inexpensive, performs reliably, and enables horizontal scaling of services. You can add and remove hardware to and from the resource pools as required, while recovery from failed instances requires only that you redeploy the failed microservice instances to the new hardware. Though your microservice implementations may vary, many event-driven microservices do not require any specialized hardware to operate. For those that do, you can allocate specialized resources into their own independent pools, such that the associated microservices can be deployed accordingly. Examples might include memory-intensive computing instances for caching purporses, or processor-intensive computing instances for applications demanding significant processing power. 
 
-# **The Basic Full-Stop Deployment Pattern** 
+## The Basic Full-Stop Deployment Pattern
 
 The basic full-stop deployment pattern is the basis of all other patterns, and this section outlines the steps involved (illustrated in Figure 16-1). You may have additional steps in your pipeline depending on the specific requirements of your domain, but I am keeping these steps lean for space purposes. Use your own judgment and domain knowledge to insert any steps specific to your use cases. 
 
@@ -93,11 +91,11 @@ It’s best to have independent integration testing environments for any sort of
 
 3. **Run predeployment validation tests.** This step ensures that your microservice will deploy properly by validating common issues before release. Validations may include: 
 
-# _Event stream validation_ 
+_Event stream validation_ 
 
 - Validate that input event streams exist, output streams exist (or can be created, if automatic creation is enabled), and your microservice has the proper read/write permissions to access them. 
 
-# _Schema validation_ 
+_Schema validation_ 
 
       - Validate that both the input and output schemas follow schema evolution rules. A simple way to do this is by convention, with your input and output schemas contained within a specific directory structure, along with a map of schemas to event streams. This step of the pipeline can simply ingest the schemas and run the comparisons for you, detecting any incompatibilities. 
 
@@ -117,7 +115,7 @@ It’s best to have independent integration testing environments for any sort of
 
 Consider the impacts to all dependent services, including SLAs, downtime, stream processing catch-up time, output event load, new event streams, and breaking schema changes. Communicate with dependent service owners to ensure that the impacts are acceptable. 
 
-# **The Rolling Update Pattern** 
+## The Rolling Update Pattern
 
 The rolling update pattern can be used to keep a service running while updating the individual microservice instances. Its prerequisites include the following: 
 
@@ -152,7 +150,7 @@ Smart implementations will run a test that checks compatibility of a release to 
 
 The main benefit of this pattern is that services can be updated while near-real-time processing continues uninterrupted, eliminating downtime. The main drawback of this pattern is its prerequisites, which limits its usage to specific scenarios. 
 
-# **The Breaking Schema Change Pattern** 
+## The Breaking Schema Change Pattern
 
 A breaking schema change is sometimes inevitable, as covered in “Breaking Schema Changes” on page 43. Deployments involving breaking schema changes must take into account a number of dependencies, including both consumer and producer responsibilities, coordination of migration efforts, and reprocessing downtime. 
 
@@ -178,7 +176,7 @@ There are two main options for migrating a breaking schema change:
 
 - Synchronized migration to a single new stream, with the old one removed 
 
-# **Eventual Migration via Two Event Streams** 
+### Eventual Migration via Two Event Streams
 
 Eventual migration via two event streams requires that the producer write events with both the old and new format, each to its respective stream. The old stream is marked as deprecated, and the consumers of it will, in their own time, migrate to the new 
 
@@ -197,7 +195,7 @@ This strategy makes a couple of assumptions:
 
 One of the main risks of eventual migration is that the migration is never finished, and similar-yet-different data streams remain in use indefinitely. Additionally, new services created during the migration may inadvertently register themselves as consumers on the old stream instead of the new one. Use metadata tagging (see “Event Stream Metadata Tagging” on page 240) to mark streams as deprecated and keep migration windows small. 
 
-# **Synchronized Migration to the New Event Stream** 
+### Synchronized Migration to the New Event Stream
 
 Another option is to update the producer to create events strictly with the new format and to cease providing updates to the old stream. This is a simpler option—technologically speaking—than maintaining two event streams, but it requires more intensive communication between the producer and consumers of the data. Consumers must update their definitions to accommodate breaking changes introduced by the producer. 
 
@@ -218,7 +216,7 @@ The biggest risk of this deployment plan is that consumers may fail in their mig
 
 Synchronized migrations tend to be rare in practice, as they require significant breaking changes or even the destruction of the event’s previous domain model. Core business entities usually have very stable domain models, but when major breaking changes occur, a synchronous migration may be unavoidable. 
 
-# **The Blue-Green Deployment Pattern** 
+## The Blue-Green Deployment Pattern
 
 The main goal of blue-green deployment is to provide zero downtime while deploying new functionality. This pattern is predominantly used in synchronous requestresponse microservice deployments, as it allows for synchronous requests to continue while the service is updated. An example of this pattern is shown in Figure 16-3. 
 
@@ -249,7 +247,7 @@ Blue-green deployments work well for microservices that consume from event strea
 
 Blue-green deployments _do not work_ when the microservice produces events to an output stream in reaction to an input event stream. The two microservices will overwrite each other’s results in the case of entity streams or will create duplicated events in the case of event streams. Use either the rolling update pattern or the basic full-stop deployment pattern instead. 
 
-# **Summary** 
+## Summary
 
 Streamlining the deployment of microservices requires your organization to pay the microservice tax and invest in the necessary deployment systems. Due to the large number of microservices that may need to be managed, it is best to delegate deployment responsibilities to the teams that own the microservices. These teams will need supportive tooling to control and manage their deployments. 
 
@@ -257,5 +255,3 @@ Streamlining the deployment of microservices requires your organization to pay t
 Continuous integration pipelines are an essential part of the deployment process. They provide the framework for setting up and executing tests, validating builds, and ensuring that the containerized services are ready to deploy to production. The container management system provides the means for managing the deployment of the containers into the compute clusters, allocating resources, and providing scalability. 
 
 There are a number of ways to deploy services, with the simplest being to stop the microservice fully and redeploy the newest code. This can incur significant downtime, however, and may not be suitable depending on the SLAs. There are several other deployment patterns, each with its own benefits and drawbacks. The patterns discussed in this chapter are by no means a comprehensive list, but should give you a good starting point for determining the needs of your own services. 
-
-

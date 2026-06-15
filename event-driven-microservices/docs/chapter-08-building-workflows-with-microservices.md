@@ -1,10 +1,10 @@
-# **CHAPTER 8 Building Workflows with Microservices** 
+# Chapter 8. Building Workflows with Microservices
 
 Microservices, by their very definition, operate on only a small portion of the overall business workflow of an organization. A _workflow_ is a particular set of actions that compose a business process, including any logical branching and compensatory actions. Workflows commonly require multiple microservices, each with its own bounded context, performing its tasks and emitting new events to downstream consumers. Most of what we’ve looked at so far has been how single microservices operate under the hood. Now we’re going to take a look at how multiple microservices can work together to fulfill larger business workflows, and some of the pitfalls and issues that arise from an event-driven microservice approach. 
 
 Here are some of the main considerations for implementing EDM workflows. 
 
-# _Creating and modifying workflows_ 
+**Creating and modifying workflows** 
 
 - How are the services related within the workflow? 
 
@@ -16,7 +16,7 @@ Here are some of the main considerations for implementing EDM workflows.
 
    - Breaking monitoring and visibility? 
 
-# _Monitoring workflows_ 
+**Monitoring workflows** 
 
 - How can I tell when the workflow is completed for an event? 
 
@@ -25,7 +25,7 @@ Here are some of the main considerations for implementing EDM workflows.
 - How can I monitor the overall health of a workflow? 
 
 
-_Implementing distributed transactions_ 
+**Implementing distributed transactions** 
 
 - Many workflows require that a number of actions happen together or not at all. How do I implement distributed transactions? 
 
@@ -33,7 +33,7 @@ _Implementing distributed transactions_
 
 This chapter covers the two main workflow patterns, choreography and orchestration, and evaluates them against these considerations. 
 
-# **The Choreography Pattern** 
+## The Choreography Pattern
 
 The term _choreographed architectures_ (also known as _reactive architectures_ ) commonly refers to highly decoupled microservice architectures. Microservices react to their input events as they arrive, without any blocking or waiting, in a manner fully independent from any upstream producers or subsequent downstream consumers. This is much like a dance performance, where each dancer must know his or her own role and perform it independently, without being controlled or told what to do during the dance. 
 
@@ -57,7 +57,7 @@ It is important to note that choreography belongs to the domain of event-driven 
 
 As you can see, a direct-call microservice is tightly coupled and fully dependent on the existing microservice’s bounded contexts. 
 
-# **A Simple Event-Driven Choreography Example** 
+### A Simple Event-Driven Choreography Example
 
 Figure 8-1 shows the output of a choreographed workflow in which service A feeds directly into service B, which in turn feeds into service C. In this particular case, you can infer that the services have a dependent workflow of A → B → C. The output of service C indicates the result of the workflow as a whole. 
 
@@ -77,12 +77,12 @@ _Figure 8-2. Business changes required by the simple event-driven choreographed 
 
 Both services C and B must be edited to consume from streams 1 and 2, respectively. The format of the data within the streams may no longer suit the needs of the new workflow, requiring breaking schema changes that may significantly affect other consumers (not shown) of event stream 2. A whole new event schema may need to be created for event stream 2, with the old data in the event stream ported over to the new format, deleted, or left in place. Finally, you must ensure that processing has completed for all of the output events of services A, B, and C before swapping the topology around, lest some events be incompletely processed and left in an inconsistent state. 
 
-# **Creating and Modifying a Choreographed Workflow** 
+### Creating and Modifying a Choreographed Workflow
 
 While choreography allows for simple addition of new steps at the end of the workflow, it may be problematic to insert steps into the middle or to change the order of the workflow. The relationships between the services may also be difficult to understand outside the context of the workflow, a challenge that is exacerbated as the number of services in the workflow increases. Choreographed workflows can be brittle, particularly when business functions cross multiple microservice instances. This can be mitigated by carefully respecting the bounded contexts of services and ensuring that full business functionality remains local to a single service. However, even when correctly implemented, small business logic changes may require you to modify or rewrite numerous services, especially those that change the order of the workflow itself. 
 
 
-# **Monitoring a Choreographed Workflow** 
+### Monitoring a Choreographed Workflow
 
 When monitoring a choreographed workflow, you need to take into account its scale and scope. In isolation, distributed choreographed workflows can make it difficult to discern the processing progress of a specific event. For event-driven systems, monitoring business-critical workflows may necessitate listening to each output event stream and materializing it into a state store, to account for where an event may have failed to process or have gotten stuck in processing. 
 
@@ -98,7 +98,7 @@ The customer may only really care where the order is in the progression from pay
 
 Be sure you know what it is you’re trying to make visible in the choreographed workflow. Different observers have different requirements, and not all steps of a workflow may require explicit exposure. 
 
-# **The Orchestration Pattern** 
+## The Orchestration Pattern
 
 In the orchestration pattern a central microservice, the orchestrator, issues commands to and awaits responses from subordinate worker microservices. Orchestration can be thought of much like a musical orchestra, where a single conductor commands the musicians during the performance. The orchestrator microservice contains the entire workflow logic for a given business process and sends specific events to worker microservices to tell them what to do. 
 
@@ -121,7 +121,7 @@ Ensure the orchestrator’s bounded context is limited strictly to workflow logi
 Note that the business responsibilities of a nonorchestrator microservice in an orchestrated pattern are identical to those of the same microservice in the choreographed pattern. The orchestrator is responsible only for orchestration and workflow logic, and not at all for the fulfillment of business logic of any of the microservices themselves. Let’s look at a simple example that illustrates these boundaries. 
 
 
-# **A Simple Event-Driven Orchestration Example** 
+### A Simple Event-Driven Orchestration Example
 
 Figure 8-3 shows an orchestration version of the architecture in Figure 8-1. 
 
@@ -185,7 +185,7 @@ consumer.commitOffsets()
 }
 ```
 
-# **A Simple Direct-Call Orchestration Example** 
+### A Simple Direct-Call Orchestration Example
 
 Orchestration can also use a request-response pattern, where the orchestrator synchronously calls the microservice’s API and awaits a response for results. The topology shown in Figure 8-4 is nearly identical to the one in Figure 8-3, aside from substitution of direct calls. 
 
@@ -197,7 +197,7 @@ _Figure 8-4. Simple direct-call orchestrated workflow_
 
 The normal benefits and restrictions of direct-call services apply here as well. That being said, this pattern is particularly useful for implementing workflows with Function-as-a-Service solutions (see Chapter 9). 
 
-# **Comparing Direct-Call and Event-Driven Orchestration** 
+### Comparing Direct-Call and Event-Driven Orchestration
 
 Direct-call and event-driven orchestration workflows are fairly similar when examined close-up. For instance, it might seem that the event-driven system is really just a request-response system, and in these simple examples, it certainly is. But when you 
 
@@ -224,7 +224,7 @@ To summarize, direct-call aka synchronous request-response workflows are general
 
 Keep in mind that there’s quite a lot of opportunity to mix and match these two options. For example, an orchestration workflow may be predominantly eventdriven, but require that a request-response call be made directly to an external API or preexisting service. When mixing these two options together, make sure that each service’s failure modes are handled as expected. 
 
-# **Creating and Modifying an Orchestration Workflow** 
+### Creating and Modifying an Orchestration Workflow
 
 The orchestrator can keep track of events in the workflow by materializing each of the incoming and outgoing event streams and response-request results. The workflow itself is defined solely within the orchestration service, allowing a single point of change for altering the workflow. In many cases, you can incorporate changes to a workflow without disrupting partially processed events. 
 
@@ -233,11 +233,11 @@ Orchestration results in a tight coupling between services. The relationship bet
 
 It is important to ensure that the orchestrator is responsible only for orchestrating the business workflow. A common anti-pattern is creating a single “God” service that issues granular commands to many weak minion services. This anti-pattern spreads workflow business logic between the orchestrator and the worker services, making for poor encapsulation, ill-defined bounded contexts, and difficulty in scaling ownership of the workflow microservices beyond a single team. The orchestrator should delegate full responsibility to the dependent worker services to minimize the amount of business logic it performs. 
 
-# **Monitoring the Orchestration Workflow** 
+### Monitoring the Orchestration Workflow
 
 You gain visibility into the orchestration workflow by querying the materialized state, so it’s easy to see the progress of any particular event and any issues that may have arisen in the workflow. You can implement monitoring and logging at the orchestrator level to detect any events that result in workflow failures. 
 
-# **Distributed Transactions** 
+## Distributed Transactions
 
 A _distributed_ transaction is a transaction that spans two or more microservices. Each microservice is responsible for processing its portion of the transaction, as well as reversing that processing in the case that the transaction is aborted and reverted. Both the fulfillment and reversal logic must reside within the same microservice, both for maintainability purposes and to ensure that new transactions cannot be started if they can’t also be rolled back. 
 
@@ -252,13 +252,13 @@ While it is still best to avoid implementing distributed transactions whenever p
 Distributed transactions in an event-driven world are often known as _sagas_ and can be implemented through either a choreographed pattern or an orchestrator pattern. The saga pattern requires that the participating microservices be able to process reversal actions to revert their portion of the transaction. Both the regular processing actions and the reverting actions should be idempotent, such that any intermittent failures of the participating microservices do not leave the system in an inconsistent state. 
 
 
-# **Choreographed Transactions: The Saga Pattern** 
+### Choreographed Transactions: The Saga Pattern
 
 Distributed transactions with choreographed workflows can be complex affairs, as each service needs to be able to roll back changes in the event of a failure. This creates strong coupling between otherwise loosely coupled services and can result in some unrelated services having strict dependencies on one another. 
 
 The choreographed saga pattern is suitable for simple distributed transactions, particularly those with strong workflow ordering requirements that are unlikely to change over time. Monitoring the progress of a choreographed transaction can be difficult, because it requires a full materialization of each participating event stream, as in the orchestrated approach. 
 
-# **Choreography Example** 
+**Choreography Example** 
 
 Continuing with the previous choreographed workflow example, consider the series of microservices A, B, C. The input event stream to service A kicks off a transaction, with the work of services A, B, and C being fully completed, or consequently canceled and rolled back. A failure at any step in the chain aborts the transaction and begins the rollback. The resultant workflow is shown in Figure 8-5. 
 
@@ -289,7 +289,7 @@ Even when consuming from both the output and failed transactions streams, the co
 
 Choreographed transactions can be somewhat brittle, generally require a strict ordering, and can be problematic to monitor. They work best in services with a very small number of microservices, such as a pair or a trio with very strict ordering and a low likelihood of needing workflow changes. 
 
-# **Orchestrated Transactions** 
+### Orchestrated Transactions
 
 Orchestrated transactions build on the orchestrator model, with the addition of logic to revert the transaction from any point in the workflow. You can roll back these transactions by reversing the workflow logic and ensuring that each worker microservice can provide a complementary reversing action. 
 
@@ -346,7 +346,7 @@ Orchestrated transactions offer better visibility into workflow dependencies, mo
 
 management, but can provide to complex workflows the clarity and structure that choreographed transactions cannot provide. 
 
-# **Compensation Workflows** 
+## Compensation Workflows
 
 Not all workflows need to be perfectly reversible and constrained by transactions. There are many unforeseen issues that can arise in a given workflow, and in many cases you might just have to do your best to complete it. In case of failure, there are actions you can take after the fact to remedy the situation. 
 
@@ -356,7 +356,7 @@ A strict transaction-based approach would require that the most recent transacti
 
 As a form of compensation, the business could order new stock, notify the customer that there has been a delay, and offer a discount code for the next purchase as an apology. The customer could be given the option to cancel the order or wait for the new stock to arrive. Music, sport, and other performance venues often use this approach in the case of oversold tickets, as do airlines and other ticket-based travel agencies. Compensation workflows are not always possible, but they are often useful for handling distributed workflow operations with customer-facing products. 
 
-# **Summary** 
+## Summary
 
 Choreography allows for loose coupling between business units and independent workflows. It is suitable for simple distributed transactions and simple nontransactional workflows, where the microservice count is low and the order of business operations is unlikely to ever change. 
 
@@ -364,5 +364,3 @@ Orchestrated transactions and workflows provide better visibility and monitoring
 
 
 Finally, not all systems require distributed transactions to successfully operate. Some workflows can provide compensatory actions in the case of failure, relying on nontechnical parts of the business to solve customer-facing issues. 
-
-
