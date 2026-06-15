@@ -1,6 +1,6 @@
-# _De lo in microservices p y g_ 
+# 12 Deploying microservices
 
-# _This chapter covers_ 
+**This chapter covers**
 
 - The four key deployment patterns, how they work, and their benefits and drawbacks: 
 
@@ -85,7 +85,7 @@ In this chapter I discuss the four main deployment options:
 
 Let’s first look at how to deploy services as language-specific packages. 
 
-# _12.1 Deploying services using the Language-specific packaging format pattern_ 
+## 12.1 Deploying services using the Language-specific packaging format pattern
 
 Let’s imagine that you want to deploy the FTGO application’s Restaurant Service, which is a Spring Boot-based Java application. One way to deploy this service is by using the Service as a language-specific package pattern. When using this pattern, what’s deployed in production and what’s managed by the service runtime is a service in its language-specific package. In the case of Restaurant Service, that’s either the executable JAR file or a WAR file. For other languages, such as NodeJS, a service is a directory of source code and modules. For some languages, such as GoLang, a service is an operating system-specific executable. 
 
@@ -140,7 +140,7 @@ This approach is commonly used when deploying applications on traditional expens
 
 The Service as a language-specific package pattern has both benefits and drawbacks. Let’s first look at the benefits. 
 
-# _12.1.1 Benefits of the Service as a language-specific package pattern_ 
+### 12.1.1 Benefits of the Service as a language-specific package pattern
 
 The Service as a language-specific package pattern has a few benefits: 
 
@@ -154,17 +154,17 @@ Let’s look at each one.
 _**Deploying services using the Language-specific packaging format pattern**_ 
 
 
-# FAST DEPLOYMENT 
+**FAST DEPLOYMENT**
 
 One major benefit of this pattern is that deploying a service instance is relatively fast: you copy the service to a host and start it. If the service is written in Java, you copy a JAR or WAR file. For other languages, such as NodeJS or Ruby, you copy the source code. In either case, the number of bytes copied over the network is relatively small. 
 
 Also, starting a service is rarely time consuming. If the service is its own process, you start it. Otherwise, if the service is one of several instances running in the same container process, you either dynamically deploy it into the container or restart the container. Because of the lack of overhead, starting a service is usually fast. 
 
-# EFFICIENT RESOURCE UTILIZATION 
+**EFFICIENT RESOURCE UTILIZATION**
 
 Another major benefit of this pattern is that it uses resources relatively efficiently. Multiple service instances share the machine and its operating system. It’s even more efficient if multiple service instances run within the same process. For example, multiple web applications could share the same Apache Tomcat server and JVM. 
 
-# _12.1.2 Drawbacks of the Service as a language-specific package pattern_ 
+### 12.1.2 Drawbacks of the Service as a language-specific package pattern
 
 Despite its appeal, the Service as a language-specific package pattern has several significant drawbacks: 
 
@@ -178,22 +178,22 @@ Despite its appeal, the Service as a language-specific package pattern has sever
 
 Let’s look at each drawback. 
 
-# LACK OF ENCAPSULATION OF THE TECHNOLOGY STACK 
+**LACK OF ENCAPSULATION OF THE TECHNOLOGY STACK**
 
 The operation team must know the specific details of how to deploy each and every service. Each service needs a particular version of the runtime. A Java web application, for example, needs particular versions of Apache Tomcat and the JDK. Operations must install the correct version of each required software package. 
 
 To make matters worse, services can be written in a variety of languages and frameworks. They might also be written in multiple versions of those languages and frameworks. Consequently, the development team must share lots of details with operations. This complexity increases the risk of errors during deployment. A machine might, for example, have the wrong version of the language runtime. 
 
-# NO ABILITY TO CONSTRAIN THE RESOURCES CONSUMED BY A SERVICE INSTANCE 
+**NO ABILITY TO CONSTRAIN THE RESOURCES CONSUMED BY A SERVICE INSTANCE**
 
 Another drawback is that you can’t constrain the resources consumed by a service instance. A process can potentially consume all of a machine’s CPU or memory, starving other service instances and operating systems of resources. This might happen, for example, because of a bug. 
 
 
-# LACK OF ISOLATION WHEN RUNNING MULTIPLE SERVICE INSTANCES ON THE SAME MACHINE 
+**LACK OF ISOLATION WHEN RUNNING MULTIPLE SERVICE INSTANCES ON THE SAME MACHINE**
 
 The problem is even worse when running multiple instances on the same machine. The lack of isolation means that a misbehaving service instance can impact other service instances. As a result, the application risks being unreliable, especially when running multiple service instances on the same machine. 
 
-# AUTOMATICALLY DETERMINING WHERE TO PLACE SERVICE INSTANCES IS CHALLENGING 
+**AUTOMATICALLY DETERMINING WHERE TO PLACE SERVICE INSTANCES IS CHALLENGING**
 
 Another challenge with running multiple service instances on the same machine is determining the placement of service instances. Each machine has a fixed set of resources, CPU, memory, and so on, and each service instance needs some amount of resources. It’s important to assign service instances to machines in a way that uses the machines efficiently without overloading them. As I explain shortly, VM-based clouds and container orchestration frameworks handle this automatically. When deploying services natively, it’s likely that you’ll need to manually decide the placement. 
 
@@ -201,11 +201,11 @@ As you can see, despite its familiarity, the Service as a language-specific pack
 
 Let’s now look at modern ways of deploying services that avoid these problems. 
 
-# _12.2 Deploying services using the Service as a virtual machine pattern_ 
+## 12.2 Deploying services using the Service as a virtual machine pattern
 
 Once again, imagine you want to deploy the FTGO Restaurant Service, except this time it’s on AWS EC2. One option would be to create and configure an EC2 instance and copy onto it the executable or WAR file. Although you would get some benefit from using the cloud, this approach suffers from the drawbacks described in the preceding section. A better, more modern approach is to package the service as an Amazon Machine Image (AMI), as shown in figure 12.6. Each service instance is an EC2 instance created from that AMI. The EC2 instances would typically be managed by an AWS Auto Scaling group, which attempts to ensure that the desired number of healthy instances is always running. 
 
-# Pattern: Deploy a service as a VM 
+**Pattern: Deploy a service as a VM**
 
 Deploy services packaged as VM images into production. Each service instance is a VM. See http://microservices.io/patterns/deployment/service-per-vm.html. 
 
@@ -226,7 +226,7 @@ Figure 12.6 The deployment pipeline packages a service as a virtual machine imag
 
 There are a variety of tools that your deployment pipeline can use to build VM images. One early tool for creating EC2 AMIs is Aminator, created by Netflix, which used it to deploy its video-streaming service on AWS (https://github.com/Netflix/ aminator). A more modern VM image builder is Packer, which unlike Aminator supports a variety of virtualization technologies, including EC2, Digital Ocean, Virtual Box, and VMware (www.packer.io). To use Packer to create an AMI, you write a configuration file that specifies the base image and a set of provisioners that install software and configure the AMI. 
 
-# About Elastic Beanstalk 
+**About Elastic Beanstalk**
 
 Elastic Beanstalk, which is provided by AWS, is an easy way to deploy your services using VMs. You upload your code, such as a WAR file, and Elastic Beanstalk deploys it as one or more load-balanced and managed EC2 instances. Elastic Beanstalk is perhaps not quite as fashionable as, say, Kubernetes, but it’s an easy way to deploy a microservices-based application on EC2. 
 
@@ -239,7 +239,7 @@ Elastic Beanstalk can also deploy Docker containers. Each EC2 instance runs a co
 
 Let’s look at the benefits and drawbacks of using this approach. 
 
-# _12.2.1 The benefits of deploying services as VMs_ 
+### 12.2.1 The benefits of deploying services as VMs
 
 The Service as a virtual machine pattern has a number of benefits: 
 
@@ -251,19 +251,19 @@ The Service as a virtual machine pattern has a number of benefits:
 
 Let’s look at each one. 
 
-# THE VM IMAGE ENCAPSULATES THE TECHNOLOGY STACK 
+**THE VM IMAGE ENCAPSULATES THE TECHNOLOGY STACK**
 
 An important benefit of this pattern is that the VM image contains the service and all of its dependencies. It eliminates the error-prone requirement to correctly install and set up the software that a service needs in order to run. Once a service has been packaged as a virtual machine, it becomes a black box that encapsulates your service’s technology stack. The VM image can be deployed anywhere without modification. The API for deploying the service becomes the VM management API. Deployment becomes much simpler and more reliable. 
 
-# SERVICE INSTANCES ARE ISOLATED 
+**SERVICE INSTANCES ARE ISOLATED**
 
 A major benefit of virtual machines is that each service instance runs in complete isolation. That, after all, is one of the main goals of virtual machine technology. Each virtual machine has a fixed amount of CPU and memory and can’t steal resources from other services. 
 
-# USES MATURE CLOUD INFRASTRUCTURE 
+**USES MATURE CLOUD INFRASTRUCTURE**
 
 Another benefit of deploying your microservices as virtual machines is that you can leverage mature, highly automated cloud infrastructure. Public clouds such as AWS attempt to schedule VMs on physical machines in a way that avoids overloading the machine. They also provide valuable features such as load balancing of traffic across VMs and autoscaling. 
 
-# _12.2.2 The drawbacks of deploying services as VMs_ 
+### 12.2.2 The drawbacks of deploying services as VMs
 
 The Service as a VM pattern also has some drawbacks: 
 
@@ -279,32 +279,32 @@ Let’s look at each drawback in turn.
 _**Deploying services using the Service as a container pattern**_ 
 
 
-# LESS-EFFICIENT RESOURCE UTILIZATION 
+**LESS-EFFICIENT RESOURCE UTILIZATION**
 
 Each service instance has the overhead of an entire virtual machine, including its operating system. Moreover, a typical public IaaS virtual machine offers a limited set of VM sizes, so the VM will probably be underutilized. This is less likely to be a problem for Java-based services because they’re relatively heavyweight. But this pattern might be an inefficient way of deploying lightweight NodeJS and GoLang services. 
 
-# RELATIVELY SLOW DEPLOYMENTS 
+**RELATIVELY SLOW DEPLOYMENTS**
 
 Building a VM image typically takes some number of minutes because of the size of the VM. There are lots of bits to be moved over the network. Also, instantiating a VM from a VM image is time consuming because of, once again, the amount of data that must be moved over the network. The operating system running inside the VM also takes some time to boot, though _slow_ is a relative term. This process, which perhaps takes minutes, is much faster than the traditional deployment process. But it’s much slower than the more lightweight deployment patterns you’ll read about soon. 
 
-# SYSTEM ADMINISTRATION OVERHEAD 
+**SYSTEM ADMINISTRATION OVERHEAD**
 
 You’re responsible for patching the operation system and runtime. System administration may seem inevitable when deploying software, but later in section 12.5, I describe serverless deployment, which eliminates this kind of system administration. 
 
 Let’s now look at an alternative way to deploy microservices that’s more lightweight, yet still has many of the benefits of virtual machines. 
 
-# _12.3 Deploying services using the Service as a container pattern_ 
+## 12.3 Deploying services using the Service as a container pattern
 
 Containers are a more modern and lightweight deployment mechanism. They’re an operating-system-level virtualization mechanism. A container, as figure 12.7 shows, consists of usually one but sometimes multiple processes running in a sandbox, which isolates it from other containers. A container running a Java service, for example, would typically consist of the JVM process. 
 
 From the perspective of a process running in a container, it’s as if it’s running on its own machine. It typically has its own IP address, which eliminates port conflicts. All Java processes can, for example, listen on port 8080. Each container also has its own root filesystem. The container runtime uses operating system mechanisms to isolate the containers from each other. The most popular example of a container runtime is Docker, although there are others, such as Solaris Zones. 
 
-# Pattern: Deploy a service as a container 
+**Pattern: Deploy a service as a container**
 
 Deploy services packaged as container images into production. Each service instance is a container. See http://microservices.io/patterns/deployment/service-per-container .html. 
 
 
-# **Each container is a sandbox that isolates the processes.** 
+**Each container is a sandbox that isolates the processes.**
 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0424-03.png)
@@ -337,11 +337,11 @@ Build time Runtime<br>VM<br>Container<br>Service<br>instance<br>$ docker build .
 
 Figure 12.8 A service is packaged as a container image, which is stored in a registry. At runtime the service consists of multiple containers instantiated from that image. Containers typically run on virtual machines. A single VM will usually run multiple containers. 
 
-# _12.3.1 Deploying services using Docker_ 
+### 12.3.1 Deploying services using Docker
 
 To deploy a service as a container, you must package it as a container image. A _container image_ is a filesystem image consisting of the application and any software required to run the service. It’s often a complete Linux root filesystem, although more lightweight images are also used. For example, to deploy a Spring Boot-based service, you build a container image containing the service’s executable JAR and the correct version of the JDK. Similarly, to deploy a Java web application, you would build a container image containing the WAR file, Apache Tomcat, and the JDK. 
 
-# BUILDING A DOCKER IMAGE 
+**BUILDING A DOCKER IMAGE**
 
 The first step in building an image is to create a Dockerfile. A _Dockerfile_ describes how to build a Docker container image. It specifies the base container image, a series of instructions for installing software and configuring the container, and the shell command to run when the container is created. Listing 12.1 shows the Dockerfile used to build an image for Restaurant Service. It builds a container image containing the service’s executable JAR file. It configures the container to run the java -jar command on startup. 
 
@@ -371,7 +371,7 @@ docker build -t ftgo-restaurant-service .
 
 The docker build command has two arguments: the -t argument specifies the name of the image, and the . specifies what Docker calls the context. The _context_ , which in this example is the current directory, consists of Dockerfile and the files used to build the image. The docker build command uploads the context to the Docker daemon, which builds the image. 
 
-# PUSHING A DOCKER IMAGE TO A REGISTRY 
+**PUSHING A DOCKER IMAGE TO A REGISTRY**
 
 The final step of the build process is to push the newly built Docker image to what is known as a registry. A Docker _registry_ is the equivalent of a Java Maven repository for Java libraries, or a NodeJS npm registry for NodeJS packages. Docker hub is an example of a public Docker registry and is equivalent to Maven Central or NpmJS.org. But for your applications you’ll probably want to use a private registry provided by services, such as Docker Cloud registry or AWS EC2 Container Registry. 
 
@@ -387,7 +387,7 @@ This command often takes much less time than you might expect. That’s because 
 
 Now that we’ve pushed the image to a registry, let’s look at how to create a container. 
 
-# RUNNING A DOCKER CONTAINER 
+**RUNNING A DOCKER CONTAINER**
 
 Once you’ve packaged your service as a container image, you can then create one or more containers. The container infrastructure will pull the image from the registry onto a production server. It will then create one or more containers from that image. Each container is an instance of your service. 
 
@@ -417,7 +417,7 @@ A better approach that’s especially useful during development is to use Docker
 
 The problem with Docker Compose, though, is that it’s limited to a single machine. To deploy services reliably, you must use a Docker orchestration framework, such as Kubernetes, which turns a set of machines into a pool of resources. I describe how to use Kubernetes later, in section 12.4. First, let’s review the benefits and drawbacks of using containers. 
 
-# _12.3.2 Benefits of deploying services as containers_ 
+### 12.3.2 Benefits of deploying services as containers
 
 Deploying services as containers has several benefits. First, containers have many of the benefits of virtual machines: 
 
@@ -433,17 +433,17 @@ But unlike virtual machines, containers are a lightweight technology. Container 
 _**Deploying the FTGO application with Kubernetes**_ 
 
 
-# _12.3.3 Drawbacks of deploying services as containers_ 
+### 12.3.3 Drawbacks of deploying services as containers
 
 One significant drawback of containers is that you’re responsible for the undifferentiated heavy lifting of administering the container images. You must patch the operating system and runtime. Also, unless you’re using a hosted container solution such as Google Container Engine or AWS ECS, you must administer the container infrastructure and possibly the VM infrastructure it runs on. 
 
-# _12.4 Deploying the FTGO application with Kubernetes_ 
+## 12.4 Deploying the FTGO application with Kubernetes
 
 Now that we’ve looked at containers and their trade-offs, let’s look at how to deploy the FTGO application’s Restaurant Service using Kubernetes. Docker Compose, described in section 12.3.1, is great for development and testing. But to reliably run containerized services in production, you need to use a much more sophisticated container runtime, such as Kubernetes. Kubernetes is a Docker orchestration framework, a layer of software on top of Docker that turns a set of machines into a single pool of resources for running services. It endeavors to keep the desired number of instances of each service running at all times, even when service instances or machines crash. The agility of containers combined with the sophistication of Kubernetes is a compelling way to deploy services. 
 
 In this section, I first give an overview of Kubernetes, its functionality, and its architecture. After that, I show how to deploy a service using Kubernetes. Kubernetes is a complex topic, and covering it exhaustively is beyond the scope of this book, so I only show how to use Kubernetes from the perspective of a developer. For more information, I recommend _Kubernetes in Action_ by Marko Luksa (Manning, 2018). 
 
-# _12.4.1 Overview of Kubernetes_ 
+### 12.4.1 Overview of Kubernetes
 
 Kubernetes is a Docker orchestration framework. A _Docker orchestration framework_ treats a set of machines running Docker as a pool of resources. You tell the Docker orchestration framework to run _N_ instances of your service, and it handles the rest. Figure 12.9 shows the architecture of a Docker orchestration framework. 
 
@@ -467,7 +467,7 @@ Figure 12.9 A Docker orchestration framework turns a set of machines running Doc
 
 Docker orchestration frameworks are an increasingly popular way to deploy applications. Docker Swarm is part of the Docker engine, so is easy to set up and use. Kubernetes is much more complex to set up and administer, but it’s much more sophisticated. At the time of writing, Kubernetes has tremendous momentum, with a massive open source community. Let’s take a closer look at how it works. 
 
-# KUBERNETES ARCHITECTURE 
+**KUBERNETES ARCHITECTURE**
 
 Kubernetes runs on a cluster of machines. Figure 12.10 shows the architecture of a Kubernetes cluster. Each machine in a Kubernetes cluster is either a master or a node. A typical cluster has a small number of masters—perhaps just one—and many nodes. A _master_ machine is responsible for managing the cluster. A _node_ is a worker than runs one or more pods. A _pod_ is Kubernetes’s unit of deployment and consists of a set of containers. 
 
@@ -505,7 +505,7 @@ A node runs several components, including the following:
 
 Let’s now look at key Kubernetes concepts you’ll need to master to deploy services on Kubernetes. 
 
-# KEY KUBERNETES CONCEPTS 
+**KEY KUBERNETES CONCEPTS**
 
 As mentioned in the introduction to this section, Kubernetes is quite complex. But it’s possible to use Kubernetes productively once you master a few key concepts, called _objects_ . Kubernetes defines many types of objects. From a developer’s perspective, the most important objects are the following: 
 
@@ -519,7 +519,7 @@ As mentioned in the introduction to this section, Kubernetes is quite complex. B
 
 Now that we’ve reviewed the key Kubernetes concepts, let’s see them in action by looking at how to deploy an application service on Kubernetes. 
 
-# _12.4.2 Deploying the Restaurant service on Kubernetes_ 
+### 12.4.2 Deploying the Restaurant service on Kubernetes
 
 As mentioned earlier, to deploy a service on Kubernetes, you need to define a deployment. The easiest way to create a Kubernetes object such as a deployment is by writing a YAML file. Listing 12.4 is a YAML file defining a deployment for Restaurant Service. This deployment specifies running two replicas of a pod. The pod has just one container. 
 
@@ -599,7 +599,7 @@ To create this deployment, you must first create the Kubernetes Secret called ft
 
 This command creates a secret containing the database user ID and password specified on the command line. See the Kubernetes documentation (https://kubernetes .io/docs/concepts/configuration/secret/#creating-your-own-secrets) for more secure ways to create secrets. 
 
-# CREATING A KUBERNETES SERVICE 
+**CREATING A KUBERNETES SERVICE**
 
 At this point the pods are running, and the Kubernetes deployment will do its best to keep them running. The problem is that the pods have dynamically assigned IP addresses and, as such, aren’t that useful to a client that wants to make an HTTP request. As described in chapter 3, the solution is to use a service discovery mechanism. 
 
@@ -632,7 +632,7 @@ Once you’ve written the YAML file, you can create the service using this comma
 
 Now that we’ve created the Kubernetes service, any clients of Restaurant Service that are running inside the Kubernetes cluster can access its REST API via http:// ftgo-restaurant-service:8080. Later, I discuss how to upgrade running services, but first let’s take a look at how to make the services accessible from outside the Kubernetes cluster. 
 
-# _12.4.3 Deploying the API gateway_ 
+### 12.4.3 Deploying the API gateway
 
 The Kubernetes service for Restaurant Service, shown in listing 12.5, is only accessible from within the cluster. That’s not a problem for Restaurant Service, but what about API Gateway? Its role is to route traffic from the outside world to the service. It therefore needs to be accessible from outside the cluster. Fortunately, a Kubernetes service supports this use case as well. The service we looked at earlier is a ClusterIP service, which is the default, but there are, however, two other types of services: NodePort and LoadBalancer. 
 
@@ -660,7 +660,7 @@ API Gateway is within the cluster using the URL http://ftgo-api-gateway and outs
 
 A NodePort type service isn’t the only option, though. You can also use a LoadBalancer service, which automatically configures a cloud-specific load balancer. The load balancer will be an ELB if Kubernetes is running on AWS. One benefit of this type of service is that you no longer have to configure your own load balancer. The drawback, however, is that although Kubernetes does give a few options for configuring the ELB, such the SSL certificate, you have a lot less control over its configuration. 
 
-# _12.4.4 Zero-downtime deployments_ 
+### 12.4.4 Zero-downtime deployments
 
 Imagine you’ve updated Restaurant Service and want to deploy those changes into production. Updating a running service is a simple three-step process when using Kubernetes: 
 
@@ -685,7 +685,7 @@ Kubernetes will then replace the pods running version 1.1.0.RELEASE with pods ru
 
 A Kubernetes deployment is a good way to deploy a service without downtime. But what if a bug only appears after the pod is ready and receiving production traffic? In that situation, Kubernetes will continue to roll out new versions, so a growing number of users will be impacted. Though your monitoring system will hopefully detect the issue and quickly roll back the deployment, you won’t avoid impacting at least some users. To address this issue and make rolling out a new version of a service more reliable, we need to separate _deploying_ , which means getting the service running in production, from _releasing_ the service, which means making it available to handle production traffic. Let’s look at how to accomplish that using a service mesh. 
 
-# _12.4.5 Using a service mesh to separate deployment from release_ 
+### 12.4.5 Using a service mesh to separate deployment from release
 
 The traditional way to roll out a new version of a service is to first test it in a staging environment. Then, once it’s passed the test in staging, you deploy in production by doing a rolling upgrade that replaces old instances of the service with new service instances. On one hand, as you just saw, Kubernetes deployments make doing a rolling upgrade very straightforward. On the other hand, this approach assumes that once a service version has passed the tests in the staging environment, it will work in production. Sadly, this is not always the case. 
 
@@ -716,7 +716,7 @@ Traditionally, separating deployments and releases in this way has been challeng
 
 As described in chapter 11, there are several service meshes to choose from. In this section, I show you how to use Istio, a popular, open source service mesh originally developed by Google, IBM, and Lyft. I begin by providing a brief overview of Istio and a few of its many features. Next I describe how to deploy an application using Istio. After that, I show how to use its traffic-routing capabilities to deploy and release an upgrade to a service. 
 
-# OVERVIEW OF THE ISTIO SERVICE MESH 
+**OVERVIEW OF THE ISTIO SERVICE MESH**
 
 The Istio website describes Istio as an “An open platform to connect, manage, and secure microservices” (https://istio.io). It’s a networking layer through which all of your services’ network traffic flows. Istio has a rich set of features organized into four main categories: 
 
@@ -753,7 +753,7 @@ The Istio Envoy proxy is a modified version of Envoy (www.envoyproxy.io). It’s
 
 Istio uses Envoy as a sidecar, a process or container that runs alongside the service instance and implements cross-cutting concerns. When running on Kubernetes, the Envoy proxy is a container within the service’s pod. In other environments that don’t have the pod concept, Envoy runs in the same container as the service. All traffic to and from a service flows through its Envoy proxy, which routes traffic according to the routing rules given to it by the control plane. For example, direct Service  Service communication becomes Service  Source Envoy  Destination Envoy  Service. 
 
-# Pattern: Sidecar 
+**Pattern: Sidecar**
 
 Implement cross-cutting concerns in a sidecar process or container that runs alongside the service instance. See http://microservices.io/patterns/deployment/sidecar.html. 
 
@@ -761,7 +761,7 @@ Istio is configured using Kubernetes-style YAML configuration files. It has a co
 
 Let’s look at how to deploy a service with Istio. 
 
-# DEPLOYING A SERVICE WITH ISTIO 
+**DEPLOYING A SERVICE WITH ISTIO**
 
 Deploying a service on Istio is quite straightforward. You define a Kubernetes Service and a Deployment for each of your application’s services. Listing 12.7 shows the definition of Service and Deployment for Consumer Service. Although it’s almost identical to the definitions I showed earlier, there are a few differences. That’s because Istio has a few requirements for the Kubernetes services and pods: 
 
@@ -951,7 +951,7 @@ As you gain confidence that the service can handle production traffic, you can i
 
 By letting you easily separate deployment from release, Istio makes rolling out a new version of a service much more reliable. Yet I’ve barely scratched the surface of Istio’s capabilities. As of the time of writing, the current version of Istio is 0.8. I’m excited to watch it and the other service meshes mature and become a standard part of a production environment. 
 
-# _12.5 Deploying services using the Serverless deployment pattern_ 
+## 12.5 Deploying services using the Serverless deployment pattern
 
 The Language-specific packaging (section 12.1), Service as a VM (section 12.2), and Service as a container (section 12.3) patterns are all quite different, but they share some common characteristics. The first is that with all three patterns you must preprovision some computing resources—either physical machines, virtual machines, or containers. Some deployment platforms implement autoscaling, which dynamically adjusts the number of VMs or containers based on the load. But you’ll always need to pay for some VMs or containers, even if they’re idle. 
 
@@ -963,11 +963,11 @@ _**Deploying microservices**_
 
 administration has been one of those things you need to do. As it turns out, though, there’s a solution: serverless. 
 
-# _12.5.1 Overview of serverless deployment with AWS Lambda_ 
+### 12.5.1 Overview of serverless deployment with AWS Lambda
 
 At AWS Re:Invent 2014, Werner Vogels, the CTO of Amazon, introduced AWS Lambda with the amazing phrase “magic happens at the intersection of functions, events, and data.” As this phrase suggests, AWS Lambda was initially for deploying event-driven services. It’s “magic” because, as you’ll see, AWS Lambda is an example of serverless deployment technology. 
 
-# Serverless deployment technologies 
+**Serverless deployment technologies**
 
 The main public clouds all provide a serverless deployment option, although AWS Lambda is the most advanced. Google Cloud has Google Cloud functions, which as of the time writing is in beta (https://cloud.google.com/functions/). Microsoft Azure has Azure functions (https://azure.microsoft.com/en-us/services/functions). 
 
@@ -977,14 +977,14 @@ AWS Lambda supports Java, NodeJS, C#, GoLang, and Python. A _lambda_ function is
 
 To deploy a service, you package your application as a ZIP file or JAR file, upload it to AWS Lambda, and specify the name of the function to invoke to handle a request (also called an _event_ ). AWS Lambda automatically runs enough instances of your microservice to handle incoming requests. You’re billed for each request based on the time taken and the memory consumed. Of course, the devil is in the details, and later you’ll see that AWS Lambda has limitations. But the notion that neither you as a developer nor anyone in your organization need worry about any aspect of servers, virtual machines, or containers is incredibly powerful. 
 
-# Pattern: Serverless deployment 
+**Pattern: Serverless deployment**
 
 Deploy services using a serverless deployment mechanism provided by a public cloud. See http://microservices.io/patterns/deployment/serverless-deployment.html. 
 
 
 _**Deploying services using the Serverless deployment pattern**_ 
 
-# _12.5.2 Developing a lambda function_ 
+### 12.5.2 Developing a lambda function
 
 Unlike when using the other three patterns, you must use a different programming model for your lambda functions. A lambda function’s code and the packaging depend on the programming language. A Java lambda function is a class that implements the generic interface RequestHandler, which is defined by the AWS Lambda Java core library and shown in the following listing. This interface takes two type parameters: I, which is the input type, and O, which is the output type. The type of I and O depend on the specific kind of request that the lambda handles. 
 
@@ -1000,7 +1000,7 @@ The RequestHandler interface defines a single handleRequest() method. This metho
 
 A Java lambda is packaged as either a ZIP file or a JAR file. A JAR file is an uber JAR (or fat JAR) created by, for example, the Maven Shade plugin. A ZIP file has the classes in the root directory and JAR dependencies in the lib directory. Later, I show how a Gradle project can create a ZIP file. But first, let’s look at the different ways of invoking lambda function. 
 
-# _12.5.3 Invoking lambda functions_ 
+### 12.5.3 Invoking lambda functions
 
 There are four ways to invoke a lambda function: 
 
@@ -1014,12 +1014,12 @@ There are four ways to invoke a lambda function:
 
 Let’s look at each one. 
 
-# HANDLING HTTP REQUESTS 
+**HANDLING HTTP REQUESTS**
 
 One way to invoke a lambda function is to configure an AWS API Gateway to route HTTP requests to your lambda. The API gateway exposes your lambda function as an HTTPS endpoint. It functions as an HTTP proxy, invokes the lambda function with an HTTP request object, and expects the lambda function to return an HTTP response object. By using the API gateway with AWS Lambda you can, for example, deploy RESTful services as lambda functions. 
 
 
-# HANDLING EVENTS GENERATED BY AWS SERVICES 
+**HANDLING EVENTS GENERATED BY AWS SERVICES**
 
 The second way to invoke a lambda function is to configure your lambda function to handle events generated by an AWS service. Examples of events that can trigger a lambda function include the following: 
 
@@ -1033,15 +1033,15 @@ The second way to invoke a lambda function is to configure your lambda function 
 
 Because of this integration with other AWS services, AWS Lambda is useful for a wide range of tasks. 
 
-# DEFINING SCHEDULED LAMBDA FUNCTIONS 
+**DEFINING SCHEDULED LAMBDA FUNCTIONS**
 
 Another way to invoke a lambda function is to use a Linux cron-like schedule. You can configure your lambda function to be invoked periodically—for example, every minute, 3 hours, or 7 days. Alternatively, you can use a cron expression to specify when AWS should invoke your lambda. cron expressions give you tremendous flexibility. For example, you can configure a lambda to be invoked at 2:15 p.m. Monday through Friday. 
 
-# INVOKING A LAMBDA FUNCTION USING A WEB SERVICE REQUEST 
+**INVOKING A LAMBDA FUNCTION USING A WEB SERVICE REQUEST**
 
 The fourth way to invoke a lambda function is for your application to invoke it using a web service request. The web service request specifies the name of the lambda function and the input event data. Your application can invoke a lambda function synchronously or asynchronously. If your application invokes the lambda function synchronously, the web service’s HTTP response contains the response of the lambda function. Otherwise, if it invokes the lambda function asynchronously, the web service response indicates whether the execution of the lambda was successfully initiated. 
 
-# _12.5.4 Benefits of using lambda functions_ 
+### 12.5.4 Benefits of using lambda functions
 
 Deploying services using lambda functions has several benefits: 
 
@@ -1057,7 +1057,7 @@ Deploying services using lambda functions has several benefits:
 _**Deploying a RESTful service using AWS Lambda and AWS Gateway**_ 
 
 
-# _12.5.5 Drawbacks of using lambda functions_ 
+### 12.5.5 Drawbacks of using lambda functions
 
 As you can see, AWS Lambda is an extremely convenient way to deploy services, but there are some significant drawbacks and limitations: 
 
@@ -1067,13 +1067,13 @@ As you can see, AWS Lambda is an extremely convenient way to deploy services, bu
 
 Because of these drawbacks and limitations, AWS Lambda isn’t a good fit for all services. But when choosing a deployment pattern, I recommend first evaluating whether serverless deployment supports your service’s requirements before considering alternatives. 
 
-# _12.6 Deploying a RESTful service using AWS Lambda and AWS Gateway_ 
+## 12.6 Deploying a RESTful service using AWS Lambda and AWS Gateway
 
 Let’s take a look at how to deploy Restaurant Service using AWS Lambda. It’s a service that has a REST API for creating and managing restaurants. It doesn’t have longlived connections to Apache Kafka, for example, so it’s a good fit for AWS lambda. Figure 12.13 shows the deployment architecture for this service. The service consists of several lambda functions, one for each REST endpoint. An AWS API Gateway is responsible for routing HTTP requests to the lambda functions. 
 
 Each lambda function has a request handler class. The ftgo-create-restaurant lambda function invokes the CreateRestaurantRequestHandler class, and the ftgofind-restaurant lambda function invokes FindRestaurantRequestHandler. Because these request handler classes implement closely related aspects of the same service, they’re packaged together in the same ZIP file, restaurant-service-aws-lambda .zip. Let’s look at the design of the service, including those handler classes. 
 
-# _12.6.1 The design of the AWS Lambda version of Restaurant Service_ 
+### 12.6.1 The design of the AWS Lambda version of Restaurant Service
 
 The architecture of the service, shown in figure 12.14, is quite similar to that of a traditional service. The main difference is that Spring MVC controllers have been replaced by AWS Lambda request handler classes. The rest of the business logic is unchanged. 
 
@@ -1107,7 +1107,7 @@ tier. The business tier consists of RestaurantService, the Restaurant JPA entity
 
 Let’s take a look at the FindRestaurantRequestHandler class. 
 
-# THE FINDRESTAURANTREQUESTHANDLER CLASS 
+**THE FINDRESTAURANTREQUESTHANDLER CLASS**
 
 The FindRestaurantRequestHandler class implements the GET /restaurant/ {restaurantId} endpoint. This class along with the other request handler classes are the leaves of the class hierarchy shown in figure 12.15. The root of the hierarchy is RequestHandler, which is part of the AWS SDK. Its abstract subclasses handle errors and inject dependencies. 
 
@@ -1204,7 +1204,7 @@ public abstract class AbstractAutowiringHttpRequestHandler extends AbstractHttpH
 
 This class overrides the beforeHandling() method defined by AbstractHttpHandler. Its beforeHandling() method injects dependencies using autowiring before handling the first request. 
 
-# THE ABSTRACTHTTPHANDLER CLASS 
+**THE ABSTRACTHTTPHANDLER CLASS**
 
 The request handlers for Restaurant Service ultimately extend AbstractHttpHandler, shown in listing 12.11. This class implements RequestHandler<APIGatewayProxyRequestEvent and APIGatewayProxyResponseEvent>. Its key responsibility is to catch exceptions thrown when handling a request and throw a 500 error code. 
 
@@ -1237,7 +1237,7 @@ public abstract class AbstractHttpHandler implements RequestHandler<APIGatewayPr
 }
 ```
 
-# _12.6.2 Packaging the service as ZIP file_ 
+### 12.6.2 Packaging the service as ZIP file
 
 Before the service can be deployed, we must package it as a ZIP file. We can easily build the ZIP file using the following Gradle task: 
 
@@ -1259,7 +1259,7 @@ Now that we’ve built the ZIP file, let’s look at how to deploy the lambda fu
 _**Deploying a RESTful service using AWS Lambda and AWS Gateway**_ 
 
 
-# _12.6.3 Deploying lambda functions using the Serverless framework_ 
+### 12.6.3 Deploying lambda functions using the Serverless framework
 
 Using the tools provided by AWS to deploy lambda functions and configure the API gateway is quite tedious. Fortunately, the Serverless open source project makes using lambda functions a lot easier. When using Serverless, you write a simple serverless.yml file that defines your lambda functions and their RESTful endpoints. Serverless then deploys the lambda functions and creates and configures an API gateway that routes requests to them. 
 
@@ -1307,7 +1307,7 @@ wait, your service will be accessible via the API gateway’s endpoint URL. AWS 
 
 The evolution of infrastructure is remarkable. Not that long ago, we manually deployed applications on physical machines. Today, highly automated public clouds provide a range of virtual deployment options. One option is to deploy services as virtual machines. Or better yet, we can package services as containers and deploy them using sophisticated Docker orchestration frameworks such as Kubernetes. Sometimes we even avoid thinking about infrastructure entirely and deploy services as lightweight, ephemeral lambda functions. 
 
-# _Summary_ 
+## Summary
 
 - You should choose the most lightweight deployment pattern that supports your service’s requirements. Evaluate the options in the following order: serverless, containers, virtual machines, and language-specific packages. 
 
@@ -1320,7 +1320,7 @@ The evolution of infrastructure is remarkable. Not that long ago, we manually de
 - Deploying your services as language-specific packages is generally best avoided unless you only have a small number of services. For example, as described in chapter 13, when starting on your journey to microservices you’ll probably deploy the services using the same mechanism you use for your monolithic application, which is most likely this option. You should only consider setting 
 
 
-_**Summary**_
+## Summary
 up a sophisticated deployment infrastructure such as Kubernetes once you’ve developed some services. 
 
 - One of the many benefits of using a service mesh—a networking layer that mediates all network traffic in and out of services—is that it enables you to deploy a service in production, test it, and only then route production traffic to it. Separating deployment from release improves the reliability of rolling out new versions of services. 

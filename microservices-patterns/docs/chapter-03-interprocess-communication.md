@@ -1,6 +1,6 @@
-# _Interprocess communication in a microservice architecture_ 
+# 3 Interprocess communication in a microservice architecture
 
-# _This chapter covers_ 
+**This chapter covers**
 
 - Applying the communication patterns: Remote procedure invocation, Circuit breaker, Client-side discovery, Self registration, Server-side discovery, Third party registration, Asynchronous messaging, Transactional outbox, Transaction log tailing, Polling publisher 
 
@@ -30,7 +30,7 @@ The choice of IPC mechanism is an important architectural decision. It can impac
 
 I begin this chapter with an overview of interprocess communication in microservice architecture. Next, I describe remote procedure invocation-based IPC, of which REST is the most popular example. I cover important topics including service discovery and how to handle partial failure. After that, I describe asynchronous messagingbased IPC. I also talk about scaling consumers while preserving message ordering, correctly handling duplicate messages, and transactional messaging. Finally, I go through the concept of self-contained services that handle synchronous requests without communicating with other services in order to improve availability. 
 
-# _3.1 Overview of interprocess communication in a microservice architecture_ 
+## 3.1 Overview of interprocess communication in a microservice architecture
 
 There are lots of different IPC technologies to choose from. Services can use synchronous request/response-based communication mechanisms, such as HTTPbased REST or gRPC. Alternatively, they can use asynchronous, message-based communication mechanisms such as AMQP or STOMP. There are also a variety of different messages formats. Services can use human-readable, text-based formats such as JSON or XML. Alternatively, they could use a more efficient binary format such as Avro or Protocol Buffers. 
 
@@ -40,7 +40,7 @@ Before getting into the details of specific technologies, I want to bring up sev
 _**Overview of interprocess communication in a microservice architecture**_
 styles, which are a technology-independent way of describing how clients and services interact. Next I discuss the importance of precisely defining APIs in a microservice architecture, including the concept of API-first design. After that, I discuss the important topic of API evolution. Finally, I discuss different options for message formats and how they can determine ease of API evolution. Let’s begin by looking at interaction styles. 
 
-# _3.1.1 Interaction styles_ 
+### 3.1.1 Interaction styles
 
 It’s useful to first think about the style of interaction between a service and its clients before selecting an IPC mechanism for a service’s API. Thinking first about the interaction style will help you focus on the requirements and avoid getting mired in the details of a particular IPC technology. Also, as described in section 3.4, the choice of interaction style impacts the availability of your application. Furthermore, as you’ll see in chapters 9 and 10, it helps you select the appropriate integration testing strategy. 
 
@@ -87,7 +87,7 @@ Each service will typically use a combination of these interaction styles. Many 
 
 Let’s look at how to define a service’s API. 
 
-- _3.1.2 Defining APIs in a microservice architecture_ 
+### 3.1.2 Defining APIs in a microservice architecture
 
 APIs or interfaces are central to software development. An application is comprised of modules. Each module has an interface that defines the set of operations that module’s clients can invoke. A well-designed interface exposes useful functionality while hiding the implementation. It enables the implementation to change without impacting clients. 
 
@@ -103,7 +103,7 @@ _**Overview of interprocess communication in a microservice architecture**_
 
 Regardless of which IPC mechanism you choose, it’s important to precisely define a service’s API using some kind of _interface definition language_ (IDL). Moreover, there are good arguments for using an API-first approach to defining services (see www .programmableweb.com/news/how-to-design-great-apis-api-first-design-and-raml/how-to/ 2015/07/10 for more). First you write the interface definition. Then you review the interface definition with the client developers. Only after iterating on the API definition do you then implement the service. Doing this up-front design increases your chances of building a service that meets the needs of its clients. 
 
-# API-first design is essential 
+**API-first design is essential**
 
 Even in small projects, I’ve seen problems occur because components don’t agree on an API. For example, on one project the backend Java developer and the AngularJS frontend developer both said they had completed development. The application, however, didn’t work. The REST and WebSocket API used by the frontend application to communicate with the backend was poorly defined. As a result, the two applications couldn’t communicate! 
 
@@ -111,7 +111,7 @@ The nature of the API definition depends on which IPC mechanism you’re using. 
 
 A service’s API is rarely set in stone. It will likely evolve over time. Let’s take a look at how to do that and consider the issues you’ll face. 
 
-# _3.1.3 Evolving APIs_ 
+### 3.1.3 Evolving APIs
 
 APIs invariably change over time as new features are added, existing features are changed, and (perhaps) old features are removed. In a monolithic application, it’s relatively straightforward to change an API and update all the callers. If you’re using a statically typed language, the compiler helps by giving a list of compilation errors. The only challenge may be the scope of the change. It might take a long time to change a widely used API. 
 
@@ -120,7 +120,7 @@ In a microservices-based application, changing a service’s API is a lot more d
 It’s important to have a strategy for dealing with these challenges. How you handle a change to an API depends on the nature of the change. 
 
 
-# USE SEMANTIC VERSIONING 
+**USE SEMANTIC VERSIONING**
 
 The Semantic Versioning specification (http://semver.org) is a useful guide to versioning APIs. It’s a set of rules that specify how version numbers are used and incremented. Semantic versioning was originally intended to be used for versioning of software packages, but you can use it for versioning APIs in a distributed system. 
 
@@ -134,7 +134,7 @@ The Semantic Versioning specification (Semvers) requires a version number to con
 
 There are a couple of places you can use the version number in an API. If you’re implementing a REST API, you can, as mentioned below, use the major version as the first element of the URL path. Alternatively, if you’re implementing a service that uses messaging, you can include the version number in the messages that it publishes. The goal is to properly version APIs and to evolve them in a controlled fashion. Let’s look at how to handle minor and major changes. 
 
-# MAKING MINOR, BACKWARD-COMPATIBLE CHANGES 
+**MAKING MINOR, BACKWARD-COMPATIBLE CHANGES**
 
 Ideally, you should strive to only make backward-compatible changes. Backwardcompatible changes are additive changes to an API: 
 
@@ -146,7 +146,7 @@ Ideally, you should strive to only make backward-compatible changes. Backwardcom
 
 If you only ever make these kinds of changes, older clients will work with newer services, provided that they observe the Robustness principle (https://en.wikipedia.org/wiki/ Robustness_principle), which states: “Be conservative in what you do, be liberal in what you accept from others.” Services should provide default values for missing request attributes. Similarly, clients should ignore any extra response attributes. In order for this to be painless, clients and services must use a request and response format that supports the Robustness principle. Later in this section, I describe how textbased formats such as JSON and XML generally make it easier to evolve APIs. 
 
-# MAKING MAJOR, BREAKING CHANGES 
+**MAKING MAJOR, BREAKING CHANGES**
 
 Sometimes you must make major, incompatible changes to an API. Because you can’t force clients to upgrade immediately, a service must simultaneously support old and new versions of an API for some period of time. If you’re using an HTTP-based IPC mechanism, such as REST, one approach is to embed the major version number in the URL. For example, version 1 paths are prefixed with '/v1/…', and version 2 paths with '/v2/…'. 
 
@@ -168,13 +168,13 @@ In order to support multiple versions of an API, the service’s adapters that i
 
 Now we’ll look at the issue of message formats, the choice of which can impact how easy evolving an API will be. 
 
-# _3.1.4 Message formats_ 
+### 3.1.4 Message formats
 
 The essence of IPC is the exchange of messages. _Messages_ usually contain data, and so an important design decision is the format of that data. The choice of message format can impact the efficiency of IPC, the usability of the API, and its evolvability. If you’re using a messaging system or protocols such as HTTP, you get to pick your message format. Some IPC mechanisms—such as gRPC, which you’ll learn about shortly—might dictate the message format. In either case, it’s essential to use a cross-language message format. Even if you’re writing your microservices in a single language today, it’s likely that you’ll use other languages in the future. You shouldn’t, for example, use Java serialization. 
 
 There are two main categories of message formats: text and binary. Let’s look at each one. 
 
-# TEXT-BASED MESSAGE FORMATS 
+**TEXT-BASED MESSAGE FORMATS**
 
 The first category is text-based formats such as JSON and XML. An advantage of these formats is that not only are they human readable, they’re self describing. A JSON message is a collection of named properties. Similarly, an XML message is effectively a collection of named elements and values. This format enables a consumer of a message to pick out the values of interest and ignore the rest. Consequently, many changes to the message schema can easily be backward-compatible. 
 
@@ -188,7 +188,7 @@ _**Interprocess communication in a microservice architecture**_
 
 the attributes in addition to their values. Another drawback is the overhead of parsing text, especially when messages are large. Consequently, if efficiency and performance are important, you may want to consider using a binary format. 
 
-# BINARY MESSAGE FORMATS 
+**BINARY MESSAGE FORMATS**
 
 There are several different binary formats to choose from. Popular formats include Protocol Buffers (https://developers.google.com/protocol-buffers/docs/overview) and Avro (https://avro.apache.org). Both formats provide a typed IDL for defining the structure of your messages. A compiler then generates the code that serializes and deserializes the messages. You’re forced to take an API-first approach to service design! Moreover, if you write your client in a statically typed language, the compiler checks that it uses the API correctly. 
 
@@ -196,13 +196,13 @@ One difference between these two binary formats is that Protocol Buffers uses ta
 
 Now that we’ve looked at message formats, let’s look at specific IPC mechanisms that transport the messages, starting with the Remote procedure invocation (RPI) pattern. 
 
-# _3.2 Communicating using the synchronous Remote procedure invocation pattern_ 
+## 3.2 Communicating using the synchronous Remote procedure invocation pattern
 
 When using a remote procedure invocation-based IPC mechanism, a client sends a request to a service, and the service processes the request and sends back a response. Some clients may block waiting for a response, and others might have a reactive, nonblocking architecture. But unlike when using messaging, the client assumes that the response will arrive in a timely fashion. 
 
 Figure 3.1 shows how RPI works. The business logic in the client invokes a _proxy interface_ , implemented by an _RPI proxy_ adapter class. The _RPI proxy_ makes a request to the service. The request is handled by an _RPI server_ adapter class, which invokes the service’s business logic via an interface. It then sends back a reply to the _RPI proxy_ , which returns the result to the client’s business logic. 
 
-# Pattern: Remote procedure invocation 
+**Pattern: Remote procedure invocation**
 
 A client invokes a service using a synchronous, remote procedure invocation-based protocol, such as REST (http://microservices.io/patterns/communication-style/ messaging.html). 
 
@@ -223,7 +223,7 @@ Figure 3.1 The client’s business logic invokes an interface that is implemente
 
 Let’s first take a look at REST. 
 
-# _3.2.1 Using REST_ 
+### 3.2.1 Using REST
 
 Today, it’s fashionable to develop APIs in the RESTful style (https://en.wikipedia .org/wiki/Representational_state_transfer). _REST_ is an IPC mechanism that (almost always) uses HTTP. Roy Fielding, the creator of REST, defines REST as follows: 
 
@@ -238,7 +238,7 @@ _**Interprocess communication in a microservice architecture**_
 
 Many developers claim their HTTP-based APIs are RESTful. But as Roy Fielding describes in a blog post, not all of them actually are (http://roy.gbiv.com/untangled/ 2008/rest-apis-must-be-hypertext-driven). To understand why, let’s take a look at the REST maturity model. 
 
-# THE REST MATURITY MODEL 
+**THE REST MATURITY MODEL**
 
 Leonard Richardson (no relation to your author) defines a very useful maturity model for REST (http://martinfowler.com/articles/richardsonMaturityModel.html) that consists of the following levels: 
 
@@ -252,11 +252,11 @@ Leonard Richardson (no relation to your author) defines a very useful maturity m
 
 I encourage you to review the REST APIs at your organization to see which level they correspond to. 
 
-# SPECIFYING REST APIS 
+**SPECIFYING REST APIS**
 
 As mentioned earlier in section 3.1, you must define your APIs using an interface definition language (IDL). Unlike older communication protocols like CORBA and SOAP, REST did not originally have an IDL. Fortunately, the developer community has rediscovered the value of an IDL for RESTful APIs. The most popular REST IDL is the Open API Specification (www.openapis.org), which evolved from the Swagger open source project. The Swagger project is a set of tools for developing and documenting REST APIs. It includes tools that generate client stubs and server skeletons from an interface definition. 
 
-# THE CHALLENGE OF FETCHING MULTIPLE RESOURCES IN A SINGLE REQUEST 
+**THE CHALLENGE OF FETCHING MULTIPLE RESOURCES IN A SINGLE REQUEST**
 
 REST resources are usually oriented around business objects, such as Consumer and Order. Consequently, a common problem when designing a REST API is how to 
 
@@ -266,7 +266,7 @@ enable the client to retrieve multiple related objects in a single request. For 
 
 One solution to this problem is for an API to allow the client to retrieve related resources when it gets a resource. For example, a client could retrieve an Order and its Consumer using GET /orders/order-id-1345?expand=consumer. The query parameter specifies the related resources to return with the Order. This approach works well in many scenarios but it’s often insufficient for more complex scenarios. It’s also potentially time consuming to implement. This has led to the increasing popularity of alternative API technologies such as GraphQL (http://graphql.org) and Netflix Falcor (http://netflix.github.io/falcor/), which are designed to support efficient data fetching. 
 
-# THE CHALLENGE OF MAPPING OPERATIONS TO HTTP VERBS 
+**THE CHALLENGE OF MAPPING OPERATIONS TO HTTP VERBS**
 
 Another common REST API design problem is how to map the operations you want to perform on a business object to an HTTP verb. A REST API should use PUT for updates, but there may be multiple ways to update an order, including cancelling it, revising the order, and so on. Also, an update might not be idempotent, which is a requirement for using PUT. One solution is to define a sub-resource for updating a particular aspect of a resource. The Order Service, for example, has a POST /orders/ {orderId}/cancel endpoint for cancelling orders, and a POST /orders/{orderId}/ revise endpoint for revising orders. Another solution is to specify a verb as a URL query parameter. Sadly, neither solution is particularly RESTful. 
 
@@ -304,7 +304,7 @@ _**Interprocess communication in a microservice architecture**_
 
 Despite these drawbacks, REST seems to be the de facto standard for APIs, though there are a couple of interesting alternatives. GraphQL, for example, implements flexible, efficient data fetching. Chapter 8 discusses GraphQL and covers the API gateway pattern. gRPC is another alternative to REST. Let’s take a look at how it works. 
 
-# _3.2.2 Using gRPC_ 
+### 3.2.2 Using gRPC
 
 As mentioned in the preceding section, one challenge with using REST is that because HTTP only provides a limited number of verbs, it’s not always straightforward to design a REST API that supports multiple update operations. An IPC technology that avoids this issue is gRPC (www.grpc.io), a framework for writing cross-language clients and servers (see https://en.wikipedia.org/wiki/Remote_procedure_call for more). gRPC is a binary message-based protocol, and this means—as mentioned earlier in the discussion of binary message formats—you’re forced to take an API-first approach to service design. You define your gRPC APIs using a Protocol Buffers-based IDL, which is Google’s language-neutral mechanism for serializing structured data. You use the Protocol Buffer compiler to generate client-side stubs and server-side skeletons. The compiler can generate code for a variety of languages, including Java, C#, NodeJS, and GoLang. Clients and servers exchange binary messages in the Protocol Buffers format using HTTP/2. 
 
@@ -358,14 +358,14 @@ gRPC also has several drawbacks:
 
 gRPC is a compelling alternative to REST, but like REST, it’s a synchronous communication mechanism, so it also suffers from the problem of partial failure. Let’s take a look at what that is and how to handle it. 
 
-- _3.2.3 Handling partial failure using the Circuit breaker pattern_ 
+### 3.2.3 Handling partial failure using the Circuit breaker pattern
 
 In a distributed system, whenever a service makes a synchronous request to another service, there is an ever-present risk of partial failure. Because the client and the service are separate processes, a service may not be able to respond in a timely way to a client’s request. The service could be down because of a failure or for maintenance. Or the service might be overloaded and responding extremely slowly to requests. 
 
 
 Because the client is blocked waiting for a response, the danger is that the failure could cascade to the client’s clients and so on and cause an outage. 
 
-# Pattern: Circuit breaker 
+**Pattern: Circuit breaker**
 
 An RPI proxy that immediately rejects invocations for a timeout period after the number of consecutive failures exceeds a specified threshold. See http://microservices .io/patterns/reliability/circuit-breaker.html. 
 
@@ -394,7 +394,7 @@ First we’ll look at how to write robust RPI proxies.
 
 _**Communicating using the synchronous Remote procedure invocation pattern**_ 
 
-# DEVELOPING ROBUST RPI PROXIES 
+**DEVELOPING ROBUST RPI PROXIES**
 
 Whenever one service synchronously invokes another service, it should protect itself using the approach described by Netflix (http://techblog.netflix.com/2012/02/faulttolerance-in-high-volume.html). This approach consists of a combination of the following mechanisms: 
 
@@ -406,7 +406,7 @@ Whenever one service synchronously invokes another service, it should protect it
 
 Netflix Hystrix (https://github.com/Netflix/Hystrix) is an open source library that implements these and other patterns. If you’re using the JVM, you should definitely consider using Hystrix when implementing RPI proxies. And if you’re running in a non-JVM environment, you should use an equivalent library. For example, the Polly library is popular in the .NET community (https://github.com/App-vNext/Polly). 
 
-# RECOVERING FROM AN UNAVAILABLE SERVICE 
+**RECOVERING FROM AN UNAVAILABLE SERVICE**
 
 Using a library such as Hystrix is only part of the solution. You must also decide on a case-by-case basis how your services should recover from an unresponsive remote service. One option is for a service to simply return an error to its client. For example, this approach makes sense for the scenario shown in figure 3.2, where the request to create an Order fails. The only option is for the API gateway to return an error to the mobile client. 
 
@@ -429,7 +429,7 @@ Figure 3.3 The API gateway implements the **GET /orders/{orderId}** endpoint usi
 
 It’s essential that you design your services to handle partial failure, but that’s not the only problem you need to solve when using RPI. Another problem is that in order for one service to invoke another service using RPI, it needs to know the network location of a service instance. On the surface this sounds simple, but in practice it’s a challenging problem. You must use a service discovery mechanism. Let’s look at how that works. 
 
-# _3.2.4 Using service discovery_ 
+### 3.2.4 Using service discovery
 
 Say you’re writing some code that invokes a service that has a REST API. In order to make a request, your code needs to know the network location (IP address and port) of a service instance. In a traditional application running on physical hardware, the network locations of service instances are usually static. For example, your code could read the network locations from a configuration file that’s occasionally updated. But in a modern, cloud-based microservices application, it’s usually not that simple. As is shown in figure 3.4, a modern application is much more dynamic. 
 
@@ -448,7 +448,7 @@ Dynamically Dynamically created<br>assigned IP and destroyed<br>Order service<br
 
 Figure 3.4 Service instances have dynamically assigned IP addresses. 
 
-# OVERVIEW OF SERVICE DISCOVERY 
+**OVERVIEW OF SERVICE DISCOVERY**
 
 As you’ve just seen, you can’t statically configure a client with the IP addresses of the services. Instead, an application must use a dynamic service discovery mechanism. Service discovery is conceptually quite simple: its key component is a service registry, which is a database of the network locations of an application’s service instances. 
 
@@ -462,7 +462,7 @@ There are two main ways to implement service discovery:
 
 Let’s look at each option. 
 
-# APPLYING THE APPLICATION-LEVEL SERVICE DISCOVERY PATTERNS 
+**APPLYING THE APPLICATION-LEVEL SERVICE DISCOVERY PATTERNS**
 
 One way to implement service discovery is for the application’s services and their clients to interact with the service registry. Figure 3.5 shows how this works. A service instance registers its network location with the service registry. A service client invokes a service by first querying the service registry to obtain a list of service instances. It then sends a request to one of those instances. 
 
@@ -481,7 +481,7 @@ Figure 3.5 The service registry keeps track of the service instances. Clients qu
 
 This approach to service discovery is a combination of two patterns. The first pattern is the Self registration pattern. A service instance invokes the service registry’s registration API to register its network location. It may also supply a health check URL, described in more detail in chapter 11. The _health check_ URL is an API endpoint that the service registry invokes periodically to verify that the service instance is healthy and available to handle requests. A service registry may require a service instance to periodically invoke a “heartbeat” API in order to prevent its registration from expiring. 
 
-# Pattern: Self registration 
+**Pattern: Self registration**
 
 A service instance registers itself with the service registry. See http://microservices.io/patterns/self-registration.html. 
 
@@ -493,7 +493,7 @@ _**Communicating using the synchronous Remote procedure invocation pattern**_
 
 then uses a load-balancing algorithm, such as a round-robin or random, to select a service instance. It then makes a request to a select service instance. 
 
-# Pattern: Client-side discovery 
+**Pattern: Client-side discovery**
 
 A service client retrieves the list of available service instances from the service registry and load balances across them. See http://microservices.io/patterns/clientside-discovery.html. 
 
@@ -531,11 +531,11 @@ This approach is a combination of two patterns:
 _**Communicating using the Asynchronous messaging pattern**_ 
 
 
-# Pattern: 3rd party registration 
+**Pattern: 3rd party registration**
 
 Service instances are automatically registered with the service registry by a third party. See http://microservices.io/patterns/3rd-party-registration.html. 
 
-# Pattern: Server-side discovery 
+**Pattern: Server-side discovery**
 
 A client makes a request to a router, which is responsible for service discovery. See http://microservices.io/patterns/server-side-discovery.html. 
 
@@ -545,11 +545,11 @@ One drawback of platform-provided service discovery is that it only supports the
 
 Now that we’ve looked at synchronous IPC using REST or gRPC, let’s take a look at the alternative: asynchronous, message-based communication. 
 
-# _3.3 Communicating using the Asynchronous messaging pattern_ 
+## 3.3 Communicating using the Asynchronous messaging pattern
 
 When using messaging, services communicate by asynchronously exchanging messages. A messaging-based application typically uses a _message broker_ , which acts as an intermediary between the services, although another option is to use a brokerless architecture, where the services communicate directly with each other. A service client makes a request to a service by sending it a message. If the service instance is expected to reply, it will do so by sending a separate message back to the client. Because the communication is asynchronous, the client doesn’t block waiting for a reply. Instead, the client is written assuming that the reply won’t be received immediately. 
 
-# Pattern: Messaging 
+**Pattern: Messaging**
 
 A client invokes a service using asynchronous messaging. See http://microservices .io/patterns/communication-style/messaging.html. 
 
@@ -558,11 +558,11 @@ I start this section with an overview of messaging. I show how to describe a mes
 
 brokerless and broker-based architectures and describe the criteria for selecting a message broker. I then discuss several important topics, including scaling consumers while preserving message ordering, detecting and discarding duplicate messages, and sending and receiving messages as part of a database transaction. Let’s begin by looking at how messaging works. 
 
-# _3.3.1 Overview of messaging_ 
+### 3.3.1 Overview of messaging
 
 A useful model of messaging is defined in the book _Enterprise Integration Patterns_ (Addison-Wesley Professional, 2003) by Gregor Hohpe and Bobby Woolf. In this model, messages are exchanged over message channels. A sender (an application or service) writes a message to a channel, and a receiver (an application or service) reads messages from a channel. Let’s look at messages and then look at channels. 
 
-# ABOUT MESSAGES 
+**ABOUT MESSAGES**
 
 A message consists of a header and a message body (www.enterpriseintegrationpatterns .com/Message.html). The _header_ is a collection of name-value pairs, metadata that describes the data being sent. In addition to name-value pairs provided by the message’s sender, the message header contains name-value pairs, such as a unique _message id_ generated by either the sender or the messaging infrastructure, and an optional _return address_ , which specifies the message channel that a reply should be written to. The message _body_ is the data being sent, in either text or binary format. 
 
@@ -578,7 +578,7 @@ The approach to the microservice architecture described in this book uses comman
 
 Let’s now look at channels, the mechanism by which services communicate. 
 
-# ABOUT MESSAGE CHANNELS 
+**ABOUT MESSAGE CHANNELS**
 
 As figure 3.7 shows, messages are exchanged over channels (www.enterpriseintegrationpatterns.com/MessageChannel.html). The business logic in the sender invokes a _sending port_ interface, which encapsulates the underlying communication mechanism. The _sending port_ is implemented by a _message sender_ adapter class, which sends a message to a receiver via a message channel. A _message channel_ is an abstraction of the messaging infrastructure. A _message handler_ adapter class in the receiver is invoked to handle the message. It invokes a _receiving port_ interface implemented by the consumer’s 
 
@@ -601,7 +601,7 @@ There are two kinds of channels: point-to-point (www.enterpriseintegrationpatter
 
 - A _publish-subscribe_ channel delivers each message to all of the attached consumers. Services use publish-subscribe channels for the one-to-many interaction styles described earlier. For example, an event message is usually sent over a publish-subscribe channel. 
 
-# _3.3.2 Implementing the interaction styles using messaging_ 
+### 3.3.2 Implementing the interaction styles using messaging
 
 One of the valuable features of messaging is that it’s flexible enough to support all the interaction styles described in section 3.1.1. Some interaction styles are directly implemented by messaging. Others must be implemented on top of messaging. 
 
@@ -636,15 +636,15 @@ Because the client and service communicate using messaging, the interaction is i
 _**Communicating using the Asynchronous messaging pattern**_ 
 
 
-# IMPLEMENTING ONE-WAY NOTIFICATIONS 
+**IMPLEMENTING ONE-WAY NOTIFICATIONS**
 
 Implementing one-way notifications is straightforward using asynchronous messaging. The client sends a message, typically a command message, to a point-to-point channel owned by the service. The service subscribes to the channel and processes the message. It doesn’t send back a reply. 
 
-# IMPLEMENTING PUBLISH/SUBSCRIBE 
+**IMPLEMENTING PUBLISH/SUBSCRIBE**
 
 Messaging has built-in support for the publish/subscribe style of interaction. A client publishes a message to a publish-subscribe channel that is read by multiple consumers. As described in chapters 4 and 5, services use publish/subscribe to publish domain events, which represent changes to domain objects. The service that publishes the domain events owns a publish-subscribe channel, whose name is derived from the domain class. For example, the Order Service publishes Order events to an Order channel, and the Delivery Service publishes Delivery events to a Delivery channel. A service that’s interested in a particular domain object’s events only has to subscribe to the appropriate channel. 
 
-# IMPLEMENTING PUBLISH/ASYNC RESPONSES 
+**IMPLEMENTING PUBLISH/ASYNC RESPONSES**
 
 The publish/async responses interaction style is a higher-level style of interaction that’s implemented by combining elements of publish/subscribe and request/response. A client publishes a message that specifies a _reply channel_ header to a publish-subscribe channel. A consumer writes a reply message containing a _correlation id_ to the reply channel. The client gathers the responses by using the _correlation id_ to match the reply messages with the request. 
 
@@ -652,7 +652,7 @@ Each service in your application that has an asynchronous API will use one or mo
 
 As described in section 3.1.2, it’s important to write an API specification for a service. Let’s look at how to do that for an asynchronous API. 
 
-# _3.3.3 Creating an API specification for a messaging-based service API_ 
+### 3.3.3 Creating an API specification for a messaging-based service API
 
 The specification for a service’s asynchronous API must, as figure 3.9 shows, specify the names of the message channels, the message types that are exchanged over each channel, and their formats. You must also describe the format of the messages using a standard such as JSON, XML, or Protobuf. But unlike with REST and Open API, there isn’t a widely adopted standard for documenting the channels and the message types. Instead, you need to write an informal document. 
 
@@ -668,7 +668,7 @@ Service API<br>Commands<br>C C C<br>Command<br>«Command channel» query<br>API<
 
 Figure 3.9 A service’s asynchronous API consists of message channels and command, reply, and event message types. 
 
-# DOCUMENTING ASYNCHRONOUS OPERATIONS 
+**DOCUMENTING ASYNCHRONOUS OPERATIONS**
 
 A service’s operations can be invoked using one of two different interaction styles: 
 
@@ -678,13 +678,13 @@ A service’s operations can be invoked using one of two different interaction s
 
 A service may use the same request channel for both asynchronous request/response and one-way notification. 
 
-# DOCUMENTING PUBLISHED EVENTS 
+**DOCUMENTING PUBLISHED EVENTS**
 
 A service can also publish events using a publish/subscribe interaction style. The specification of this style of API consists of the event channel and the types and formats of the event messages that are published by the service to the channel. 
 
 The messages and channels model of messaging is a great abstraction and a good way to design a service’s asynchronous API. But in order to implement a service you need to choose a messaging technology and determine how to implement your design using its capabilities. Let’s take a look at what’s involved. 
 
-# _3.3.4 Using a message broker_ 
+### 3.3.4 Using a message broker
 
 A messaging-based application typically uses a _message broker_ , an infrastructure service through which the service communicates. But a broker-based architecture isn’t the only messaging architecture. You can also use a brokerless-based messaging architecture, in which the services communicate with one another directly. The two approaches, shown in figure 3.10, have different trade-offs, but usually a broker-based architecture is a better approach. 
 
@@ -703,7 +703,7 @@ Figure 3.10 The services in brokerless architecture communicate directly, wherea
 
 This book focuses on broker-based architecture, but it’s worthwhile to take a quick look at the brokerless architecture, because there may be scenarios where you find it useful. 
 
-# BROKERLESS MESSAGING 
+**BROKERLESS MESSAGING**
 
 In a brokerless architecture, services can exchange messages directly. ZeroMQ (http:// zeromq.org) is a popular brokerless messaging technology. It’s both a specification and a set of libraries for different languages. It supports a variety of transports, including TCP, UNIX-style domain sockets, and multicast. 
 
@@ -731,7 +731,7 @@ In fact, some of these drawbacks, such as reduced availability and the need for 
 
 Because of these limitations, most enterprise applications use a message brokerbased architecture. Let’s look at how that works. 
 
-# OVERVIEW OF BROKER-BASED MESSAGING 
+**OVERVIEW OF BROKER-BASED MESSAGING**
 
 A message broker is an intermediary through which all messages flow. A sender writes the message to the message broker, and the message broker delivers it to the receiver. An important benefit of using a message broker is that the sender doesn’t need to know the network location of the consumer. Another benefit is that a message broker buffers messages until the consumer is able to process them. 
 
@@ -773,7 +773,7 @@ It’s likely, though, that messaging ordering and scalability are essential. Le
 _**Communicating using the Asynchronous messaging pattern**_ 
 
 
-# IMPLEMENTING MESSAGE CHANNELS USING A MESSAGE BROKER 
+**IMPLEMENTING MESSAGE CHANNELS USING A MESSAGE BROKER**
 
 Each message broker implements the message channel concept in a different way. As table 3.2 shows, JMS message brokers such as ActiveMQ have queues and topics. AMQP-based message brokers such as RabbitMQ have exchanges and queues. Apache Kafka has topics, AWS Kinesis has streams, and AWS SQS has queues. What’s more, some message brokers offer more flexible messaging than the message and channels abstraction described in this chapter. 
 
@@ -816,7 +816,7 @@ There are some downsides to using messaging:
 
 Let’s look at some design issues you might face. 
 
-# _3.3.5 Competing receivers and message ordering_ 
+### 3.3.5 Competing receivers and message ordering
 
 One challenge is how to scale out message receivers while preserving message ordering. It’s a common requirement to have multiple instances of a service in order to process messages concurrently. Moreover, even a single service instance will probably use threads to concurrently process multiple messages. Using multiple threads and service instances to concurrently process messages increases the throughput of the application. But the challenge with processing messages concurrently is ensuring that each message is processed once and in order. 
 
@@ -845,7 +845,7 @@ Figure 3.11 Scaling consumers while preserving message ordering by using a shard
 
 In this example, each Order event message has the orderId as its shard key. Each event for a particular order is published to the same shard, which is read by a single consumer instance. As a result, these messages are guaranteed to be processed in order. 
 
-# _3.3.6 Handling duplicate messages_ 
+### 3.3.6 Handling duplicate messages
 
 Another challenge you must tackle when using messaging is dealing with duplicate messages. A message broker should ideally deliver each message only once, but guaranteeing exactly-once messaging is usually too costly. Instead, most message brokers promise to deliver a message _at least_ once. 
 
@@ -862,13 +862,13 @@ There are a couple of different ways to handle duplicate messages:
 Let’s look at each option. 
 
 
-# WRITING IDEMPOTENT MESSAGE HANDLERS 
+**WRITING IDEMPOTENT MESSAGE HANDLERS**
 
 If the application logic that processes messages is idempotent, then duplicate messages are harmless. Application logic is _idempotent_ if calling it multiple times with the same input values has no additional effect. For instance, cancelling an already-cancelled order is an idempotent operation. So is creating an order with a client-supplied ID. An idempotent message handler can be safely executed multiple times, provided that the message broker preserves ordering when redelivering messages. 
 
 Unfortunately, application logic is often not idempotent. Or you may be using a message broker that doesn’t preserve ordering when redelivering messages. Duplicate or out-of-order messages can cause bugs. In this situation, you must write message handlers that track messages and discard duplicate messages. 
 
-# TRACKING MESSAGES AND DISCARDING DUPLICATES 
+**TRACKING MESSAGES AND DISCARDING DUPLICATES**
 
 Consider, for example, a message handler that authorizes a consumer credit card. It must authorize the card exactly once for each order. This example of application logic has a different effect each time it’s invoked. If duplicate messages caused the message handler to execute this logic multiple times, the application would behave incorrectly. The message handler that executes this kind of application logic must become idempotent by detecting and discarding duplicate messages. 
 
@@ -891,7 +891,7 @@ _**Communicating using the Asynchronous messaging pattern**_
 
 Another option is for a  message handler to record message ids in an application table instead of a dedicated table. This approach is particularly useful when using a NoSQL database that has a limited transaction model, so it doesn’t support updating two tables as part of a database transaction. Chapter 7 shows an example of this approach. 
 
-# _3.3.7 Transactional messaging_ 
+### 3.3.7 Transactional messaging
 
 A service often needs to publish messages as part of a transaction that updates the database. For instance, throughout this book you see examples of services that publish domain events whenever they create or update business entities. Both the database update and the sending of the message must happen within a transaction. Otherwise, a service might update the database and then crash, for example, before sending the message. If the service doesn’t perform these two operations atomically, a failure could leave the system in an inconsistent state. 
 
@@ -899,7 +899,7 @@ The traditional solution is to use a distributed transaction that spans the data
 
 As a result, an application must use a different mechanism to reliably publish messages. Let’s look at how that works. 
 
-# USING A DATABASE TABLE AS A MESSAGE QUEUE 
+**USING A DATABASE TABLE AS A MESSAGE QUEUE**
 
 Let’s imagine that your application is using a relational database. A straightforward way to reliably publish messages is to apply the Transactional outbox pattern. This pattern uses a database table as a temporary message queue. As figure 3.13 shows, a service that sends messages has an OUTBOX database table. As part of the database 
 
@@ -921,7 +921,7 @@ transaction that creates, updates, and deletes business objects, the service sen
 
 The OUTBOX table acts a temporary message queue. The MessageRelay is a component that reads the OUTBOX table and publishes the messages to a message broker. 
 
-# Pattern: Transactional outbox 
+**Pattern: Transactional outbox**
 
 Publish an event or message as part of a database transaction by saving it in an OUTBOX in the database. See http://microservices.io/patterns/data/transactional-outbox.html. 
 
@@ -945,7 +945,7 @@ DELETE FROM OUTBOX WHERE ID in (....)
 COMMIT 
 ```
 
-# Pattern: Polling publisher 
+**Pattern: Polling publisher**
 
 Publish messages by polling the outbox in the database. See http://microservices.io/patterns/data/polling-publisher.html. 
 
@@ -973,7 +973,7 @@ Figure 3.14 A service publishes messages inserted into the **OUTBOX** table by m
 
 The Transaction Log Miner reads the transaction log entries. It converts each relevant log entry corresponding to an inserted message into a message and publishes that message to the message broker. This approach can be used to publish messages written to an OUTBOX table in an RDBMS or messages appended to records in a NoSQL database. 
 
-# Pattern: Transaction log tailing 
+**Pattern: Transaction log tailing**
 
 Publish changes made to the database by tailing the transaction log. See http://microservices.io/patterns/data/transaction-log-tailing.html. 
 
@@ -990,7 +990,7 @@ There are a few examples of this approach in use:
 
 Although this approach is obscure, it works remarkably well. The challenge is that implementing it requires some development effort. You could, for example, write lowlevel code that calls database-specific APIs. Alternatively, you could use an open source framework such as Debezium that publishes changes made by an application to MySQL, Postgres, or MongoDB to Apache Kafka. The drawback of using Debezium is that its focus is capturing changes at the database level and that APIs for sending and receiving messages are outside of its scope. That’s why I created the Eventuate Tram framework, which provides the messaging APIs as well as transaction tailing and polling. 
 
-# _3.3.8 Libraries and frameworks for messaging_ 
+### 3.3.8 Libraries and frameworks for messaging
 
 A service needs to use a library to send and receive messages. One approach is to use the message broker’s client library, although there are several problems with using such a library directly: 
 
@@ -1008,7 +1008,7 @@ _**Communicating using the Asynchronous messaging pattern**_
 
 for sending and receiving messages, Eventuate Tram also supports higher-level interaction styles such as asynchronous request/response and domain event publishing. 
 
-# What!? Why the Eventuate frameworks? 
+**What!? Why the Eventuate frameworks?**
 
 The code samples in this book use the open source Eventuate frameworks I’ve developed for transactional messaging, event sourcing, and sagas. I chose to use my frameworks because, unlike with, say, dependency injection and the Spring framework, there are no widely adopted frameworks for many of the features the microservice architecture requires. Without the Eventuate Tram framework, many examples would have to use the low-level messaging APIs directly, making them much more complicated and obscuring important concepts. Or they would use a framework that isn’t widely adopted, which would also provoke criticism. 
 
@@ -1022,7 +1022,7 @@ Eventuate Tram also implements two important mechanisms:
 
 Let’s take a look at the Eventuate Tram APIs. 
 
-# BASIC MESSAGING 
+**BASIC MESSAGING**
 
 The basic messaging API consists of two Java interfaces: MessageProducer and MessageConsumer. A producer service uses the MessageProducer interface to publish messages to message channels. Here’s an example of using this interface: 
 
@@ -1044,7 +1044,7 @@ MessageProducer and MessageConsumer are the foundation of the higher-level APIs 
 
 Let’s talk about how to publish and subscribe to events. 
 
-# DOMAIN EVENT PUBLISHING 
+**DOMAIN EVENT PUBLISHING**
 
 Eventuate Tram has APIs for publishing and consuming domain events. Chapter 5 explains that domain events are events that are emitted by an _aggregate_ (business object) when it’s created, updated, or deleted. A service publishes a domain event using the DomainEventPublisher interface. Here is an example: 
 
@@ -1068,7 +1068,7 @@ new DomainEventDispatcher("eventDispatcherId", domainEventHandlers, messageConsu
 
 Events aren’t the only high-level messaging pattern supported by Eventuate Tram. It also supports command/reply-based messaging. 
 
-# COMMAND/REPLY-BASED MESSAGING 
+**COMMAND/REPLY-BASED MESSAGING**
 
 A client can send a command message to a service using the CommandProducer interface. For example 
 
@@ -1096,13 +1096,13 @@ As you’ve seen, the Eventuate Tram framework implements transactional messagin
 
 Let’s now look at a service design approach that uses asynchronous messaging to improve availability. 
 
-# _3.4 Using asynchronous messaging to improve availability_ 
+## 3.4 Using asynchronous messaging to improve availability
 
 As you’ve seen, a variety of IPC mechanisms have different trade-offs. One particular trade-off is how your choice of IPC mechanism impacts availability. In this section, you’ll learn that synchronous communication with other services as part of request handling reduces application availability. As a result, you should design your services to use asynchronous messaging whenever possible. 
 
 Let’s first look at the problem with synchronous communication and how it impacts availability. 
 
-# _3.4.1 Synchronous communication reduces availability_ 
+### 3.4.1 Synchronous communication reduces availability
 
 REST is an extremely popular IPC mechanism. You may be tempted to use it for interservice communication. The problem with REST, though, is that it’s a synchronous protocol: an HTTP client must wait for the service to send a response. Whenever services communicate using a synchronous protocol, the availability of the application is reduced. 
 
@@ -1139,13 +1139,13 @@ This problem isn’t specific to REST-based communication. Availability is reduc
 
 If you want to maximize availability, you must minimize the amount of synchronous communication. Let’s look at how to do that. 
 
-# _3.4.2 Eliminating synchronous interaction_ 
+### 3.4.2 Eliminating synchronous interaction
 
 There are a few different ways to reduce the amount of synchronous communication with other services while handling synchronous requests. One solution is to avoid the problem entirely by defining services that only have asynchronous APIs. That’s not always possible, though. For example, public APIs are commonly RESTful. Services are therefore sometimes required to have synchronous APIs. 
 
 Fortunately, there are ways to handle synchronous requests without making synchronous requests. Let’s talk about the options. 
 
-# USE ASYNCHRONOUS INTERACTION STYLES 
+**USE ASYNCHRONOUS INTERACTION STYLES**
 
 Ideally, all interactions should be done using the asynchronous interaction styles described earlier in this chapter. For example, say a client of the FTGO application used an asynchronous request/asynchronous response style of interaction to create orders. A client creates an order by sending a request message to the Order Service. 
 
@@ -1171,7 +1171,7 @@ Such an architecture would be extremely resilient, because the message broker bu
 
 If a service has a synchronous API, one way to improve availability is to replicate data. Let’s see how that works. 
 
-# REPLICATE DATA 
+**REPLICATE DATA**
 
 One way to minimize synchronous requests during request processing is to replicate data. A service maintains a replica of the data that it needs when processing requests. It keeps the replica up-to-date by subscribing to events published by the services that own the data. For example, Order Service could maintain a replica of data owned by Consumer Service and Restaurant Service. This would enable Order Service to handle a request to create an order without having to interact with those services. Figure 3.17 shows the design. 
 
@@ -1244,7 +1244,7 @@ After the Order has been validated, Order Service completes the rest of the orde
 
 A drawback of a service responding before fully processing a request is that it makes the client more complex. For example, Order Service makes minimal guarantees about the state of a newly created order when it returns a response. It creates the order and returns immediately before validating the order and authorizing the consumer’s credit card. Consequently, in order for the client to know whether the order was successfully created, either it must periodically poll or Order Service must send it a notification message. As complex as it sounds, in many situations this is the preferred approach—especially because it also addresses the distributed transaction management issues I discuss in the next chapter. In chapters 4 and 5, for example, I describe how Order Service uses this approach. 
 
-# _Summary_ 
+## Summary
 
 - The microservice architecture is a distributed architecture, so interprocess communication plays a key role. 
 
@@ -1257,7 +1257,7 @@ A drawback of a service responding before fully processing a request is that it 
 - An architecture that uses synchronous protocols must include a service discovery mechanism in order for clients to determine the network location of a service instance. The simplest approach is to use the service discovery mechanism implemented by the deployment platform: the Server-side discovery and 3rd party registration patterns. But an alternative approach is to implement service discovery at the application level: the Client-side discovery and Self registration 
 
 
-_**Summary**_
+## Summary
 patterns. It’s more work, but it does handle the scenario where services are running on multiple deployment platforms. 
 
 - A good way to design a messaging-based architecture is to use the messages and channels model, which abstracts the details of the underlying messaging system. You can then map that design to a specific messaging infrastructure, which is typically message broker–based. 

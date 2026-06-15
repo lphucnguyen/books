@@ -1,6 +1,6 @@
-# _Developing business lo ic with event sourcin g g_ 
+# 6 Developing business logic with event sourcing
 
-# _This chapter covers_ 
+**This chapter covers**
 
 - Using the Event sourcing pattern to develop business logic 
 
@@ -21,11 +21,11 @@ Many years ago, Mary had learned about _event sourcing_ , an event-centric way o
 
 I begin this chapter by describing how event sourcing works and how you can use it to write business logic. I describe how event sourcing persists each aggregate as a sequence of events in what is known as an _event store_ . I discuss the benefits and drawbacks of event sourcing and cover how to implement an event store. I describe a simple framework for writing event sourcing-based business logic. After that, I discuss how event sourcing is a good foundation for implementing sagas. Let’s start by looking at how to develop business logic with event sourcing. 
 
-# _6.1 Developing business logic using event sourcing_ 
+## 6.1 Developing business logic using event sourcing
 
 Event sourcing is a different way of structuring the business logic and persisting aggregates. It persists an aggregate as a sequence of events. Each event represents a state change of the aggregate. An application recreates the current state of an aggregate by replaying the events. 
 
-# Pattern: Event sourcing 
+**Pattern: Event sourcing**
 
 Persist an aggregate as a sequence of domain events that represent state changes. See http://microservices.io/patterns/data/event-sourcing.html. 
 
@@ -39,7 +39,7 @@ Let’s first look at the limitations of the traditional approach to persistence
 _**Developing business logic using event sourcing**_ 
 
 
-# _6.1.1 The trouble with traditional persistence_ 
+### 6.1.1 The trouble with traditional persistence
 
 The traditional approach to persistence maps classes to database tables, fields of those classes to table columns, and instances of those classes to rows in those tables. For example, figure 6.1 shows how the Order aggregate, described in chapter 5, is mapped to the ORDER table. Its OrderLineItems are mapped to the ORDER_LINE_ITEM table. 
 
@@ -81,30 +81,30 @@ This approach clearly works well because most enterprise applications store data
 
 Let’s look at each of these problems, starting with the Object-Relational impedance mismatch problem. 
 
-# OBJECT-RELATIONAL IMPEDANCE MISMATCH 
+**OBJECT-RELATIONAL IMPEDANCE MISMATCH**
 
 One age-old problem is the so-called _Object-Relational impedance mismatch_ problem. There’s a fundamental conceptual mismatch between the tabular relational schema and the graph structure of a rich domain model with its complex relationships. Some aspects of this problem are reflected in polarized debates over the suitability of Object/Relational mapping (ORM) frameworks. For example, Ted Neward has said that “Object-Relational mapping is the Vietnam of Computer Science” (http://blogs .tedneward.com/post/the-vietnam-of-computer-science/). To be fair, I’ve used 
 
 
 Hibernate successfully to develop applications where the database schema has been derived from the object model. But the problems are deeper than the limitations of any particular ORM framework. 
 
-# LACK OF AGGREGATE HISTORY 
+**LACK OF AGGREGATE HISTORY**
 
 Another limitation of traditional persistence is that it only stores the current state of an aggregate. Once an aggregate has been updated, its previous state is lost. If an application must preserve the history of an aggregate, perhaps for regulatory purposes, then developers must implement this mechanism themselves. It is time consuming to implement an aggregate history mechanism and involves duplicating code that must be synchronized with the business logic. 
 
-# IMPLEMENTING AUDIT LOGGING IS TEDIOUS AND ERROR PRONE 
+**IMPLEMENTING AUDIT LOGGING IS TEDIOUS AND ERROR PRONE**
 
 Another issue is audit logging. Many applications must maintain an audit log that tracks which users have changed an aggregate. Some applications require auditing for security or regulatory purposes. In other applications, the history of user actions is an important feature. For example, issue trackers and task-management applications such as Asana and JIRA display the history of changes to tasks and issues. The challenge of implementing auditing is that besides being a time-consuming chore, the auditing logging code and the business logic can diverge, resulting in bugs. 
 
-# EVENT PUBLISHING IS BOLTED ON TO THE BUSINESS LOGIC 
+**EVENT PUBLISHING IS BOLTED ON TO THE BUSINESS LOGIC**
 
 Another limitation of traditional persistence is that it usually doesn’t support publishing domain events. Domain events, discussed in chapter 5, are events that are published by an aggregate when its state changes. They’re a useful mechanism for synchronizing data and sending notifications in microservice architecture. Some ORM frameworks, such as Hibernate, can invoke application-provided callbacks when data objects change. But there’s no support for automatically publishing messages as part of the transaction that updates the data. Consequently, as with history and auditing, developers must bolt on event-generation logic, which risks not being synchronized with the business logic. Fortunately, there’s a solution to these issues: event sourcing. 
 
-# _6.1.2 Overview of event sourcing_ 
+### 6.1.2 Overview of event sourcing
 
 Event sourcing is an event-centric technique for implementing business logic and persisting aggregates. An aggregate is stored in the database as a series of events. Each event represents a state change of the aggregate. An aggregate’s business logic is structured around the requirement to produce and consume these events. Let’s see how that works. 
 
-# EVENT SOURCING PERSISTS AGGREGATES USING EVENTS 
+**EVENT SOURCING PERSISTS AGGREGATES USING EVENTS**
 
 Earlier, in section 6.1.1, I discussed how traditional persistence maps aggregates to tables, their fields to columns, and their instances to rows. Event sourcing is a very different approach to persisting aggregates that builds on the concept of domain events. It persists each aggregate as a sequence of events in the database, known as an event store. 
 
@@ -154,7 +154,7 @@ It may be strange and unfamiliar to reconstruct the in-memory state of an aggreg
 
 Let’s now look at the requirements event sourcing places on domain events. 
 
-# EVENTS REPRESENT STATE CHANGES 
+**EVENTS REPRESENT STATE CHANGES**
 
 Chapter 5 defines domain events as a mechanism for notifying subscribers of changes to aggregates. Events can either contain minimal data, such as just the aggregate ID, or can be enriched to contain data that’s useful to a typical consumer. For example, the Order Service can publish an OrderCreated event when an order is created. An OrderCreated event may only contain the orderId. Alternatively, the event could contain the complete order so consumers of that event don’t have to fetch the data from the Order Service. Whether events are published and what those events contain are driven by the needs of the consumers. With event sourcing, though, it’s primarily the aggregate that determines the events and their structure. 
 
@@ -183,7 +183,7 @@ Event<br>apply()<br>«aggregate» «aggregate»<br>Order Order<br>S S’<br>**--
 
 Figure 6.3 Applying event **E** when the **Order** is in state **S** must change the **Order** state to **S'** . The event must contain the data necessary to perform the state change. 
 
-# AGGREGATE METHODS ARE ALL ABOUT EVENTS 
+**AGGREGATE METHODS ARE ALL ABOUT EVENTS**
 
 The business logic handles a request to update an aggregate by calling a command method on the aggregate root. In a traditional application, a command method typically validates its arguments and then updates one or more of the aggregate’s fields. Command methods in an event sourcing-based application work because they must generate events. As figure 6.4 shows, the outcome of invoking an aggregate’s command method is a sequence of events that represent the state changes that must be made. These events are persisted in the database and applied to the aggregate to update its state. 
 
@@ -246,7 +246,7 @@ An aggregate is updated using the following steps:
 
 To see this in action, let’s now look at the event sourcing version of the Order aggregate. 
 
-# EVENT SOURCING-BASED ORDER AGGREGATE 
+**EVENT SOURCING-BASED ORDER AGGREGATE**
 
 Listing 6.1 shows the Order aggregate’s fields and the methods responsible for creating it. The event sourcing version of the Order aggregate has some similarities to the JPA-based version shown in chapter 5. Its fields are almost identical, and it emits similar events. What’s different is that its business logic is implemented in terms of processing commands that emit events and applying those events, which updates its state. Each method that creates or updates the JPA-based aggregate, such as createOrder() and reviseOrder(), is replaced in the event sourcing version by process() and apply() methods. 
 
@@ -327,7 +327,7 @@ public class Order {
 
 As you can see, each method has been replaced by a process() method and one or more apply() methods. The reviseOrder() method has been replaced by process (ReviseOrder) and apply(OrderRevisionProposed). Similarly, confirmRevision() has been replaced by process(ConfirmReviseOrder) and apply(OrderRevised). 
 
-- _6.1.3 Handling concurrent updates using optimistic locking_ 
+### 6.1.3 Handling concurrent updates using optimistic locking
 
 It’s not uncommon for two or more requests to simultaneously update the same aggregate. An application that uses traditional persistence often uses optimistic locking to prevent one transaction from overwriting another’s changes. _Optimistic locking_ typically uses a version column to detect whether an aggregate has changed since it was read. The application maps the aggregate root to a table that has a VERSION column, which is incremented whenever the aggregate is updated. The application updates the aggregate using an UPDATE statement like this: 
 
@@ -344,13 +344,13 @@ An event store can also use optimistic locking to handle concurrent updates. Eac
 
 approach is to use the number of events as the version number. Alternatively, as you’ll see below in section 6.2, an event store could maintain an explicit version number. 
 
-- _6.1.4 Event sourcing and publishing events_ 
+### 6.1.4 Event sourcing and publishing events
 
 Strictly speaking, event sourcing persists aggregates as events and reconstructs the current state of an aggregate from those events. You can also use event sourcing as a reliable event publishing mechanism. Saving an event in the event store is an inherently atomic operation. We need to implement a mechanism to deliver all persisted events to interested consumers. 
 
 Chapter 3 describes a couple of different mechanisms—polling and transaction log tailing—for publishing messages that are inserted into the database as part of a transaction. An event sourcing-based application can publish events using one of these mechanisms. The main difference is that it permanently stores events in an EVENTS table rather than temporarily saving events in an OUTBOX table and then deleting them. Let’s take a look at each approach, starting with polling. 
 
-# USING POLLING TO PUBLISH EVENTS 
+**USING POLLING TO PUBLISH EVENTS**
 
 If events are stored in the EVENTS table shown in figure 6.6, an event publisher can poll the table for new events by executing a SELECT statement and publish the events to a message broker. The challenge is determining which events are new. For example, imagine that eventIds are monotonically increasing. The superficially appealing approach is for the event publisher to record the last eventId that it has processed. It would then retrieve new events using a query like this: 
 
@@ -394,11 +394,11 @@ UPDATE EVENTS SET PUBLISHED = 1 WHERE EVENT_ID in (...)
 
 This approach prevents the event publisher from skipping events. 
 
-# USING TRANSACTION LOG TAILING TO RELIABLY PUBLISH EVENTS 
+**USING TRANSACTION LOG TAILING TO RELIABLY PUBLISH EVENTS**
 
 More sophisticated event stores use _transaction log tailing_ , which, as chapter 3 describes, guarantees that events will be published and is also more performant and scalable. For example, Eventuate Local, an open source event store, uses this approach. It reads events inserted into an EVENTS table from the database transaction log and publishes them to the message broker. Section 6.2 discusses how Eventuate Local works in more detail. 
 
-# _6.1.5 Using snapshots to improve performance_ 
+### 6.1.5 Using snapshots to improve performance
 
 An Order aggregate has relatively few state transitions, so it only has a small number of events. It’s efficient to query the event store for those events and reconstruct an Order aggregate. Long-lived aggregates, though, can have a large number of events. For example, an Account aggregate potentially has a large number of events. Over time, it would become increasingly inefficient to load and fold those events. 
 
@@ -454,7 +454,7 @@ The Customer Service recreates the Customer by deserializing the snapshot’s JS
 
 _**Developing business logic using event sourcing**_ 
 
-# _6.1.6 Idempotent message processing_ 
+### 6.1.6 Idempotent message processing
 
 Services often consume messages from other applications or other services. A service might, for example, consume domain events published by aggregates or command messages sent by a saga orchestrator. As described in chapter 3, an important issue when developing a message consumer is ensuring that it’s idempotent, because a message broker might deliver the same message multiple times. 
 
@@ -483,7 +483,7 @@ In this scenario, the redelivery of events results in a different and possibly e
 One way to avoid this problem is to always publish an event. If an aggregate doesn’t emit an event, an application saves a pseudo event solely to record the message ID. Event consumers must ignore these pseudo events. 
 
 
-# _6.1.7 Evolving domain events_ 
+### 6.1.7 Evolving domain events
 
 Event sourcing, at least conceptually, stores events forever—which is a double-edged sword. On one hand, it provides the application with an audit log of changes that’s guaranteed to be accurate. It also enables an application to reconstruct the historical state of an aggregate. On the other hand, it creates a challenge, because the structure of events often changes over time. 
 
@@ -491,7 +491,7 @@ An application must potentially deal with multiple versions of events. For examp
 
 Let’s first look at the different ways that events can change, and then I’ll describe a commonly used approach for handling changes. 
 
-# EVENT SCHEMA EVOLUTION 
+**EVENT SCHEMA EVOLUTION**
 
 Conceptually, an event sourcing application has a schema that’s organized into three levels: 
 
@@ -520,7 +520,7 @@ emitted by a particular aggregate can change. Developers can change the structur
 
 Fortunately, many of these types of changes are backward-compatible changes. For example, adding a field to an event is unlikely to impact consumers. A consumer ignores unknown fields. Other changes, though, aren’t backward compatible. For example, changing the name of an event or the name of a field requires consumers of that event type to be changed. 
 
-# MANAGING SCHEMA CHANGES THROUGH UPCASTING 
+**MANAGING SCHEMA CHANGES THROUGH UPCASTING**
 
 In the SQL database world, changes to a database schema are commonly handled using schema migrations. Each schema change is represented by a _migration_ , a SQL script that changes the schema and migrates the data to a new schema. The schema migrations are stored in a version control system and applied to a database using a tool such as Flyway. 
 
@@ -528,7 +528,7 @@ An event sourcing application can use a similar approach to handle non-backwardc
 
 Now that we’ve looked at how event sourcing works, let’s consider its benefits and drawbacks. 
 
-# _6.1.8 Benefits of event sourcing_ 
+### 6.1.8 Benefits of event sourcing
 
 Event sourcing has both benefits and drawbacks. The benefits include the following: 
 
@@ -542,26 +542,26 @@ Event sourcing has both benefits and drawbacks. The benefits include the followi
 
 Let’s examine each benefit in more detail. 
 
-# RELIABLY PUBLISHES DOMAIN EVENTS 
+**RELIABLY PUBLISHES DOMAIN EVENTS**
 
 A major benefit of event sourcing is that it reliably publishes events whenever the state of an aggregate changes. That’s a good foundation for an event-driven microservice architecture. Also, because each event can store the identity of the user who made the change, event sourcing provides an audit log that’s guaranteed to be accurate. The stream of events can be used for a variety of other purposes, including notifying users, application integration, analytics, and monitoring. 
 
-# PRESERVES THE HISTORY OF AGGREGATES 
+**PRESERVES THE HISTORY OF AGGREGATES**
 
 Another benefit of event sourcing is that it stores the entire history of each aggregate. You can easily implement temporal queries that retrieve the past state of an aggregate. To determine the state of an aggregate at a given point in time, you fold the events 
 
 
 that occurred up until that point. It’s straightforward, for example, to calculate the available credit of a customer at some point in the past. 
 
-# MOSTLY AVOIDS THE O/R IMPEDANCE MISMATCH PROBLEM 
+**MOSTLY AVOIDS THE O/R IMPEDANCE MISMATCH PROBLEM**
 
 Event sourcing persists events rather than aggregating them. Events typically have a simple, easily serializable structure. As mentioned earlier, a service can snapshot a complex aggregate by serializing a memento of its state, which adds a level of indirection between an aggregate and its serialized representation. 
 
-# PROVIDES DEVELOPERS WITH A TIME MACHINE 
+**PROVIDES DEVELOPERS WITH A TIME MACHINE**
 
 Event sourcing stores a history of everything that’s happened in the lifetime of an application. Imagine that the FTGO developers need to implement a new requirement to customers who added an item to their shopping cart and then removed it. A traditional application wouldn’t preserve this information, so could only market to customers who add and remove items after the feature is implemented. In contrast, an event sourcing-based application can immediately market to customers who have done this in the past. It’s as if event sourcing provides developers with a time machine for traveling to the past and implementing unanticipated requirements. 
 
-# _6.1.9 Drawbacks of event sourcing_ 
+### 6.1.9 Drawbacks of event sourcing
 
 Event sourcing isn’t a silver bullet. It has the following drawbacks: 
 
@@ -577,11 +577,11 @@ Event sourcing isn’t a silver bullet. It has the following drawbacks:
 
 Let’s look at each drawback. 
 
-# DIFFERENT PROGRAMMING MODEL THAT HAS A LEARNING CURVE 
+**DIFFERENT PROGRAMMING MODEL THAT HAS A LEARNING CURVE**
 
 It’s a different and unfamiliar programming model, and that means a learning curve. In order for an existing application to use event sourcing, you must rewrite its business logic. Fortunately, that’s a fairly mechanical transformation that you can do when you migrate your application to microservices. 
 
-# COMPLEXITY OF A MESSAGING-BASED APPLICATION 
+**COMPLEXITY OF A MESSAGING-BASED APPLICATION**
 
 Another drawback of event sourcing is that message brokers usually guarantee at-leastonce delivery. Event handlers that aren’t idempotent must detect and discard duplicate events. The event sourcing framework can help by assigning each event a monotonically increasing ID. An event handler can then detect duplicate events by tracking the highest-seen event ID. This even happens automatically when event handlers update aggregates. 
 
@@ -589,11 +589,11 @@ Another drawback of event sourcing is that message brokers usually guarantee at-
 _**Developing business logic using event sourcing**_ 
 
 
-# EVOLVING EVENTS CAN BE TRICKY 
+**EVOLVING EVENTS CAN BE TRICKY**
 
 With event sourcing, the schema of events (and snapshots!) will evolve over time. Because events are stored forever, aggregates potentially need to fold events corresponding to multiple schema versions. There’s a real risk that aggregates may become bloated with code to deal with all the different versions. As mentioned in section 6.1.7, a good solution to this problem is to upgrade events to the latest version when they’re loaded from the event store. This approach separates the code that upgrades events from the aggregate, which simplifies the aggregates because they only need to apply the latest version of the events. 
 
-# DELETING DATA IS TRICKY 
+**DELETING DATA IS TRICKY**
 
 Because one of the goals of event sourcing is to preserve the history of aggregates, it intentionally stores data forever. The traditional way to delete data when using event sourcing is to do a soft delete. An application deletes an aggregate by setting a _deleted_ flag. The aggregate will typically emit a Deleted event, which notifies any interested consumers. Any code that accesses that aggregate can check the flag and act accordingly. 
 
@@ -604,11 +604,11 @@ Encryption is one mechanism you can use to solve this problem. Each user has an 
 Encrypting events solves most problems with erasing a user’s personal information. But if some aspect of a user’s personal information, such as email address, is used as an aggregate ID, throwing away the encryption key may not be sufficient. For example, section 6.2 describes an event store that has an entities table whose primary key is the aggregate ID. One solution to this problem is to use the technique of _pseudonymization_ , replacing the email address with a UUID token and using that as the aggregate ID. The application stores the association between the UUID token and the email address in a database table. When a user requests to be erased, the application deletes the row for their email address from that table. This prevents the application from mapping the UUID back to the email address. 
 
 
-# QUERYING THE EVENT STORE IS CHALLENGING 
+**QUERYING THE EVENT STORE IS CHALLENGING**
 
 Imagine you need to find customers who have exhausted their credit limit. Because there isn’t a column containing the credit, you can’t write SELECT * FROM CUSTOMER WHERE CREDIT_LIMIT = 0. Instead, you must use a more complex and potentially inefficient query that has a nested SELECT to compute the credit limit by folding events that set the initial credit and adjusting it. To make matters worse, a NoSQL-based event store will typically only support primary key-based lookup. Consequently, you must implement queries using the CQRS approach described in chapter 7. 
 
-# _6.2 Implementing an event store_ 
+## 6.2 Implementing an event store
 
 An application that uses event sourcing stores its events in an event store. An _event store_ is a hybrid of a database and a message broker. It behaves as a database because it has an API for inserting and retrieving an aggregate’s events by primary key. And it behaves as a message broker because it has an API for subscribing to events. 
 
@@ -632,11 +632,11 @@ I begin the following sections by describing how the Eventuate Local event store
 _**Implementing an event store**_ 
 
 
-# _6.2.1 How the Eventuate Local event store works_ 
+### 6.2.1 How the Eventuate Local event store works
 
 Eventuate Local is an open source event store. Figure 6.9 shows the architecture. Events are stored in a database, such as MySQL. Applications insert and retrieve aggregate events by primary key. Applications consume events from a message broker, such as Apache Kafka. A transaction log tailing mechanism propagates events from the database to the message broker. 
 
-# **Stores the events** 
+**Stores the events**
 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0233-05.png)
@@ -725,7 +725,7 @@ This statement verifies that the version is unchanged since it was retrieved by 
 
 Now that we’ve looked at how Eventuate Local stores an aggregate’s events and snapshots, let’s see how a client subscribes to events using Eventuate Local’s event broker. 
 
-# CONSUMING EVENTS BY SUBSCRIBING TO EVENTUATE LOCAL’S EVENT BROKER 
+**CONSUMING EVENTS BY SUBSCRIBING TO EVENTUATE LOCAL’S EVENT BROKER**
 
 Services consume events by subscribing to the event broker, which is implemented using Apache Kafka. The event broker has a topic for each aggregate type. As described in chapter 3, a _topic_ is a partitioned message channel. This enables consumers to scale horizontally while preserving message ordering. The aggregate ID is used as the partition key, which preserves the ordering of events published by a given aggregate. To consume an aggregate’s events, a service subscribes to the aggregate’s topic. 
 
@@ -739,7 +739,7 @@ The event relay is deployed as a standalone process. In order to restart correct
 
 The event database, message broker, and event relay comprise the event store. Let’s now look at the framework a Java application uses to access the event store. 
 
-# _6.2.2 The Eventuate client framework for Java_ 
+### 6.2.2 The Eventuate client framework for Java
 
 The Eventuate client framework enables developers to write event sourcing-based applications that use the Eventuate Local event store. The framework, shown in figure 6.10, provides the foundation for developing event sourcing-based aggregates, services, and event handlers. 
 
@@ -783,13 +783,13 @@ public class Order extends ReflectiveMutableCommandProcessingAggregate<Order, Or
 
 The two type parameters passed to ReflectiveMutableCommandProcessingAggregate are Order and OrderCommand, which is the base interface for Order’s commands. 
 
-# DEFINING AGGREGATE COMMANDS 
+**DEFINING AGGREGATE COMMANDS**
 
 An aggregate’s command classes must extend an aggregate-specific base interface, which itself must extend the Command interface. For example, the Order aggregate’s commands extend OrderCommand: public interface OrderCommand extends Command { } public class CreateOrderCommand implements OrderCommand { ... } 
 
 The OrderCommand interface extends Command, and the CreateOrderCommand command class extends OrderCommand. 
 
-# DEFINING DOMAIN EVENTS 
+**DEFINING DOMAIN EVENTS**
 
 An aggregate’s event classes must extend the Event interface, which is a marker interface with no methods. It’s also useful to define a common base interface, which extends Event for all of an aggregate’s event classes. For example, here’s the definition of the OrderCreated event: interface OrderEvent extends Event { 
 
@@ -873,7 +873,7 @@ An event handler has a parameter of type EventHandlerContext, which contains the
 
 Now that we’ve looked at how to write event sourcing-based business logic using the Eventuate client framework, let’s look at how to use event sourcing-based business logic with sagas. 
 
-# _6.3 Using sagas and event sourcing together_ 
+## 6.3 Using sagas and event sourcing together
 
 Imagine you’ve implemented one or more services using event sourcing. You’ve probably written services similar to the one shown in listing 6.4. But if you’ve read chapter 4, you know that services often need to initiate and participate in _sagas_ , sequences of local transactions used to maintain data consistency across services. For example, Order Service uses a saga to validate an Order. Kitchen Service, Consumer Service, and Accounting Service participate in that saga. Consequently, you must integrate sagas and event sourcing-based business logic. 
 
@@ -906,7 +906,7 @@ Let’s take a closer look at some of the different scenarios and issues you’l
 
 We’ll begin by looking at how to implement choreography-based sagas using event sourcing. 
 
-# _6.3.1 Implementing choreography-based sagas using event sourcing_ 
+### 6.3.1 Implementing choreography-based sagas using event sourcing
 
 The event-driven nature of event sourcing makes it quite straightforward to implement choreography-based sagas. When an aggregate is updated, it emits an event. An event handler for a different aggregate can consume that event and update its aggregate. The event sourcing framework automatically makes each event handler idempotent. 
 
@@ -924,15 +924,15 @@ Let’s first look at how a service method such as OrderService.createOrder() cr
 _**Using sagas and event sourcing together**_ 
 
 
-# _6.3.2 Creating an orchestration-based saga_ 
+### 6.3.2 Creating an orchestration-based saga
 
 Saga orchestrators are created by some service methods. Other service methods, such as OrderService.createOrder(), do two things: create or update an aggregate _and_ create a saga orchestrator. The service must perform both actions in a way that guarantees that if it does the first action, then the second action will be done eventually. How the service ensures that both of these actions are performed depends on the kind of event store it uses. 
 
-# CREATING A SAGA ORCHESTRATOR WHEN USING AN RDBMS-BASED EVENT STORE 
+**CREATING A SAGA ORCHESTRATOR WHEN USING AN RDBMS-BASED EVENT STORE**
 
 If a service uses an RDBMS-based event store, it can update the event store and create a saga orchestrator within the same ACID transaction. For example, imagine that the OrderService uses Eventuate Local and the Eventuate Tram saga framework. Its createOrder() method would look like this: 
 
-# class OrderService 
+**class OrderService**
 
 **Ensure the createOrder() executes within a database transaction.** 
 
@@ -974,7 +974,7 @@ Now that we’ve looked at how to reliably create a saga orchestrator, let’s s
 _**Using sagas and event sourcing together**_ 
 
 
-# _6.3.3 Implementing an event sourcing-based saga participant_ 
+### 6.3.3 Implementing an event sourcing-based saga participant
 
 Imagine that you used event sourcing to implement a service that needs to participate in an orchestration-based saga. Not surprisingly, if your service uses an RDBMS-based event store such as Eventuate Local, you can easily ensure that it atomically processes saga command messages and sends replies. It can update the event store as part of the ACID transaction initiated by the Eventuate Tram framework. But you must use an entirely different approach if your service uses an event store that can’t participate in the same transaction as the Eventuate Tram framework. 
 
@@ -986,11 +986,11 @@ You must address a couple of different issues:
 
 Let’s first look at how to implement idempotent command message handlers. 
 
-# IDEMPOTENT COMMAND MESSAGE HANDLING 
+**IDEMPOTENT COMMAND MESSAGE HANDLING**
 
 The first problem to solve is how an event sourcing-based saga participant can detect and discard duplicate messages in order to implement idempotent command message handling. Fortunately, this is an easy problem to address using the idempotent message handling mechanism described earlier. A saga participant records the message ID in the events that are generated when processing the message. Before updating an aggregate, the saga participant verifies that it hasn’t processed the message before by looking for the message ID in the events. 
 
-# ATOMICALLY SENDING REPLY MESSAGES 
+**ATOMICALLY SENDING REPLY MESSAGES**
 
 The second problem to solve is how an event sourcing-based saga participant can atomically send replies. In principle, a saga orchestrator could subscribe to the events emitted by an aggregate, but there are two problems with this approach. The first is that a saga command might not actually change the state of an aggregate. In this scenario, the aggregate won’t emit an event, so no reply will be sent to the saga orchestrator. The second problem is that this approach requires the saga orchestrator to treat saga participants that use event sourcing differently from those that don’t. That’s because in order to receive domain events, the saga orchestrator must subscribe to the aggregate’s event channel in addition to its own reply channel. 
 
@@ -1003,7 +1003,7 @@ A better approach is for the saga participant to continue to send a reply messag
 Let’s look at an example to see how this works. 
 
 
-# EXAMPLE EVENT SOURCING-BASED SAGA PARTICIPANT 
+**EXAMPLE EVENT SOURCING-BASED SAGA PARTICIPANT**
 
 This example looks at Accounting Service, one of the participants of Create Order Saga. Figure 6.12 shows how Accounting Service handles the Authorize Command sent by the saga. Accounting Service is implemented using the Eventuate Saga framework. The Eventuate Saga framework is an open source framework for writing sagas that use event sourcing. It’s built on the Eventuate Client framework. 
 
@@ -1065,7 +1065,7 @@ These UpdateOptions configure the update() method to do the following:
 
 Now that we’ve looked at how to implement saga participants using event sourcing, let’s find out how to implement saga orchestrators. 
 
-# _6.3.4 Implementing saga orchestrators using event sourcing_ 
+### 6.3.4 Implementing saga orchestrators using event sourcing
 
 So far in this section, I’ve described how event sourcing-based services can initiate and participate in sagas. You can also use event sourcing to implement saga orchestrators. This will enable you to develop applications that are entirely based on an event store. 
 
@@ -1079,7 +1079,7 @@ There are three key design problems you must solve when implementing a saga orch
 
 Chapter 4 discusses how to implement an RDBMS-based saga orchestrator. Let’s look at how to solve these problems when using event sourcing. 
 
-# PERSISTING A SAGA ORCHESTRATOR USING EVENT SOURCING 
+**PERSISTING A SAGA ORCHESTRATOR USING EVENT SOURCING**
 
 A saga orchestrator has a very simple lifecycle. First, it’s created. Then it’s updated in response to replies from saga participants. We can, therefore, persist a saga using the following events: 
 
@@ -1089,7 +1089,7 @@ A saga orchestrator has a very simple lifecycle. First, it’s created. Then it�
 
 A saga orchestrator emits a SagaOrchestratorCreated event when it’s created and a SagaOrchestratorUpdated event when it has been updated. These events contain the data necessary to re-create the state of the saga orchestrator. For example, the events for CreateOrderSaga, described in chapter 4, would contain a serialized (for example, JSON) CreateOrderSagaState. 
 
-# SENDING COMMAND MESSAGES RELIABLY 
+**SENDING COMMAND MESSAGES RELIABLY**
 
 Another key design issue is how to atomically update the state of the saga and send a command. As described in chapter 4, the Eventuate Tram-based saga implementation does this by updating the orchestrator and inserting the command message into a message table as part of the same transaction. An application that uses an 
 
@@ -1123,13 +1123,13 @@ Because the event store provides at-least-once delivery, an event handler might 
 
 mechanism. The ID of SagaCommandEvent, which is guaranteed to be unique, is used as the ID of the command message. As a result, the duplicate messages will have the same ID. A saga participant that receives a duplicate command message will discard it using the mechanism described earlier. 
 
-# PROCESSING REPLIES EXACTLY ONCE 
+**PROCESSING REPLIES EXACTLY ONCE**
 
 A saga orchestrator also needs to detect and discard duplicate reply messages, which it can do using the mechanism described earlier. The orchestrator stores the reply message’s ID in the events that it emits when processing the reply. It can then easily determine whether a message is a duplicate. 
 
 As you can see, event sourcing is a good foundation for implementing sagas. This is in addition to the other benefits of event sourcing, including the inherently reliable generation of events whenever data changes, reliable audit logging, and the ability to do temporal queries. Event sourcing isn’t a silver bullet, though. It involves a significant learning curve. Evolving the event schema isn’t always straightforward. But despite these drawbacks, event sourcing has a major role to play in a microservice architecture. In the next chapter, we’ll switch gears and look at how to tackle a different distributed data management challenge in a microservice architecture: queries. I’ll describe how to implement queries that retrieve data scattered across multiple services. 
 
-# _Summary_ 
+## Summary
 
 - Event sourcing persists an aggregate as a sequence of events. Each event represents either the creation of the aggregate or a state change. An application recreates the state of an aggregate by replaying events. Event sourcing preserves the history of a domain object, provides an accurate audit log, and reliably publishes domain events. 
 
@@ -1144,7 +1144,7 @@ As you can see, event sourcing is a good foundation for implementing sagas. This
 - Deleting data in an event sourcing application is tricky. An application must use techniques such as encryption and pseudonymization in order to comply with regulations like the European Union’s GDPR that requires an application to erase an individual’s data. 
 
 
-_**Summary**_ 
+## Summary
 
 - Event sourcing is a simple way to implement choreography-based sagas. Services have event handlers that listen to the events published by event sourcingbased aggregates. 
 
