@@ -55,7 +55,7 @@ So, this one line of the log indicates that on February 27, 2015, at 17:55:11 UT
 
 Various tools can take these log files and produce pretty reports about your website traffic, but for the sake of exercise, let’s build our own, using basic Unix tools. For example, say you want to find the five most popular pages on your website. You can do this in a Unix shell as follows:[i] 
 
-```bash
+```
 cat /var/log/nginx/access.log |
   awk '{print $7}' |
   sort             |
@@ -97,18 +97,23 @@ We don’t have space in this book to explore Unix tools in detail, but they are
 
 Instead of the chain of Unix commands, you could write a simple program to do the same thing. For example, in Ruby, it might look something like this: 
 
-```ruby
-counts = Hash.new(0)
 
-File.open('/var/log/nginx/access.log') do |file|
-  file.each do |line|
-    url = line.split[6]
-    counts[url] += 1
-  end
+```
+counts=Hash.new(0)
+```
+
+```
+File.open('/var/log/nginx/access.log') do|file|
+file.eachdo|line|
+url=line.split[6]
+counts[url]+=1
 end
+end
+```
 
-top5 = counts.map { |url, count| [count, url] }.sort.reverse[0...5]
-top5.each { |count, url| puts "#{count} #{url}" }
+```
+top5=counts.map{|url, count|[count, url] }.sort.reverse[0...5]
+top5.each{|count, url|puts"#{count}#{url}" }
 ```
 
 `counts` is a hash table that keeps a counter for the number of times we’ve seen each URL. A counter is zero by default. 

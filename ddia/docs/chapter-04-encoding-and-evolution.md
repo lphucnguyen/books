@@ -1,4 +1,4 @@
-# Encoding and evolution
+# Encoding and evolution 
 
 _Everything changes and nothing stands still._ 
 
@@ -31,7 +31,7 @@ Backward compatibility is normally not hard to achieve: as author of the newer c
 
 In this chapter we will look at several formats for encoding data, including JSON, XML, Protocol Buffers, Thrift, and Avro. In particular, we will look at how they handle schema changes and how they support systems where old and new data and code need to coexist. We will then discuss how those formats are used for data storage and for communication: in web services, Representational State Transfer (REST), and remote procedure calls (RPC), as well as message-passing systems such as actors and message queues. 
 
-## Formats for encoding data
+## Formats for encoding data 
 
 Programs usually work with data in (at least) two different representations: 
 
@@ -105,11 +105,11 @@ Some of these formats extend the set of datatypes (e.g., distinguishing integers
 
 _Example 4-1. Example record which we will encode in several binary formats in this chapter_ 
 
-```json
+```
 {
-  "userName": "Martin",
-  "favoriteNumber": 1337,
-  "interests": ["daydreaming", "hacking"]
+"userName":"Martin",
+"favoriteNumber":1337,
+"interests": ["daydreaming", "hacking"]
 }
 ```
 
@@ -139,22 +139,22 @@ Apache Thrift [15] and Protocol Buffers (protobuf) [16] are binary encoding libr
 
 Both Thrift and Protocol Buffers require a schema for any data that is encoded. To encode the data in Example 4-1 in Thrift, you would describe the schema in the Thrift interface definition language (IDL) like this: 
 
-```thrift
-struct Person {
-  1: required string       userName,
-  2: optional i64          favoriteNumber,
-  3: optional list<string> interests
+```
+structPerson {
+1:requiredstringuserName,
+2:optionali64favoriteNumber,
+3:optionallist<string>interests
 }
 ```
 
 
 The equivalent schema definition for Protocol Buffers looks very similar: 
 
-```protobuf
-message Person {
-  required string user_name       = 1;
-  optional int64  favorite_number = 2;
-  repeated string interests       = 3;
+```
+messagePerson {
+requiredstringuser_name=1;
+optionalint64favorite_number=2;
+repeatedstringinterests=3;
 }
 ```
 
@@ -226,25 +226,25 @@ Avro also uses a schema to specify the structure of the data being encoded. It h
 
 Our example schema, written in Avro IDL, might look like this: 
 
-```avro
-record Person {
-  string userName;
-  union { null, long } favoriteNumber = null;
-  array<string> interests;
+```
+recordPerson {
+stringuserName;
+union { null, long } favoriteNumber=null;
+array<string>interests;
 }
 ```
 
 The equivalent JSON representation of that schema is as follows: 
 
-```json
+```
 {
-  "type": "record",
-  "name": "Person",
-  "fields": [
-    {"name": "userName",       "type": "string"},
-    {"name": "favoriteNumber", "type": ["null", "long"], "default": null},
-    {"name": "interests",      "type": {"type": "array", "items": "string"}}
-  ]
+"type":"record",
+"name":"Person",
+"fields": [
+        {"name":"userName",       "type":"string"},
+        {"name":"favoriteNumber", "type": ["null", "long"], "default":null},
+        {"name":"interests",      "type": {"type":"array", "items":"string"}}
+    ]
 }
 ```
 
@@ -367,7 +367,7 @@ So, we can see that although textual data formats such as JSON, XML, and CSV are
 
 In summary, schema evolution allows the same kind of flexibility as schemaless/ schema-on-read JSON databases provide (see “Schema flexibility in the document model” on page 39), while also providing better guarantees about your data and better tooling. 
 
-## Modes of dataflow
+## Modes of dataflow 
 
 At the beginning of this chapter we said that whenever you want to send some data to another process with which you don’t share memory—for example, whenever you want to send data over the network or write it to a file—you need to encode it as a sequence of bytes. We then discussed a variety of different encodings for doing this. 
 

@@ -692,12 +692,12 @@ To implement this cache maintenance in a stream processor, you need streams of e
 
 Another way of looking at this stream process is that it maintains a materialized view for a query that joins two tables (tweets and follows), something like the following: 
 
-```sql
-SELECT follows.follower_id AS timeline_id,
-       array_agg(tweets.* ORDER BY tweets.timestamp DESC)
-FROM tweets
-JOIN follows ON follows.followee_id = tweets.sender_id
-GROUP BY follows.follower_id
+```
+SELECTfollows.follower_idAStimeline_id,
+array_agg(tweets.*ORDERBYtweets.timestampDESC)
+FROMtweets
+JOINfollowsONfollows.followee_id=tweets.sender_id
+GROUPBYfollows.follower_id
 ```
 
 The join of the streams corresponds directly to the join of the tables in that query. The timelines are effectively a cache of the result of this query, updated every time the underlying tables change.[iii] 

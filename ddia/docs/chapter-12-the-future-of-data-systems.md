@@ -1,4 +1,4 @@
-# **CHAPTER 12 The Future of Data Systems** 
+# The future of data systems
 
 _If a thing be ordained to another as to its end, its last end cannot consist in the preservation of its being. Hence a captain does not intend as a last end, the preservation of the ship entrusted to him, since a ship is ordained to something else as its end, viz. to navigation. (Often quoted as: If the highest aim of a captain was the preserve his ship, he would keep it in port forever.)_ 
 
@@ -11,7 +11,7 @@ Opinions and speculation about the future are of course subjective, and so I wil
 The goal of this book was outlined in Chapter 1: to explore how to create applications and systems that are _reliable_ , _scalable_ , and _maintainable_ . These themes have run through all of the chapters: for example, we discussed many fault-tolerance algorithms that help improve reliability, partitioning to improve scalability, and mechanisms for evolution and abstraction that improve maintainability. In this chapter we will bring all of these ideas together, and build on them to envisage the future. Our goal is to discover how to design applications that are better than the ones of today— robust, correct, evolvable, and ultimately beneficial to humanity. 
 
 
-# **Data Integration** 
+## Data integration
 
 A recurring theme in this book has been that for any given problem, there are several solutions, all of which have different pros, cons, and trade-offs. For example, when discussing storage engines in Chapter 3, we saw log-structured storage, B-trees, and column-oriented storage. When discussing replication in Chapter 5, we saw singleleader, multi-leader, and leaderless approaches. 
 
@@ -169,7 +169,7 @@ Unifying batch and stream processing in one system requires the following featur
 - Tools for windowing by event time, not by processing time, since processing time is meaningless when reprocessing historical events (see “Reasoning About Time” on page 468). For example, Apache Beam provides an API for expressing such computations, which can then be run using Apache Flink or Google Cloud Dataflow. 
 
 
-# **Unbundling Databases** 
+## Unbundling databases
 
 At a most abstract level, databases, Hadoop, and operating systems all perform the same functions: they store some data, and they allow you to process and query that data [16]. A database stores data in records of some data model (rows in tables, documents, vertices in a graph, etc.) while an operating system’s filesystem stores data in files—but at their core, both are “information management” systems [17]. As we saw in Chapter 10, the Hadoop ecosystem is somewhat like a distributed version of Unix. 
 
@@ -467,7 +467,7 @@ Another example of this pattern occurs in fraud prevention: in order to assess t
 
 The internal query execution graphs of MPP databases have similar characteristics (see “Comparing Hadoop to Distributed Databases” on page 414). If you need to perform this kind of multi-partition join, it is probably simpler to use a database that provides this feature than to implement it using a stream processor. However, treating queries as streams provides an option for implementing large-scale applications that run against the limits of conventional off-the-shelf solutions. 
 
-# **Aiming for Correctness** 
+## Aiming for correctness
 
 With stateless services that only read data, it is not a big deal if something goes wrong: you can fix the bug and restart the service, and everything returns to normal. Stateful systems such as databases are not so simple: they are designed to remember things forever (more or less), so if something goes wrong, the effects also potentially last forever—which means they require more careful thought [50]. 
 
@@ -830,7 +830,7 @@ Cryptographic auditing and integrity checking often relies on _Merkle trees_ [74
 
 I could imagine integrity-checking and auditing algorithms, like those of certificate transparency and distributed ledgers, becoming more widely used in data systems in general. Some work will be needed to make them equally scalable as systems without cryptographic auditing, and to keep the performance penalty as low as possible. But I think this is an interesting area to watch in the future. 
 
-# **Doing the Right Thing** 
+## Doing the right thing
 
 In the final section of this book, I would like to take a step back. Throughout this book we have examined a wide range of different architectures for data systems, evaluated their pros and cons, and explored techniques for building reliable, scalable, and maintainable applications. However, we have left out an important and fundamental part of the discussion, which I would now like to fill in. 
 

@@ -1,4 +1,4 @@
-# Partitioning
+# Partitioning 
 
 _Clearly, we must break away from the sequential and not limit the computers. We must state definitions and provide for priorities and descriptions of data. We must state relationships, not procedures._ 
 
@@ -29,7 +29,7 @@ Partitioned databases were pioneered in the 1980s by products such as Teradata a
 
 In this chapter we will first look at different approaches for partitioning large datasets and observe how the indexing of data interacts with partitioning. We’ll then talk about rebalancing, which is necessary if you want to add or remove nodes in your cluster. Finally, we’ll get an overview of how databases route requests to the right partitions and execute queries. 
 
-## Partitioning and replication
+## Partitioning and replication 
 
 Partitioning is usually combined with replication so that copies of each partition are stored on multiple nodes. This means that, even though each record belongs to exactly one partition, it may still be stored on several different nodes for fault tolerance. 
 
@@ -43,7 +43,7 @@ Everything we discussed in Chapter 5 about replication of databases applies equa
 
 _Figure 6-1. Combining replication and partitioning: each node acts as leader for some partitions and follower for other partitions._ 
 
-## Partition of key-value data
+## Partition of key-value data 
 
 Say you have a large amount of data, and you want to partition it. How do you decide which records to store on which nodes? 
 
@@ -129,7 +129,7 @@ Perhaps in the future, data systems will be able to automatically detect and com
 **Partitioning of Key-Value Data | 205** 
 
 
-## Partitioning and secondary indexes
+## Partitioning and secondary indexes 
 
 The partitioning schemes we have discussed so far rely on a key-value data model. If records are only ever accessed via their primary key, we can determine the partition from that key and use it to route read and write requests to the partition responsible for that key. 
 
@@ -186,7 +186,7 @@ In practice, updates to global secondary indexes are often asynchronous (that is
 
 Other uses of global term-partitioned indexes include Riak’s search feature [21] and the Oracle data warehouse, which lets you choose between local and global indexing [22]. We will return to the topic of implementing term-partitioned secondary indexes in Chapter 12. 
 
-## Rebalancing partitions
+## Rebalancing partitions 
 
 Over time, things change in a database: 
 
@@ -281,7 +281,7 @@ Such automation can be dangerous in combination with automatic failure detection
 
 For that reason, it can be a good thing to have a human in the loop for rebalancing. It’s slower than a fully automatic process, but it can help prevent operational surprises. 
 
-## Request routing
+## Request routing 
 
 We have now partitioned our dataset across multiple nodes running on multiple machines. But there remains an open question: when a client wants to make a request, how does it know which node to connect to? As partitions are rebalanced, the assignment of partitions to nodes changes. Somebody needs to stay on top of those changes in order to answer the question: if I want to read or write the key “foo”, which IP address and port number do I need to connect to? 
 
