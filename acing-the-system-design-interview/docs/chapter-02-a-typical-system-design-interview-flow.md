@@ -1,7 +1,7 @@
 <!-- PAGE 84 -->
  84 -->
 
-Chapter 2  A typical system design interview flow
+# Chapter 2  A typical system design interview flow
 tools, as reflected in frequent feedback? Which ones were abandoned, and why? 
 How do these tools stack up to competitors and to the state of the art? 
 ¡ What has the company or the relevant teams within the company done to address 
@@ -64,7 +64,7 @@ them.
 ¡ Start the discussion by clarifying the system’s requirements and discuss possible 
 tradeoffs in the system’s capabilities to optimize for the requirements.
 ¡ The next step is to draft the API specification to satisfy the functional 
-requirements.
+## requirements.
 ¡ Draw the connections between users and data. What data do users read and write 
 to the system, and how is data modified as it moves between system components?
 ¡ Discuss other concerns like logging, monitoring, alerting, search, and others 
@@ -77,7 +77,7 @@ to determine if it is where you wish to invest your career.
 ¡ Logging, monitoring, and alerting are critical to alert us to unexpected events 
 quickly and provide useful information to resolve them.
 ¡ Use the four golden signals and three instruments to quantify your service’s 
-observability.
+### observability.
 ¡ Log entries should be easy to parse, small, useful, categorized, have standardized 
 time formats, and contain no private information.
 ¡ Follow the best practices of responding to alerts, such as runbooks that are useful 
@@ -89,13 +89,13 @@ the common patterns you identify.
  86 -->
 
 Non-functional 
-requirements
+## requirements
 This chapter covers
 ¡ Discussing non-functional requirements at the 	
 	 start of the interview
 ¡ Using techniques and technologies to fulfill 	
-	 non-functional requirements
-¡ Optimizing for non-functional requirements
+## non-functional requirements
+## ¡ Optimizing for non-functional requirements
 A system has functional and non-functional requirements. Functional requirements 
 describe the inputs and outputs of the system. You can represent them as a rough 
 API specification and endpoints.
@@ -143,7 +143,7 @@ and provide an excessive solution.
 A beginner is more likely to fail to clarify non-functional requirements, but a lack of 
 clarification can occur for both functional and non-functional requirements. We must 
 begin any systems design discussion with discussion and clarification of both the func-
-tional and non-functional requirements. 
+## tional and non-functional requirements.
 Non-functional requirements are commonly traded off against each other. In any 
 system design interview, we must discuss how various design decisions can be made for 
 various tradeoffs. 

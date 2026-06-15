@@ -1,11 +1,11 @@
 <!-- PAGE 54 -->
  54 -->
 
-Chapter 1  A walkthrough of system design concepts
+# Chapter 1  A walkthrough of system design concepts
 For these reasons, many companies adopt a multi-cloud strategy, using multiple 
 cloud vendors instead of a single one, so these companies can migrate away from any 
 particular vendor at short notice should the need suddenly arise.
-1.4.10	 Serverless: Function as a Service (FaaS)
+### 1.4.10	 Serverless: Function as a Service (FaaS)
 If a certain endpoint or function is infrequently used or does not have strict latency 
 requirements, it may be cheaper to implement it as a function on a Function as a Ser-
 vice (FaaS) platform, such as AWS Lambda or Azure Functions. Running a function 
@@ -58,7 +58,7 @@ Spring Cloud Function (https://spring.io/projects/spring-cloud-function) is an
 emerging FaaS framework that is a generalization of this concept. It is supported by 
 AWS Lambda, Azure Functions, Google Cloud Functions, Alibaba Function Compute, 
 and may be supported by other FaaS vendors in the future. 
-1.4.11	 Conclusion: Scaling backend services 
+### 1.4.11	 Conclusion: Scaling backend services
 In the rest of part 1, we discuss concepts and techniques to scale a backend service. 
 A frontend/UI service is usually a Node.js service, and all it does is serve the same 
 browser app written in a JavaScript framework like ReactJS or Vue.js to any user, so 
@@ -77,13 +77,13 @@ They also allow us to divide our users into groups and expose each group to a
 different version of our app for experimentation purposes.
 ¡ Infrastructure as Code tools like Terraform are useful automation tools for clus-
 ter management, scaling, and feature experimentation.
-¡ Functional partitioning and centralization of cross-cutting concerns are key ele-
+### ¡ Functional partitioning and centralization of cross-cutting concerns are key ele-
 ments of system design.
 ¡ ETL jobs can be used to spread out the processing of traffic spikes over a longer 
 time period, which reduces our required cluster size.
 ¡ Cloud hosting has many advantages. Cost is often but not always an advantage. 
 There are also possible disadvantages such as vendor lock-in and potential pri-
-vacy and security risks.
+## vacy and security risks.
 ¡ Serverless is an alternative approach to services. In exchange for the cost 
 advantage of not having to keep hosts constantly running, it imposes limited 
 functionality.
@@ -100,7 +100,7 @@ This chapter covers
 ¡ Drafting your system’s API specification
 ¡ Designing the data models of your system
 ¡ Discussing concerns like logging, monitoring, 	
-	 and alerting or search
+## and alerting or search
 ¡ Reflecting on your interview experience and 	
 	 evaluating the company
 In this chapter, we will discuss a few principles of system design interviews that must 
@@ -153,7 +153,7 @@ discussion are filled with useful information.
 The following list is a rough guide. A system design discussion is dynamic, and we 
 should not expect it to progress in the order of this list: 
 1	 Clarify the requirements. Discuss tradeoffs. 
-2	 Draft the API specification. 
+## 2	 Draft the API specification.
 3	 Design the data model. Discuss possible analytics. 
 4	 Discuss failure design, graceful degradation, monitoring, and alerting. Other 
 topics include bottlenecks, load balancing, removing single points of failure, 

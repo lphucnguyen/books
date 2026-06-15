@@ -1,7 +1,7 @@
 <!-- PAGE 360 -->
  360 -->
 
-Chapter 14  Design a text messaging app 
+# Chapter 14  Design a text messaging app
 ¡ Discuss a system design for user onboarding. How can a new user join our mes-
 saging app? How may a new user add or invite contacts? A user can manually type 
 in contacts or add contacts using Bluetooth or QR codes. Or our mobile app can 
@@ -19,7 +19,7 @@ sages to large numbers of recipients.
 ¡ A scalable and cost-efficient technique to handle traffic spikes is to use a message 
 queue. However, latency will suffer during traffic spikes.
 ¡ We can decrease latency by assigning fewer users to a host, with the tradeoff of 
-higher costs. 
+## higher costs.
 ¡ Either solution must handle host failures and reassign a host’s users to other 
 hosts.
 ¡ A recipient’s device may be unavailable, so provide a GET endpoint to retrieve 
@@ -32,7 +32,7 @@ and error events.
 <!-- PAGE 361 -->
  361 -->
 
-Design Airbnb
+**Design Airbnb**
 This chapter covers
 ¡ Designing a reservation system
 ¡ Designing systems for operations staff to  

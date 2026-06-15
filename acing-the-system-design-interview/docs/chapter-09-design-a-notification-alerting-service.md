@@ -1,7 +1,7 @@
 <!-- PAGE 254 -->
  254 -->
 
-Chapter 9  Design a notification/alerting service 
+# 9 Design a notification/alerting service
 Summary
 ¡ A service that must serve the same functionality to many different platforms 
 can consist of a single backend that centralizes common processing and directs 
@@ -20,8 +20,7 @@ other metrics missed.
 <!-- PAGE 255 -->
  255 -->
 
-Design a database 
-batch auditing service
+# 10 Design a database batch auditing service
 This chapter covers
 ¡ Auditing database tables to find invalid data
 ¡ Designing a scalable and accurate solution to 	

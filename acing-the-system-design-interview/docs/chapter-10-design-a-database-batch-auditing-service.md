@@ -1,7 +1,7 @@
 <!-- PAGE 276 -->
  276 -->
 
-Chapter 10  Design a database batch auditing service 
+# 10 Design a database batch auditing service
 Summary
 ¡ During a system design interview, we can discuss auditing as a common approach 
 to maintaining data integrity. This chapter discussed a possible system design for 

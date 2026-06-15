@@ -1,17 +1,17 @@
 <!-- PAGE 296 -->
  296 -->
 
-Chapter 11  Autocomplete/typeahead
+# Chapter 11  Autocomplete/typeahead
 ¡ Discrimination or negative stereotypes on religion, gender, and other groups.
 ¡ Misinformation, including political misinformation such as conspiracy theories 
 on climate change or vaccination or misinformation driven by business agendas. 
 ¡ Libel against prominent individuals, or defendants in legal proceedings where 
 no verdict has been reached. 
 Current solutions use a combination of heuristics and machine learning. 
-11.11	Logging, monitoring, and alerting 
+## 11.11	Logging, monitoring, and alerting
 Besides the usual actions in chapter 9, we should log searches that don’t return any 
 autocomplete results, which is indicative of bugs in our trie generator. 
-11.12	Other considerations and further discussion
+## 11.12	Other considerations and further discussion
 Here are other possible requirements and discussion points that may come up as the 
 interview progresses: 
 ¡ There are many common words longer than three letters, such as “then,” “con-
@@ -70,16 +70,16 @@ are low.
 cessing costs. The tradeoff is high complexity and maintenance. 
 ¡ Other considerations include other uses of the processed data, sampling, filter-
 ing content, personalization, Lambda architecture, graceful degradation, and 
-rate limiting.
+### rate limiting.
 
 
 <!-- PAGE 298 -->
  298 -->
 
-Design Flickr
+**Design Flickr**
 This chapter covers
 ¡ Selecting storage services based on  
-	 non-functional requirements
+## non-functional requirements
 ¡ Minimizing access to critical services
 ¡ Utilizing sagas for asynchronous processes
 In this chapter, we design an image sharing service like Flickr. Besides sharing files/
@@ -98,8 +98,8 @@ ready for download.
  299 -->
 
 	
-Non-functional requirements 
-12.1	 User stories and functional requirements 
+## Non-functional requirements
+## 12.1	 User stories and functional requirements
 Let’s discuss user stories with the interviewer and scribble them down: 
 ¡ A user can view photos shared by others. We refer to this user as a viewer.
 ¡ Our app should generate and display thumbnails of 50 px width. A user should 
@@ -131,7 +131,7 @@ operating system).
 ¡ We will not discuss video. Discussions of many details of video (such as codecs) 
 require specialized domain knowledge that is outside the scope of a general sys-
 tem design interview. 
-12.2	 Non-functional requirements 
+## 12.2	 Non-functional requirements
 Here are some questions we may discuss on non-functional requirements: 
 ¡ How many users and downloads via API do we expect? 
 –	 Our system must be scalable. It should serve one billion users distributed 

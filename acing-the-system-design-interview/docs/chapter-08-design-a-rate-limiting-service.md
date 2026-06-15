@@ -1,12 +1,12 @@
 <!-- PAGE 226 -->
  226 -->
 
-Chapter 8  Design a rate-limiting service 
+# 8 Design a rate-limiting service
 ¡ Signs of possible malicious activity, such as users, which continue to make 
 requests at a high rate despite being shadow-banned.
 ¡ Signs of possible DDoS attempts, such as an unusually high number of users 
 being rate limited in a short interval.
-8.12	 Providing functionality in a client library
+## Providing functionality in a client library
 Does a user service need to query the rate limiter service for every request? An alterna-
 tive approach is for the user service to aggregate user requests and then query the rate 
 limiter service in certain circumstances such as when it
@@ -55,12 +55,12 @@ they are suddenly rate limited at a particular request rate where they were not 
 ited before.
 An alternative approach is for the client to use anomaly detection to notice a sudden 
 increase in the request rate, then start sending rate-limiting requests to the server.
-8.13	 Further reading
+## Further reading
 ¡ Smarshchok, Mikhail, 2019. System Design Interview YouTube channel, https://
 youtu.be/FU4WlwfS3G0. 
 ¡ The discussions of fixed window counter, sliding window log, and sliding win-
 dow counter were adapted from https://www.figma.com/blog/an-alternative 
--approach-to-rate-limiting/. 
+### -approach-to-rate-limiting/.
 ¡ Madden, Neil, 2020. API Security in Action. Manning Publications.
 ¡ Posta, Christian E. and Maloku, Rinor, 2022. Istio in Action. Manning Publications.
 ¡ Bruce, Morgan and Pereira, Paulo A., 2018. Microservices in Action, chapter 3.5. 
@@ -70,7 +70,7 @@ Summary
 ¡ Alternatives such as adding more hosts or using the load balancer for rate lim-
 iting are infeasible. Adding more hosts to handle traffic spikes may be too slow, 
 while using a level 7 load balancer just for rate limiting may add too much cost 
-and complexity. 
+### and complexity.
 ¡ Do not use rate limiting if it results in poor user experience or for complex use 
 cases such as subscriptions.
 ¡ The non-functional requirements of a rate limiter are scalability, performance, 
@@ -78,7 +78,7 @@ and lower complexity. To optimize for these requirements, we can trade off avail
 ability, fault-tolerance, accuracy, and consistency.
 ¡ The main input to our rate-limiter service is user ID and service ID, which will be 
 processed according to rules defined by our admin users to return a “yes” or “no” 
-response on rate limiting.
+### response on rate limiting.
 ¡ There are various rate limiting algorithms, each with its own tradeoffs. Token 
 bucket is easy to understand and implement and is memory-efficient, but syn-
 chronization and cleanup are tricky. Leaky bucket is easy to understand and 
@@ -100,7 +100,7 @@ This chapter covers
 ¡ Designing a service that delegates to  
 	 platform-specific channels
 ¡ Designing a system for flexible configurations 	
-	 and templates
+### and templates
 ¡ Handling other typical concerns of a service
 We create functions and classes in our source code to avoid duplication of coding, 
 debugging, and testing, to improve maintainability, and to allow reuse. Likewise, we 
@@ -109,8 +109,7 @@ cross-cutting concerns).
 Sending user notifications is a common system requirement. In any system design 
 discussion, whenever we discuss sending notifications, we should suggest a common 
 notification service for the organization.  
-9.1	
-Functional requirements
+## Functional requirements
 Our notification service should be as simple as possible for a wide range of users, 
 which causes considerable complexity in the functional requirements. There are 
 many possible features that a notification service can provide. Given our limited 
@@ -120,8 +119,7 @@ time, we should clearly define some use cases and features for our notification
 <!-- PAGE 229 -->
  229 -->
 
-	
-Functional requirements
+## Functional requirements
 service that will make it useful to our anticipated wide user base. A well-defined feature 
 scope will allow us to discern and optimize for its non-functional requirements. After 
 we design our initial system, we can discuss and design for further possible features. 
@@ -129,8 +127,7 @@ This question can also be a good exercise in designing an MVP. We can anticipate
 possible features and design our system to be composed of loosely coupled components 
 to be adaptable to adding new functionality and services and evolve in response to user 
 feedback and changing business requirements. 
-9.1.1	
-Not for uptime monitoring
+### Not for uptime monitoring
 Our notification service will likely be a layer on top of various messaging services (e.g., 
 email, SMS, etc.). A service to send such a message (e.g., an email service) is a complex 
 service in itself. In this question, we will use shared messaging services, but we will not 
@@ -150,8 +147,7 @@ that is independent of the services that it monitors. This is one key reason ext
 uptime monitoring services like PagerDuty are so popular.
 All this being said, section 9.14 discusses a possible approach to using this service for 
 uptime monitoring. 
-9.1.2	
-Users and data
+### Users and data
 Our notification service has three types of users:
 ¡ Sender: A person or service who CRUDs (create, read, update, and delete) notifi-
 cations and sends them to recipients.

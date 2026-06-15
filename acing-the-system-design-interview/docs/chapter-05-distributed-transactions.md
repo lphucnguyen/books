@@ -1,9 +1,9 @@
 <!-- PAGE 152 -->
  152 -->
 
-Chapter 5  Distributed transactions
-Choreography
-Orchestration
+# Chapter 5  Distributed transactions
+### Choreography
+### Orchestration
 Less resource-intensive, less chatty, and less net-
 work traffic; hence, it has lower latency overall.
 Since every step must pass through the orchestra-
@@ -30,7 +30,7 @@ various services involved in the saga.
 Compensating transactions are triggered by the 
 orchestrator.
 5.7	
-Other transaction types
+## Other transaction types
 The following consensus algorithms are typically more useful for achieving consen-
 sus for a large number of nodes, typically in distributed databases. We will not discuss 
 them in this book. Refer to Designing Data-Intensive Applications by Martin Kleppman for 
@@ -40,7 +40,7 @@ more details.
 ¡ Raft 
 ¡ Zab (ZooKeeper atomic broadcast protocol) – Used by Apache ZooKeeper.
 5.8	
-Further reading 
+## Further reading
 ¡ Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and 
 Maintainable Systems by Martin Kleppmann (O'Reilly Media, 2017)
 ¡ Cloud Native: Using Containers, Functions, and Data to Build Next-Generation Applica-
@@ -73,18 +73,18 @@ sagas.
  154 -->
 
 Common services for 
-functional partitioning
+### functional partitioning
 This chapter covers
 ¡ Centralizing cross-cutting concerns with API 	
 	 gateway or service mesh/sidecar
 ¡ Minimizing network traffic with a metadata 	
 	 service
-¡ Considering web and mobile frameworks to 	
-	 fulfill requirements
+### ¡ Considering web and mobile frameworks to
+## fulfill requirements
 ¡ Implementing functionality as libraries vs. 		
 	 services
 ¡ Selecting an appropriate API paradigm between 	
-	 REST, RPC, and GraphQL
+### REST, RPC, and GraphQL
 Earlier in this book, we discussed functional partitioning as a scalability technique 
 that partitions out specific functions from our backend to run on their own dedi-
 cated clusters. This chapter first discusses the API gateway, followed by the sidecar 
@@ -100,11 +100,11 @@ release in 2018.
  155 -->
 
 	
-Common functionalities of various services
+## Common functionalities of various services
 Last, we discuss frameworks that can be used to develop the various components in a 
 system design. 
 6.1	
-Common functionalities of various services
+## Common functionalities of various services
 A service can have many non-functional requirements, and many services with differ-
 ent functional requirements can share the same non-functional requirements. For 
 example, a service that calculates sales taxes and a service to check hotel room avail-
@@ -126,11 +126,11 @@ services for centralization of cross-cutting concerns across various services, e
 are written in different programming languages. It should be kept as simple as possi-
 ble despite its many responsibilities. Amazon API Gateway (https://aws.amazon.com/
 api-gateway/) and Kong (https://konghq.com/kong) are examples of cloud-provided 
-API gateways.
+## API gateways.
 The functionalities of an API gateway include the following, which can be grouped 
 into categories. 
 6.1.1	
-Security
+## Security
 These functionalities prevent unauthorized access to a service’s data:
 ¡ Authentication: Verifies that a request is from an authorized user. 
 ¡ Authorization: Verifies that a user is allowed to make this request. 

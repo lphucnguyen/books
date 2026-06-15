@@ -1,19 +1,19 @@
 <!-- PAGE 338 -->
  338 -->
 
-Chapter 13  Design a Content Distribution Network 
+# Chapter 13  Design a Content Distribution Network
 5	 The storage service produces an event to the response topic to inform the meta-
 data service that the file writes were successfully completed.
 6	 The metadata service consumes this event.
 7	 The metadata service produces an event to the file deletion topic to request the 
 storage service to delete the file from its old locations.
 8	 The storage service consumes this event and deletes the file from its old locations.
-13.7	 Cache invalidation
+## 13.7	 Cache invalidation
 As a CDN is for static files, cache invalidation is much less of a concern. We can finger-
 print the files as discussed in section 4.11.1. We discussed various caching strategies 
 (section 4.8) and designing a system to monitor the cache for stale files. This system 
 will have to anticipate high traffic. 
-13.8	 Logging, monitoring, and alerting 
+## 13.8	 Logging, monitoring, and alerting
 In section 2.5, we discussed key concepts of logging, monitoring, and alerting that one 
 must mention in an interview. Besides what was discussed in section 2.5, we should 
 monitor and send alerts for the following: 
@@ -23,7 +23,7 @@ progress, completed, or failed.
 ¡ The frontend service can log the request rate for files. This can be done on a 
 shared logging service. 
 ¡ Monitor for unusual or malicious activity. 
-13.9	 Other possible discussions on downloading media files 
+## 13.9	 Other possible discussions on downloading media files
 We may wish media files to be playable before they are fully downloaded. A solution 
 is to divide the media file into smaller files, which can be downloaded in sequence 
 and assembled into a media file that is a partial version of the original. Such a system 
@@ -86,7 +86,7 @@ This chapter covers
 	 short messages 
 ¡ Considering approaches that trade off latency 	
 	 vs. cost
-¡ Designing for fault-tolerance
+## ¡ Designing for fault-tolerance
 Let’s design a text messaging app, a system for 100K users to send messages to each 
 other within seconds. Do not consider video or audio chat. Users send messages at 
 an unpredictable rate, so our system should be able to handle these traffic surges. 
@@ -98,8 +98,8 @@ Messages should not be lost, nor should they be sent more than once.
  341 -->
 
 	
-Requirements
-14.1	 Requirements
+## Requirements
+## 14.1	 Requirements
 After some discussion, we determined the following functional requirements: 
 ¡ Real-time or eventually-consistent? Consider either case. 
 ¡ How many users may a chatroom have? A chatroom can contain between two to 
@@ -126,7 +126,7 @@ be a client-side feature that we do not consider here.
 ¡ Some messaging apps allow users to see if their connections are online. We do 
 not consider this. 
 ¡ We consider sending text only, not media like voice messages, photos, or videos. 
-Non-functional requirements: 
+## Non-functional requirements:
 ¡ Scalability: 100K simultaneous users. Assume each user sends a 4 KB message 
 every minute, which is a write rate of 400 MB/min. A user can have up to 1,000 
 connections, and a message can be sent to up to 1,000 recipients, each of whom 

@@ -1,7 +1,7 @@
 <!-- PAGE 404 -->
  404 -->
 
-Chapter 16  Design a news feed
+# Chapter 16  Design a news feed
 We may discuss the tradeoffs of handling and storing text and media in separate 
 services vs. a single service. We can refer to chapter 13 to discuss more details of hosting 
 images on a CDN, such as the tradeoffs of hosting media on a CDN. 
@@ -20,7 +20,7 @@ listen to audio files. This will allow us to hire hearing-impaired staff, improv
 pany’s inclusivity culture. A staff can play a video file at 2x or 3x speed when they review 
 it and read the transcribed audio separately from viewing the video file. We can also 
 consider machine learning solutions to review articles. 
-16.6	 Other possible discussion topics 
+## 16.6	 Other possible discussion topics
 Here are other possible discussion topics that may come up as the interview progresses, 
 which may be suggested by either the interviewer or candidate: 
 ¡ Create hashtags, which are dynamic, rather than a fixed set of topics. 
@@ -30,7 +30,7 @@ which may be suggested by either the interviewer or candidate:
 ¡ Boosting to prioritize certain articles over others. 
 We can consider the items that were out-of-scope in the functional requirements 
 discussion: 
-¡ Analytics. 
+### ¡ Analytics.
 ¡ Personalization. Instead of serving the same 1,000 news items to all users, serve 
 each user a personalized set of 100 news items. This design will be substantially 
 more complex. 
@@ -76,10 +76,10 @@ Amazon by sales volume
 This chapter covers
 ¡ Scaling an aggregation operation on a large 	
 	 data stream
-¡ Using a Lambda architecture for fast  
+### ¡ Using a Lambda architecture for fast
 	 approximate results and slow accurate results
 ¡ Using Kappa architecture as an alternative to 	
-	 Lambda architecture 
+### Lambda architecture
 ¡ Approximating an aggregation operation for 	
 	 faster speed
 Analytics is a common discussion topic in a system design interview. We will always 
@@ -96,7 +96,7 @@ ing it, or we may decide to spend more resources to promote it to increase its s
  407 -->
 
 	
-Requirements 
+## Requirements
 The Top K Problem is a common topic we can discuss in an interview when discuss-
 ing analytics, or it may be its own standalone interview question. It can take on endless 
 forms. Some examples of the Top K Problem include 
@@ -109,7 +109,7 @@ tion) or revenue.
 ¡ Most traded stocks on an exchange like Robinhood or E*TRADE. 
 ¡ Most forwarded posts on a social media app, such as the most retweeted Twitter 
 tweets or most shared Instagram post. 
-17.1	 Requirements 
+## 17.1	 Requirements
 Let’s ask some questions to determine the functional and non-functional require-
 ments. We assume that we have access to the data centers of Amazon or whichever 
 ecommerce app we are concerned with 

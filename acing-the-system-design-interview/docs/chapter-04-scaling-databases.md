@@ -1,7 +1,7 @@
 <!-- PAGE 140 -->
  140 -->
 
-Chapter 4  Scaling databases
+# Chapter 4  Scaling databases
 ¡ Database writes are expensive and difficult to scale, so we should minimize data-
 base writes wherever possible. Aggregating events helps to reduce the rate of 
 database writes.
@@ -36,16 +36,16 @@ subsequent users, but cache warming has many disadvantages.
 <!-- PAGE 141 -->
  141 -->
 
-Distributed transactions
+### Distributed transactions
 This chapter covers
 ¡ Creating data consistency across multiple 		
 	 services
 ¡ Using event sourcing for scalability, availability, 	
-	 lower cost, and consistency
+## lower cost, and consistency
 ¡ Writing a change to multiple services with 		
-	 Change Data Capture (CDC) 
+## Change Data Capture (CDC)
 ¡ Doing transactions with choreography vs. 	 	
-	 orchestration
+### orchestration
 In a system, a unit of work may involve writing data to multiple services. Each write 
 to each service is a separate request/event. Any write may fail; the causes may 
 include bugs or host or network outages. This may cause data inconsistency across 

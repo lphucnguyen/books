@@ -1,9 +1,8 @@
 <!-- PAGE 174 -->
  174 -->
 
-Chapter 6  Common services for functional partitioning
-6.7.5	
-WebSocket 
+# 6 Common services for functional partitioning
+### WebSocket
 WebSocket is a communications protocol for full-duplex communication over a 
 persistent TCP connection, unlike HTTP, which creates a new connection for every 
 request and closes it with every response. REST, RPC, GraphQL, and Actor model are 
@@ -23,8 +22,7 @@ Socket and the resource overhead of maintaining connections means that WebSocket
 is less scalable. 
 WebSocket allows p2p communication, so no backend is required. It trades off scal-
 ability for lower latency and higher performance.
-6.7.6	
-Comparison 
+### Comparison
 During an interview, we may need to evaluate the tradeoffs between these architec-
 tural styles and the factors to consider in choosing a style and protocol. REST and 
 RPC are the most common. Startups usually use REST for simplicity, while large 
@@ -32,7 +30,7 @@ organizations can benefit from RPC’s efficiency and backward and forward compa
 ibility. GraphQL is a relatively new philosophy. WebSocket is useful for bidirectional 
 communication, including p2p communication. Other references include https://
 apisyouwonthate.com/blog/picking-api-paradigm/ and https://www.baeldung.com/
-rest-vs-websockets. 
+### rest-vs-websockets.
 Summary
 ¡ An API gateway is a web service designed to be stateless and lightweight yet fulfill 
 many cross-cutting concerns across various services, which can be grouped into 
@@ -61,7 +59,7 @@ with native or cross-platform frameworks.
 mobile apps, and web servers. They carry tradeoffs, which may make them unsuit-
 able for one’s particular requirements.
 ¡ Backend development frameworks can be classified into RPC, REST, and 
-GraphQL frameworks.
+### GraphQL frameworks.
 ¡ Some components can be implemented as either libraries or services. Each 
 approach has its tradeoffs.
 ¡ Most communication paradigms are implemented on top of HTTP. RPC is a low-
@@ -124,8 +122,7 @@ of data into a dashboard that can be used to make decisions.
 
 <!-- PAGE 179 -->
  179 -->
-
-Design Craigslist
+# 7 Design Craigslist
 This chapter covers
 ¡ Designing an application with two distinct types 	
 	 of users

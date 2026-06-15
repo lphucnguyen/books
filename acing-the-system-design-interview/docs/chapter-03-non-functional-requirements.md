@@ -1,12 +1,12 @@
 <!-- PAGE 108 -->
  108 -->
 
-Chapter 3  Non-functional requirements
+# Chapter 3  Non-functional requirements
 Summary
 ¡ We must discuss both the functional and non-functional requirements of a 
 system. Do not make assumptions about the non-functional requirements. 
 ­Non-functional characteristics can be traded off against each other to optimize 
-for the non-functional requirements.
+## for the non-functional requirements.
 ¡ Scalability is the ability to easily adjust the system’s hardware resource usage for 
 cost efficiency. This is almost always discussed because it is difficult or impossible 
 to predict the amount of traffic to our system.
@@ -44,7 +44,7 @@ niques to achieve common non-functional requirements.
 <!-- PAGE 109 -->
  109 -->
 
-Scaling databases
+**Scaling databases**
 This chapter covers
 ¡ Understanding various types of storage 	
 	
@@ -53,13 +53,13 @@ This chapter covers
 ¡ Aggregating events to reduce database writes
 ¡ Differentiating normalization vs. 	 	
 	
-	 denormalization
+## denormalization
 ¡ Caching frequent queries in memory
 In this chapter, we discuss concepts in scaling databases, their tradeoffs, and com-
 mon databases that utilize these concepts in their implementations. We consider 
 these concepts when choosing databases for various services in our system.  
 4.1	
-Brief prelude on storage services
+## Brief prelude on storage services
 Storage services are stateful services. Compared to stateless services, stateful services 
 have mechanisms to ensure consistency and require redundancy to avoid data loss. 
 A stateful service may choose mechanisms like Paxos for strong consistency or even-

@@ -1,8 +1,8 @@
 <!-- PAGE 384 -->
  384 -->
 
-Chapter 15  Design Airbnb
-15.10.1	Handling regulations 
+# Chapter 15  Design Airbnb
+### 15.10.1	Handling regulations
 We can consider designing and implementing a dedicated regulation service to provide 
 a standard API for communicating regulations. All other services must be designed to 
 interact with this API, so they are flexible to changing regulations or at least be more 
@@ -64,7 +64,7 @@ complex transaction.
 <!-- PAGE 386 -->
  386 -->
 
-Design a news feed
+**Design a news feed**
 This chapter covers
 ¡ Designing a personalized scalable system
 ¡ Filtering out news feed items
@@ -72,7 +72,7 @@ This chapter covers
 Design a news feed that provides a user with a list of news items, sorted by approx-
 imate reverse chronological order that belong to the topics selected by the user. A 
 news item can be categorized into 1–3 topics. A user may select up to three topics of 
-interest at any time. 
+### interest at any time.
 This is a common system design interview question. In this chapter, we use the 
 terms “news item” and “post” interchangeably. In social media apps like Facebook or 
 Twitter, a user’s news feed is usually populated by posts from friends/connections. 
@@ -84,8 +84,8 @@ than by their connections.
  387 -->
 
 	
-Requirements 
-16.1	 Requirements 
+## Requirements
+## 16.1	 Requirements
 These are the functional requirements of our news feed system, which as usual we can 
 discuss/uncover via an approximately five-minute Q&A with the interviewer. 
 ¡ A user can select topics of interest. There are up to 100 tags. (We will use the term 

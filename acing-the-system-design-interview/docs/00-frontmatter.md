@@ -154,7 +154,7 @@ Overview of this book  5
 	 1.4	
 Prelude—A brief discussion of scaling the various services of a 
 system  6
-The beginning—A small initial deployment of our app   6 
+The beginning—A small initial deployment of our app   6
 Scaling with GeoDNS   7  ■  Adding a caching service   8 
 Content Distribution Network (CDN)  9  ■  A brief discussion 
 of horizontal scalability and cluster management, continuous 
@@ -162,7 +162,7 @@ integration (CI) and continuous deployment (CD)   10
 Functional partitioning and centralization of cross-cutting 
 concerns   13  ■  Batch and streaming extract, transform, and 
 load (ETL)   17  ■  Other common services   18  ■  Cloud vs. bare 
-metal   19  ■  Serverless—Function as a Service (FaaS)  22 
+metal   19  ■  Serverless—Function as a Service (FaaS)  22
 Conclusion—Scaling backend services   23
 	 	
 
@@ -191,7 +191,7 @@ update conflicts  31
 Logging, monitoring, and alerting  34
 The importance of monitoring  34  ■  Observability  34 
 Responding to alerts   36  ■  Application-level logging tools   37 
-Streaming and batch audit of data quality   39  ■  Anomaly 
+Streaming and batch audit of data quality   39  ■  Anomaly
 detection to detect data anomalies   39  ■  Silent errors and 
 auditing   40  ■  Further reading on observability  40
 	 2.6	
@@ -202,13 +202,13 @@ Using Elasticsearch in place of SQL   43  ■  Implementing search
 in our services   44  ■  Further reading on search  44
 	 2.7	
 Other discussions   44
-Maintaining and extending the application   44  ■  Supporting 
+Maintaining and extending the application   44  ■  Supporting
 other types of users   45  ■  Alternative architectural decisions   45 
 Usability and feedback   45  ■  Edge cases and new 
 constraints   46  ■  Cloud native concepts   47
 	 2.8	
 Post-interview reflection and assessment   47
-Write your reflection as soon as possible after the interview   47 
+Write your reflection as soon as possible after the interview   47
 Writing your assessment   49  ■  Details you didn’t mention   49 
 Interview feedback   50
 	 2.9	
@@ -358,12 +358,12 @@ app  129  ■  Web and mobile frameworks   130
 Library vs. service   134
 Language specific vs. technology-agnostic   135  ■  Predictability 
 of latency   136  ■  Predictability and reproducibility of 
-behavior   136  ■  Scaling considerations for libraries   136 
+behavior   136  ■  Scaling considerations for libraries   136
 Other considerations   137
 	 6.7	
 Common API paradigms  137
-The Open Systems Interconnection (OSI) model   137 
-REST   138  ■  RPC (Remote Procedure Call)   140 
+The Open Systems Interconnection (OSI) model   137
+REST   138  ■  RPC (Remote Procedure Call)   140
 GraphQL   141  ■  WebSocket   142  ■  Comparison   142
 	 	
 Part 2.......................................................................145
@@ -541,12 +541,12 @@ Prevent too many simultaneous queries  239
 Other users of database schema metadata  240
 	 10.9	
 Auditing a data pipeline  241
-	 10.10	 Logging, monitoring, and alerting   242
-	 10.11	 Other possible types of audits  242
+10.10	 Logging, monitoring, and alerting   242
+10.11	 Other possible types of audits  242
 Cross data center consistency audits  242  ■  Compare upstream 
 and downstream data  243
-	 10.12	 Other possible discussion topics   243
-	 10.13	 References   243
+10.12	 Other possible discussion topics   243
+10.13	 References   243
 	 	
 	
 Autocomplete/typeahead  245
@@ -556,7 +556,7 @@ Possible uses of autocomplete   246
 Search vs. autocomplete   246
 	 11.3	
 Functional requirements   248
-Scope of our autocomplete service  248  ■  Some UX (user 
+Scope of our autocomplete service  248  ■  Some UX (user
 experience) details  248  ■  Considering search history  249 
 Content moderation and fairness  250
 	 11.4	
@@ -573,7 +573,7 @@ logs from Elasticsearch to HDFS  255  ■  Split the search strings
 into words, and other simple operations  255  ■  Filter out 
 inappropriate words  256  ■  Fuzzy matching and spelling 
 correction  258  ■  Count the words  259  ■  Filter for appropriate 
-words  259  ■  Managing new popular unknown words  259 
+words  259  ■  Managing new popular unknown words  259
 Generate and deliver the weighted trie  259
 
 
@@ -584,11 +584,11 @@ Generate and deliver the weighted trie  259
 Sampling approach  260
 	 11.9	
 Handling storage requirements  261
-	 11.10	 Handling phrases instead of single words  263
-Maximum length of autocomplete suggestions  263 
+11.10	 Handling phrases instead of single words  263
+Maximum length of autocomplete suggestions  263
 Preventing inappropriate suggestions  263
-	 11.11	 Logging, monitoring, and alerting   264
-	 11.12	 Other considerations and further discussion  264
+11.11	 Logging, monitoring, and alerting   264
+11.12	 Other considerations and further discussion  264
 	 	
 	
 Design Flickr  266
@@ -637,7 +637,7 @@ Requirements   291
 	
 	 13.3	
 CDN authentication and authorization  291
-Steps in CDN authentication and authorization  292 
+Steps in CDN authentication and authorization  292
 Key rotation  294
 	 13.4	
 High-level architecture   294
@@ -727,7 +727,7 @@ Changing posts on users’ devices  365  ■  Tagging posts  365
 Moderation service  367
 	 16.5	
 Logging, monitoring, and alerting   368
-Serving images as well as text   368  ■  High-level 
+Serving images as well as text   368  ■  High-level
 architecture    369
 	 16.6	
 Other possible discussion points   372
@@ -760,7 +760,7 @@ process on a host   380
 Batch pipeline   381
 	 17.6	
 Streaming pipeline   383
-Hash table and max-heap with a single host   383 
+Hash table and max-heap with a single host   383
 Horizontal scaling to multiple hosts and multi-tier 
 aggregation   385
 	 17.7	
@@ -772,9 +772,9 @@ Dashboard with Lambda architecture  390
 Kappa architecture approach  390
 Lambda vs. Kappa architecture  391  ■  Kappa architecture for 
 our dashboard  392
-	 17.10	 Logging, monitoring, and alerting   393
+17.10	 Logging, monitoring, and alerting   393
 	 17.11	 Other possible discussion points   393
-	 17.12	 References   394
+17.12	 References   394
 	 	
 	
 A
@@ -821,7 +821,7 @@ Prelude: Simple login, cookie-based authentication  404
 Single sign-on (SSO)   404
 	 B.4	
 Disadvantages of simple login   404
-Complexity and lack of maintainability   405  ■  No partial 
+Complexity and lack of maintainability   405  ■  No partial
 authorization   405
 	 B.5	
 OAuth 2.0 flow   406
@@ -1102,7 +1102,7 @@ xxv
 about this book
 This book is about web services. A candidate should discuss the system’s require-
 ments and then design a system of reasonable complexity and cost that fulfills those 
-requirements. 
+requirements.
 Besides coding interviews, system design interviews are conducted for most software 
 engineering, software architecture, and engineering manager interviews.
 The ability to design and review large-scale systems is regarded as more important 
@@ -1246,7 +1246,7 @@ In chapter 2, we discuss one’s experience in a typical system design interview
 We’ll learn to clarify the requirements of the question and what aspects of the sys-
 tem to optimize at the expense of others. Then we discuss other common topics, 
 including storing and searching data, operational concerns like monitoring and 
-alerting, and edge cases and new constraints. 
+alerting, and edge cases and new constraints.
 In chapter 3, we dive into non-functional requirements, which are usually not 
 explicitly requested by the customer or interviewer and must be clarified prior to 
 designing a system. 

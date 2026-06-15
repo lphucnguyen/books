@@ -1,7 +1,7 @@
 <!-- PAGE 318 -->
  318 -->
 
-Chapter 12  Design Flickr
+# Chapter 12  Design Flickr
 Summary
 ¡ Scalability, availability, and high download performance are required for a file- 
 or image-sharing service. High upload performance and consistency are not 
@@ -11,7 +11,7 @@ secure and limit write access to sensitive services like a CDN.
 ¡ Which processing operations should be put in the client vs. the server? One con-
 sideration is that processing on a client can save our company hardware resources 
 and cost, but may be considerably more complex and incur more costs from this 
-complexity.
+### complexity.
 ¡ Client-side and server-side have their tradeoffs. Server-side is generally preferred 
 where possible for ease of development/upgrades. Doing both allows the low 
 computational cost of client-side and the reliability of server-side. 

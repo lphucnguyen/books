@@ -1,7 +1,7 @@
 <!-- PAGE 202 -->
  202 -->
 
-Chapter 7  Design Craigslist
+# 7 Design Craigslist
 location, or do we also need to prevent users from viewing or posting about banned 
 products and services?
 An initial approach to selectively display sections will be to add logic in the clients to 
@@ -48,10 +48,9 @@ searches, rate limiting, serving more posts to each user, and local regulations.
 <!-- PAGE 203 -->
  203 -->
 
-Design a 
-rate-limiting service
+# 8 Design a rate-limiting service
 This chapter covers
-¡ Using rate limiting
+### ¡ Using rate limiting
 ¡ Discussing a rate-limiting service
 ¡ Understanding various rate-limiting algorithms
 Rate limiting is a common service that we should almost always mention during a 
