@@ -375,7 +375,22 @@ A domain event typically also has metadata, such as the event ID, and a timestam
 
 The OrderCreated event is an example of a domain event. It doesn’t have any fields, because the Order’s ID is part of the event envelope. The following listing shows the OrderCreated event class and the DomainEventEnvelope class. 
 
-Listing 5.1 The **OrderCreated** event and the **DomainEventEnvelope** class interface DomainEvent {} interface OrderDomainEvent extends DomainEvent {} class OrderCreated implements OrderDomainEvent {} class DomainEventEnvelope<T extends DomainEvent> { private String aggregateType; private Object aggregateId; **The event’s** private T event; **metadata** ... } 
+Listing 5.1 The **OrderCreated** event and the **DomainEventEnvelope** class 
+
+```java
+interface DomainEvent {} 
+
+interface OrderDomainEvent extends DomainEvent {} 
+
+class OrderCreated implements OrderDomainEvent {} 
+
+class DomainEventEnvelope<T extends DomainEvent> { 
+  private String aggregateType; 
+  private Object aggregateId; 
+  private T event; 
+  ... 
+}
+```
 
 The DomainEvent interface is a marker interface that identifies a class as a domain event. OrderDomainEvent is a marker interface for events, such as OrderCreated, which are published by the Order aggregate. The DomainEventEnvelope is a class that contains event metadata and the event object. It’s a generic class that’s parameterized by the domain event type. 
 
@@ -390,11 +405,16 @@ An alternative approach known as _event enrichment_ is for events to contain inf
 
 # Listing 5.2 The enriched **OrderCreated** event 
 
-class OrderCreated implements OrderEvent { private List<OrderLineItem> lineItems; private DeliveryInformation deliveryInformation; private PaymentInformation paymentInformation; private long restaurantId; private String restaurantName; ... 
-
-**Data that its consumers typically need** 
-
-} 
+```java
+class OrderCreated implements OrderEvent { 
+  private List<OrderLineItem> lineItems; 
+  private DeliveryInformation deliveryInformation; 
+  private PaymentInformation paymentInformation; 
+  private long restaurantId; 
+  private String restaurantName; 
+  ... 
+}
+```
 
 Because this version of the OrderCreated event contains the order details, an event consumer, such as the Order History Service (discussed in chapter 7) no longer needs to fetch that data when processing an OrderCreated event. 
 
@@ -457,25 +477,37 @@ A better approach is to split responsibility between the aggregate and the servi
 
 Listing 5.3 The **Ticket** aggregate’s **accept()** method 
 
-|public class Ticket {||||||
-|---|---|---|---|---|---|
-|public List<DomainEvent> accept(ZonedDateTime readyBy) {||||||
-|...||||||
-|this.acceptTime = ZonedDateTime.now();<br>this.readyBy = readyBy;||**Updates**<br>**the Ticket**||||
-|return singletonList(new TicketAcceptedEvent(readyBy)); <br>}|||||**Returns**<br>**an event**|
-|}||||||
-
+```java
+public class Ticket { 
+  public List<DomainEvent> accept(ZonedDateTime readyBy) { 
+    ... 
+    this.acceptTime = ZonedDateTime.now(); 
+    this.readyBy = readyBy; 
+    return singletonList(new TicketAcceptedEvent(readyBy)); 
+  } 
+}
+```
 
 The service invokes the aggregate root’s method, and then publishes the events. For example, the following listing shows how KitchenService invokes Ticket.accept() and publishes the events. 
 
-Listing 5.4 **KitchenService** calls **Ticket.accept()**
-public class KitchenService { @Autowired private TicketRepository ticketRepository; @Autowired private DomainEventPublisher domainEventPublisher; 
+Listing 5.4 **KitchenService** calls **Ticket.accept()** 
 
+```java
+public class KitchenService { 
+  @Autowired 
+  private TicketRepository ticketRepository; 
 
-_**Publishing domain events**_ 
+  @Autowired 
+  private DomainEventPublisher domainEventPublisher; 
 
-
-public void accept(long ticketId, ZonedDateTime readyBy) { Ticket ticket = ticketRepository.findById(ticketId) .orElseThrow(() -> new TicketNotFoundException(ticketId)); **Publishes** List<DomainEvent> events = ticket.accept(readyBy); **domain events** domainEventPublisher.publish(Ticket.class, orderId, events); } 
+  public void accept(long ticketId, ZonedDateTime readyBy) { 
+    Ticket ticket = ticketRepository.findById(ticketId) 
+      .orElseThrow(() -> new TicketNotFoundException(ticketId)); 
+    List<DomainEvent> events = ticket.accept(readyBy); 
+    domainEventPublisher.publish(Ticket.class, orderId, events); 
+  } 
+}
+```
 
 The accept() method first invokes the TicketRepository to load the Ticket from the database. It then updates the Ticket by calling accept(). KitchenService then publishes events returned by Ticket by calling DomainEventPublisher.publish(), described shortly. 
 
@@ -483,9 +515,18 @@ This approach is quite simple. Methods that would otherwise have a void return t
 
 Another option is for the aggregate root to accumulate events in a field. The service then retrieves the events and publishes them. For example, the following listing shows a variant of the Ticket class that works this way. 
 
-Listing 5.5 The **Ticket** extends a superclass, which records domain events public class Ticket extends AbstractAggregateRoot { public void accept(ZonedDateTime readyBy) { ... this.acceptTime = ZonedDateTime.now(); this.readyBy = readyBy; registerDomainEvent(new TicketAcceptedEvent(readyBy)); } 
+Listing 5.5 The **Ticket** extends a superclass, which records domain events 
 
-} 
+```java
+public class Ticket extends AbstractAggregateRoot { 
+  public void accept(ZonedDateTime readyBy) { 
+    ... 
+    this.acceptTime = ZonedDateTime.now(); 
+    this.readyBy = readyBy; 
+    registerDomainEvent(new TicketAcceptedEvent(readyBy)); 
+  } 
+}
+```
 
 Ticket extends AbstractAggregateRoot, which defines a registerDomainEvent() method that records the event. A service would call AbstractAggregateRoot.getDomainEvents() to retrieve those events. 
 
@@ -500,33 +541,50 @@ The Tram framework provides a DomainEventPublisher interface, shown in the follo
 
 # Listing 5.6 The Eventuate Tram framework’s **DomainEventPublisher** interface 
 
-public interface DomainEventPublisher { void publish(String aggregateType, Object aggregateId, List<DomainEvent> domainEvents); 
+```java
+public interface DomainEventPublisher { 
+  void publish(String aggregateType, Object aggregateId, List<DomainEvent> domainEvents); 
+}
+```
 
 It uses the Eventuate Tram framework’s MessageProducer interface to publish those events transactionally. 
 
 A service could call the DomainEventPublisher publisher directly. But one drawback of doing so is that it doesn’t ensure that a service only publishes valid events. KitchenService, for example, should only publish events that implement TicketDomainEvent, which is the marker interface for the Ticket aggregate’s events. A better option is for services to implement a subclass of AbstractAggregateDomainEventPublisher, which is shown in listing 5.7. AbstractAggregateDomainEventPublisher is an abstract class that provides a type-safe interface for publishing domain events. It’s a generic class that has two type parameters, A, the aggregate type, and E, the marker interface type for the domain events. A service publishes events by calling the publish() method, which has two parameters: an aggregate of type A and a list of events of type E. 
 
-Listing 5.7 The abstract superclass of type-safe domain event publishers public abstract class AbstractAggregateDomainEventPublisher<A, E extends Doma inEvent> { private Function<A, Object> idSupplier; private DomainEventPublisher eventPublisher; private Class<A> aggregateType; protected AbstractAggregateDomainEventPublisher( DomainEventPublisher eventPublisher, Class<A> aggregateType, Function<A, Object> idSupplier) { this.eventPublisher = eventPublisher; this.aggregateType = aggregateType; 
+Listing 5.7 The abstract superclass of type-safe domain event publishers 
 
+```java
+public abstract class AbstractAggregateDomainEventPublisher<A, E extends DomainEvent> { 
+  private Function<A, Object> idSupplier; 
+  private DomainEventPublisher eventPublisher; 
+  private Class<A> aggregateType; 
 
-_**Publishing domain events**_
-this.idSupplier = idSupplier; 
+  protected AbstractAggregateDomainEventPublisher(DomainEventPublisher eventPublisher, 
+                                                   Class<A> aggregateType, 
+                                                   Function<A, Object> idSupplier) { 
+    this.eventPublisher = eventPublisher; 
+    this.aggregateType = aggregateType; 
+    this.idSupplier = idSupplier; 
+  } 
 
-} public void publish(A aggregate, List<E> events) { eventPublisher.publish(aggregateType, idSupplier.apply(aggregate), (List<DomainEvent>) events); 
-
-} 
-
-} 
+  public void publish(A aggregate, List<E> events) { 
+    eventPublisher.publish(aggregateType, idSupplier.apply(aggregate), (List<DomainEvent>) events); 
+  } 
+}
+```
 
 The publish() method retrieves the aggregate’s ID and invokes DomainEventPublisher .publish(). The following listing shows the TicketDomainEventPublisher, which publishes domain events for the Ticket aggregate. 
 
 Listing 5.8 A type-safe interface for publishing **Ticket** aggregates' domain events 
 
-- public class TicketDomainEventPublisher extends AbstractAggregateDomainEventPublisher<Ticket, TicketDomainEvent> { 
-
-public TicketDomainEventPublisher(DomainEventPublisher eventPublisher) { super(eventPublisher, Ticket.class, Ticket::getId); } 
-
-} 
+```java
+public class TicketDomainEventPublisher extends AbstractAggregateDomainEventPublisher<Ticket, TicketDomainEvent> { 
+  public TicketDomainEventPublisher(DomainEventPublisher eventPublisher) { 
+    super(eventPublisher, Ticket.class, Ticket::getId); 
+  } 
+}
+```
+ 
 
 This class only publishes events that are a subclass of TicketDomainEvent. 
 
@@ -538,18 +596,25 @@ Domain events are ultimately published as messages to a message broker, such as 
 
 # Listing 5.9 Dispatching events to event handler methods 
 
-public class KitchenServiceEventConsumer { @Autowired private RestaurantService restaurantService; **Maps events to event handlers** public DomainEventHandlers domainEventHandlers() { return DomainEventHandlersBuilder 
+```java
+public class KitchenServiceEventConsumer { 
+  @Autowired 
+  private RestaurantService restaurantService; 
 
-.forAggregateType("net.chrisrichardson.ftgo.restaurantservice.Restaurant") .onEvent(RestaurantMenuRevised.class, this::reviseMenu) 
+  public DomainEventHandlers domainEventHandlers() { 
+    return DomainEventHandlersBuilder 
+      .forAggregateType("net.chrisrichardson.ftgo.restaurantservice.Restaurant") 
+      .onEvent(RestaurantMenuRevised.class, this::reviseMenu) 
+      .build(); 
+  } 
 
-
-.build(); 
-
-} public void reviseMenu(DomainEventEnvelope<RestaurantMenuRevised> de) { long id = Long.parseLong(de.getAggregateId()); RestaurantMenu revisedMenu = de.getEvent().getRevisedMenu(); restaurantService.reviseMenu(id, revisedMenu); 
-
-} 
-
-} 
+  public void reviseMenu(DomainEventEnvelope<RestaurantMenuRevised> de) { 
+    long id = Long.parseLong(de.getAggregateId()); 
+    RestaurantMenu revisedMenu = de.getEvent().getRevisedMenu(); 
+    restaurantService.reviseMenu(id, revisedMenu); 
+  } 
+}
+```
 
 **An event handler for the RestaurantMenuRevised event** 
 
@@ -605,11 +670,26 @@ The following listing shows an excerpt of the code for this class. The Ticket cl
 
 Listing 5.10 Part of the **Ticket** class, which is a JPA entity 
 
-@Entity(table="tickets") public class Ticket { 
+```java
+@Entity(table="tickets") 
+public class Ticket { 
+  @Id 
+  private Long id; 
+  private TicketState state; 
+  private Long restaurantId; 
 
-@Id private Long id; private TicketState state; private Long restaurantId; 
+  @ElementCollection 
+  @CollectionTable(name="ticket_line_items") 
+  private List<TicketLineItem> lineItems; 
 
-@ElementCollection @CollectionTable(name="ticket_line_items") private List<TicketLineItem> lineItems; private ZonedDateTime readyBy; private ZonedDateTime acceptTime; private ZonedDateTime preparingTime; private ZonedDateTime pickedUpTime; private ZonedDateTime readyForPickupTime; ... 
+  private ZonedDateTime readyBy; 
+  private ZonedDateTime acceptTime; 
+  private ZonedDateTime preparingTime; 
+  private ZonedDateTime pickedUpTime; 
+  private ZonedDateTime readyForPickupTime; 
+  ... 
+}
+```
 
 This class is persisted with JPA and is mapped to the TICKETS table. The restaurantId field is a Long rather than an object reference to a Restaurant. The readyBy field stores the estimate of when the order will be ready for pickup. The Ticket class has several fields that track the history of the order, including acceptTime, preparingTime, and pickupTime. Let’s look at this class’s methods. 
 
@@ -630,7 +710,37 @@ _**Kitchen Service business logic**_
 
 # Listing 5.11 Some of the **Ticket** 's methods 
 
-public class Ticket { public static ResultWithAggregateEvents<Ticket, TicketDomainEvent> create(Long id, TicketDetails details) { return new ResultWithAggregateEvents<>(new Ticket(id, details), new TicketCreatedEvent(id, details)); } public List<TicketPreparationStartedEvent> preparing() { switch (state) { case ACCEPTED: this.state = TicketState.PREPARING; this.preparingTime = ZonedDateTime.now(); return singletonList(new TicketPreparationStartedEvent()); default: throw new UnsupportedStateTransitionException(state); } } public List<TicketDomainEvent> cancel() { switch (state) { case CREATED: case ACCEPTED: this.state = TicketState.CANCELLED; return singletonList(new TicketCancelled()); case READY_FOR_PICKUP: throw new TicketCannotBeCancelledException(); default: throw new UnsupportedStateTransitionException(state); } } 
+```java
+public class Ticket { 
+  public static ResultWithAggregateEvents<Ticket, TicketDomainEvent> create(Long id, TicketDetails details) { 
+    return new ResultWithAggregateEvents<>(new Ticket(id, details), new TicketCreatedEvent(id, details)); 
+  } 
+
+  public List<TicketPreparationStartedEvent> preparing() { 
+    switch (state) { 
+      case ACCEPTED: 
+        this.state = TicketState.PREPARING; 
+        this.preparingTime = ZonedDateTime.now(); 
+        return singletonList(new TicketPreparationStartedEvent()); 
+      default: 
+        throw new UnsupportedStateTransitionException(state); 
+    } 
+  } 
+
+  public List<TicketDomainEvent> cancel() { 
+    switch (state) { 
+      case CREATED: 
+      case ACCEPTED: 
+        this.state = TicketState.CANCELLED; 
+        return singletonList(new TicketCancelled()); 
+      case READY_FOR_PICKUP: 
+        throw new TicketCannotBeCancelledException(); 
+      default: 
+        throw new UnsupportedStateTransitionException(state); 
+    } 
+  } 
+}
+```
 
 The create() method creates a Ticket. The preparing() method is called when the restaurant starts preparing the order. It changes the state of the order to PREPARING, records the time, and publishes an event. The cancel() method is called when a user attempts to cancel an order. If the cancellation is allowed, this method changes the state of the order and returns an event. Otherwise, it throws an exception. These methods are invoked in response to REST API requests as well as events and command messages. Let’s look at the classes that invoke the aggregate’s method. 
 
@@ -639,14 +749,24 @@ The create() method creates a Ticket. The preparing() method is called when the 
 KitchenService is invoked by the service’s inbound adapters. It defines various methods for changing the state of an order, including accept(), reject(), preparing(), and others. Each method loads the specifies aggregate, calls the corresponding method on the aggregate root, and publishes any domain events. The following listing shows its accept() method. 
 
 
-Listing 5.12 The service’s **accept()** method updates **Ticket**
+Listing 5.12 The service’s **accept()** method updates **Ticket** 
+
+```java
 public class KitchenService { 
+  @Autowired 
+  private TicketRepository ticketRepository; 
 
-@Autowired private TicketRepository ticketRepository; 
+  @Autowired 
+  private TicketDomainEventPublisher domainEventPublisher; 
 
-@Autowired private TicketDomainEventPublisher domainEventPublisher; public void accept(long ticketId, ZonedDateTime readyBy) { Ticket ticket = ticketRepository.findById(ticketId) .orElseThrow(() -> new TicketNotFoundException(ticketId)); List<TicketDomainEvent> events = ticket.accept(readyBy); domainEventPublisher.publish(ticket, events); **Publish** } **domain events** 
-
-} 
+  public void accept(long ticketId, ZonedDateTime readyBy) { 
+    Ticket ticket = ticketRepository.findById(ticketId) 
+      .orElseThrow(() -> new TicketNotFoundException(ticketId)); 
+    List<TicketDomainEvent> events = ticket.accept(readyBy); 
+    domainEventPublisher.publish(ticket, events); 
+  } 
+}
+```
 
 The accept() method is invoked when the restaurant accepts a new order. It has two parameters: 
 
@@ -662,35 +782,45 @@ Now let’s look at the class that handles asynchronous commands.
 
 The KitchenServiceCommandHandler class is an adapter that’s responsible for handling command messages sent by the various sagas implemented by Order Service. This class defines a handler method for each command, which invokes KitchenService to create or update a Ticket. The following listing shows an excerpt of this class. 
 
-Listing 5.13 Handling command messages sent by sagas public class KitchenServiceCommandHandler { 
+Listing 5.13 Handling command messages sent by sagas 
 
-@Autowired private KitchenService kitchenService; 
+```java
+public class KitchenServiceCommandHandler { 
+  @Autowired 
+  private KitchenService kitchenService; 
 
-**Maps  command messages** public CommandHandlers commandHandlers() { **to message handlers** return CommandHandlersBuilder 
+  public CommandHandlers commandHandlers() { 
+    return CommandHandlersBuilder 
+      .fromChannel("orderService") 
+      .onMessage(CreateTicket.class, this::createTicket) 
+      .onMessage(ConfirmCreateTicket.class, this::confirmCreateTicket) 
+      .onMessage(CancelCreateTicket.class, this::cancelCreateTicket) 
+      .build(); 
+  } 
 
-.fromChannel("orderService") 
+  private Message createTicket(CommandMessage<CreateTicket> cm) { 
+    CreateTicket command = cm.getCommand(); 
+    long restaurantId = command.getRestaurantId(); 
+    Long ticketId = command.getOrderId(); 
+    TicketDetails ticketDetails = command.getTicketDetails(); 
 
-.onMessage(CreateTicket.class, this::createTicket) 
+    try { 
+      Ticket ticket = kitchenService.createTicket(restaurantId, ticketId, ticketDetails); 
+      CreateTicketReply reply = new CreateTicketReply(ticket.getId()); 
+      return withSuccess(reply); 
+    } catch (RestaurantDetailsVerificationException e) { 
+      return withFailure(); 
+    } 
+  } 
 
-.onMessage(ConfirmCreateTicket.class, this::confirmCreateTicket) 
-
-
-_**Order Service business logic**_ 
-
-.onMessage(CancelCreateTicket.class, this::cancelCreateTicket) .build(); 
-
-} private Message createTicket(CommandMessage<CreateTicket> cm) { 
-
-CreateTicket command = cm.getCommand(); long restaurantId = command.getRestaurantId(); Long ticketId = command.getOrderId(); TicketDetails ticketDetails = command.getTicketDetails(); 
-
-**Invokes KitchenService to create the Ticket**
-try { Ticket ticket = kitchenService.createTicket(restaurantId, ticketId, ticketDetails); 
-
-CreateTicketReply reply = new CreateTicketReply(ticket.getId()); **Sends back a** return withSuccess(reply); **successful reply** } catch (RestaurantDetailsVerificationException e) { return withFailure(); } **Sends back a** } **failure reply** private Message confirmCreateTicket (CommandMessage<ConfirmCreateTicket> cm) { **Confirms** Long ticketId = cm.getCommand().getTicketId(); **the order** kitchenService.confirmCreateTicket(ticketId); return withSuccess(); 
-
-} 
-
-... 
+  private Message confirmCreateTicket (CommandMessage<ConfirmCreateTicket> cm) { 
+    Long ticketId = cm.getCommand().getTicketId(); 
+    kitchenService.confirmCreateTicket(ticketId); 
+    return withSuccess(); 
+  } 
+  ... 
+}
+```
 
 All the command handler methods invoke KitchenService and reply with either a success or a failure reply. 
 
@@ -759,17 +889,36 @@ The Order class has a collection of OrderLineItems. Because the Order’s Consum
 
 # Listing 5.14 The **Order** class and its fields 
 
-@Entity @Table(name="orders") @Access(AccessType.FIELD) public class Order { 
+```java
+@Entity 
+@Table(name="orders") 
+@Access(AccessType.FIELD) 
+public class Order { 
+  @Id 
+  @GeneratedValue 
+  private Long id; 
 
-@Id @GeneratedValue private Long id; @Version private Long version; private OrderState state; private Long consumerId; private Long restaurantId; 
+  @Version 
+  private Long version; 
 
-@Embedded private OrderLineItems orderLineItems; 
+  private OrderState state; 
+  private Long consumerId; 
+  private Long restaurantId; 
 
-@Embedded private DeliveryInformation deliveryInformation; 
+  @Embedded 
+  private OrderLineItems orderLineItems; 
 
-@Embedded private PaymentInformation paymentInformation; 
+  @Embedded 
+  private DeliveryInformation deliveryInformation; 
 
-@Embedded private Money orderMinimum; 
+  @Embedded 
+  private PaymentInformation paymentInformation; 
+
+  @Embedded 
+  private Money orderMinimum; 
+  ... 
+}
+```
 
 This class is persisted with JPA and is mapped to the ORDERS table. The id field is the primary key. The version field is used for optimistic locking. The state of an Order is represented by the OrderState enumeration. The DeliveryInformation and PaymentInformation fields are mapped using the @Embedded annotation and are stored as columns of the ORDERS table. The orderLineItems field is an embedded object that contains the order line items. The Order aggregate consists of more than just fields. It also implements business logic, which can be described by a state machine. Let’s take a look at the state machine. 
 
@@ -800,7 +949,47 @@ Let’s now look at the how the Order aggregate implements this state machine.
 The Order class has several groups of methods, each of which corresponds to a saga. In each group, one method is invoked at the start of the saga, and the other methods are invoked at the end. I’ll first discuss the business logic that creates an Order. After that we’ll look at how an Order is updated. The following listing shows the Order’s methods that are invoked during the process of creating an Order. 
 
 
-Listing 5.15 The methods that are invoked during order creation public class Order { ... public static ResultWithDomainEvents<Order, OrderDomainEvent> createOrder(long consumerId, Restaurant restaurant, List<OrderLineItem> orderLineItems) { Order order = new Order(consumerId, restaurant.getId(), orderLineItems); List<OrderDomainEvent> events = singletonList(new OrderCreatedEvent( new OrderDetails(consumerId, restaurant.getId(), orderLineItems, order.getOrderTotal()), restaurant.getName())); return new ResultWithDomainEvents<>(order, events); } public Order(OrderDetails orderDetails) { this.orderLineItems = new OrderLineItems(orderDetails.getLineItems()); this.orderMinimum = orderDetails.getOrderMinimum(); this.state = APPROVAL_PENDING; } ... public List<DomainEvent> noteApproved() { switch (state) { case APPROVAL_PENDING: this.state = APPROVED; return singletonList(new OrderAuthorized()); ... default: throw new UnsupportedStateTransitionException(state); } } public List<DomainEvent> noteRejected() { switch (state) { case APPROVAL_PENDING: this.state = REJECTED; return singletonList(new OrderRejected()); ... default: throw new UnsupportedStateTransitionException(state); } } 
+Listing 5.15 The methods that are invoked during order creation 
+
+```java
+public class Order { 
+  ... 
+  public static ResultWithDomainEvents<Order, OrderDomainEvent> createOrder(long consumerId, Restaurant restaurant, List<OrderLineItem> orderLineItems) { 
+    Order order = new Order(consumerId, restaurant.getId(), orderLineItems); 
+    List<OrderDomainEvent> events = singletonList(new OrderCreatedEvent( 
+      new OrderDetails(consumerId, restaurant.getId(), orderLineItems, order.getOrderTotal()), 
+      restaurant.getName())); 
+    return new ResultWithDomainEvents<>(order, events); 
+  } 
+
+  public Order(OrderDetails orderDetails) { 
+    this.orderLineItems = new OrderLineItems(orderDetails.getLineItems()); 
+    this.orderMinimum = orderDetails.getOrderMinimum(); 
+    this.state = APPROVAL_PENDING; 
+  } 
+
+  public List<DomainEvent> noteApproved() { 
+    switch (state) { 
+      case APPROVAL_PENDING: 
+        this.state = APPROVED; 
+        return singletonList(new OrderAuthorized()); 
+      default: 
+        throw new UnsupportedStateTransitionException(state); 
+    } 
+  } 
+
+  public List<DomainEvent> noteRejected() { 
+    switch (state) { 
+      case APPROVAL_PENDING: 
+        this.state = REJECTED; 
+        return singletonList(new OrderRejected()); 
+      default: 
+        throw new UnsupportedStateTransitionException(state); 
+    } 
+  } 
+  ... 
+}
+```
 
 The createOrder() method is a static factory method that creates an Order and publishes an OrderCreatedEvent. The OrderCreatedEvent is enriched with the details of the Order, including the line items, the total amount, the restaurant ID, and the restaurant name. Chapter 7 discusses how Order History Service uses Order events, including OrderCreatedEvent, to maintain an easily queried replica of Orders. 
 
@@ -811,20 +1000,40 @@ The initial state of the Order is APPROVAL_PENDING. When the CreateOrderSaga com
 
 In addition to createOrder(), the Order class defines several update methods. For example, the Revise Order Saga revises an order by first invoking the revise() method and then, once it’s verified that the revision can be made, it invokes the confirmRevised() method. The following listing shows these methods. 
 
-Listing 5.16 The **Order** method for revising an **Order**
-class Order ... public List<OrderDomainEvent> revise(OrderRevision orderRevision) { switch (state) { case APPROVED: LineItemQuantityChange change = orderLineItems.lineItemQuantityChange(orderRevision); if (change.newOrderTotal.isGreaterThanOrEqual(orderMinimum)) { throw new OrderMinimumNotMetException(); } this.state = REVISION_PENDING; return singletonList(new OrderRevisionProposed(orderRevision, change.currentOrderTotal, change.newOrderTotal)); default: throw new UnsupportedStateTransitionException(state); } } public List<OrderDomainEvent> confirmRevision(OrderRevision orderRevision) { switch (state) { case REVISION_PENDING: LineItemQuantityChange licd = orderLineItems.lineItemQuantityChange(orderRevision); orderRevision .getDeliveryInformation() .ifPresent(newDi -> this.deliveryInformation = newDi); if (!orderRevision.getRevisedLineItemQuantities().isEmpty()) { orderLineItems.updateLineItems(orderRevision); } this.state = APPROVED; return singletonList(new OrderRevised(orderRevision, licd.currentOrderTotal, licd.newOrderTotal)); 
+Listing 5.16 The **Order** method for revising an **Order** 
 
+```java
+public class Order { 
+  public List<OrderDomainEvent> revise(OrderRevision orderRevision) { 
+    switch (state) { 
+      case APPROVED: 
+        LineItemQuantityChange change = orderLineItems.lineItemQuantityChange(orderRevision); 
+        if (change.newOrderTotal.isGreaterThanOrEqual(orderMinimum)) { 
+          throw new OrderMinimumNotMetException(); 
+        } 
+        this.state = OrderState.REVISION_PENDING; 
+        return singletonList(new OrderRevisionProposed(orderRevision, change.currentOrderTotal, change.newOrderTotal)); 
+      default: 
+        throw new UnsupportedStateTransitionException(state); 
+    } 
+  } 
 
-_**Designing business logic in a microservice architecture**_ 
-
-
-default: throw new UnsupportedStateTransitionException(state); 
-
-} 
-
-} 
-
-# } 
+  public List<OrderDomainEvent> confirmRevision(OrderRevision orderRevision) { 
+    switch (state) { 
+      case REVISION_PENDING: 
+        LineItemQuantityChange licd = orderLineItems.lineItemQuantityChange(orderRevision); 
+        orderRevision.getDeliveryInformation().ifPresent(newDi -> this.deliveryInformation = newDi); 
+        if (!orderRevision.getRevisedLineItemQuantities().isEmpty()) { 
+          orderLineItems.updateLineItems(orderRevision); 
+        } 
+        this.state = OrderState.APPROVED; 
+        return singletonList(new OrderRevised(orderRevision, licd.currentOrderTotal, licd.newOrderTotal)); 
+      default: 
+        throw new UnsupportedStateTransitionException(state); 
+    } 
+  } 
+}
+```
 
 The revise() method is called to initiate the revision of an order. Among other things, it verifies that the revised order won’t violate the order minimum and changes the state of the order to REVISION_PENDING. Once Revise Order Saga has successfully updated Kitchen Service and Accounting Service, it then calls confirmRevision() to complete the revision. 
 
@@ -836,39 +1045,50 @@ The OrderService class defines methods for creating and updating Orders. It’s 
 
 Listing 5.17 The **OrderService** class has methods for creating and managing orders 
 
-@Transactional public class OrderService { 
+```java
+@Transactional 
+public class OrderService { 
+  @Autowired 
+  private OrderRepository orderRepository; 
 
-@Autowired private OrderRepository orderRepository; 
+  @Autowired 
+  private SagaManager<CreateOrderSagaState, CreateOrderSagaState> createOrderSagaManager; 
 
-@Autowired private SagaManager<CreateOrderSagaState, CreateOrderSagaState> createOrderSagaManager; 
+  @Autowired 
+  private SagaManager<ReviseOrderSagaState, ReviseOrderSagaData> reviseOrderSagaManagement; 
 
-@Autowired private SagaManager<ReviseOrderSagaState, ReviseOrderSagaData> reviseOrderSagaManagement; 
+  @Autowired 
+  private OrderDomainEventPublisher orderAggregateEventPublisher; 
 
-@Autowired private OrderDomainEventPublisher orderAggregateEventPublisher; public Order createOrder(OrderDetails orderDetails) { 
+  public Order createOrder(OrderDetails orderDetails) { 
+    Restaurant restaurant = restaurantRepository.findById(restaurantId) 
+      .orElseThrow(() -> new RestaurantNotFoundException(restaurantId)); 
 
-Restaurant restaurant = restaurantRepository.findById(restaurantId) .orElseThrow(() - 
+    List<OrderLineItem> orderLineItems = makeOrderLineItems(lineItems, restaurant); 
 
-> > new RestaurantNotFoundException(restaurantId)); 
+    ResultWithDomainEvents<Order, OrderDomainEvent> orderAndEvents = Order.createOrder(consumerId, restaurant, orderLineItems); 
 
+    Order order = orderAndEvents.result; 
+    orderRepository.save(order); 
 
-_**Order Service business logic**_ 
+    orderAggregateEventPublisher.publish(order, orderAndEvents.events); 
 
+    OrderDetails orderDetails = new OrderDetails(consumerId, restaurantId, orderLineItems, order.getOrderTotal()); 
+    CreateOrderSagaState data = new CreateOrderSagaState(order.getId(), orderDetails); 
+    createOrderSagaManager.create(data, Order.class, order.getId()); 
 
-List<OrderLineItem> orderLineItems = makeOrderLineItems(lineItems, restaurant); 
+    return order; 
+  } 
 
-**Creates the Order aggregate** 
-
-ResultWithDomainEvents<Order, OrderDomainEvent> orderAndEvents = Order.createOrder(consumerId, restaurant, orderLineItems); 
-
-Order order = orderAndEvents.result; orderRepository.save(order); 
-
-**Publishes Persists the Order domain in the database events**
-orderAggregateEventPublisher.publish(order, orderAndEvents.events); 
-
-OrderDetails orderDetails = new OrderDetails(consumerId, restaurantId, orderLineItems, order.getOrderTotal()); CreateOrderSagaState data = new CreateOrderSagaState(order.getId(), orderDetails); createOrderSagaManager.create(data, Order.class, order.getId()); 
-
-return order; **Creates the Create** } **Order Saga**
-public Order reviseOrder(Long orderId, Long expectedVersion, OrderRevision orderRevision) { public Order reviseOrder(long orderId, OrderRevision orderRevision) { Order order = orderRepository.findById(orderId) .orElseThrow(() -> new OrderNotFoundException(orderId)); ReviseOrderSagaData sagaData = new ReviseOrderSagaData(order.getConsumerId(), orderId, **Retrieves** null, orderRevision); **the Order** reviseOrderSagaManager.create(sagaData); **Creates the** return order; **Revise Order** } **Saga** } 
+  public Order reviseOrder(long orderId, OrderRevision orderRevision) { 
+    Order order = orderRepository.findById(orderId) 
+      .orElseThrow(() -> new OrderNotFoundException(orderId)); 
+    ReviseOrderSagaData sagaData = new ReviseOrderSagaData(order.getConsumerId(), orderId, null, orderRevision); 
+    reviseOrderSagaManager.create(sagaData); 
+    return order; 
+  } 
+}
+```
 
 The createOrder() method first creates and persists an Order aggregate. It then publishes the domain events emitted by the aggregate. Finally, it creates a CreateOrderSaga. The reviseOrder() retrieves the Order and then creates a ReviseOrderSaga. 
 

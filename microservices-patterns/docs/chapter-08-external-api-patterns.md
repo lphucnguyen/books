@@ -364,17 +364,21 @@ As mentioned earlier, API composition consists of invoking multiple backend serv
 
 Listing 8.1 Fetching the order details by calling the backend services sequentially 
 
-@RestController public class OrderDetailsController { @RequestMapping("/order/{orderId}") public OrderDetails getOrderDetails(@PathVariable String orderId) { 
-
-OrderInfo orderInfo = orderService.findOrderById(orderId); 
-
-TicketInfo ticketInfo = kitchenService 
-
-.findTicketByOrderId(orderId); 
-
-DeliveryInfo deliveryInfo = deliveryService .findDeliveryByOrderId(orderId); BillInfo billInfo = accountingService .findBillByOrderId(orderId); 
-
-OrderDetails orderDetails = OrderDetails.makeOrderDetails(orderInfo, ticketInfo, deliveryInfo, billInfo); return orderDetails; } ... 
+```java
+@RestController 
+public class OrderDetailsController { 
+  @RequestMapping("/order/{orderId}") 
+  public OrderDetails getOrderDetails(@PathVariable String orderId) { 
+    OrderInfo orderInfo = orderService.findOrderById(orderId); 
+    TicketInfo ticketInfo = kitchenService.findTicketByOrderId(orderId); 
+    DeliveryInfo deliveryInfo = deliveryService.findDeliveryByOrderId(orderId); 
+    BillInfo billInfo = accountingService.findBillByOrderId(orderId); 
+    OrderDetails orderDetails = OrderDetails.makeOrderDetails(orderInfo, ticketInfo, deliveryInfo, billInfo); 
+    return orderDetails; 
+  } 
+  ... 
+}
+```
 
 The drawback of calling the services sequentially is that the response time is the sum of the service response times. In order to minimize response time, the composition logic should, whenever possible, invoke services concurrently. In this example, there are no dependencies between the service calls. All services should be invoked concurrently, which significantly reduces response time. The challenge is to write concurrent code that’s maintainable. 
 
@@ -529,36 +533,54 @@ The OrderConfiguration class, shown in listing 8.2, is a Spring @Configuration c
 
 Listing 8.2 The Spring **@Beans** that implement the **/orders** endpoints 
 
+```java
 @Configuration 
+@EnableConfigurationProperties(OrderDestinations.class) 
+public class OrderConfiguration { 
 
-@EnableConfigurationProperties(OrderDestinations.class) public class OrderConfiguration { 
+  @Bean 
+  public RouteLocator orderProxyRouting(OrderDestinations orderDestinations) { 
+    return Routes.locator() 
+      .route("orders") 
+      .uri(orderDestinations.orderServiceUrl) 
+      .predicate(path("/orders").or(path("/orders/*"))) 
+      .and() 
+      .build(); 
+  } 
 
-# @Bean 
+  @Bean 
+  public OrderHandlers orderHandlers(OrderService orderService, 
+                                     KitchenService kitchenService, 
+                                     DeliveryService deliveryService, 
+                                     AccountingService accountingService) { 
+    return new OrderHandlers(orderService, kitchenService, deliveryService, accountingService); 
+  } 
 
-public RouteLocator orderProxyRouting(OrderDestinations orderDestinations) { return Routes.locator() 
-
-.route("orders") .uri(orderDestinations.orderServiceUrl) .predicate(path("/orders").or(path("/orders/*"))) .and() ... **By default, route all requests whose** .build(); **path begins with /orders to the URL** } **orderDestinations.orderServiceUrl.** 
-
-@Bean public RouterFunction<ServerResponse> orderHandlerRouting(OrderHandlers orderHandlers) { return RouterFunctions.route(GET("/orders/{orderId}"), orderHandlers::getOrderDetails); 
-
-**Route a GET /orders/{orderId} to orderHandlers:: getOrderDetails.** 
-
-} 
-
-
-@Bean public OrderHandlers orderHandlers(OrderService orderService, KitchenService kitchenService, DeliveryService deliveryService, AccountingService accountingService) { return new OrderHandlers(orderService, kitchenService, deliveryService, accountingService); } 
-
-} 
-
-**The @Bean, which implements the custom request-handling logic** 
+  @Bean 
+  public RouterFunction<ServerResponse> orderHandlerRouting(OrderHandlers orderHandlers) { 
+    return RouterFunctions.route(GET("/orders/{orderId}"), orderHandlers::getOrderDetails); 
+  } 
+}
+```
 
 OrderDestinations, shown in the following listing, is a Spring @ConfigurationProperties class that enables the externalized configuration of backend service URLs. 
 
 Listing 8.3 The externalized configuration of backend service URLs 
 
-@ConfigurationProperties(prefix = "order.destinations") public class OrderDestinations { 
+```java
+@ConfigurationProperties(prefix = "order.destinations") 
+public class OrderDestinations { 
+  @NotNull 
+  public String orderServiceUrl; 
 
-@NotNull public String orderServiceUrl; public String getOrderServiceUrl() { return orderServiceUrl; } public void setOrderServiceUrl(String orderServiceUrl) { this.orderServiceUrl = orderServiceUrl; } ... } 
+  public String getOrderServiceUrl() { return orderServiceUrl; } 
+
+  public void setOrderServiceUrl(String orderServiceUrl) { 
+    this.orderServiceUrl = orderServiceUrl; 
+  } 
+  ... 
+}
+```
 
 You can, for example, specify the URL of the Order Service either as the order .destinations.orderServiceUrl property in a properties file or as an operating system environment variable, ORDER_DESTINATIONS_ORDER_SERVICE_URL. 
 
@@ -566,18 +588,56 @@ You can, for example, specify the URL of the Order Service either as the order .
 
 The OrderHandlers class, shown in the following listing, defines the request handler methods that implement custom behavior, including API composition. The getOrderDetails() method, for example, performs API composition to retrieve information about an order. This class is injected with several proxy classes that make requests to backend services. 
 
-Listing 8.4 The **OrderHandlers** class implements custom request-handling logic. public class OrderHandlers { private OrderService orderService; private KitchenService kitchenService; private DeliveryService deliveryService; private AccountingService accountingService; 
+Listing 8.4 The **OrderHandlers** class implements custom request-handling logic. 
 
+```java
+public class OrderHandlers { 
+  private OrderService orderService; 
+  private KitchenService kitchenService; 
+  private DeliveryService deliveryService; 
+  private AccountingService accountingService; 
 
-_**Implementing an API gateway**_
-public OrderHandlers(OrderService orderService, 
+  public OrderHandlers(OrderService orderService, 
+                       KitchenService kitchenService, 
+                       DeliveryService deliveryService, 
+                       AccountingService accountingService) { 
+    this.orderService = orderService; 
+    this.kitchenService = kitchenService; 
+    this.deliveryService = deliveryService; 
+    this.accountingService = accountingService; 
+  } 
 
-KitchenService kitchenService, DeliveryService deliveryService, AccountingService accountingService) { this.orderService = orderService; this.kitchenService = kitchenService; this.deliveryService = deliveryService; this.accountingService = accountingService; } public Mono<ServerResponse> getOrderDetails(ServerRequest serverRequest) { String orderId = serverRequest.pathVariable("orderId"); 
+  public Mono<ServerResponse> getOrderDetails(ServerRequest serverRequest) { 
+    String orderId = serverRequest.pathVariable("orderId"); 
+    Mono<OrderInfo> orderInfo = orderService.findOrderById(orderId); 
 
-Mono<OrderInfo> orderInfo = orderService.findOrderById(orderId); 
+    Mono<Optional<TicketInfo>> ticketInfo = kitchenService 
+      .findTicketByOrderId(orderId) 
+      .map(Optional::of) 
+      .onErrorReturn(Optional.empty()); 
 
-Mono<Optional<TicketInfo>> ticketInfo = kitchenService **Transform a TicketInfo into** .findTicketByOrderId(orderId) **an Optional<TicketInfo>.** .map(Optional::of) .onErrorReturn(Optional.empty()); **return Optional.empty().** Mono<Optional<DeliveryInfo>> deliveryInfo = deliveryService .findDeliveryByOrderId(orderId) .map(Optional::of) .onErrorReturn(Optional.empty()); Mono<Optional<BillInfo>> billInfo = accountingService .findBillByOrderId(orderId) .map(Optional::of) **Combine the four** .onErrorReturn(Optional.empty()); **values into a single value, a Tuple4.** Mono<Tuple4<OrderInfo, Optional<TicketInfo>, Optional<DeliveryInfo>, Optional<BillInfo>>> combined = Mono.when(orderInfo, ticketInfo, deliveryInfo, billInfo); 
+    Mono<Optional<DeliveryInfo>> deliveryInfo = deliveryService 
+      .findDeliveryByOrderId(orderId) 
+      .map(Optional::of) 
+      .onErrorReturn(Optional.empty()); 
 
+    Mono<Optional<BillInfo>> billInfo = accountingService 
+      .findBillByOrderId(orderId) 
+      .map(Optional::of) 
+      .onErrorReturn(Optional.empty()); 
+
+    Mono<Tuple4<OrderInfo, Optional<TicketInfo>, Optional<DeliveryInfo>, Optional<BillInfo>>> combined = 
+      Mono.when(orderInfo, ticketInfo, deliveryInfo, billInfo); 
+
+    return combined.flatMap(tuple -> { 
+      OrderDetails orderDetails = OrderDetails.makeOrderDetails(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4()); 
+      return ServerResponse.ok() 
+        .contentType(MediaType.APPLICATION_JSON) 
+        .body(fromObject(orderDetails)); 
+    }); 
+  } 
+}
+```
 **If the service invocation failed, return Optional.empty().** 
 
 Mono<OrderDetails> orderDetails = combined.map(OrderDetails::makeOrderDetails); 
@@ -613,20 +673,26 @@ The OrderService class, shown in the following listing, is a remote proxy for th
 
 Listing 8.5 **OrderService** class—a remote proxy for **Order Service** 
 
-@Service public class OrderService { private OrderDestinations orderDestinations; private WebClient client; 
+```java
+@Service 
+public class OrderService { 
+  private OrderDestinations orderDestinations; 
+  private WebClient client; 
 
-public OrderService(OrderDestinations orderDestinations, WebClient client) { this.orderDestinations = orderDestinations; this.client = client; } public Mono<OrderInfo> findOrderById(String orderId) { Mono<ClientResponse> response = client .get() 
+  public OrderService(OrderDestinations orderDestinations, WebClient client) { 
+    this.orderDestinations = orderDestinations; 
+    this.client = client; 
+  } 
 
-
-_**Implementing an API gateway**_ 
-
-**Invoke the service.** 
-
-.uri(orderDestinations.orderServiceUrl + "/orders/{orderId}", orderId) .exchange(); return response.flatMap(resp -> resp.bodyToMono(OrderInfo.class)); 
-
-} 
-
-**Convert the response** } **body to an OrderInfo.** 
+  public Mono<OrderInfo> findOrderById(String orderId) { 
+    Mono<ClientResponse> response = client 
+      .get() 
+      .uri(orderDestinations.orderServiceUrl + "/orders/{orderId}", orderId) 
+      .exchange(); 
+    return response.flatMap(resp -> resp.bodyToMono(OrderInfo.class)); 
+  } 
+}
+```
 
 The findOrder() method retrieves the OrderInfo for an order. It uses the WebClient to make the HTTP request to the Order Service and deserializes the JSON response to an OrderInfo. WebClient has a reactive API, and the response is wrapped in a Mono. The findOrder() method uses flatMap() to transform the Mono<ClientResponse> into a Mono<OrderInfo>. As the name suggests, the bodyToMono() method returns the response body as a Mono. 
 
@@ -636,9 +702,17 @@ The ApiGatewayApplication class, shown in the following listing, implements the 
 
 Listing 8.6 The **main()** method for the API gateway 
 
-@SpringBootConfiguration @EnableAutoConfiguration @EnableGateway @Import(OrdersConfiguration.class) public class ApiGatewayApplication { public static void main(String[] args) { SpringApplication.run(ApiGatewayApplication.class, args); 
-
-} } 
+```java
+@SpringBootConfiguration 
+@EnableAutoConfiguration 
+@EnableGateway 
+@Import(OrdersConfiguration.class) 
+public class ApiGatewayApplication { 
+  public static void main(String[] args) { 
+    SpringApplication.run(ApiGatewayApplication.class, args); 
+  } 
+}
+```
 
 The @EnableGateway annotation imports the Spring configuration for the Spring Cloud Gateway framework. 
 
@@ -720,12 +794,48 @@ GraphQL also uses fields to define the queries supported by the schema. You defi
 
 The following listing shows part of the schema for the GraphQL-based FTGO API gateway. It defines several object types. Most of the object types correspond to the FTGO application’s Consumer, Order, and Restaurant entities. It also has a Query object type that defines the schema’s queries. 
 
-Listing 8.7 The GraphQL schema for the FTGO API gateway type Query { **Defines the queries** orders(consumerId : Int!): [Order] **that a client can** order(orderId : Int!): Order **execute** consumer(consumerId : Int!): Consumer } type Consumer { **The unique ID** id: ID **for a Consumer** firstName: String lastName: String orders: [Order] **A consumer has** } **a list of orders.** type Order { orderId: ID, consumerId : Int, consumer: Consumer restaurant: Restaurant deliveryInfo : DeliveryInfo 
+Listing 8.7 The GraphQL schema for the FTGO API gateway 
 
-... } type Restaurant { id: ID name: String ... } 
+```graphql
+type Query { 
+  orders(consumerId : Int!): [Order] 
+  order(orderId : Int!): Order 
+  consumer(consumerId : Int!): Consumer 
+} 
 
+type Consumer { 
+  id: ID 
+  firstName: String 
+  lastName: String 
+  orders: [Order] 
+} 
 
-type DeliveryInfo { status : DeliveryStatus estimatedDeliveryTime : Int assignedCourier :String } enum DeliveryStatus { PREPARING READY_FOR_PICKUP PICKED_UP DELIVERED } 
+type Order { 
+  orderId: ID 
+  consumerId : Int 
+  consumer: Consumer 
+  restaurant: Restaurant 
+  deliveryInfo : DeliveryInfo 
+} 
+
+type Restaurant { 
+  id: ID 
+  name: String 
+} 
+
+type DeliveryInfo { 
+  status : DeliveryStatus 
+  estimatedDeliveryTime : Int 
+  assignedCourier :String 
+} 
+
+enum DeliveryStatus { 
+  PREPARING 
+  READY_FOR_PICKUP 
+  PICKED_UP 
+  DELIVERED 
+} 
+```
 
 Despite having a different syntax, the Consumer, Order, Restaurant, and DeliveryInfo object types are structurally similar to the corresponding Java classes. One difference is the ID type, which represents a unique identifier. 
 
@@ -780,9 +890,22 @@ The details of how resolver functions are associated with the schema depend on w
 
 when using the Apollo GraphQL server. You create a doubly nested JavaScript object. Each top-level property corresponds to an object type, such as Query and Order. Each second-level property, such as Order.consumer, defines a field’s resolver function. 
 
-Listing 8.8 Attaching the resolver functions to fields of the GraphQL schema const resolvers = { **The resolver for** Query: { orders: resolveOrders, **the orders query** consumer: resolveConsumer, order: resolveOrder }, **The resolver for** Order: { **the consumer field** consumer: resolveOrderConsumer, **of an Order** restaurant: resolveOrderRestaurant, deliveryInfo: resolveOrderDeliveryInfo 
+Listing 8.8 Attaching the resolver functions to fields of the GraphQL schema 
 
-... }; 
+```javascript
+const resolvers = { 
+  Query: { 
+    orders: resolveOrders, 
+    consumer: resolveConsumer, 
+    order: resolveOrder 
+  }, 
+  Order: { 
+    consumer: resolveOrderConsumer, 
+    restaurant: resolveOrderRestaurant, 
+    deliveryInfo: resolveOrderDeliveryInfo 
+  } 
+}; 
+```
 
 A resolver function has three parameters: 
 
@@ -794,14 +917,26 @@ A resolver function has three parameters:
 
 A resolver function might invoke a single service or it might implement the API composition pattern and retrieve data from multiple services. An Apollo GraphQL server resolver function returns a Promise, which is JavaScript’s version of Java’s CompletableFuture. The promise contains the object (or a list of objects) that the resolver function retrieved from the data store. GraphQL engine includes the return value in the result object. 
 
-Let’s look at a couple of examples. Here’s the resolveOrders() function, which is the resolver for the orders query: function resolveOrders(_, { consumerId }, context) { return context.orderServiceProxy.findOrders(consumerId); } 
+Let’s look at a couple of examples. Here’s the resolveOrders() function, which is the resolver for the orders query: 
+
+```javascript
+function resolveOrders(_, { consumerId }, context) { 
+  return context.orderServiceProxy.findOrders(consumerId); 
+} 
+```
 
 This function obtains the OrderServiceProxy from the context and invokes it to fetch a consumer’s orders. It ignores its first parameter. It passes the consumerId argument, provided by the query document, to OrderServiceProxy.findOrders(). The findOrders() method retrieves the consumer’s orders from OrderHistoryService. 
 
 
 _**Implementing an API gateway**_ 
 
-Here’s the resolveOrderRestaurant() function, which is the resolver for the Order.restaurant field that retrieves an order’s restaurant: function resolveOrderRestaurant({restaurantId}, args, context) { return context.restaurantServiceProxy.findRestaurant(restaurantId); } 
+Here’s the resolveOrderRestaurant() function, which is the resolver for the Order.restaurant field that retrieves an order’s restaurant: 
+
+```javascript
+function resolveOrderRestaurant({restaurantId}, args, context) { 
+  return context.restaurantServiceProxy.findRestaurant(restaurantId); 
+} 
+```
 
 Its first parameter is Order. It invokes RestaurantServiceProxy.findRestaurant() with the Order’s restaurantId, which was provided by resolveOrders(). 
 
@@ -832,8 +967,25 @@ One important optimization is to use a combination of server-side batching and c
 
 A NodeJS-based GraphQL server can use the DataLoader module to implement batching and caching (https://github.com/facebook/dataloader). It coalesces loads that occur within a single execution of the event loop and calls a batch loading function that you provide. It also caches calls to eliminate duplicate loads. The following listing shows how RestaurantServiceProxy can use DataLoader. The findRestaurant() method loads a Restaurant via DataLoader. 
 
-Listing 8.9 Using a **DataLoader** to optimize calls to **Restaurant Service**
-const DataLoader = require('dataloader'); class RestaurantServiceProxy { **Create a DataLoader, which uses** constructor() { **batchFindRestaurants() as the** this.dataLoader = **batch loading functions.** new DataLoader(restaurantIds => this.batchFindRestaurants(restaurantIds)); } **Load the specified Restaurant via the DataLoader.** findRestaurant(restaurantId) { return this.dataLoader.load(restaurantId); } **Load a batch of Restaurants.** batchFindRestaurants(restaurantIds) { ... } } 
+Listing 8.9 Using a **DataLoader** to optimize calls to **Restaurant Service** 
+
+```javascript
+const DataLoader = require('dataloader'); 
+
+class RestaurantServiceProxy { 
+  constructor() { 
+    this.dataLoader = new DataLoader(restaurantIds => this.batchFindRestaurants(restaurantIds)); 
+  } 
+
+  findRestaurant(restaurantId) { 
+    return this.dataLoader.load(restaurantId); 
+  } 
+
+  batchFindRestaurants(restaurantIds) { 
+    ... 
+  } 
+} 
+```
 
 RestaurantServiceProxy and, hence, DataLoader are created for each request, so there’s no possibility of DataLoader mixing together different users’ data. 
 
@@ -849,21 +1001,33 @@ The Apollo GraphQL server executes GraphQL queries. In order for clients to invo
 
 Listing 8.10 shows how to use the Apollo GraphQL server in an Express application. The key function is graphqlExpress, which is provided by the apollo-serverexpress module. It builds an Express request handler that executes GraphQL queries against a schema. This example configures Express to route requests to the GET /graphql and POST /graphql endpoints of this GraphQL request handler. It also creates a GraphQL context containing the proxies, which makes them available to the resolvers. 
 
-Listing 8.10 Integrating the GraphQL server with the Express web framework const {graphqlExpress} = require("apollo-server-express"); const typeDefs = gql` **Define the GraphQL** type Query { **schema.** orders: resolveOrders, ... } type Consumer { ... **Define the** const resolvers = { **resolvers.** Query: { ... } } 
+Listing 8.10 Integrating the GraphQL server with the Express web framework 
 
-**Combine the schema with the resolvers to create an executable schema.**
+```javascript
+const {graphqlExpress} = require("apollo-server-express"); 
+
 const schema = makeExecutableSchema({ typeDefs, resolvers }); 
 
-**Inject repositories into the context so they’re available to resolvers.**
-const app = express(); function makeContextWithDependencies(req) { const orderServiceProxy = new OrderServiceProxy(); const consumerServiceProxy = new ConsumerServiceProxy(); const restaurantServiceProxy = new RestaurantServiceProxy(); ... return {orderServiceProxy, consumerServiceProxy, restaurantServiceProxy, ...}; 
+const app = express(); 
 
-**Make an express request handler that executes GraphQL queries against the executable schema.** 
+function makeContextWithDependencies(req) { 
+  const orderServiceProxy = new OrderServiceProxy(); 
+  const consumerServiceProxy = new ConsumerServiceProxy(); 
+  const restaurantServiceProxy = new RestaurantServiceProxy(); 
+  return {orderServiceProxy, consumerServiceProxy, restaurantServiceProxy}; 
+} 
 
-} function makeGraphQLHandler() { return graphqlExpress(req => { return {schema: schema, context: makeContextWithDependencies(req)} }); 
+function makeGraphQLHandler() { 
+  return graphqlExpress(req => { 
+    return {schema: schema, context: makeContextWithDependencies(req)} 
+  }); 
+} 
 
-} app.post('/graphql', bodyParser.json(), makeGraphQLHandler()); app.get('/graphql', makeGraphQLHandler()); 
+app.post('/graphql', bodyParser.json(), makeGraphQLHandler()); 
+app.get('/graphql', makeGraphQLHandler()); 
 
 app.listen(PORT); 
+```
 
 **Route POST /graphql and GET /graphql endpoints to the GraphQL server.** 
 
@@ -879,14 +1043,30 @@ There are a couple of different ways a client application can invoke the GraphQL
 The following listing shows the FtgoGraphQLClient class, which is a simple GraphQL-based client for the FTGO application. Its constructor instantiates ApolloClient, which is provided by the Apollo GraphQL client library. The FtgoGraphQLClient class defines a findConsumer() method that uses the client to retrieve the name of a consumer. 
 
 
-![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0320-07.png)
+Listing 8.11 Using the Apollo GraphQL client to execute queries 
 
+```javascript
+class FtgoGraphQLClient { 
+  constructor(...) { 
+    this.client = new ApolloClient({ ... }); 
+  } 
 
-**----- Start of picture text -----**<br>
-Listing 8.11 Using the Apollo GraphQL client to execute queries<br>class FtgoGraphQLClient {<br>constructor(...) {<br>this.client = new ApolloClient({ ... });<br>}<br>findConsumer(consumerId) { Supply the value<br>return this.client.query({ of the $cid.<br>variables: { cid: consumerId},<br>query: gql` Define $cid as a<br>query foo($cid : Int!) { variable of type Int.<br>consumer(consumerId: $cid) {<br>id Set the value of<br>firstName query parameter<br>lastName consumerid to $cid.<br>}<br>} `,<br>})<br>}<br>**----- End of picture text -----**<br>
-
-
-} 
+  findConsumer(consumerId) { 
+    return this.client.query({ 
+      variables: { cid: consumerId}, 
+      query: gql` 
+        query foo($cid : Int!) { 
+          consumer(consumerId: $cid) { 
+            id 
+            firstName 
+            lastName 
+          } 
+        } 
+      `, 
+    }) 
+  } 
+}
+```
 
 The FtgoGraphQLClient class can define a variety of query methods, such as findConsumer(). Each one executes a query that retrieves exactly the data needed by the client. 
 

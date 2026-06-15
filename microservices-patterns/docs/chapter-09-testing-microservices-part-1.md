@@ -316,8 +316,23 @@ Because you test API Gateway using the published contracts, you can be confident
 
 The contracts are the key part of this testing strategy. The following listing shows an example Spring Cloud Contract. It consists of an HTTP request and an HTTP response. 
 
-Listing 9.1 A contract that describes how **API Gateway** invokes **Order Service**
-org.springframework.cloud.contract.spec.Contract.make { request { method 'GET' **The HTTP request’s** url '/orders/1223232' **method and path** } response { **The HTTP response’s status** status 200 **code, headers, and body** headers { header('Content-Type': 'application/json;charset=UTF-8') } body("{ ... }") } } 
+Listing 9.1 A contract that describes how **API Gateway** invokes **Order Service** 
+
+```groovy
+org.springframework.cloud.contract.spec.Contract.make { 
+  request { 
+    method 'GET' 
+    url '/orders/1223232' 
+  } 
+  response { 
+    status 200 
+    headers { 
+      header('Content-Type': 'application/json;charset=UTF-8') 
+    } 
+    body("{ ... }") 
+  } 
+}
+```
 
 
 _**Testing strategies for microservice architectures**_ 
@@ -435,9 +450,26 @@ Let’s begin by looking at how to test entities.
 
 The following listing shows an excerpt of OrderTest class, which implements the unit tests for the Order entity. The class has an @Before setUp() method that creates an Order before running each test. Its @Test methods might further initialize Order, invoke one of its methods, and then make assertions about the return value and the state of Order. 
 
-Listing 9.2 A simple, fast-running unit test for the **Order** entity public class OrderTest { private ResultWithEvents<Order> createResult; private Order order; @Before public void setUp() throws Exception { createResult = Order.createOrder(CONSUMER_ID, AJANTA_ID, CHICKEN_VINDALOO _LINE_ITEMS); order = createResult.result; } @Test public void shouldCalculateTotal() { assertEquals(CHICKEN_VINDALOO_PRICE.multiply(CHICKEN_VINDALOO_QUANTITY), order.getOrderTotal()); } ... 
+Listing 9.2 A simple, fast-running unit test for the **Order** entity 
 
-} 
+```java
+public class OrderTest { 
+  private ResultWithEvents<Order> createResult; 
+  private Order order; 
+
+  @Before 
+  public void setUp() throws Exception { 
+    createResult = Order.createOrder(CONSUMER_ID, AJANTA_ID, CHICKEN_VINDALOO_LINE_ITEMS); 
+    order = createResult.result; 
+  } 
+
+  @Test 
+  public void shouldCalculateTotal() { 
+    assertEquals(CHICKEN_VINDALOO_PRICE.multiply(CHICKEN_VINDALOO_QUANTITY), order.getOrderTotal()); 
+  } 
+  ... 
+}
+```
 
 The @Test shouldCalculateTotal() method verifies that Order.getOrderTotal() returns the expected value. Unit tests thoroughly test the business logic. They are 
 
@@ -448,11 +480,28 @@ sociable unit tests for the Order class and its dependencies. You can use them a
 
 Value objects are immutable, so they tend to be easy to test. You don’t have to worry about side effects. A test for a value object typically creates a value object in a particular state, invokes one of its methods, and makes assertions about the return value. Listing 9.3 shows the tests for the Money value object, which is a simple class that represents a money value. These tests verify the behavior of the Money class’s methods, including add(), which adds two Money objects, and multiply(), which multiplies a Money object by an integer. They are solitary tests because the Money class doesn’t depend on any other application classes. 
 
-Listing 9.3 A simple, fast-running test for the **Money** value object public class MoneyTest { private final int M1_AMOUNT = 10; private final int M2_AMOUNT = 15; private Money m1 = new Money(M1_AMOUNT); private Money m2 = new Money(M2_AMOUNT); **Verify that two Money objects can** @Test **be added together.** public void shouldAdd() { assertEquals(new Money(M1_AMOUNT + M2_AMOUNT), m1.add(m2)); } **Verify that a Money** @Test **object can be multiplied** public void shouldMultiply() { **by an integer.** int multiplier = 12; assertEquals(new Money(M2_AMOUNT * multiplier), m2.multiply(multiplier)); } 
+Listing 9.3 A simple, fast-running test for the **Money** value object 
 
-... 
+```java
+public class MoneyTest { 
+  private final int M1_AMOUNT = 10; 
+  private final int M2_AMOUNT = 15; 
+  private Money m1 = new Money(M1_AMOUNT); 
+  private Money m2 = new Money(M2_AMOUNT); 
 
-} 
+  @Test 
+  public void shouldAdd() { 
+    assertEquals(new Money(M1_AMOUNT + M2_AMOUNT), m1.add(m2)); 
+  } 
+
+  @Test 
+  public void shouldMultiply() { 
+    int multiplier = 12; 
+    assertEquals(new Money(M2_AMOUNT * multiplier), m2.multiply(multiplier)); 
+  } 
+  ... 
+}
+```
 
 Entities and value objects are the building blocks of a service’s business logic. But some business logic also resides in the service’s sagas and services. Let’s look at how to test those. 
 
@@ -472,35 +521,40 @@ Listing 9.4 shows a test for CreateOrderSaga. It’s a sociable unit test that t
 
 Listing 9.4 A simple, fast-running unit test for **CreateOrderSaga** 
 
-|public class CreateOrderSagaTest {||||||||
-|---|---|---|---|---|---|---|---|
-|**Create**||||||||
-|@Test<br>public void shouldCreateOrder() {<br>**the saga.**||||||||
-|given()<br>.saga(new CreateOrderSaga(kitchenServiceProxy),  <br>new CreateOrderSagaState(ORDER_ID,<br>CHICKEN_VINDALOO_ORDER_DETAILS)).||||||**Verify that it sends**<br>**a ValidateOrderBy-**<br>**Consumer message**<br>**to Consumer Service.**||
-|expect().||||||||
-|command(new ValidateOrderByConsumer(CONSUMER_ID,|ORDER_ID,|||||||
-|CHICKEN_VINDALOO_ORDER_TOTAL)).||||||||
-|to(ConsumerServiceChannels.consumerServiceChannel).||||||||
-|andGiven().<br>successReply().|||**Send a Success reply**<br>**to that message.**|||||
-|expect().||||||||
-|command(new CreateTicket(AJANTA_ID, ORDER_ID, null)). <br>to(KitchenServiceChannels.kitchenServiceChannel);<br>}|||||||**Verify that it sends**<br>**a CreateTicket**<br>**message to**|
-||||||||**Kitchen Service.**|
-|@Test||||||||
-|public void shouldRejectOrderDueToConsumerVerificationFailed()|||||{|||
-|given()||||||||
-|.saga(new CreateOrderSaga(kitchenServiceProxy),||||||||
-|new CreateOrderSagaState(ORDER_ID,||||||||
-|CHICKEN_VINDALOO_ORDER_DETAILS)).||||||||
-|expect().||||||||
-|command(new ValidateOrderByConsumer(CONSUMER_ID, ORDER_ID,||||||||
-|CHICKEN_VINDALOO_ORDER_TOTAL)).||||||||
-|to(ConsumerServiceChannels.consumerServiceChannel).||||||||
-|andGiven().||||||||
+```java
+public class CreateOrderSagaTest { 
 
+  @Test 
+  public void shouldCreateOrder() { 
+    given() 
+      .saga(new CreateOrderSaga(kitchenServiceProxy), 
+            new CreateOrderSagaState(ORDER_ID, CHICKEN_VINDALOO_ORDER_DETAILS)) 
+    .expect() 
+      .command(new ValidateOrderByConsumer(CONSUMER_ID, ORDER_ID, CHICKEN_VINDALOO_ORDER_TOTAL)) 
+      .to(ConsumerServiceChannels.consumerServiceChannel) 
+    .andGiven() 
+      .successReply() 
+    .expect() 
+      .command(new CreateTicket(AJANTA_ID, ORDER_ID, null)) 
+      .to(KitchenServiceChannels.kitchenServiceChannel); 
+  } 
 
-failureReply(). expect(). command(new RejectOrderCommand(ORDER_ID)). to(OrderServiceChannels.orderServiceChannel); } **Verify that the saga sends a RejectOrderCommand** } **message to Order Service.** 
-
-**Send a failure reply indicating that Consumer Service rejected Order.** 
+  @Test 
+  public void shouldRejectOrderDueToConsumerVerificationFailed() { 
+    given() 
+      .saga(new CreateOrderSaga(kitchenServiceProxy), 
+            new CreateOrderSagaState(ORDER_ID, CHICKEN_VINDALOO_ORDER_DETAILS)) 
+    .expect() 
+      .command(new ValidateOrderByConsumer(CONSUMER_ID, ORDER_ID, CHICKEN_VINDALOO_ORDER_TOTAL)) 
+      .to(ConsumerServiceChannels.consumerServiceChannel) 
+    .andGiven() 
+      .failureReply() 
+    .expect() 
+      .command(new RejectOrderCommand(ORDER_ID)) 
+      .to(OrderServiceChannels.orderServiceChannel); 
+  } 
+}
+```
 
 The @Test shouldCreateOrder() method tests the happy path. The @Test shouldRejectOrderDueToConsumerVerificationFailed() method tests the scenario where Consumer Service rejects the order. It verifies that CreateOrderSaga sends a RejectOrderCommand to compensate for the consumer being rejected. The CreateOrderSagaTest class has methods that test other failure scenarios. 
 
@@ -518,39 +572,46 @@ Listing 9.5 shows the OrderServiceTest class, which tests OrderService. It defin
 
 - 3 _Verify_ —Verifies that the value returned by the service method is correct and that the dependencies have been invoked correctly 
 
-Listing 9.5 A simple, fast-running unit test for the **OrderService** class public class OrderServiceTest { private OrderService orderService; private OrderRepository orderRepository; private DomainEventPublisher eventPublisher; private RestaurantRepository restaurantRepository; private SagaManager<CreateOrderSagaState> createOrderSagaManager; private SagaManager<CancelOrderSagaData> cancelOrderSagaManager; private SagaManager<ReviseOrderSagaData> reviseOrderSagaManager; @Before public void setup() { orderRepository = mock(OrderRepository.class); eventPublisher = mock(DomainEventPublisher.class); restaurantRepository = mock(RestaurantRepository.class); 
+Listing 9.5 A simple, fast-running unit test for the **OrderService** class 
 
-**Create Mockito mocks for OrderService’s dependencies.** 
+```java
+public class OrderServiceTest { 
+  private OrderService orderService; 
+  private OrderRepository orderRepository; 
+  private DomainEventPublisher eventPublisher; 
+  private RestaurantRepository restaurantRepository; 
+  private SagaManager<CreateOrderSagaState> createOrderSagaManager; 
+  private SagaManager<CancelOrderSagaData> cancelOrderSagaManager; 
+  private SagaManager<ReviseOrderSagaData> reviseOrderSagaManager; 
 
+  @Before 
+  public void setup() { 
+    orderRepository = mock(OrderRepository.class); 
+    eventPublisher = mock(DomainEventPublisher.class); 
+    restaurantRepository = mock(RestaurantRepository.class); 
+    createOrderSagaManager = mock(SagaManager.class); 
+    cancelOrderSagaManager = mock(SagaManager.class); 
+    reviseOrderSagaManager = mock(SagaManager.class); 
+    orderService = new OrderService(orderRepository, eventPublisher, restaurantRepository, createOrderSagaManager, cancelOrderSagaManager, reviseOrderSagaManager); 
+  } 
 
-_**Writing unit tests for a service**_ 
+  @Test 
+  public void shouldCreateOrder() { 
+    when(restaurantRepository.findById(AJANTA_ID)).thenReturn(Optional.of(AJANTA_RESTAURANT)); 
+    when(orderRepository.save(any(Order.class))).then(invocation -> { 
+      Order order = (Order) invocation.getArguments()[0]; 
+      order.setId(ORDER_ID); 
+      return order; 
+    }); 
 
+    Order order = orderService.createOrder(CONSUMER_ID, AJANTA_ID, CHICKEN_VINDALOO_MENU_ITEMS_AND_QUANTITIES); 
 
-createOrderSagaManager = mock(SagaManager.class); cancelOrderSagaManager = mock(SagaManager.class); reviseOrderSagaManager = mock(SagaManager.class); orderService = new OrderService(orderRepository, eventPublisher, restaurantRepository, createOrderSagaManager, cancelOrderSagaManager, reviseOrderSagaManager); 
-
-} 
-
-**Create an OrderService injected with mock dependencies.** 
-
-@Test 
-
-**Configure RestaurantRepository.findById() to return the Ajanta restaurant.**
-public void shouldCreateOrder() { **to return the Ajanta restaurant.** when(restaurantRepository .findById(AJANTA_ID)).thenReturn(Optional.of(AJANTA_RESTAURANT_); when(orderRepository.save(any(Order.class))).then(invocation -> { Order order = (Order) invocation.getArguments()[0]; order.setId(ORDER_ID); return order; **Configure OrderRepository.save() to set Order’s ID.** }); 
-
-**Configure OrderRepository.save() to set Order’s ID.** 
-
-**Invoke** Order order = orderService.createOrder(CONSUMER_ID, **OrderService** AJANTA_ID, CHICKEN_VINDALOO_MENU_ITEMS_AND_QUANTITIES); **.create().** 
-
-**Verify that** verify(orderRepository).save(same(order)); **OrderService saved the newly created** verify(eventPublisher).publish(Order.class, ORDER_ID, **Order in the database.** singletonList( 
-
-**Verify that OrderService published an OrderCreatedEvent.**
-new OrderCreatedEvent(CHICKEN_VINDALOO_ORDER_DETAILS))); verify(createOrderSagaManager) .create(new CreateOrderSagaState(ORDER_ID, CHICKEN_VINDALOO_ORDER_DETAILS), Order.class, ORDER_ID); 
-
-**Verify that OrderService created a CreateOrderSaga.** 
-
-} 
-
-} 
+    verify(orderRepository).save(same(order)); 
+    verify(eventPublisher).publish(Order.class, ORDER_ID, singletonList(new OrderCreatedEvent(CHICKEN_VINDALOO_ORDER_DETAILS))); 
+    verify(createOrderSagaManager).create(new CreateOrderSagaState(ORDER_ID, CHICKEN_VINDALOO_ORDER_DETAILS), Order.class, ORDER_ID); 
+  } 
+}
+```
 
 The setUp() method creates an OrderService injected with mock dependencies. The @Test shouldCreateOrder() method verifies that OrderService.createOrder() invokes OrderRepository to save the newly created Order, publishes an OrderCreatedEvent, and creates a CreateOrderSaga. 
 
@@ -571,20 +632,36 @@ Because these tests use the Spring Framework, you might argue that they’re not
 
 Listing 9.6 shows the OrderControllerTest class, which tests Order Service’s OrderController. It defines solitary unit tests that use mocks for OrderController’s dependencies. It’s written using Rest Assured Mock MVC , which provides a simple DSL that abstracts away the details of interacting with controllers. Rest Assured makes it easy to send a mock HTTP request to a controller and verify the response. OrderControllerTest creates a controller that’s injected with Mockito mocks for OrderService and OrderRepository. Each test configures the mocks, makes an HTTP request, verifies that the response is correct, and possibly verifies that the controller invoked the mocks. 
 
-Listing 9.6 A simple, fast-running unit test for the **OrderController** class public class OrderControllerTest { private OrderService orderService; private OrderRepository orderRepository; @Before public void setUp() throws Exception { orderService = mock(OrderService.class); orderRepository = mock(OrderRepository.class); 
+Listing 9.6 A simple, fast-running unit test for the **OrderController** class 
 
-**Create mocks for OrderController’s dependencies.** 
+```java
+public class OrderControllerTest { 
+  private OrderService orderService; 
+  private OrderRepository orderRepository; 
 
+  @Before 
+  public void setUp() throws Exception { 
+    orderService = mock(OrderService.class); 
+    orderRepository = mock(OrderRepository.class); 
+    orderController = new OrderController(orderService, orderRepository); 
+  } 
 
-_**Writing unit tests for a service**_ 
-
-
-orderController = new OrderController(orderService, orderRepository); } @Test public void shouldFindOrder() { when(orderRepository.findById(1L)) **return an Order.** .thenReturn(Optional.of(CHICKEN_VINDALOO_ORDER_); **Configure** given(). **OrderController.** standaloneSetup(configureControllers( **Make an** new OrderController(orderService, orderRepository))). **HTTP** when(). **request.** get("/orders/1"). **Verify the response** then(). **status code.** statusCode(200). body("orderId", **Verify elements** equalTo(new Long(OrderDetailsMother.ORDER_ID).intValue())). **of the JSON** body("state", **response** equalTo(OrderDetailsMother.CHICKEN_VINDALOO_ORDER_STATE.name())). **body.** body("orderTotal", equalTo(CHICKEN_VINDALOO_ORDER_TOTAL.asString())) ; } @Test public void shouldFindNotOrder() { ... } 
-
-**Configure the mock OrderRepository to return an Order.**
-private StandaloneMockMvcBuilder controllers(Object... controllers) { ... } 
-
-} 
+  @Test 
+  public void shouldFindOrder() { 
+    when(orderRepository.findById(1L)).thenReturn(Optional.of(CHICKEN_VINDALOO_ORDER)); 
+    given() 
+      .standaloneSetup(orderController) 
+    .when() 
+      .get("/orders/1") 
+    .then() 
+      .statusCode(200) 
+      .body("orderId", equalTo(new Long(OrderDetailsMother.ORDER_ID).intValue())) 
+      .body("state", equalTo(OrderDetailsMother.CHICKEN_VINDALOO_ORDER_STATE.name())) 
+      .body("orderTotal", equalTo(CHICKEN_VINDALOO_ORDER_TOTAL.asString())); 
+  } 
+  ... 
+}
+```
 
 The shouldFindOrder() test method first configures the OrderRepository mock to return an Order. It then makes an HTTP request to retrieve the order. Finally, it checks that the request was successful and that the response body contains the expected data. 
 
@@ -601,7 +678,33 @@ scenes, though, the messaging infrastructure is stubbed, so no message broker is
 
 Listing 9.7 shows part of the OrderEventConsumerTest class, which tests OrderEventConsumer. It verifies that OrderEventConsumer routes each event to the appropriate handler method and correctly invokes OrderService. The test uses the Eventuate Tram Mock Messaging framework, which provides an easy-to-use DSL for writing mock messaging tests that uses the same given-when-then format as Rest Assured. Each test instantiates OrderEventConsumer injected with a mock OrderService, publishes a domain event, and verifies that OrderEventConsumer correctly invokes the service mock. 
 
-Listing 9.7 A fast-running unit test for the **OrderEventConsumer** class public class OrderEventConsumerTest { private OrderService orderService; private OrderEventConsumer orderEventConsumer; **Instantiate** @Before **OrderEventConsumer with** public void setUp() throws Exception { **mocked dependencies.** orderService = mock(OrderService.class); orderEventConsumer = new OrderEventConsumer(orderService); } @Test **Configure** public void shouldCreateMenu() { **OrderEventConsumer domain handlers.** given(). eventHandlers(orderEventConsumer.domainEventHandlers()). when(). aggregate("net.chrisrichardson.ftgo.restaurantservice.domain.Restaurant", AJANTA_ID). **Publish a** publishes(new RestaurantCreated(AJANTA_RESTAURANT_NAME, **Restaurant-** RestaurantMother.AJANTA_RESTAURANT_MENU)) **Created** then(). **event.** verify(() -> { **Verify that OrderEventConsumer** verify(orderService) **invoked OrderService.createMenu().** .createMenu(AJANTA_ID, new RestaurantMenu(RestaurantMother.AJANTA_RESTAURANT_MENU_ITEMS)); }) ; } } 
+Listing 9.7 A fast-running unit test for the **OrderEventConsumer** class 
+
+```java
+public class OrderEventConsumerTest { 
+  private OrderService orderService; 
+  private OrderEventConsumer orderEventConsumer; 
+
+  @Before 
+  public void setUp() throws Exception { 
+    orderService = mock(OrderService.class); 
+    orderEventConsumer = new OrderEventConsumer(orderService); 
+  } 
+
+  @Test 
+  public void shouldCreateMenu() { 
+    given() 
+      .eventHandlers(orderEventConsumer.domainEventHandlers()) 
+    .when() 
+      .aggregate("net.chrisrichardson.ftgo.restaurantservice.domain.Restaurant", AJANTA_ID) 
+      .publishes(new RestaurantCreated(AJANTA_RESTAURANT_NAME, RestaurantMother.AJANTA_RESTAURANT_MENU)) 
+    .then() 
+      .verify(() -> { 
+        verify(orderService).createMenu(AJANTA_ID, new RestaurantMenu(RestaurantMother.AJANTA_RESTAURANT_MENU_ITEMS)); 
+      }); 
+  } 
+}
+```
 
 The setUp() method creates an OrderEventConsumer injected with a mock OrderService. The shouldCreateMenu() method publishes a RestaurantCreated event and verifies that OrderEventConsumer invoked OrderService.createMenu(). The OrderEventConsumerTest class and the other unit test classes execute extremely quickly. The unit tests run in just a few seconds. 
 

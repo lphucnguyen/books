@@ -368,15 +368,25 @@ When implementing a feature as a service or extracting a service from the monoli
 
 # DESIGNING THE INTEGRATION GLUE API 
 
-The first step in designing the integration glue is to decide what APIs it provides to the domain logic. There are a couple of different styles of interface to choose from, depending on whether you’re querying data or updating data. Let’s say you’re working on Delayed Delivery Service, which needs to retrieve customer contact info from the monolith. The service’s business logic doesn’t need to know the IPC mechanism that the integration glue uses to retrieve the information. Therefore, that mechanism should be encapsulated by an interface. Because Delayed Delivery Service is querying data, it makes sense to define a CustomerContactInfoRepository: interface CustomerContactInfoRepository { 
+The first step in designing the integration glue is to decide what APIs it provides to the domain logic. There are a couple of different styles of interface to choose from, depending on whether you’re querying data or updating data. Let’s say you’re working on Delayed Delivery Service, which needs to retrieve customer contact info from the monolith. The service’s business logic doesn’t need to know the IPC mechanism that the integration glue uses to retrieve the information. Therefore, that mechanism should be encapsulated by an interface. Because Delayed Delivery Service is querying data, it makes sense to define a CustomerContactInfoRepository: 
 
-CustomerContactInfo findCustomerContactInfo(long customerId) } 
+```java
+interface CustomerContactInfoRepository { 
+  CustomerContactInfo findCustomerContactInfo(long customerId); 
+} 
+```
 
 The service’s business logic can invoke this API without knowing how the integration glue retrieves the data. 
 
-Let’s consider a different service. Imagine that you’re extracting delivery management from the FTGO monolith. The monolith needs to invoke Delivery Service to schedule, reschedule, and cancel deliveries. Once again, the details of the underlying IPC mechanism aren’t important to the business logic and should be encapsulated by an interface. In this scenario, the monolith must invoke a service operation, so using a repository doesn’t make sense. A better approach is to define a service interface, such as the following: interface DeliveryService { void scheduleDelivery(...); void rescheduleDelivery(...); void cancelDelivery(...); 
+Let’s consider a different service. Imagine that you’re extracting delivery management from the FTGO monolith. The monolith needs to invoke Delivery Service to schedule, reschedule, and cancel deliveries. Once again, the details of the underlying IPC mechanism aren’t important to the business logic and should be encapsulated by an interface. In this scenario, the monolith must invoke a service operation, so using a repository doesn’t make sense. A better approach is to define a service interface, such as the following: 
 
+```java
+interface DeliveryService { 
+  void scheduleDelivery(...); 
+  void rescheduleDelivery(...); 
+  void cancelDelivery(...); 
 } 
+```
 
 
 _**Designing how the service and the monolith collaborate**_ 

@@ -1,6 +1,4 @@
-# **CHAPTER 2** 
-
-# **Data Models and Query Languages** 
+# Data models and query language
 
 _The limits of my language mean the limits of my world._ 
 
@@ -29,7 +27,7 @@ It can take a lot of effort to master just one data model (think how many books 
 
 In this chapter we will look at a range of general-purpose data models for data storage and querying (point 2 in the preceding list). In particular, we will compare the relational model, the document model, and a few graph-based data models. We will also look at various query languages and compare their use cases. In Chapter 3 we will discuss how storage engines work; that is, how these data models are actually implemented (point 3 in the list). 
 
-# **Relational Model Versus Document Model** 
+## Relational model vs document model
 
 The best-known data model today is probably that of SQL, based on the relational model proposed by Edgar Codd in 1970 [1]: data is organized into _relations_ (called _tables_ in SQL), where each relation is an unordered collection of _tuples_ ( _rows_ in SQL). 
 
@@ -91,37 +89,26 @@ For a data structure like a résumé, which is mostly a self-contained _document
 
 _Example 2-1. Representing a LinkedIn profile as a JSON document_ 
 
-```
+```json
 {
-"user_id":     251,
-"first_name":  "Bill",
-"last_name":   "Gates",
-```
-
-```
-"summary":     "Co-chair of the Bill & Melinda Gates... Active blogger.",
-```
-
-```
-"region_id":   "us:91",
-"industry_id": 131,
-```
-
-- **`"photo_url"`** `:   "/p/7/000/253/05b/308dd6e.jpg",` 
-
-
-```
-"positions": [
+  "user_id":     251,
+  "first_name":  "Bill",
+  "last_name":   "Gates",
+  "summary":     "Co-chair of the Bill & Melinda Gates... Active blogger.",
+  "region_id":   "us:91",
+  "industry_id": 131,
+  "photo_url":   "/p/7/000/253/05b/308dd6e.jpg",
+  "positions": [
     {"job_title": "Co-chair", "organization": "Bill & Melinda Gates Foundation"},
     {"job_title": "Co-founder, Chairman", "organization": "Microsoft"}
   ],
-"education": [
+  "education": [
     {"school_name": "Harvard University",       "start": 1973, "end": 1975},
     {"school_name": "Lakeside School, Seattle", "start": null, "end": null}
   ],
-"contact_info": {
-"blog":    "http://thegatesnotes.com",
-"twitter": "http://twitter.com/BillGates"
+  "contact_info": {
+    "blog":    "http://thegatesnotes.com",
+    "twitter": "http://twitter.com/BillGates"
   }
 }
 ```
@@ -282,20 +269,19 @@ Schema-on-read is similar to dynamic (runtime) type checking in programming lang
 
 The difference between the approaches is particularly noticeable in situations where an application wants to change the format of its data. For example, say you are currently storing each user’s full name in one field, and you instead want to store the first name and last name separately [23]. In a document database, you would just start writing new documents with the new fields and have code in the application that handles the case when old documents are read. For example: 
 
+```javascript
+if (user && user.name && !user.first_name) {
+  // Documents written before Dec 8, 2013 don't have first_name
+  user.first_name = user.name.split(" ")[0];
+}
 ```
-if (user&&user.name&&!user.first_name) {
-```
-
-- _`// Documents written before Dec 8, 2013 don't have first_name`_ `user.first_name = user.name.split(" ")[0];` 
-
-- `}` 
 
 On the other hand, in a “statically typed” database schema, you would typically perform a _migration_ along the lines of: 
 
-```
-ALTERTABLEusersADDCOLUMNfirst_nametext;
-UPDATEusersSETfirst_name=split_part(name, ' ', 1);      -- PostgreSQL
-UPDATEusersSETfirst_name=substring_index(name, ' ', 1);      -- MySQL
+```sql
+ALTER TABLE users ADD COLUMN first_name text;
+UPDATE users SET first_name = split_part(name, ' ', 1);      -- PostgreSQL
+UPDATE users SET first_name = substring_index(name, ' ', 1);      -- MySQL
 ```
 
 Schema changes have a bad reputation of being slow and requiring downtime. This reputation is not entirely deserved: most relational database systems execute the `ALTER TABLE` statement in a few milliseconds. MySQL is a notable exception—it copies the entire table on `ALTER TABLE` , which can mean minutes or even hours of downtime when altering a large table—although various tools exist to work around this limitation [24, 25, 26]. 
@@ -334,21 +320,21 @@ It seems that relational and document databases are becoming more similar over t
 
 A hybrid of the relational and document models is a good route for databases to take in the future. 
 
-# **Query Languages for Data** 
+## Query languages for data
 
 When the relational model was introduced, it included a new way of querying data: SQL is a _declarative_ query language, whereas IMS and CODASYL queried the database using _imperative_ code. What does that mean? 
 
 Many commonly used programming languages are imperative. For example, if you have a list of animal species, you might write something like this to return only the sharks in the list: 
 
-```
-functiongetSharks() {
-varsharks= [];
-for (vari=0; i<animals.length; i++) {
-if (animals[i].family==="Sharks") {
-sharks.push(animals[i]);
-        }
+```javascript
+function getSharks() {
+  var sharks = [];
+  for (var i = 0; i < animals.length; i++) {
+    if (animals[i].family === "Sharks") {
+      sharks.push(animals[i]);
     }
-returnsharks;
+  }
+  return sharks;
 }
 ```
 
@@ -361,8 +347,8 @@ where σ (the Greek letter sigma) is the selection operator, returning only thos
 
 When SQL was defined, it followed the structure of the relational algebra fairly closely: 
 
-```
-SELECT*FROManimalsWHEREfamily='Sharks';
+```sql
+SELECT * FROM animals WHERE family = 'Sharks';
 ```
 
 An imperative language tells the computer to perform certain operations in a certain order. You can imagine stepping through the code line by line, evaluating conditions, updating variables, and deciding whether to go around the loop one more time. 
@@ -411,9 +397,9 @@ The selected item is marked with the CSS class `"selected"` .
 
 Now say you want the title of the currently selected page to have a blue background, so that it is visually highlighted. This is easy, using CSS: 
 
-```
-li.selected>p {
-background-color:blue;
+```css
+li.selected > p {
+  background-color: blue;
 }
 ```
 
@@ -422,18 +408,11 @@ Here the CSS selector `li.selected > p` declares the pattern of elements to whic
 
 If you were using XSL instead of CSS, you could do something similar: 
 
-- **`<xsl:template`** `match="li[@class='selected']/p"` **`>`** 
-
-```
-<fo:blockbackground-color="blue">
-```
-
-```
-<xsl:apply-templates/>
-```
-
-```
-</fo:block>
+```xml
+<xsl:template match="li[@class='selected']/p">
+  <fo:block background-color="blue">
+    <xsl:apply-templates/>
+  </fo:block>
 </xsl:template>
 ```
 
@@ -441,18 +420,18 @@ Here, the XPath expression `li[@class='selected']/p` is equivalent to the CSS se
 
 Imagine what life would be like if you had to use an imperative approach. In JavaScript, using the core Document Object Model (DOM) API, the result might look something like this: 
 
-```
-varliElements=document.getElementsByTagName("li");
-for (vari=0; i<liElements.length; i++) {
-if (liElements[i].className==="selected") {
-varchildren=liElements[i].childNodes;
-for (varj=0; j<children.length; j++) {
-varchild=children[j];
-if (child.nodeType===Node.ELEMENT_NODE&&child.tagName==="P") {
-child.setAttribute("style", "background-color: blue");
-            }
-        }
+```javascript
+var liElements = document.getElementsByTagName("li");
+for (var i = 0; i < liElements.length; i++) {
+  if (liElements[i].className === "selected") {
+    var children = liElements[i].childNodes;
+    for (var j = 0; j < children.length; j++) {
+      var child = children[j];
+      if (child.nodeType === Node.ELEMENT_NODE && child.tagName === "P") {
+        child.setAttribute("style", "background-color: blue");
+      }
     }
+  }
 }
 ```
 
@@ -477,12 +456,12 @@ To give an example, imagine you are a marine biologist, and you add an observati
 
 In PostgreSQL you might express that query like this: 
 
-```
-SELECTdate_trunc('month', observation_timestamp) ASobservation_month,
-sum(num_animals) AStotal_animals
-FROMobservations
-WHEREfamily='Sharks'
-GROUPBYobservation_month;
+```sql
+SELECT date_trunc('month', observation_timestamp) AS observation_month,
+       sum(num_animals) AS total_animals
+FROM observations
+WHERE family = 'Sharks'
+GROUP BY observation_month;
 ```
 
 The `date_trunc('month', timestamp)` function determines the calendar month containing `timestamp` , and returns another timestamp representing the beginning of that month. In other words, it rounds a timestamp down to the nearest month. 
@@ -492,24 +471,25 @@ This query first filters the observations to only show species in the `Sharks` f
 The same can be expressed with MongoDB’s MapReduce feature as follows: 
 
 > vi. IMS and CODASYL both used imperative query APIs. Applications typically used COBOL code to iterate over records in the database, one record at a time [2, 16]. 
+feature as follows: 
 
-
-```
+```javascript
 db.observations.mapReduce(
-functionmap() {
-varyear=this.observationTimestamp.getFullYear();
-varmonth=this.observationTimestamp.getMonth() +1;
-emit(year+"-"+month, this.numAnimals);
-    },
-functionreduce(key, values) {
-returnArray.sum(values);
-    },
-    {
-query: { family:"Sharks" },
-out:"monthlySharkReport"
-    }
+  function map() {
+    var year = this.observationTimestamp.getFullYear();
+    var month = this.observationTimestamp.getMonth() + 1;
+    emit(year + "-" + month, this.numAnimals);
+  },
+  function reduce(key, values) {
+    return Array.sum(values);
+  },
+  {
+    query: { family: "Sharks" },
+    out: "monthlySharkReport"
+  }
 );
 ```
+
 
 The filter to consider only shark species can be specified declaratively (this is a MongoDB-specific extension to MapReduce). 
 
@@ -551,23 +531,23 @@ Being able to use JavaScript code in the middle of a query is a great feature fo
 
 A usability problem with MapReduce is that you have to write two carefully coordinated JavaScript functions, which is often harder than writing a single query. Moreover, a declarative query language offers more opportunities for a query optimizer to improve the performance of a query. For these reasons, MongoDB 2.2 added support for a declarative query language called the _aggregation pipeline_ [9]. In this language, the same shark-counting query looks like this: 
 
-```
+```json
 db.observations.aggregate([
-    { $match: { family:"Sharks" } },
-    { $group: {
-_id: {
-year:  { $year:"$observationTimestamp" },
-month: { $month:"$observationTimestamp" }
-        },
-totalAnimals: { $sum:"$numAnimals" }
-    } }
+  { $match: { family: "Sharks" } },
+  { $group: {
+    _id: {
+      year:  { $year: "$observationTimestamp" },
+      month: { $month: "$observationTimestamp" }
+    },
+    totalAnimals: { $sum: "$numAnimals" }
+  } }
 ]);
 ```
 
 The aggregation pipeline language is similar in expressiveness to a subset of SQL, but it uses a JSON-based syntax rather than SQL’s English-sentence-style syntax; the difference is perhaps a matter of taste. The moral of the story is that a NoSQL system may find itself accidentally reinventing SQL, albeit in disguise. 
 
 
-# **Graph-Like Data Models** 
+## Graph-like data models
 
 We saw earlier that many-to-many relationships are an important distinguishing feature between different data models. If your application has mostly one-to-many relationships (tree-structured data) or no relationships between records, the document model is appropriate. 
 
@@ -632,20 +612,22 @@ You can think of a graph store as consisting of two relational tables, one for v
 
 _Example 2-2. Representing a property graph using a relational schema_ 
 
-```
-CREATETABLEvertices (
-vertex_idintegerPRIMARYKEY,
-propertiesjson
+```sql
+CREATE TABLE vertices (
+  vertex_id integer PRIMARY KEY,
+  properties json
 );
-CREATETABLEedges (
-edge_idintegerPRIMARYKEY,
-tail_vertexintegerREFERENCESvertices (vertex_id),
-head_vertexintegerREFERENCESvertices (vertex_id),
-labeltext,
-propertiesjson
+
+CREATE TABLE edges (
+  edge_id integer PRIMARY KEY,
+  tail_vertex integer REFERENCES vertices (vertex_id),
+  head_vertex integer REFERENCES vertices (vertex_id),
+  label text,
+  properties json
 );
-CREATEINDEXedges_tailsONedges (tail_vertex);
-CREATEINDEXedges_headsONedges (head_vertex);
+
+CREATE INDEX edges_tails ON edges (tail_vertex);
+CREATE INDEX edges_heads ON edges (head_vertex);
 ```
 
 Some important aspects of this model are: 
@@ -673,9 +655,8 @@ Example 2-3 shows the Cypher query to insert the lefthand portion of Figure 2-5 
 
 _Example 2-3. A subset of the data in Figure 2-5, represented as a Cypher query_ 
 
-# **`CREATE`** 
-
-```
+```cypher
+CREATE
   (NAmerica:Location {name:'North America', type:'continent'}),
   (USA:Location      {name:'United States', type:'country'  }),
   (Idaho:Location    {name:'Idaho',         type:'state'    }),
@@ -691,11 +672,10 @@ Example 2-4 shows how to express that query in Cypher. The same arrow notation i
 
 matches any two vertices that are related by an edge labeled `BORN_IN` . The tail vertex of that edge is bound to the variable `person` , and the head vertex is left unnamed. 
 
-# _Example 2-4. Cypher query to find people who emigrated from the US to Europe_ 
+_Example 2-4. Cypher query to find people who emigrated from the US to Europe_ 
 
-# **`MATCH`** 
-
-```
+```cypher
+MATCH
   (person) -[:BORN_IN]->  () -[:WITHIN*0..]-> (us:Location {name:'United States'}),
   (person) -[:LIVES_IN]-> () -[:WITHIN*0..]-> (eu:Location {name:'Europe'})
 RETURN person.name
@@ -736,52 +716,41 @@ Since SQL:1999, this idea of variable-length traversal paths in a query can be e
 
 _Example 2-5. The same query as Example 2-4, expressed in SQL using recursive common table expressions_ 
 
-# **`WITH RECURSIVE`** 
-
-```
--- in_usa is the set of vertex IDs of all locations within the United States
-in_usa(vertex_id) AS (
-SELECTvertex_idFROMverticesWHEREproperties->>'name'='United States'
-UNION
-SELECTedges.tail_vertexFROMedges
-JOINin_usaONedges.head_vertex=in_usa.vertex_id
-WHEREedges.label='within'
+```sql
+WITH RECURSIVE
+  -- in_usa is the set of vertex IDs of all locations within the United States
+  in_usa(vertex_id) AS (
+    SELECT vertex_id FROM vertices WHERE properties->>'name' = 'United States'
+    UNION
+    SELECT edges.tail_vertex FROM edges
+    JOIN in_usa ON edges.head_vertex = in_usa.vertex_id
+    WHERE edges.label = 'within'
   ),
--- in_europe is the set of vertex IDs of all locations within Europe
-in_europe(vertex_id) AS (
-SELECTvertex_idFROMverticesWHEREproperties->>'name'='Europe'
-UNION
-SELECTedges.tail_vertexFROMedges
-JOINin_europeONedges.head_vertex=in_europe.vertex_id
-WHEREedges.label='within'
+  -- in_europe is the set of vertex IDs of all locations within Europe
+  in_europe(vertex_id) AS (
+    SELECT vertex_id FROM vertices WHERE properties->>'name' = 'Europe'
+    UNION
+    SELECT edges.tail_vertex FROM edges
+    JOIN in_europe ON edges.head_vertex = in_europe.vertex_id
+    WHERE edges.label = 'within'
   ),
--- born_in_usa is the set of vertex IDs of all people born in the US
-born_in_usa(vertex_id) AS (
-SELECTedges.tail_vertexFROMedges
-JOINin_usaONedges.head_vertex=in_usa.vertex_id
-WHEREedges.label='born_in'
+  -- born_in_usa is the set of vertex IDs of all people born in the US
+  born_in_usa(vertex_id) AS (
+    SELECT edges.tail_vertex FROM edges
+    JOIN in_usa ON edges.head_vertex = in_usa.vertex_id
+    WHERE edges.label = 'born_in'
   ),
-```
-
-
-```
--- lives_in_europe is the set of vertex IDs of all people living in Europe
-lives_in_europe(vertex_id) AS (
-SELECTedges.tail_vertexFROMedges
-JOINin_europeONedges.head_vertex=in_europe.vertex_id
-WHEREedges.label='lives_in'
+  -- lives_in_europe is the set of vertex IDs of all people living in Europe
+  lives_in_europe(vertex_id) AS (
+    SELECT edges.tail_vertex FROM edges
+    JOIN in_europe ON edges.head_vertex = in_europe.vertex_id
+    WHERE edges.label = 'lives_in'
   )
-```
-
-```
-SELECTvertices.properties->>'name'
-FROMvertices
-```
-
-```
+SELECT vertices.properties->>'name'
+FROM vertices
 -- join to find those people who were both born in the US *and* live in Europe
-JOINborn_in_usaONvertices.vertex_id=born_in_usa.vertex_id
-JOINlives_in_europeONvertices.vertex_id=lives_in_europe.vertex_id;
+JOIN born_in_usa ON vertices.vertex_id = born_in_usa.vertex_id
+JOIN lives_in_europe ON vertices.vertex_id = lives_in_europe.vertex_id;
 ```
 
 First find the vertex whose `name` property has the value `"United States"` , and make it the first element of the set of vertices `in_usa` . 
@@ -817,7 +786,7 @@ Example 2-6 shows the same data as in Example 2-3, written as triples in a forma
 
 _Example 2-6. A subset of the data in Figure 2-5, represented as Turtle triples_ 
 
-```
+```turtle
 @prefix : <urn:example:>.
 _:lucy     a       :Person.
 _:lucy     :name   "Lucy".
@@ -871,32 +840,29 @@ vii. Technically, Datomic uses 5-tuples rather than triples; the two additional 
 
 _Example 2-8. The data of Example 2-7, expressed using RDF/XML syntax_ 
 
-```
-<rdf:RDFxmlns="urn:example:"
-xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-```
-
-```
-<Locationrdf:nodeID="idaho">
-<name>Idaho</name>
-<type>state</type>
-<within>
-<Locationrdf:nodeID="usa">
-<name>United States</name>
-<type>country</type>
-<within>
-<Locationrdf:nodeID="namerica">
-<name>North America</name>
-<type>continent</type>
-</Location>
-</within>
-</Location>
-</within>
-</Location>
-<Personrdf:nodeID="lucy">
-<name>Lucy</name>
-<bornInrdf:nodeID="idaho"/>
-</Person>
+```xml
+<rdf:RDF xmlns="urn:example:"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <Location rdf:nodeID="idaho">
+    <name>Idaho</name>
+    <type>state</type>
+    <within>
+      <Location rdf:nodeID="usa">
+        <name>United States</name>
+        <type>country</type>
+        <within>
+          <Location rdf:nodeID="namerica">
+            <name>North America</name>
+            <type>continent</type>
+          </Location>
+        </within>
+      </Location>
+    </within>
+  </Location>
+  <Person rdf:nodeID="lucy">
+    <name>Lucy</name>
+    <bornIn rdf:nodeID="idaho"/>
+  </Person>
 </rdf:RDF>
 ```
 
@@ -913,15 +879,13 @@ The same query as before—finding people who have moved from the US to Europe�
 
 _Example 2-9. The same query as Example 2-4, expressed in SPARQL_ 
 
-```
+```sparql
 PREFIX : <urn:example:>
-```
 
-```
-SELECT ?personNameWHERE {
-  ?person:name ?personName.
-  ?person:bornIn/:within*/:name"United States".
-  ?person:livesIn/:within*/:name"Europe".
+SELECT ?personName WHERE {
+  ?person :name ?personName.
+  ?person :bornIn/:within*/:name "United States".
+  ?person :livesIn/:within*/:name "Europe".
 }
 ```
 
@@ -977,7 +941,7 @@ Datalog’s data model is similar to the triple-store model, generalized a bit. 
 
 _Example 2-10. A subset of the data in Figure 2-5, represented as Datalog facts_ 
 
-```
+```prolog
 name(namerica, 'North America').
 type(namerica, continent).
 name(usa, 'United States').
@@ -994,18 +958,17 @@ Now that we have defined the data, we can write the same query as before, as sho
 
 _Example 2-11. The same query as Example 2-4, expressed in Datalog_ 
 
-```
+```prolog
 within_recursive(Location, Name) :- name(Location, Name).     /* Rule 1 */
 within_recursive(Location, Name) :- within(Location, Via),    /* Rule 2 */
-within_recursive(Via, Name).
-migrated(Name, BornIn, LivingIn) :- name(Person, Name),       /* Rule 3 */
-born_in(Person, BornLoc),
-within_recursive(BornLoc, BornIn),
-lives_in(Person, LivingLoc),
-within_recursive(LivingLoc, LivingIn).
-```
+                                    within_recursive(Via, Name).
 
-```
+migrated(Name, BornIn, LivingIn) :- name(Person, Name),       /* Rule 3 */
+                                    born_in(Person, BornLoc),
+                                    within_recursive(BornLoc, BornIn),
+                                    lives_in(Person, LivingLoc),
+                                    within_recursive(LivingLoc, LivingIn).
+
 ?- migrated(Who, 'United States', 'Europe').
 /* Who = 'Lucy'. */
 ```

@@ -1,4 +1,4 @@
-# **CHAPTER 3 Storage and Retrieval** 
+# Storage and retrieval
 
 _Wer Ordnung hält, ist nur zu faul zum Suchen. (If you keep things tidily ordered, you’re just too lazy to go searching.)_ 
 
@@ -17,17 +17,18 @@ However, first we’ll start this chapter by talking about storage engines that 
 
 storage engines: _log-structured_ storage engines, and _page-oriented_ storage engines such as B-trees. 
 
-# **Data Structures That Power Your Database** 
+## Data structures that power up your database
 
 Consider the world’s simplest database, implemented as two Bash functions: 
 
-```
+```bash
 #!/bin/bash
-db_set (){
-echo"$1,$2" >> database
+db_set () {
+  echo "$1,$2" >> database
 }
-db_get (){
-    grep "^$1," database | sed -e "s/^$1,//" | tail -n 1
+
+db_get () {
+  grep "^$1," database | sed -e "s/^$1,//" | tail -n 1
 }
 ```
 
@@ -35,36 +36,20 @@ These two functions implement a key-value store. You can call `db_set key value`
 
 And it works: 
 
-- `$` **`db_set 123456 '{"name":"London","attractions":["Big Ben","London Eye"]}'`** 
-
-```
+```bash
+$ db_set 123456 '{"name":"London","attractions":["Big Ben","London Eye"]}'
 $ db_set 42 '{"name":"San Francisco","attractions":["Golden Gate Bridge"]}'
-```
-
-```
 $ db_get 42
-```
-
-```
 {"name":"San Francisco","attractions":["Golden Gate Bridge"]}
 ```
 
 The underlying storage format is very simple: a text file where each line contains a key-value pair, separated by a comma (roughly like a CSV file, ignoring escaping issues). Every call to `db_set` appends to the end of the file, so if you update a key several times, the old versions of the value are not overwritten—you need to look at the last occurrence of a key in a file to find the latest value (hence the `tail -n 1` in `db_get` ): 
 
-```
+```bash
 $ db_set 42 '{"name":"San Francisco","attractions":["Exploratorium"]}'
-```
-
-```
 $ db_get 42
 {"name":"San Francisco","attractions":["Exploratorium"]}
-```
-
-```
 $ cat database
-```
-
-```
 123456,{"name":"London","attractions":["Big Ben","London Eye"]}
 42,{"name":"San Francisco","attractions":["Golden Gate Bridge"]}
 42,{"name":"San Francisco","attractions":["Exploratorium"]}
@@ -377,9 +362,9 @@ The most common type of multi-column index is called a _concatenated index_ , wh
 
 Multi-dimensional indexes are a more general way of querying several columns at once, which is particularly important for geospatial data. For example, a restaurantsearch website may have a database containing the latitude and longitude of each restaurant. When a user is looking at the restaurants on a map, the website needs to search for all the restaurants within the rectangular map area that the user is currently viewing. This requires a two-dimensional range query like the following: 
 
-```
-SELECT*FROMrestaurantsWHERElatitude>51.4946ANDlatitude<51.5079
-ANDlongitude>-0.1162ANDlongitude<-0.1004;
+```sql
+SELECT * FROM restaurants WHERE latitude > 51.4946 AND latitude < 51.5079
+   AND longitude > -0.1162 AND longitude < -0.1004;
 ```
 
 A standard B-tree or LSM-tree index is not able to answer that kind of query efficiently: it can give you either all the restaurants in a range of latitudes (but at any longitude), or all the restaurants in a range of longitudes (but anywhere between the North and South poles), but not both simultaneously. 
@@ -424,7 +409,7 @@ approach still requires indexes to fit entirely in memory, though (like the Bitc
 
 Further changes to storage engine design will probably be needed if _non-volatile memory_ (NVM) technologies become more widely adopted [46]. At present, this is a new area of research, but it is worth keeping an eye on in the future. 
 
-# **Transaction Processing or Analytics?** 
+## Transaction processing or analytics?
 
 In the early days of business data processing, a write to the database typically corresponded to a _commercial transaction_ taking place: making a sale, placing an order with a supplier, paying an employee’s salary, etc. As databases expanded into areas that didn’t involve money changing hands, the term _transaction_ nevertheless stuck, referring to a group of reads and writes that form a logical unit. 
 
@@ -527,7 +512,7 @@ A variation of this template is known as the _snowflake schema_ , where dimensio
 
 In a typical data warehouse, tables are often very wide: fact tables often have over 100 columns, sometimes several hundred [51]. Dimension tables can also be very wide, as they include all the metadata that may be relevant for analysis—for example, the `dim_store` table may include details of which services are offered at each store, whether it has an in-store bakery, the square footage, the date when the store was first opened, when it was last remodeled, how far it is from the nearest highway, etc. 
 
-# **Column-Oriented Storage** 
+## Column-oriented storage
 
 If you have trillions of rows and petabytes of data in your fact tables, storing and querying them efficiently becomes a challenging problem. Dimension tables are usually much smaller (millions of rows), so in this section we will concentrate primarily on storage of facts. 
 
@@ -538,18 +523,18 @@ Although fact tables are often over 100 columns wide, a typical data warehouse q
 
 _Example 3-1. Analyzing whether people are more inclined to buy fresh fruit or candy, depending on the day of the week_ 
 
-```
+```sql
 SELECT
-dim_date.weekday, dim_product.category,
-SUM(fact_sales.quantity) ASquantity_sold
-FROMfact_sales
-JOINdim_dateONfact_sales.date_key=dim_date.date_key
-JOINdim_productONfact_sales.product_sk=dim_product.product_sk
+  dim_date.weekday, dim_product.category,
+  SUM(fact_sales.quantity) AS quantity_sold
+FROM fact_sales
+JOIN dim_date ON fact_sales.date_key = dim_date.date_key
+JOIN dim_product ON fact_sales.product_sk = dim_product.product_sk
 WHERE
-dim_date.year=2013AND
-dim_product.categoryIN ('Fresh fruit', 'Candy')
-GROUPBY
-dim_date.weekday, dim_product.category;
+  dim_date.year = 2013 AND
+  dim_product.category IN ('Fresh fruit', 'Candy')
+GROUP BY
+  dim_date.weekday, dim_product.category;
 ```
 
 How can we execute this query efficiently? 

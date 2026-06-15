@@ -1,4 +1,4 @@
-# **CHAPTER 11 Stream Processing** 
+# Stream processing
 
 _A complex system that works is invariably found to have evolved from a simple system that works. The inverse proposition also appears to be true: A complex system designed from scratch never works and cannot be made to work._ 
 
@@ -19,7 +19,7 @@ In general, a “stream” refers to data that is incrementally made available o
 
 In this chapter we will look at _event streams_ as a data management mechanism: the unbounded, incrementally processed counterpart to the batch data we saw in the last chapter. We will first discuss how streams are represented, stored, and transmitted over a network. In “Databases and Streams” on page 451 we will investigate the relationship between streams and databases. And finally, in “Processing Streams” on page 464 we will explore approaches and tools for processing those streams continually, and ways that they can be used to build applications. 
 
-# **Transmitting Event Streams** 
+## Transmitting event streams
 
 In the batch processing world, the inputs and outputs of a job are files (perhaps on a distributed filesystem). What does the streaming equivalent look like? 
 
@@ -225,7 +225,7 @@ The only side effect of processing, besides any output of the consumer, is that 
 
 This aspect makes log-based messaging more like the batch processes of the last chapter, where derived data is clearly separated from input data through a repeatable transformation process. It allows more experimentation and easier recovery from errors and bugs, making it a good tool for integrating dataflows within an organization [24]. 
 
-# **Databases and Streams** 
+## Databases and streams
 
 We have drawn some comparisons between message brokers and databases. Even though they have traditionally been considered separate categories of tools, we saw that log-based message brokers have been successful in taking ideas from databases and applying them to messaging. We can also go in reverse: take ideas from messaging and streams, and apply them to databases. 
 
@@ -460,7 +460,7 @@ Truly deleting data is surprisingly hard [64], since copies can live in many pla
 
 to retrieve the data” than actually “making it impossible to retrieve the data.” Nevertheless, you sometimes have to try, as we shall see in “Legislation and self-regulation” on page 542. 
 
-# **Processing Streams** 
+## Processing Streams
 
 So far in this chapter we have talked about where streams come from (user activity events, sensors, and writes to databases), and we have talked about how streams are transported (through direct messaging, via message brokers, and in event logs). 
 
@@ -692,12 +692,12 @@ To implement this cache maintenance in a stream processor, you need streams of e
 
 Another way of looking at this stream process is that it maintains a materialized view for a query that joins two tables (tweets and follows), something like the following: 
 
-```
-SELECTfollows.follower_idAStimeline_id,
-array_agg(tweets.*ORDERBYtweets.timestampDESC)
-FROMtweets
-JOINfollowsONfollows.followee_id=tweets.sender_id
-GROUPBYfollows.follower_id
+```sql
+SELECT follows.follower_id AS timeline_id,
+       array_agg(tweets.* ORDER BY tweets.timestamp DESC)
+FROM tweets
+JOIN follows ON follows.followee_id = tweets.sender_id
+GROUP BY follows.follower_id
 ```
 
 The join of the streams corresponds directly to the join of the tables in that query. The timelines are effectively a cache of the result of this query, updated every time the underlying tables change.[iii] 

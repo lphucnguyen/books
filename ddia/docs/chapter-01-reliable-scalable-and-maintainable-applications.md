@@ -50,27 +50,29 @@ When you combine several tools in order to provide a service, the service’s in
 If you are designing a data system or service, a lot of tricky questions arise. How do you ensure that the data remains correct and complete, even when things go wrong internally? How do you provide consistently good performance to clients, even when parts of your system are degraded? How do you scale to handle an increase in load? What does a good API for the service look like? 
 
 There are many factors that may influence the design of a data system, including the skills and experience of the people involved, legacy system dependencies, the timescale for delivery, your organization’s tolerance of different kinds of risk, regulatory constraints, etc. Those factors depend very much on the situation. 
-
+# Reliable, scalable, and maintainable applications
 
 In this book, we focus on three concerns that are important in most software systems: 
 
-# _Reliability_ 
+## Reliability
 
 The system should continue to work _correctly_ (performing the correct function at the desired level of performance) even in the face of _adversity_ (hardware or software faults, and even human error). See “Reliability” on page 6. 
 
-# _Scalability_ 
+## Scalability
 
 As the system _grows_ (in data volume, traffic volume, or complexity), there should be reasonable ways of dealing with that growth. See “Scalability” on page 10. 
 
-# _Maintainability_ 
+## Maintainability
 
 Over time, many different people will work on the system (engineering and operations, both maintaining current behavior and adapting the system to new use cases), and they should all be able to work on it _productively_ . See “Maintainability” on page 18. 
 
+
 These words are often cast around without a clear understanding of what they mean. In the interest of thoughtful engineering, we will spend the rest of this chapter exploring ways of thinking about reliability, scalability, and maintainability. Then, in the following chapters, we will look at various techniques, architectures, and algorithms that are used in order to achieve those goals. 
 
-# **Reliability** 
+## Reliability
 
-Everybody has an intuitive idea of what it means for something to be reliable or unreliable. For software, typical expectations include: 
+Everybody has an intuitive idea of what it means for something to be reliable or unreliable. 
+ For software, typical expectations include: 
 
 - The application performs the function that the user expected. 
 
@@ -156,9 +158,10 @@ Even in “noncritical” applications we have a responsibility to our users. Co
 
 There are situations in which we may choose to sacrifice reliability in order to reduce development cost (e.g., when developing a prototype product for an unproven market) or operational cost (e.g., for a service with a very narrow profit margin)—but we should be very conscious of when we are cutting corners. 
 
-# **Scalability** 
+## Scalability
 
-Even if a system is working reliably today, that doesn’t mean it will necessarily work reliably in the future. One common reason for degradation is increased load: perhaps the system has grown from 10,000 concurrent users to 100,000 concurrent users, or from 1 million to 10 million. Perhaps it is processing much larger volumes of data than it did before. 
+Even if a system is working reliably today, that doesn’t mean it will necessarily work reliably in the future. 
+ One common reason for degradation is increased load: perhaps the system has grown from 10,000 concurrent users to 100,000 concurrent users, or from 1 million to 10 million. Perhaps it is processing much larger volumes of data than it did before. 
 
 _Scalability_ is the term we use to describe a system’s ability to cope with increased load. Note, however, that it is not a one-dimensional label that we can attach to a system: it is meaningless to say “X is scalable” or “Y doesn’t scale.” Rather, discussing 
 
@@ -183,11 +186,11 @@ Simply handling 12,000 writes per second (the peak rate for posting tweets) woul
 
 1. Posting a tweet simply inserts the new tweet into a global collection of tweets. When a user requests their home timeline, look up all the people they follow, find all the tweets for each of those users, and merge them (sorted by time). In a relational database like in Figure 1-2, you could write a query such as: 
 
-```
-SELECTtweets.*, users.*FROMtweets
-JOINusersONtweets.sender_id=users.id
-JOINfollowsONfollows.followee_id=users.id
-WHEREfollows.follower_id=current_user
+```sql
+SELECT tweets.*, users.* FROM tweets
+JOIN users ON tweets.sender_id = users.id
+JOIN follows ON follows.followee_id = users.id
+WHERE follows.follower_id = current_user
 ```
 
 > ii. A term borrowed from electronic engineering, where it describes the number of logic gate inputs that are attached to another gate’s output. The output needs to supply enough current to drive all the attached inputs. In transaction processing systems, we use it to describe the number of requests to other services that we need to make in order to serve one incoming request. 
@@ -311,9 +314,10 @@ An architecture that scales well for a particular application is built around as
 
 Even though they are specific to a particular application, scalable architectures are nevertheless usually built from general-purpose building blocks, arranged in familiar patterns. In this book we discuss those building blocks and patterns. 
 
-# **Maintainability** 
+## Maintainability
 
-It is well known that the majority of the cost of software is not in its initial development, but in its ongoing maintenance—fixing bugs, keeping its systems operational, investigating failures, adapting it to new platforms, modifying it for new use cases, repaying technical debt, and adding new features. 
+It is well known that the majority of the cost of software is not in its initial development, but in its ongoing maintenance
+—fixing bugs, keeping its systems operational, investigating failures, adapting it to new platforms, modifying it for new use cases, repaying technical debt, and adding new features. 
 
 Yet, unfortunately, many people working on software systems dislike maintenance of so-called _legacy_ systems—perhaps it involves fixing other people’s mistakes, or working with platforms that are now outdated, or systems that were forced to do things they were never intended for. Every legacy system is unpleasant in its own way, and so it is difficult to give general recommendations for dealing with them. 
 

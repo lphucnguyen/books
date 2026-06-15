@@ -621,26 +621,35 @@ Figure 4.10 **OrderService** creates and updates **Orders** , invokes the **Orde
 
 I’ll discuss this class in more detail in chapter 5. For now, let’s focus on the createOrder() method. The following listing shows OrderService’s createOrder() method. This method first creates an Order and then creates an CreateOrderSaga to validate the order. 
 
-Listing 4.1 The **OrderService** class and its **createOrder()** method @Transactional **Ensure that service** public class OrderService { **methods are transactional.** 
+Listing 4.1 The **OrderService** class and its **createOrder()** method 
 
-@Autowired private SagaManager<CreateOrderSagaState> createOrderSagaManager; 
+```java
+@Transactional 
+public class OrderService { 
+  @Autowired 
+  private SagaManager<CreateOrderSagaState> createOrderSagaManager; 
 
-@Autowired private OrderRepository orderRepository; 
+  @Autowired 
+  private OrderRepository orderRepository; 
 
-@Autowired private DomainEventPublisher eventPublisher; 
+  @Autowired 
+  private DomainEventPublisher eventPublisher; 
 
-**Create the Order. Publish domain events.**
-public Order createOrder(OrderDetails orderDetails) { 
+  public Order createOrder(OrderDetails orderDetails) { 
+    ... 
+    ResultWithEvents<Order> orderAndEvents = Order.createOrder(...); 
+    Order order = orderAndEvents.result; 
+    orderRepository.save(order); 
+    eventPublisher.publish(Order.class, Long.toString(order.getId()), orderAndEvents.events); 
 
-... ResultWithEvents<Order> orderAndEvents = Order.createOrder(...); Order order = orderAndEvents.result; orderRepository.save(order); **Persist the Order in the database.** eventPublisher.publish(Order.class, Long.toString(order.getId()), **events.** orderAndEvents.events); 
+    CreateOrderSagaState data = new CreateOrderSagaState(order.getId(), orderDetails); 
+    createOrderSagaManager.create(data, Order.class, order.getId()); 
 
-CreateOrderSagaState data = new CreateOrderSagaState(order.getId(), orderDetails); createOrderSagaManager.create(data, Order.class, order.getId()); 
-
-} return order; 
-
-**Create a CreateOrderSaga.** 
-
-... } 
+    return order; 
+  } 
+  ... 
+}
+```
 
 The createOrder() method creates an Order by calling the factory method Order .createOrder(). It then persists the Order using the OrderRepository, which is a JPAbased repository. It creates the CreateOrderSaga by calling SagaManager.create(), passing a CreateOrderSagaState containing the ID of the newly saved Order and the OrderDetails. The SagaManager instantiates the saga orchestrator, which causes it to send a command message to the first saga participant, and persists the saga orchestrator in the database. 
 
@@ -682,26 +691,52 @@ The CreateOrderSaga class implements the state machine shown earlier in figure 4
 
 # Listing 4.2 The definition of the **CreateOrderSaga** 
 
-public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaState> { private SagaDefinition<CreateOrderSagaState> sagaDefinition; public CreateOrderSaga(OrderServiceProxy orderService, ConsumerServiceProxy consumerService, KitchenServiceProxy kitchenService, AccountingServiceProxy accountingService) { this.sagaDefinition = step() .withCompensation(orderService.reject, CreateOrderSagaState::makeRejectOrderCommand) .step() .invokeParticipant(consumerService.validateOrder, CreateOrderSagaState::makeValidateOrderByConsumerCommand) .step() .invokeParticipant(kitchenService.create, CreateOrderSagaState::makeCreateTicketCommand) .onReply(CreateTicketReply.class, CreateOrderSagaState::handleCreateTicketReply) .withCompensation(kitchenService.cancel, CreateOrderSagaState::makeCancelCreateTicketCommand) .step() .invokeParticipant(accountingService.authorize, CreateOrderSagaState::makeAuthorizeCommand) .step() .invokeParticipant(kitchenService.confirmCreate, CreateOrderSagaState::makeConfirmCreateTicketCommand) 
+```java
+public class CreateOrderSaga implements SimpleSaga<CreateOrderSagaState> { 
+  private SagaDefinition<CreateOrderSagaState> sagaDefinition; 
 
+  public CreateOrderSaga(OrderServiceProxy orderService, 
+                         ConsumerServiceProxy consumerService, 
+                         KitchenServiceProxy kitchenService, 
+                         AccountingServiceProxy accountingService) { 
+    this.sagaDefinition = step() 
+      .withCompensation(orderService.reject, CreateOrderSagaState::makeRejectOrderCommand) 
+      .step() 
+      .invokeParticipant(consumerService.validateOrder, CreateOrderSagaState::makeValidateOrderByConsumerCommand) 
+      .step() 
+      .invokeParticipant(kitchenService.create, CreateOrderSagaState::makeCreateTicketCommand) 
+        .onReply(CreateTicketReply.class, CreateOrderSagaState::handleCreateTicketReply) 
+        .withCompensation(kitchenService.cancel, CreateOrderSagaState::makeCancelCreateTicketCommand) 
+      .step() 
+      .invokeParticipant(accountingService.authorize, CreateOrderSagaState::makeAuthorizeCommand) 
+      .step() 
+      .invokeParticipant(kitchenService.confirmCreate, CreateOrderSagaState::makeConfirmCreateTicketCommand) 
+      .step() 
+      .invokeParticipant(orderService.approve, CreateOrderSagaState::makeApproveOrderCommand) 
+      .build(); 
+  } 
 
-_**The design of the Order Service and the Create Order Saga**_ 
-
-.step() 
-
-.invokeParticipant(orderService.approve, CreateOrderSagaState::makeApproveOrderCommand) .build(); 
-
-} 
-
-@Override public SagaDefinition<CreateOrderSagaState> getSagaDefinition() { return sagaDefinition; 
-
-} 
+  @Override 
+  public SagaDefinition<CreateOrderSagaState> getSagaDefinition() { 
+    return sagaDefinition; 
+  } 
+}
+```
 
 The CreateOrderSaga’s constructor creates the saga definition and stores it in the sagaDefinition field. The getSagaDefinition() method returns the saga definition. 
 
 To see how CreateOrderSaga works, let’s look at the definition of the third step of the saga, shown in the following listing. This step of the saga invokes the Kitchen Service to create a Ticket. Its compensating transaction cancels that Ticket. The step(), invokeParticipant(), onReply(), and withCompensation() methods are part of the DSL provided by Eventuate Tram Saga. 
 
-Listing 4.3 The definition of the third step of the saga class CreateOrderSaga ... **Call handleCreateTicketReply() when a successful reply is received.** CreateOrderSaga(..., KitchenServiceProxy kitchenService, ...) { ....step() **Define the forward transaction.** .invokeParticipant(kitchenService.create, CreateOrderSagaState::makeCreateTicketCommand) .onReply(CreateTicketReply.class, CreateOrderSagaState::handleCreateTicketReply) .withCompensation(kitchenService.cancel, CreateOrderSagaState::makeCancelCreateTicketCommand) ... **Define the compensatingtransaction.** ; public class CreateOrderSaga ... 
+Listing 4.3 The definition of the third step of the saga 
+
+```java
+// CreateOrderSaga(..., KitchenServiceProxy kitchenService, ...) { 
+    .step() 
+      .invokeParticipant(kitchenService.create, CreateOrderSagaState::makeCreateTicketCommand) 
+      .onReply(CreateTicketReply.class, CreateOrderSagaState::handleCreateTicketReply) 
+      .withCompensation(kitchenService.cancel, CreateOrderSagaState::makeCancelCreateTicketCommand) 
+// ...
+```
 
 public CreateOrderSaga(..., KitchenServiceProxy kitchenService, ...) { 
 
@@ -716,9 +751,42 @@ defined by a KitchenServiceProxy. Let’s take a look at each of those classes, 
 
 The CreateOrderSagaState class, shown in the following listing, represents the state of a saga instance. An instance of this class is created by OrderService and is persisted in the database by the Eventuate Tram Saga framework. Its primary responsibility is to create the messages that are sent to saga participants. 
 
-Listing 4.4 **CreateOrderSagaState** stores the state of a saga instance public class CreateOrderSagaState { private Long orderId; private OrderDetails orderDetails; private long ticketId; public Long getOrderId() { return orderId; } **Invoked by the OrderService to** private CreateOrderSagaState() { **instantiate a** } **CreateOrderSagaState**
-public CreateOrderSagaState(Long orderId, OrderDetails orderDetails) { this.orderId = orderId; this.orderDetails = orderDetails; } **Creates a CreateTicket command message** CreateTicket makeCreateTicketCommand() { return new CreateTicket(getOrderDetails().getRestaurantId(), getOrderId(), makeTicketDetails(getOrderDetails())); } void handleCreateTicketReply(CreateTicketReply reply) { **Saves the ID** logger.debug("getTicketId {}", reply.getTicketId()); **of the newly** setTicketId(reply.getTicketId()); **created Ticket** } CancelCreateTicket makeCancelCreateTicketCommand() { **Creates** return new CancelCreateTicket(getOrderId()); **CancelCreateTicket** } **command message** ... 
+Listing 4.4 **CreateOrderSagaState** stores the state of a saga instance 
 
+```java
+public class CreateOrderSagaState { 
+  private Long orderId; 
+  private OrderDetails orderDetails; 
+  private long ticketId; 
+
+  public Long getOrderId() { return orderId; } 
+
+  // Invoked by the OrderService to instantiate a CreateOrderSagaState
+  private CreateOrderSagaState() { } 
+
+  public CreateOrderSagaState(Long orderId, OrderDetails orderDetails) { 
+    this.orderId = orderId; 
+    this.orderDetails = orderDetails; 
+  } 
+
+  // Creates a CreateTicket command message
+  CreateTicket makeCreateTicketCommand() { 
+    return new CreateTicket(getOrderDetails().getRestaurantId(), getOrderId(), makeTicketDetails(getOrderDetails())); 
+  } 
+
+  void handleCreateTicketReply(CreateTicketReply reply) { 
+    // Saves the ID of the newly created Ticket
+    logger.debug("getTicketId {}", reply.getTicketId()); 
+    setTicketId(reply.getTicketId()); 
+  } 
+
+  CancelCreateTicket makeCancelCreateTicketCommand() { 
+    // Creates CancelCreateTicket command message
+    return new CancelCreateTicket(getOrderId()); 
+  } 
+  ... 
+}
+```
 The CreateOrderSaga invokes the CreateOrderSagaState to create the command messages. It sends those command messages to the endpoints defined by the SagaParticipantProxy classes. Let’s take a look at one of those classes: KitchenServiceProxy. 
 
 
@@ -737,10 +805,29 @@ The KitchenServiceProxy class, shown in listing 4.5, defines the command message
 
 Each CommandEndpoint specifies the command type, the command message’s destination channel, and the expected reply types. 
 
-Listing 4.5 **KitchenServiceProxy** defines the command message endpoints for **Kitchen Service**
-public class KitchenServiceProxy { public final CommandEndpoint<CreateTicket> create = CommandEndpointBuilder .forCommand(CreateTicket.class) .withChannel( KitchenServiceChannels.kitchenServiceChannel) .withReply(CreateTicketReply.class) .build(); public final CommandEndpoint<ConfirmCreateTicket> confirmCreate = CommandEndpointBuilder .forCommand(ConfirmCreateTicket.class) .withChannel( KitchenServiceChannels.kitchenServiceChannel) .withReply(Success.class) .build(); public final CommandEndpoint<CancelCreateTicket> cancel = CommandEndpointBuilder .forCommand(CancelCreateTicket.class) .withChannel( KitchenServiceChannels.kitchenServiceChannel) .withReply(Success.class) .build(); 
+Listing 4.5 **KitchenServiceProxy** defines the command message endpoints for **Kitchen Service** 
 
-} 
+```java
+public class KitchenServiceProxy { 
+  public final CommandEndpoint<CreateTicket> create = CommandEndpointBuilder 
+    .forCommand(CreateTicket.class) 
+    .withChannel(KitchenServiceChannels.kitchenServiceChannel) 
+    .withReply(CreateTicketReply.class) 
+    .build(); 
+
+  public final CommandEndpoint<ConfirmCreateTicket> confirmCreate = CommandEndpointBuilder 
+    .forCommand(ConfirmCreateTicket.class) 
+    .withChannel(KitchenServiceChannels.kitchenServiceChannel) 
+    .withReply(Success.class) 
+    .build(); 
+
+  public final CommandEndpoint<CancelCreateTicket> cancel = CommandEndpointBuilder 
+    .forCommand(CancelCreateTicket.class) 
+    .withChannel(KitchenServiceChannels.kitchenServiceChannel) 
+    .withReply(Success.class) 
+    .build(); 
+}
+```
 
 Proxy classes, such as KitchenServiceProxy, aren’t strictly necessary. A saga could simply send command messages directly to participants. But proxy classes have two important benefits. First, a proxy class defines static typed endpoints, which reduces the chance of a saga sending the wrong message to a service. Second, a proxy class is a well-defined API for invoking a service that makes the code easier to understand and test. For example, chapter 10 describes how to write tests for KitchenServiceProxy that verify that Order Service correctly invokes Kitchen Service. Without KitchenServiceProxy, it would be impossible to write such a narrowly scoped test. 
 
@@ -839,13 +926,35 @@ _**The design of the Order Service and the Create Order Saga**_
 
 The following listing shows the OrderCommandHandlers class. Its commandHandlers() method maps command message types to handler methods. Each handler method takes a command message as a parameter, invokes OrderService, and returns a reply message. 
 
-Listing 4.6 The command handlers for **Order Service**
+Listing 4.6 The command handlers for **Order Service** 
+
+```java
 public class OrderCommandHandlers { 
+  @Autowired 
+  private OrderService orderService; 
 
-@Autowired private OrderService orderService; 
+  public CommandHandlers commandHandlers() { 
+    return SagaCommandHandlersBuilder 
+      .fromChannel("orderService") 
+      .onMessage(ApproveOrderCommand.class, this::approveOrder) 
+      .onMessage(RejectOrderCommand.class, this::rejectOrder) 
+      ... 
+      .build(); 
+  } 
 
-**Route each command message to the appropriate handler method.**
-public CommandHandlers commandHandlers() { return SagaCommandHandlersBuilder .fromChannel("orderService") .onMessage(ApproveOrderCommand.class, this::approveOrder) .onMessage(RejectOrderCommand.class, this::rejectOrder) ... .build(); } public Message approveOrder(CommandMessage<ApproveOrderCommand> cm) { long orderId = cm.getCommand().getOrderId(); orderService.approveOrder(orderId); **Change the state** return withSuccess(); **of the Order to** } **Return a generic authorized. success message.** public Message rejectOrder(CommandMessage<RejectOrderCommand> cm) { long orderId = cm.getCommand().getOrderId(); orderService.rejectOrder(orderId); **Change the state of** return withSuccess(); **the Order to rejected.** } 
+  public Message approveOrder(CommandMessage<ApproveOrderCommand> cm) { 
+    long orderId = cm.getCommand().getOrderId(); 
+    orderService.approveOrder(orderId); 
+    return withSuccess(); 
+  } 
+
+  public Message rejectOrder(CommandMessage<RejectOrderCommand> cm) { 
+    long orderId = cm.getCommand().getOrderId(); 
+    orderService.rejectOrder(orderId); 
+    return withSuccess(); 
+  } 
+}
+```
 
 The approveOrder() and rejectOrder() methods update the specified Order by invoking OrderService. The other services that participate in sagas have similar command handler classes that update their domain objects. 
 
@@ -855,12 +964,48 @@ The Order Service uses the Spring framework. The following listing is an excerpt
 
 Listing 4.7 The **OrderServiceConfiguration** is a Spring **@Configuration** class that defines the Spring **@Beans** for the **Order Service** . 
 
-@Configuration public class OrderServiceConfiguration { 
+```java
+@Configuration 
+public class OrderServiceConfiguration { 
+  @Bean 
+  public OrderService orderService(RestaurantRepository restaurantRepository, 
+                                   SagaManager<CreateOrderSagaState> createOrderSagaManager, ...) { 
+    return new OrderService(restaurantRepository, ... createOrderSagaManager ...); 
+  } 
 
-@Bean public OrderService orderService(RestaurantRepository restaurantRepository, 
+  @Bean 
+  public SagaManager<CreateOrderSagaState> createOrderSagaManager(CreateOrderSaga saga) { 
+    return new SagaManagerImpl<>(saga); 
+  } 
 
+  @Bean 
+  public CreateOrderSaga createOrderSaga(OrderServiceProxy orderService, 
+                                         ConsumerServiceProxy consumerService, ...) { 
+    return new CreateOrderSaga(orderService, consumerService, ...); 
+  } 
 
-... SagaManager<CreateOrderSagaState> createOrderSagaManager, ...) { return new OrderService(restaurantRepository, ... createOrderSagaManager ...); } @Bean public SagaManager<CreateOrderSagaState> createOrderSagaManager(CreateOrderS aga saga) { return new SagaManagerImpl<>(saga); } @Bean public CreateOrderSaga createOrderSaga(OrderServiceProxy orderService, ConsumerServiceProxy consumerService, ...) { return new CreateOrderSaga(orderService, consumerService, ...); } @Bean public OrderCommandHandlers orderCommandHandlers() { return new OrderCommandHandlers(); } @Bean public SagaCommandDispatcher orderCommandHandlersDispatcher(OrderCommandHan dlers orderCommandHandlers) { return new SagaCommandDispatcher("orderService", orderCommandHandlers.comma ndHandlers()); } @Bean public KitchenServiceProxy kitchenServiceProxy() { return new KitchenServiceProxy(); } @Bean public OrderServiceProxy orderServiceProxy() { return new OrderServiceProxy(); } ... } 
+  @Bean 
+  public OrderCommandHandlers orderCommandHandlers() { 
+    return new OrderCommandHandlers(); 
+  } 
+
+  @Bean 
+  public SagaCommandDispatcher orderCommandHandlersDispatcher(OrderCommandHandlers orderCommandHandlers) { 
+    return new SagaCommandDispatcher("orderService", orderCommandHandlers.commandHandlers()); 
+  } 
+
+  @Bean 
+  public KitchenServiceProxy kitchenServiceProxy() { 
+    return new KitchenServiceProxy(); 
+  } 
+
+  @Bean 
+  public OrderServiceProxy orderServiceProxy() { 
+    return new OrderServiceProxy(); 
+  } 
+  ... 
+}
+```
 
 This class defines several Spring @Beans including orderService, createOrderSagaManager, createOrderSaga, orderCommandHandlers, and orderCommandHandlersDispatcher. It also defines Spring @Beans for the various proxy classes, including kitchenServiceProxy and orderServiceProxy. 
 
@@ -878,5 +1023,12 @@ As you can see, transaction management and some aspects of business logic design
 - You can use either choreography or orchestration to coordinate the steps of a saga. In a choreography-based saga, a local transaction publishes events that trigger other participants to execute local transactions. In an orchestration-based saga, a centralized saga orchestrator sends command messages to participants telling them to execute local transactions. You can simplify development and testing by modeling saga orchestrators as state machines. Simple sagas can use choreography, but orchestration is usually a better approach for complex sagas. 
 
 - Designing saga-based business logic can be challenging because, unlike ACID transactions, sagas aren’t isolated from one another. You must often use countermeasures, which are design strategies that prevent concurrency anomalies caused by the ACD transaction model. An application may even need to use locking in order to simplify the business logic, even though that risks deadlocks. 
+
+
+ 
+
+
+isks deadlocks. 
+
 
 

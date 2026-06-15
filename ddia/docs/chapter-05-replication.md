@@ -1,4 +1,4 @@
-# **CHAPTER 5 Replication** 
+# Replication
 
 _The major difference between a thing that might go wrong and a thing that cannot possibly go wrong is that when a thing that cannot possibly go wrong goes wrong it usually turns out to be impossible to get at or repair._ 
 
@@ -21,7 +21,7 @@ There are many trade-offs to consider with replication: for example, whether to 
 
 Replication of databases is an old topic—the principles haven’t changed much since they were studied in the 1970s [1], because the fundamental constraints of networks have remained the same. However, outside of research, many developers continued to assume for a long time that a database consisted of just one node. Mainstream use of distributed databases is more recent. Since many application developers are new to this area, there has been a lot of misunderstanding around issues such as _eventual consistency_ . In “Problems with Replication Lag” on page 161 we will get more precise about eventual consistency and discuss things like the _read-your-writes_ and _monotonic reads_ guarantees. 
 
-# **Leaders and Followers** 
+## Leaders and followers
 
 Each node that stores a copy of the database is called a _replica_ . With multiple replicas, a question inevitably arises: how do we ensure that all the data ends up on all the replicas? 
 
@@ -211,7 +211,7 @@ A trigger lets you register custom application code that is automatically execut
 
 Trigger-based replication typically has greater overheads than other replication methods, and is more prone to bugs and limitations than the database’s built-in replication. However, it can nevertheless be useful due to its flexibility. 
 
-# **Problems with Replication Lag** 
+## Problems with replication lag
 
 Being able to tolerate node failures is just one reason for wanting replication. As mentioned in the introduction to Part II, other reasons are scalability (processing more requests than a single machine can handle) and latency (placing replicas geographically closer to users). 
 
@@ -334,7 +334,7 @@ It would be better if application developers didn’t have to worry about subtle
 Single-node transactions have existed for a long time. However, in the move to distributed (replicated and partitioned) databases, many systems have abandoned them, claiming that transactions are too expensive in terms of performance and availability, and asserting that eventual consistency is inevitable in a scalable system. There is some truth in that statement, but it is overly simplistic, and we will develop a more nuanced view over the course of the rest of this book. We will return to the topic of transactions in Chapters 7 and 9, and we will discuss some alternative mechanisms in Part III. 
 
 
-# **Multi-Leader Replication** 
+## Multi-leader replication
 
 So far in this chapter we have only considered replication architectures using a single leader. Although that is a common approach, there are interesting alternatives. 
 
@@ -540,7 +540,7 @@ To order these events correctly, a technique called _version vectors_ can be use
 
 If you are using a system with multi-leader replication, it is worth being aware of these issues, carefully reading the documentation, and thoroughly testing your database to ensure that it really does provide the guarantees you believe it to have. 
 
-# **Leaderless Replication** 
+## Leaderless replication
 
 The replication approaches we have discussed so far in this chapter—single-leader and multi-leader replication—are based on the idea that a client sends a write request to one node (the leader), and the database system takes care of copying that write to the other replicas. A leader determines the order in which writes should be processed, and followers apply the leader’s writes in the same order. 
 

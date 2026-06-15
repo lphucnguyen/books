@@ -400,9 +400,14 @@ _**Designing configurable services**_
 
 A particular property value from a source earlier in this list overrides the same property from a source later in this list. For example, operating system environment variables override properties read from a configuration file. 
 
-Spring Boot makes these properties available to the Spring Framework’s ApplicationContext. A service can, for example, obtain the value of a property using the @Value annotation: public class OrderHistoryDynamoDBConfiguration { 
+Spring Boot makes these properties available to the Spring Framework’s ApplicationContext. A service can, for example, obtain the value of a property using the @Value annotation: 
 
-@Value("${aws.region}") private String awsRegion; 
+```java
+public class OrderHistoryDynamoDBConfiguration { 
+  @Value("${aws.region}") 
+  private String awsRegion; 
+}
+```
 
 The Spring Framework initializes the awsRegion field to the value of the aws.region property. This property is read from one of the sources listed earlier, such as a configuration file or from the AWS_REGION environment variable. 
 
@@ -613,10 +618,9 @@ Figure 11.12 shows what in distributed tracing terminology is called a _trace_ .
 
 A valuable side effect of distributed tracing is that it assigns a unique ID to each external request. A service can include the request ID in its log entries. When combined with log aggregation, the request ID enables you to easily find all log entries for a particular external request. For example, here’s an example log entry from Order Service: 
 
-- 2018-03-04 17:38:12.032 DEBUG [ftgo-orderservice,8d8fdc37be104cc6,8d8fdc37be104cc6,false] 
-
-7 --- [nio-8080-exec-6] org.hibernate.SQL : select order0_.id as id1_3_0_, order0_.consumer_id as consumer2_3_0_, order 0_.city as city3_3_0_, order0_.delivery_state as delivery4_3_0_, order0_.street1 as street5_3_0_, order0_.street2 as street6_3_0_, order0_.zip as zip7_3_0_, order0_.delivery_time as delivery8_3_0_, order0_.a 
-
+```text
+2018-03-04 17:38:12.032 DEBUG [ftgo-orderservice,8d8fdc37be104cc6,8d8fdc37be104cc6,false] 7 --- [nio-8080-exec-6] org.hibernate.SQL : select order0_.id as id1_3_0_, order0_.consumer_id as consumer2_3_0_, order0_.city as city3_3_0_, order0_.delivery_state as delivery4_3_0_, order0_.street1 as street5_3_0_, order0_.street2 as street6_3_0_, order0_.zip as zip7_3_0_, order0_.delivery_time as delivery8_3_0_, order0_.a 
+```
 
 The [ftgo-order-service,8d8fdc37be104cc6,8d8fdc37be104cc6,false] part of the log entry (the SLF4J Mapped Diagnostic Context—see www.slf4j.org/manual.html) contains information from the distributed tracing infrastructure. It consists of four values: 
 
@@ -698,9 +702,30 @@ the Micrometer Metrics library as a dependency and using a few lines of configur
 
 The following listing shows how OrderService can collect metrics about the number of orders placed, approved, and rejected. It uses MeterRegistry, which is the interfaceprovided Micrometer Metrics, to gather custom metrics. Each method increments an appropriately named counter. 
 
-Listing 11.1 **OrderService** tracks the number of orders placed, approved, and rejected. public class OrderService { **The Micrometer Metrics** @Autowired **library API for managing** private MeterRegistry meterRegistry; **application-specific meters** public Order createOrder(...) { **Increments the** ... **placedOrders counter** meterRegistry.counter("placed_orders").increment(); **when an order has** return order; **successfully been** } **placed** public void approveOrder(long orderId) { **Increments the** ... **approvedOrders counter when an counter when an** meterRegistry.counter("approved_orders").increment(); **order has been** } **approved** public void rejectOrder(long orderId) { **Increments the** ... **rejectedOrders** meterRegistry.counter("rejected_orders").increment(); **counter when an** } 
+Listing 11.1 **OrderService** tracks the number of orders placed, approved, and rejected. 
 
-**Increments the approvedOrders counter when an counter when an order has been approved Increments the rejectedOrders counter when an order has been rejected** 
+```java
+public class OrderService { 
+  @Autowired 
+  private MeterRegistry meterRegistry; 
+
+  public Order createOrder(...) { 
+    ... 
+    meterRegistry.counter("placed_orders").increment(); 
+    return order; 
+  } 
+
+  public void approveOrder(long orderId) { 
+    ... 
+    meterRegistry.counter("approved_orders").increment(); 
+  } 
+
+  public void rejectOrder(long orderId) { 
+    ... 
+    meterRegistry.counter("rejected_orders").increment(); 
+  } 
+}
+```
 
 # DELIVERING METRICS TO THE METRICS SERVICE 
 

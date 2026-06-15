@@ -1,4 +1,4 @@
-# **CHAPTER 8 The Trouble with Distributed Systems** 
+# The trouble with distributed systems
 
 _Hey I just met you The network’s laggy But here’s my data So store it maybe_ 
 
@@ -17,7 +17,7 @@ In the end, our task as engineers is to build systems that do their job (i.e., m
 
 This chapter is a thoroughly pessimistic and depressing overview of things that may go wrong in a distributed system. We will look into problems with networks (“Unreliable Networks” on page 277); clocks and timing issues (“Unreliable Clocks” on page 287); and we’ll discuss to what degree they are avoidable. The consequences of all these issues are disorienting, so we’ll explore how to think about the state of a distributed system and how to reason about things that have happened (“Knowledge, Truth, and Lies” on page 300). 
 
-# **Faults and Partial Failures** 
+## Faults and partial failures
 
 When you are writing a program on a single computer, it normally behaves in a fairly predictable way: either it works or it doesn’t. Buggy software may give the appearance that the computer is sometimes “having a bad day” (a problem that is often fixed by a reboot), but that is mostly just a consequence of badly written software. 
 
@@ -84,7 +84,7 @@ Although the system can be more reliable than its underlying parts, there is alw
 
 Although the more reliable higher-level system is not perfect, it’s still useful because it takes care of some of the tricky low-level faults, and so the remaining faults are usually easier to reason about and deal with. We will explore this matter further in “The end-to-end argument” on page 519. 
 
-# **Unreliable Networks** 
+## Unreliable networks
 
 As discussed in the introduction to Part II, the distributed systems we focus on in this book are _shared-nothing systems_ : i.e., a bunch of machines connected by a network. The network is the only way those machines can communicate—we assume that each 
 
@@ -266,7 +266,7 @@ Variable delays in networks are not a law of nature, but simply the result of a 
 
 However, such quality of service is currently not enabled in multi-tenant datacenters and public clouds, or when communicating via the internet.[iv] Currently deployed technology does not allow us to make any guarantees about delays or reliability of the network: we have to assume that network congestion, queueing, and unbounded delays will happen. Consequently, there’s no “correct” value for timeouts—they need to be determined experimentally. 
 
-# **Unreliable Clocks** 
+## Unreliable clocks
 
 Clocks and time are important. Applications depend on clocks in various ways to answer questions like the following: 
 
@@ -523,7 +523,7 @@ A variant of this idea is to use the garbage collector only for short-lived obje
 These measures cannot fully prevent garbage collection pauses, but they can usefully reduce their impact on the application. 
 
 
-# **Knowledge, Truth, and Lies** 
+## Knowledge, truth and lies
 
 So far in this chapter we have explored the ways in which distributed systems are different from programs running on a single computer: there is no shared memory, only message passing via an unreliable network with variable delays, and the systems may suffer from partial failures, unreliable clocks, and processing pauses. 
 

@@ -1,4 +1,4 @@
-# **CHAPTER 9 Consistency and Consensus** 
+# Consistency and consensus
 
 _Is it better to be alive and wrong or right and dead?_ 
 
@@ -23,7 +23,7 @@ We need to understand the scope of what can and cannot be done: in some situatio
 
 Researchers in the field of distributed systems have been studying these topics for decades, so there is a lot of material—we’ll only be able to scratch the surface. In this book we don’t have space to go into details of the formal models and proofs, so we will stick with informal intuitions. The literature references offer plenty of additional depth if you’re interested. 
 
-# **Consistency Guarantees** 
+## Consistency guarantees
 
 In “Problems with Replication Lag” on page 161 we looked at some timing issues that occur in a replicated database. If you look at two database nodes at the same moment in time, you’re likely to see different data on the two nodes, because write requests arrive on different nodes at different times. These inconsistencies occur no matter what replication method the database uses (single-leader, multi-leader, or leaderless replication). 
 
@@ -49,7 +49,7 @@ This chapter covers a broad range of topics, but as we shall see, these areas ar
 - In the third section (“Distributed Transactions and Consensus” on page 352) we will explore how to atomically commit a distributed transaction, which will finally lead us toward solutions for the consensus problem. 
 
 
-# **Linearizability** 
+## Linearizability
 
 In an eventually consistent database, if you ask two different replicas the same question at the same time, you may get two different answers. That’s confusing. Wouldn’t it be a lot simpler if the database could give the illusion that there is only one replica (i.e., only one copy of the data)? Then every client would have the same view of the data, and you wouldn’t have to worry about replication lag. 
 
@@ -341,7 +341,7 @@ The same is true of many distributed databases that choose not to provide linear
 Can’t we maybe find a more efficient implementation of linearizable storage? It seems the answer is no: Attiya and Welch [47] prove that if you want linearizability, the response time of read and write requests is at least proportional to the uncertainty of delays in the network. In a network with highly variable delays, like most computer networks (see “Timeouts and Unbounded Delays” on page 281), the response time of linearizable reads and writes is inevitably going to be high. A faster algorithm for linearizability does not exist, but weaker consistency models can be much faster, so this trade-off is important for latency-sensitive systems. In Chapter 12 we will discuss some approaches for avoiding linearizability without sacrificing correctness. 
 
 
-# **Ordering Guarantees** 
+## Ordering guarantees
 
 We said previously that a linearizable register behaves as if there is only a single copy of the data, and that every operation appears to take effect atomically at one point in time. This definition implies that operations are executed in some well-defined order. We illustrated the ordering in Figure 9-4 by joining up the operations in the order in which they seem to have executed. 
 
@@ -607,7 +607,7 @@ This is no coincidence: it can be proved that a linearizable compare-and-set (or
 
 It is time to finally tackle the consensus problem head-on, which we will do in the rest of this chapter. 
 
-# **Distributed Transactions and Consensus** 
+## Distributed transactions and consensus
 
 Consensus is one of the most important and fundamental problems in distributed computing. On the surface, it seems simple: informally, the goal is simply to _get several nodes to agree on something_ . You might think that this shouldn’t be too hard. Unfortunately, many broken systems have been built in the mistaken belief that this problem is easy to solve. 
 

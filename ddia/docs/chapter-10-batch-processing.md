@@ -1,4 +1,4 @@
-# **CHAPTER 10 Batch Processing** 
+# Batch processing
 
 _A system cannot be successful if it is too strongly influenced by a single person. Once the initial design is complete and fairly robust, the real test begins as people with many different viewpoints undertake their own experiments._ 
 
@@ -31,7 +31,7 @@ In fact, batch processing is a very old form of computing. Long before programma
 
 In this chapter, we will look at MapReduce and several other batch processing algorithms and frameworks, and explore how they are used in modern data systems. But first, to get started, we will look at data processing using standard Unix tools. Even if you are already familiar with them, a reminder about the Unix philosophy is worthwhile because the ideas and lessons from Unix carry over to large-scale, heterogeneous distributed data systems. 
 
-# **Batch Processing with Unix Tools** 
+## Batch processing with Unix tools
 
 Let’s start with a simple example. Say you have a web server that appends a line to a log file every time it serves a request. For example, using the nginx default access log format, one line of the log might look like this: 
 
@@ -55,7 +55,7 @@ So, this one line of the log indicates that on February 27, 2015, at 17:55:11 UT
 
 Various tools can take these log files and produce pretty reports about your website traffic, but for the sake of exercise, let’s build our own, using basic Unix tools. For example, say you want to find the five most popular pages on your website. You can do this in a Unix shell as follows:[i] 
 
-```
+```bash
 cat /var/log/nginx/access.log |
   awk '{print $7}' |
   sort             |
@@ -97,23 +97,18 @@ We don’t have space in this book to explore Unix tools in detail, but they are
 
 Instead of the chain of Unix commands, you could write a simple program to do the same thing. For example, in Ruby, it might look something like this: 
 
+```ruby
+counts = Hash.new(0)
 
-```
-counts=Hash.new(0)
-```
-
-```
-File.open('/var/log/nginx/access.log') do|file|
-file.eachdo|line|
-url=line.split[6]
-counts[url]+=1
+File.open('/var/log/nginx/access.log') do |file|
+  file.each do |line|
+    url = line.split[6]
+    counts[url] += 1
+  end
 end
-end
-```
 
-```
-top5=counts.map{|url, count|[count, url] }.sort.reverse[0...5]
-top5.each{|count, url|puts"#{count}#{url}" }
+top5 = counts.map { |url, count| [count, url] }.sort.reverse[0...5]
+top5.each { |count, url| puts "#{count} #{url}" }
 ```
 
 `counts` is a hash table that keeps a counter for the number of times we’ve seen each URL. A counter is zero by default. 
@@ -206,7 +201,7 @@ Thus, even though Unix tools are quite blunt, simple tools compared to a query o
 
 However, the biggest limitation of Unix tools is that they run only on a single machine—and that’s where tools like Hadoop come in. 
 
-# **MapReduce and Distributed Filesystems** 
+## Map reduce and distributed filesystems
 
 MapReduce is a bit like Unix tools, but distributed across potentially thousands of machines. Like Unix tools, it is a fairly blunt, brute-force, but surprisingly effective tool. A single MapReduce job is comparable to a single Unix process: it takes one or more inputs and produces one or more outputs. 
 
@@ -583,7 +578,7 @@ And this is why MapReduce is designed to tolerate frequent unexpected task termi
 Among open source cluster schedulers, preemption is less widely used. YARN’s CapacityScheduler supports preemption for balancing the resource allocation of different queues [58], but general priority preemption is not supported in YARN, Mesos, or Kubernetes at the time of writing [60]. In an environment where tasks are not so often terminated, the design decisions of MapReduce make less sense. In the next section, we will look at some alternatives to MapReduce that make different design decisions. 
 
 
-# **Beyond MapReduce** 
+## Beyond MapReduce
 
 Although MapReduce became very popular and received a lot of hype in the late 2000s, it is just one among many possible programming models for distributed systems. Depending on the volume of data, the structure of the data, and the type of processing being done with it, other tools may be more appropriate for expressing a computation. 
 

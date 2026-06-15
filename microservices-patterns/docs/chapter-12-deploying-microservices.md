@@ -348,11 +348,14 @@ The first step in building an image is to create a Dockerfile. A _Dockerfile_ de
 
 Listing 12.1 The **Dockerfile** used to build **Restaurant Service** 
 
-**The base image Install curl for use by the Configure Docker health check. to run java -jar .. when the container is started.** 
+```dockerfile
+FROM openjdk:8u171-jre-alpine 
+RUN apk --no-cache add curl 
+CMD java ${JAVA_OPTS} -jar ftgo-restaurant-service.jar 
+HEALTHCHECK --start-period=30s --interval=5s CMD curl http://localhost:8080/actuator/health || exit 1 
+COPY build/libs/ftgo-restaurant-service.jar . 
+```
 
-FROM openjdk:8u171-jre-alpine RUN apk --no-cache add curl CMD java ${JAVA_OPTS} -jar ftgo-restaurant-service.jar HEALTHCHECK --start-period=30s -- interval=5s CMD curl http://localhost:8080/actuator/health || exit 1 COPY build/libs/ftgo-restaurant-service.jar . 
-
-**Configure Docker to Copies the JAR in Gradle’s build invoke the health directory into the image check endpoint.** 
 
 The base image openjdk:8u171-jre-alpine is a minimal footprint Linux image containing the JRE. The Dockerfile copies the service’s JAR into the image and configures the image to execute the JAR on startup. It also configures Docker to periodically invoke the health check endpoint, described in chapter 11. The HEALTHCHECK directive says to invoke the health check endpoint API, described in chapter 11, every 5 seconds after an initial 30-second delay, which gives the service time to start. 
 
@@ -360,7 +363,11 @@ Once you’ve written the Dockerfile, you can then build the image. The followin
 
 Listing 12.2 The shell commands used to build the container image for **Restaurant Service** 
 
-**Change to the Build the** cd ftgo-restaurant-service **service’s directory. service’s JAR.** ../gradlew assemble docker build -t ftgo-restaurant-service . **Build the image.** 
+```bash
+cd ftgo-restaurant-service 
+../gradlew assemble 
+docker build -t ftgo-restaurant-service . 
+```
 
 The docker build command has two arguments: the -t argument specifies the name of the image, and the . specifies what Docker calls the context. The _context_ , which in this example is the current directory, consists of Dockerfile and the files used to build the image. The docker build command uploads the context to the Docker daemon, which builds the image. 
 
@@ -388,13 +395,16 @@ As you might expect, Docker provides a docker run command that creates and start
 
 Listing 12.3 Using **docker run** to run a containerized service 
 
-|docker run \<br>-d<br>\<br>--name ftgo-restaurant-service<br>**Runs it as a**<br>**background**|\<br> <br>**daemon**||**The name of**<br>**the container**|**Binds port 8080 of the**<br>**container to port 8082**<br>**of the host machine**|**Binds port 8080 of the**<br>**container to port 8082**<br>**of the host machine**|**Binds port 8080 of the**<br>**container to port 8082**<br>**of the host machine**|
-|---|---|---|---|---|---|---|
-|-p 8082:8080<br>\|||||||
-|-e SPRING_DATASOURCE_URL=... -e|SPRING_DATASOURCE_USERNAME=...|||||\<br>**Environment**|
-|-e SPRING_DATASOURCE_PASSWORD=... \||||||**variables**|
-|registry.acme.com/ftgo-restaurant-service:1.0.0.RELEASE|||||||
-||||**Image to run**||||
+```bash
+docker run \ 
+  -d \ 
+  --name ftgo-restaurant-service \ 
+  -p 8082:8080 \ 
+  -e SPRING_DATASOURCE_URL=... \ 
+  -e SPRING_DATASOURCE_USERNAME=... \ 
+  -e SPRING_DATASOURCE_PASSWORD=... \ 
+  registry.acme.com/ftgo-restaurant-service:1.0.0.RELEASE 
+```
 
 
 The docker run command pulls the image from the registry if necessary. It then creates and starts the container, which runs the java -jar command specified in the Dockerfile. 
@@ -519,11 +529,61 @@ _**Deploying the FTGO application with Kubernetes**_
 
 The container definition specifies the Docker image running along with other attributes, such as the values of environment variables. The container’s environment variables are the service’s externalized configuration. They are read by Spring Boot and made available as properties in the application context. 
 
-Listing 12.4 Kubernetes **Deployment** for **ftgo-restaurant-service**
-apiVersion: extensions/v1beta1 **Specifies that this is an** kind: Deployment **object of type Deployment** metadata: name: ftgo-restaurant-service **The name of the deployment** spec: replicas: 2 **Number of pod replicas** template: metadata: **Gives each pod a label** labels: **called app whose value is** app: ftgo-restaurant-service **ftgo-restaurant-service** spec: **The specification of** containers: **the pod, which defines** - name: ftgo-restaurant-service **just one container** image: msapatterns/ftgo-restaurant-service:latest imagePullPolicy: Always ports: - containerPort: 8080 **The container’s port** name: httpport env: - name: JAVA_OPTS **The container’s environment** value: "-Dsun.net.inetaddr.ttl=30" **variables, which are read by** - name: SPRING_DATASOURCE_URL **Spring Boot** value: jdbc:mysql://ftgo-mysql/eventuate - name: SPRING_DATASOURCE_USERNAME valueFrom: secretKeyRef: name: ftgo-db-secret key: username **Sensitive values that** - name: SPRING_DATASOURCE_PASSWORD valueFrom: **are retrieved from the Kubernetes Secret** secretKeyRef: **called ftgo-db-secret** name: ftgo-db-secret key: password - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME value: com.mysql.jdbc.Driver - name: EVENTUATELOCAL_KAFKA_BOOTSTRAP_SERVERS value: ftgo-kafka:9092 - name: EVENTUATELOCAL_ZOOKEEPER_CONNECTION_STRING value: ftgo-zookeeper:2181 livenessProbe: **Configure Kubernetes** httpGet: **to invoke the health** path: /actuator/health **check endpoint.** port: 8080 initialDelaySeconds: 60 periodSeconds: 20 readinessProbe: 
+Listing 12.4 Kubernetes **Deployment** for **ftgo-restaurant-service** 
 
-
-httpGet: path: /actuator/health port: 8080 initialDelaySeconds: 60 periodSeconds: 20 
+```yaml
+apiVersion: extensions/v1beta1 
+kind: Deployment 
+metadata: 
+  name: ftgo-restaurant-service 
+spec: 
+  replicas: 2 
+  template: 
+    metadata: 
+      labels: 
+        app: ftgo-restaurant-service 
+    spec: 
+      containers: 
+      - name: ftgo-restaurant-service 
+        image: msapatterns/ftgo-restaurant-service:latest 
+        imagePullPolicy: Always 
+        ports: 
+        - containerPort: 8080 
+          name: httpport 
+        env: 
+        - name: JAVA_OPTS 
+          value: "-Dsun.net.inetaddr.ttl=30" 
+        - name: SPRING_DATASOURCE_URL 
+          value: jdbc:mysql://ftgo-mysql/eventuate 
+        - name: SPRING_DATASOURCE_USERNAME 
+          valueFrom: 
+            secretKeyRef: 
+              name: ftgo-db-secret 
+              key: username 
+        - name: SPRING_DATASOURCE_PASSWORD 
+          valueFrom: 
+            secretKeyRef: 
+              name: ftgo-db-secret 
+              key: password 
+        - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME 
+          value: com.mysql.jdbc.Driver 
+        - name: EVENTUATELOCAL_KAFKA_BOOTSTRAP_SERVERS 
+          value: ftgo-kafka:9092 
+        - name: EVENTUATELOCAL_ZOOKEEPER_CONNECTION_STRING 
+          value: ftgo-zookeeper:2181 
+        livenessProbe: 
+          httpGet: 
+            path: /actuator/health 
+            port: 8080 
+          initialDelaySeconds: 60 
+          periodSeconds: 20 
+        readinessProbe: 
+          httpGet: 
+            path: /actuator/health 
+            port: 8080 
+          initialDelaySeconds: 60 
+          periodSeconds: 20 
+```
 
 This deployment definition configures Kubernetes to invoke Restaurant Service’s health check endpoint. As described in chapter 11, a health check endpoint enables Kubernetes to determine the health of the service instance. Kubernetes implements two different checks. The first check is readinessProbe, which it uses to determine whether it should route traffic to a service instance. In this example, Kubernetes invokes the /actuator/health HTTP endpoint every 20 seconds after an initial 30second delay, which gives it a chance to initialize. If some number (default is 1) of consecutive readinessProbes succeeds, Kubernetes considers the service to be ready, whereas if some number (default, 3) of consecutive readinessProbes fail, it’s considered not to be ready. Kubernetes will only route traffic to the service instance when the readinessProbe indicates that it’s ready. 
 
@@ -551,7 +611,20 @@ One approach is to use a client-side discovery mechanism and install a service r
 
 A _service_ is a Kubernetes object that provides the clients of one or more pods with a stable endpoint. It has an IP address and a DNS name that resolves that IP address. The service load balances traffic to that IP address across the pods. Listing 12.5 shows the Kubernetes service for Restaurant Service. This service routes traffic from http://ftgo-restaurant-service:8080 to the pods defined by the deployment shown in the listing. 
 
-Listing 12.5 The YAML definition of the Kubernetes service for **ftgo-restaurant-service** apiVersion: v1 kind: Service metadata: **The name of the service, also the DNS name** name: ftgo-restaurant-service spec: ports: **The exposed** - port: 8080 **port The container port to route traffic to** targetPort: 8080 selector: app: ftgo-restaurant-service **Selects the containers** --- **to route traffic to** 
+Listing 12.5 The YAML definition of the Kubernetes service for **ftgo-restaurant-service** 
+
+```yaml
+apiVersion: v1 
+kind: Service 
+metadata: 
+  name: ftgo-restaurant-service 
+spec: 
+  ports: 
+  - port: 8080 
+    targetPort: 8080 
+  selector: 
+    app: ftgo-restaurant-service 
+```
 
 The key part of the service definition is selector, which selects the target pods. It selects those pods that have a label named app with the value ftgo-restaurant-service. If you look closely, you’ll see that the container defined in listing 12.4 has such a label. 
 
@@ -566,10 +639,22 @@ The Kubernetes service for Restaurant Service, shown in listing 12.5, is only ac
 
 A NodePort service is accessible via a cluster-wide port on all the nodes in the cluster. Any traffic to that port on any cluster node is load balanced to the backend pods. You must select an available port in the range of 30000–32767. For example, listing 12.6 shows a service that routes traffic to port 30000 of Consumer Service. 
 
-Listing 12.6 The YAML definition of a **NodePort** service that routes traffic to port 8082 of **Consumer Service**
-apiVersion: v1 kind: Service metadata: name: ftgo-api-gateway spec: **Specifies a type of NodePort** type: NodePort ports: - nodePort: 30000 **The cluster-** port: 80 **wide port** targetPort: 8080 selector: app: ftgo-api-gateway 
+Listing 12.6 The YAML definition of a **NodePort** service that routes traffic to port 8082 of **Consumer Service** 
 
---- 
+```yaml
+apiVersion: v1 
+kind: Service 
+metadata: 
+  name: ftgo-api-gateway 
+spec: 
+  type: NodePort 
+  ports: 
+  - nodePort: 30000 
+    port: 80 
+    targetPort: 8080 
+  selector: 
+    app: ftgo-api-gateway 
+```
 
 API Gateway is within the cluster using the URL http://ftgo-api-gateway and outside the URL http://<node-ip-address>:3000/, where node-ip-address is the IP address of one of the nodes. After configuring a NodePort service you can, for example, configure an AWS Elastic Load Balancer (ELB) to load balance requests from the internet across the nodes. A key benefit of this approach is that the ELB is entirely under your control. You have complete flexibility when configuring it. 
 
@@ -690,7 +775,37 @@ Deploying a service on Istio is quite straightforward. You define a Kubernetes S
 _**Deploying the FTGO application with Kubernetes**_ 
 
 
-Listing 12.7 Deploying Consumer Service with Istio apiVersion: v1 kind: Service metadata: name: ftgo-consumer-service spec: ports: - name: http **Named port** port: 8080 targetPort: 8080 selector: app: ftgo-consumer-service --apiVersion: extensions/v1beta1 kind: Deployment metadata: **Versioned** name: ftgo-consumer-service-v2 **deployment** spec: replicas: 1 template: metadata: labels: **Recommended labels** app: ftgo-consumer-service version: v2 spec: containers: **Image** - **version** image: image: ftgo-consumer-service:v2 ... 
+Listing 12.7 Deploying Consumer Service with Istio 
+
+```yaml
+apiVersion: v1 
+kind: Service 
+metadata: 
+  name: ftgo-consumer-service 
+spec: 
+  ports: 
+  - name: http 
+    port: 8080 
+    targetPort: 8080 
+  selector: 
+    app: ftgo-consumer-service 
+--- 
+apiVersion: extensions/v1beta1 
+kind: Deployment 
+metadata: 
+  name: ftgo-consumer-service-v1 
+spec: 
+  replicas: 1 
+  template: 
+    metadata: 
+      labels: 
+        app: ftgo-consumer-service 
+        version: v1 
+    spec: 
+      containers: 
+      - name: ftgo-consumer-service 
+        image: msapatterns/ftgo-consumer-service:v1 
+```
 
 By now, you may be wondering how to run the Envoy proxy container in the service’s pod. Fortunately, Istio makes that remarkably easy by automating modifying the pod definition to include the Envoy proxy. There are two ways to do that. The first is to use _manual sidecar injection_ and run the istioctl kube-inject command: istioctl kube-inject -f ftgo-consumer-service/src/deployment/kubernetes/ftgoconsumer-service.yml | kubectl apply -f - 
 
@@ -727,11 +842,42 @@ _**Deploying the FTGO application with Kubernetes**_
 
 Figure 12.12 shows the routing rule for Consumer Service that routes all traffic to v1. It consists of two Istio objects: a VirtualService and a DestinationRule. 
 
-A VirtualService defines how to route requests for one or more hostnames. In this example, VirtualService defines the routes for a single hostname: ftgo-consumerservice. Here’s the definition of VirtualService for Consumer Service: apiVersion: networking.istio.io/v1alpha3 kind: VirtualService metadata: name: ftgo-consumer-service spec: hosts: **Applies to the** - **Consumer Service** ftgo-consumer-service http: - route: **Routes to** - destination: **Consumer Service** host: ftgo-consumer-service subset: v1 **The v1 subset** 
+A VirtualService defines how to route requests for one or more hostnames. In this example, VirtualService defines the routes for a single hostname: ftgo-consumerservice. Here’s the definition of VirtualService for Consumer Service: 
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3 
+kind: VirtualService 
+metadata: 
+  name: ftgo-consumer-service 
+spec: 
+  hosts: 
+  - ftgo-consumer-service 
+  http: 
+  - route: 
+    - destination: 
+        host: ftgo-consumer-service 
+        subset: v1 
+```
 
 It routes all requests for the v1 subset of the pods of Consumer Service. Later, I show more complex examples that route based on HTTP requests and load balance across multiple weighted destinations. 
 
-In addition to VirtualService, you must also define a DestinationRule, which defines one or more subsets of pods for a service. A subset of pods is typically a service version. A DestinationRule can also define traffic policies, such as the load-balancing algorithm. Here’s the DestinationRule for Consumer Service: apiVersion: networking.istio.io/v1alpha3 kind: DestinationRule metadata: name: ftgo-consumer-service spec: host: ftgo-consumer-service subsets: **The name of** - name: v1 **the subset** labels: version: v1 - name: v2 **The pod selector for the subset** labels: version: v2 
+In addition to VirtualService, you must also define a DestinationRule, which defines one or more subsets of pods for a service. A subset of pods is typically a service version. A DestinationRule can also define traffic policies, such as the load-balancing algorithm. Here’s the DestinationRule for Consumer Service: 
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3 
+kind: DestinationRule 
+metadata: 
+  name: ftgo-consumer-service 
+spec: 
+  host: ftgo-consumer-service 
+  subsets: 
+  - name: v1 
+    labels: 
+      version: v1 
+  - name: v2 
+    labels: 
+      version: v2 
+```
 
 This DestinationRule defines two subsets of pods: v1 and v2. The v1 subset selects pods with the label version: v1. The v2 subset selects pods with the label version: v2. 
 
@@ -746,7 +892,30 @@ This deployment is called ftgo-consumer-service-v2. It labels its pods with vers
 
 ROUTING TEST TRAFFIC TO VERSION 2 
 
-Once you’ve deployed a new version of a service, the next step is to test it. Let’s suppose that requests from test users have a testuser header . We can enhance the ftgoconsumer-service VirtualService to route requests with this header to v2 instances by making the following change: apiVersion: networking.istio.io/v1alpha3 kind: VirtualService metadata: name: ftgo-consumer-service spec: hosts: - ftgo-consumer-service http: - match: - headers: testuser: **Matches a nonblank** regex: "^.+$" **testuser header** route: - destination: host: ftgo-consumer-service **Routes test** subset: v2 **users to v2** - route: - destination: host: ftgo-consumer-service **Routes everyone** subset: v1 **else to v1** 
+We can enhance the ftgoconsumer-service VirtualService to route requests with this header to v2 instances by making the following change: 
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3 
+kind: VirtualService 
+metadata: 
+  name: ftgo-consumer-service 
+spec: 
+  hosts: 
+  - ftgo-consumer-service 
+  http: 
+  - match: 
+    - headers: 
+        testuser: 
+          regex: "^.+$" 
+    route: 
+    - destination: 
+        host: ftgo-consumer-service 
+        subset: v2 
+  - route: 
+    - destination: 
+        host: ftgo-consumer-service 
+        subset: v1 
+```
 
 In addition to the original default route, VirtualService has a routing rule that routes requests with the testuser header to the v2 subset. After you’ve updated the rules, you can now test Consumer Service. Then, once you feel confident that the v2 is working, you can route some production traffic to it. Let’s look at how to do that. 
 
@@ -756,7 +925,27 @@ _**Deploying services using the Serverless deployment pattern**_
 
 ROUTING PRODUCTION TRAFFIC TO VERSION 2 
 
-After you’ve tested a newly deployed service, the next step is to start routing production traffic to it. A good strategy is to initially only route a small amount of traffic. Here, for example, is a rule that routes 95% of traffic to v1 and 5% to v2: apiVersion: networking.istio.io/v1alpha3 kind: VirtualService metadata: name: ftgo-consumer-service spec: hosts: - ftgo-consumer-service http: - route: - destination: host: ftgo-consumer-service subset: v1 weight: 95 - destination: host: ftgo-consumer-service subset: v2 weight: 5 
+Here, for example, is a rule that routes 95% of traffic to v1 and 5% to v2: 
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3 
+kind: VirtualService 
+metadata: 
+  name: ftgo-consumer-service 
+spec: 
+  hosts: 
+  - ftgo-consumer-service 
+  http: 
+  - route: 
+    - destination: 
+        host: ftgo-consumer-service 
+        subset: v1 
+      weight: 95 
+    - destination: 
+        host: ftgo-consumer-service 
+        subset: v2 
+      weight: 5 
+```
 
 As you gain confidence that the service can handle production traffic, you can incrementally increase the amount of traffic going to the version 2 pods until it reaches 100%. At that point, Istio isn’t routing any traffic to the v1 pods. You could leave them running for a little while longer before deleting the version 1 Deployment. 
 
@@ -799,7 +988,13 @@ _**Deploying services using the Serverless deployment pattern**_
 
 Unlike when using the other three patterns, you must use a different programming model for your lambda functions. A lambda function’s code and the packaging depend on the programming language. A Java lambda function is a class that implements the generic interface RequestHandler, which is defined by the AWS Lambda Java core library and shown in the following listing. This interface takes two type parameters: I, which is the input type, and O, which is the output type. The type of I and O depend on the specific kind of request that the lambda handles. 
 
-Listing 12.8 A Java lambda function is a class that implements the **RequestHandler** interface. public interface RequestHandler<I, O> { public O handleRequest(I input, Context context); } 
+Listing 12.8 A Java lambda function is a class that implements the **RequestHandler** interface. 
+
+```java
+public interface RequestHandler<I, O> { 
+  public O handleRequest(I input, Context context); 
+} 
+```
 
 The RequestHandler interface defines a single handleRequest() method. This method has two parameters, an input object and a context, which provide access to the lambda execution environment, such as the request ID. The handleRequest() method returns an output object. For lambda functions that handle HTTP requests that are proxied by an AWS API Gateway, I and O are APIGatewayProxyRequestEvent and APIGatewayProxyResponseEvent, respectively. As you’ll soon see, the handler functions are quite similar to old-style Java EE servlets. 
 
@@ -931,27 +1126,36 @@ The AbstractHttpHandler class is the abstract base class for HTTP request handle
 Listing 12.9 shows the code for the FindRestaurantRequestHandler class. The FindRestaurantRequestHandler class has a handleHttpRequest() method, which takes an APIGatewayProxyRequestEvent representing an HTTP request as a parameter. It invokes RestaurantService to find the restaurant and returns an APIGatewayProxyResponseEvent describing the HTTP response. 
 
 
-Listing 12.9 The handler class for **GET /restaurant/{restaurantId}**
+Listing 12.9 The handler class for **GET /restaurant/{restaurantId}** 
+
+```java
 public class FindRestaurantRequestHandler extends AbstractAutowiringHttpRequestHandler { 
+  @Autowired 
+  private RestaurantService restaurantService; 
 
-@Autowired private RestaurantService restaurantService; 
+  @Override 
+  protected Class<?> getApplicationContextClass() { 
+    return CreateRestaurantRequestHandler.class; 
+  } 
 
-**The Spring Java configuration class to use for the application context** 
+  @Override 
+  protected APIGatewayProxyResponseEvent handleHttpRequest(APIGatewayProxyRequestEvent request, Context context) { 
+    long restaurantId; 
+    try { 
+      restaurantId = Long.parseLong(request.getPathParameters().get("restaurantId")); 
+    } catch (NumberFormatException e) { 
+      return makeBadRequestResponse(context); 
+    } 
 
-@Override protected Class<?> getApplicationContextClass() { return CreateRestaurantRequestHandler.class; } @Override protected APIGatewayProxyResponseEvent handleHttpRequest(APIGatewayProxyRequestEvent request, Context context) { long restaurantId; try { restaurantId = Long.parseLong(request.getPathParameters() .get("restaurantId")); } catch (NumberFormatException e) { **Returns a 400 - bad request** return makeBadRequestResponse(context); **response if the restaurantId** } **is missing or invalid** 
+    Optional<Restaurant> possibleRestaurant = restaurantService.findById(restaurantId); 
 
-**Returns a 400 - bad request response if the restaurantId is missing or invalid** 
-
-Optional<Restaurant> possibleRestaurant = restaurantService.findById(restaur antId); 
-
-**Returns either the restaurant or a 404 - not found response**
-return possibleRestaurant .map(this::makeGetRestaurantResponse) .orElseGet(() -> makeRestaurantNotFoundResponse(context, restaurantId)); 
-
-} private APIGatewayProxyResponseEvent makeBadRequestResponse(Context context) { 
-
-... 
-
-} private APIGatewayProxyResponseEvent makeRestaurantNotFoundResponse(Context context, long restaurantId) { ... } private APIGatewayProxyResponseEvent makeGetRestaurantResponse(Restaurant restaurant) { ... } } 
+    return possibleRestaurant 
+      .map(this::makeGetRestaurantResponse) 
+      .orElseGet(() -> makeRestaurantNotFoundResponse(context, restaurantId)); 
+  } 
+  ... 
+}
+```
 
 As you can see, it’s quite similar to a servlet, except that instead of a service() method, which takes an HttpServletRequest and returns HttpServletResponse, it has a handleHttpRequest(), which takes an APIGatewayProxyRequestEvent and returns APIGatewayProxyResponseEvent. 
 
@@ -965,8 +1169,38 @@ DEPENDENCY INJECTION USING THE ABSTRACTAUTOWIRINGHTTPREQUESTHANDLER CLASS
 
 An AWS Lambda function is neither a web application nor an application with a main() method. But it would be a shame to not be able to use the features of Spring Boot that we’ve been accustomed to. The AbstractAutowiringHttpRequestHandler class, shown in the following listing, implements dependency injection for request handlers. It creates an ApplicationContext using SpringApplication.run() and autowires dependencies prior to handling the first request. Subclasses such as FindRestaurantRequestHandler must implement the getApplicationContextClass() method. 
 
-Listing 12.10 An abstract **RequestHandler** that implements dependency injection public abstract class AbstractAutowiringHttpRequestHandler extends AbstractHttpHandler { private static ConfigurableApplicationContext ctx; private ReentrantReadWriteLock ctxLock = new ReentrantReadWriteLock(); private boolean autowired = false; **Creates the Spring** protected synchronized ApplicationContext getAppCtx() { **Boot application** ctxLock.writeLock().lock(); **context just once** try { if (ctx == null) { ctx = SpringApplication.run(getApplicationContextClass()); } return ctx; } finally { ctxLock.writeLock().unlock(); } **Injects dependencies into** } **the request handler using autowiring before handling** @Override **the first request** protected void beforeHandling(APIGatewayProxyRequestEvent request, Context context) { super.beforeHandling(request, context); if (!autowired) { getAppCtx().getAutowireCapableBeanFactory().autowireBean(this); autowired = true; } **Returns the @Configuration** } **class used to create ApplicationContext**
-protected abstract Class<?> getApplicationContextClass(); } 
+Listing 12.10 An abstract **RequestHandler** that implements dependency injection 
+
+```java
+public abstract class AbstractAutowiringHttpRequestHandler extends AbstractHttpHandler { 
+  private static ConfigurableApplicationContext ctx; 
+  private ReentrantReadWriteLock ctxLock = new ReentrantReadWriteLock(); 
+  private boolean autowired = false; 
+
+  protected synchronized ApplicationContext getAppCtx() { 
+    ctxLock.writeLock().lock(); 
+    try { 
+      if (ctx == null) { 
+        ctx = SpringApplication.run(getApplicationContextClass()); 
+      } 
+      return ctx; 
+    } finally { 
+      ctxLock.writeLock().unlock(); 
+    } 
+  } 
+
+  @Override 
+  protected void beforeHandling(APIGatewayProxyRequestEvent request, Context context) { 
+    super.beforeHandling(request, context); 
+    if (!autowired) { 
+      getAppCtx().getAutowireCapableBeanFactory().autowireBean(this); 
+      autowired = true; 
+    } 
+  } 
+
+  protected abstract Class<?> getApplicationContextClass(); 
+}
+```
 
 This class overrides the beforeHandling() method defined by AbstractHttpHandler. Its beforeHandling() method injects dependencies using autowiring before handling the first request. 
 
@@ -977,13 +1211,45 @@ The request handlers for Restaurant Service ultimately extend AbstractHttpHandle
 
 Listing 12.11 An abstract **RequestHandler** that catches exceptions and returns a 500 HTTP response 
 
-- public abstract class AbstractHttpHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> { 
+```java
+public abstract class AbstractHttpHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> { 
+  private Logger log = LoggerFactory.getLogger(this.getClass()); 
 
-private Logger log = LoggerFactory.getLogger(this.getClass()); @Override public APIGatewayProxyResponseEvent handleRequest( APIGatewayProxyRequestEvent input, Context context) { log.debug("Got request: {}", input); try { beforeHandling(input, context); return handleHttpRequest(input, context); } catch (Exception e) { log.error("Error handling request id: {}", context.getAwsRequestId(), e); return buildErrorResponse(new AwsLambdaError( "Internal Server Error", "500", context.getAwsRequestId(), "Error handling request: " + context.getAwsRequestId() + " " + input.toString())); } } protected void beforeHandling(APIGatewayProxyRequestEvent request, Context context) { // do nothing } protected abstract APIGatewayProxyResponseEvent handleHttpRequest( APIGatewayProxyRequestEvent request, Context context); } 
+  @Override 
+  public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) { 
+    log.debug("Got request: {}", input); 
+    try { 
+      beforeHandling(input, context); 
+      return handleHttpRequest(input, context); 
+    } catch (Exception e) { 
+      log.error("Error handling request id: {}", context.getAwsRequestId(), e); 
+      return buildErrorResponse(new AwsLambdaError( 
+        "Internal Server Error", "500", context.getAwsRequestId(), 
+        "Error handling request: " + context.getAwsRequestId() + " " + input.toString())); 
+    } 
+  } 
+
+  protected void beforeHandling(APIGatewayProxyRequestEvent request, Context context) { 
+    // do nothing 
+  } 
+
+  protected abstract APIGatewayProxyResponseEvent handleHttpRequest(APIGatewayProxyRequestEvent request, Context context); 
+}
+```
 
 # _12.6.2 Packaging the service as ZIP file_ 
 
-Before the service can be deployed, we must package it as a ZIP file. We can easily build the ZIP file using the following Gradle task: task buildZip(type: Zip) { from compileJava from processResources into('lib') { from configurations.runtime } } 
+Before the service can be deployed, we must package it as a ZIP file. We can easily build the ZIP file using the following Gradle task: 
+
+```groovy
+task buildZip(type: Zip) { 
+  from compileJava 
+  from processResources 
+  into('lib') { 
+    from configurations.runtime 
+  } 
+} 
+```
 
 This task builds a ZIP with the classes and resources at the top level and the JAR dependencies in the lib directory. 
 
@@ -999,7 +1265,40 @@ Using the tools provided by AWS to deploy lambda functions and configure the API
 
 The following listing is an excerpt of the serverless.yml that deploys Restaurant Service as a lambda. 
 
-Listing 12.12 The **serverless.yml** deploys **Restaurant Service** . service: ftgo-application-lambda provider: **Tells serverless to** name: aws **deploy on AWS** runtime: java8 timeout: 35 **Supplies the service’s** region: ${env:AWS_REGION} **externalized configuration** stage: dev **via environment variables** environment: SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.jdbc.Driver SPRING_DATASOURCE_URL: ... SPRING_DATASOURCE_USERNAME: ... **The ZIP file** SPRING_DATASOURCE_PASSWORD: ... **containing the lambda functions** package: artifact: ftgo-restaurant-service-aws-lambda/build/distributions/ ftgo-restaurant-service-aws-lambda.zip **Lambda function definitions consisting of the handler** functions: **function and HTTP endpoint** create-restaurant: handler: net.chrisrichardson.ftgo.restaurantservice.lambda .CreateRestaurantRequestHandler events: - http: path: restaurants method: post find-restaurant: handler: net.chrisrichardson.ftgo.restaurantservice.lambda .FindRestaurantRequestHandler events: - http: path: restaurants/{restaurantId} method: get 
+Listing 12.12 The **serverless.yml** deploys **Restaurant Service** . 
+
+```yaml
+service: ftgo-application-lambda 
+
+provider: 
+  name: aws 
+  runtime: java8 
+  timeout: 35 
+  region: ${env:AWS_REGION} 
+  stage: dev 
+  environment: 
+    SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.jdbc.Driver 
+    SPRING_DATASOURCE_URL: ... 
+    SPRING_DATASOURCE_USERNAME: ... 
+    SPRING_DATASOURCE_PASSWORD: ... 
+
+package: 
+  artifact: ftgo-restaurant-service-aws-lambda/build/distributions/ftgo-restaurant-service-aws-lambda.zip 
+
+functions: 
+  create-restaurant: 
+    handler: net.chrisrichardson.ftgo.restaurantservice.lambda.CreateRestaurantRequestHandler 
+    events: 
+      - http: 
+          path: restaurants 
+          method: post 
+  find-restaurant: 
+    handler: net.chrisrichardson.ftgo.restaurantservice.lambda.FindRestaurantRequestHandler 
+    events: 
+      - http: 
+          path: restaurants/{restaurantId} 
+          method: get 
+```
 
 You can then use the serverless deploy command, which reads the serverless.yml file, deploys the lambda functions, and configures the AWS API Gateway. After a short 
 

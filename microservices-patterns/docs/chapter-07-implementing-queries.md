@@ -616,16 +616,30 @@ Let’s look at the design of the event handlers, the DAO, and the DynamoDB tabl
 This module consists of the event handlers that consume events and update the DynamoDB table. As the following listing shows, the event handlers are simple methods. Each method is a one-liner that invokes an OrderHistoryDao method with arguments that are derived from the event. 
 
 
-Listing 7.1 Event handlers that call the **OrderHistoryDao**
-public class OrderHistoryEventHandlers { private OrderHistoryDao orderHistoryDao; public OrderHistoryEventHandlers(OrderHistoryDao orderHistoryDao) { this.orderHistoryDao = orderHistoryDao; } public void handleOrderCreated(DomainEventEnvelope<OrderCreated> dee) { orderHistoryDao.addOrder(makeOrder(dee.getAggregateId(), dee.getEvent()), makeSourceEvent(dee)); 
+Listing 7.1 Event handlers that call the **OrderHistoryDao** 
 
-} private Order makeOrder(String orderId, OrderCreatedEvent event) { ... 
+```java
+public class OrderHistoryEventHandlers { 
+  private OrderHistoryDao orderHistoryDao; 
 
-} public void handleDeliveryPickedUp(DomainEventEnvelope<DeliveryPickedUp> dee) { orderHistoryDao.notePickedUp(dee.getEvent().getOrderId(), makeSourceEvent(dee)); 
+  public OrderHistoryEventHandlers(OrderHistoryDao orderHistoryDao) { 
+    this.orderHistoryDao = orderHistoryDao; 
+  } 
 
-} 
+  public void handleOrderCreated(DomainEventEnvelope<OrderCreated> dee) { 
+    orderHistoryDao.addOrder(makeOrder(dee.getAggregateId(), dee.getEvent()), makeSourceEvent(dee)); 
+  } 
 
-... 
+  private Order makeOrder(String orderId, OrderCreatedEvent event) { 
+    ... 
+  } 
+
+  public void handleDeliveryPickedUp(DomainEventEnvelope<DeliveryPickedUp> dee) { 
+    orderHistoryDao.notePickedUp(dee.getEvent().getOrderId(), makeSourceEvent(dee)); 
+  } 
+  ... 
+}
+```
 
 Each event handler has a single parameter of type DomainEventEnvelope, which contains the event and some metadata describing the event. For example, the handleOrderCreated() method is invoked to handle an OrderCreated event. It calls orderHistoryDao.addOrder() to create an Order in the database. Similarly, the handleDeliveryPickedUp() method is invoked to handle a DeliveryPickedUp event. It calls orderHistoryDao.notePickedUp() to update the status of the Order in the database. 
 
@@ -767,8 +781,31 @@ The OrderHistoryDaoDynamoDb class implements methods that read and write items i
 
 The addOrder() method, which is shown in listing 7.2, adds an order to the ftgoorder-history table. It has two parameters: order and sourceEvent. The order parameter is the Order to add, which is obtained from the OrderCreated event. The sourceEvent parameter contains the eventId and the type and ID of the aggregate that emitted the event. It’s used to implement the conditional update. 
 
-Listing 7.2 The **addOrder()** method adds or updates an **Order**
-public class OrderHistoryDaoDynamoDb ... **The primary key of the Order item to update** @Override public boolean addOrder(Order order, Optional<SourceEvent> eventSource) { UpdateItemSpec spec = new UpdateItemSpec() .withPrimaryKey("orderId", order.getOrderId()) .withUpdateExpression("SET orderStatus = :orderStatus, " + **expression thatupdates theThe update** ""creationDate:lineItems, keywords= :cd, consumerId= :keywords,= :consumerId,restaurantNamelineItems= " + =" + **attributes** ":restaurantName") .withValueMap(new Maps() **The values of the** .add(":orderStatus", order.getStatus().toString()) **placeholders in** .add(":cd", order.getCreationDate().getMillis()) **the update** .add(":consumerId", order.getConsumerId()) **expression** .add(":lineItems", mapLineItems(order.getLineItems())) .add(":keywords", mapKeywords(order)) .add(":restaurantName", order.getRestaurantName()) .map()) .withReturnValues(ReturnValue.NONE); return idempotentUpdate(spec, eventSource); } 
+Listing 7.2 The **addOrder()** method adds or updates an **Order** 
+
+```java
+public class OrderHistoryDaoDynamoDb ... { 
+  @Override 
+  public boolean addOrder(Order order, Optional<SourceEvent> eventSource) { 
+    UpdateItemSpec spec = new UpdateItemSpec() 
+      .withPrimaryKey("orderId", order.getOrderId()) 
+      .withUpdateExpression("SET orderStatus = :orderStatus, " + 
+                            "creationDate = :cd, lineItems = :lineItems, " + 
+                            "keywords = :keywords, consumerId = :consumerId, " + 
+                            "restaurantName = :restaurantName") 
+      .withValueMap(new Maps() 
+        .add(":orderStatus", order.getStatus().toString()) 
+        .add(":cd", order.getCreationDate().getMillis()) 
+        .add(":consumerId", order.getConsumerId()) 
+        .add(":lineItems", mapLineItems(order.getLineItems())) 
+        .add(":keywords", mapKeywords(order)) 
+        .add(":restaurantName", order.getRestaurantName()) 
+        .map()) 
+      .withReturnValues(ReturnValue.NONE); 
+    return idempotentUpdate(spec, eventSource); 
+  } 
+}
+```
 
 
 The addOrder() method creates an UpdateSpec, which is part of the AWS SDK and describes the update operation. After creating the UpdateSpec, it calls idempotentUpdate(), a helper method that performs the update after adding a condition expression that guards against duplicate updates. 
@@ -777,14 +814,22 @@ The addOrder() method creates an UpdateSpec, which is part of the AWS SDK and de
 
 The notePickedUp() method, shown in listing 7.3, is called by the event handler for the DeliveryPickedUp event. It changes the deliveryStatus of the Order item to PICKED_UP. 
 
-Listing 7.3 The **notePickedUp()** method changes the order status to **PICKED_UP**
-public class OrderHistoryDaoDynamoDb ... 
+Listing 7.3 The **notePickedUp()** method changes the order status to **PICKED_UP** 
 
-@Override public void notePickedUp(String orderId, Optional<SourceEvent> eventSource) { UpdateItemSpec spec = new UpdateItemSpec() 
-
-.withPrimaryKey("orderId", orderId) .withUpdateExpression("SET #deliveryStatus = :deliveryStatus") .withNameMap(Collections.singletonMap("#deliveryStatus", DELIVERY_STATUS_FIELD)) .withValueMap(Collections.singletonMap(":deliveryStatus", DeliveryStatus.PICKED_UP.toString())) 
-
-.withReturnValues(ReturnValue.NONE); idempotentUpdate(spec, eventSource); } 
+```java
+public class OrderHistoryDaoDynamoDb ... { 
+  @Override 
+  public void notePickedUp(String orderId, Optional<SourceEvent> eventSource) { 
+    UpdateItemSpec spec = new UpdateItemSpec() 
+      .withPrimaryKey("orderId", orderId) 
+      .withUpdateExpression("SET #deliveryStatus = :deliveryStatus") 
+      .withNameMap(Collections.singletonMap("#deliveryStatus", DELIVERY_STATUS_FIELD)) 
+      .withValueMap(Collections.singletonMap(":deliveryStatus", DeliveryStatus.PICKED_UP.toString())) 
+      .withReturnValues(ReturnValue.NONE); 
+    idempotentUpdate(spec, eventSource); 
+  } 
+}
+```
 
 This method is similar to addOrder(). It creates an UpdateItemSpec and invokes idempotentUpdate(). Let’s look at the idempotentUpdate() method. 
 
@@ -792,9 +837,22 @@ This method is similar to addOrder(). It creates an UpdateItemSpec and invokes i
 
 The following listing shows the idempotentUpdate() method, which updates the item after possibly adding a condition expression to the UpdateItemSpec that guards against duplicate updates. 
 
-Listing 7.4 The **idempotentUpdate()** method ignores duplicate events public class OrderHistoryDaoDynamoDb ... private boolean idempotentUpdate(UpdateItemSpec spec, Optional<SourceEvent> eventSource) { try { table.updateItem(eventSource.map(es -> es.addDuplicateDetection(spec)) .orElse(spec)); return true; } catch (ConditionalCheckFailedException e) { // Do nothing return false; } 
+Listing 7.4 The **idempotentUpdate()** method ignores duplicate events 
 
-} 
+```java
+public class OrderHistoryDaoDynamoDb ... { 
+  private boolean idempotentUpdate(UpdateItemSpec spec, Optional<SourceEvent> eventSource) { 
+    try { 
+      table.updateItem(eventSource.map(es -> es.addDuplicateDetection(spec)) 
+        .orElse(spec)); 
+      return true; 
+    } catch (ConditionalCheckFailedException e) { 
+      // Do nothing 
+      return false; 
+    } 
+  } 
+}
+```
 
 
 _**Implementing a CQRS view with AWS DynamoDB**_ 
@@ -808,20 +866,45 @@ Now that we’ve seen the code that updates the table, let’s look at the query
 
 The findOrderHistory() method, shown in listing 7.5, retrieves the consumer’s orders by querying the ftgo-order-history table using the ftgo-order-history-by-consumerid-and-creation-time secondary index. It has two parameters: consumerId specifies the consumer, and filter specifies the search criteria. This method creates QuerySpec—which, like UpdateSpec, is part of the AWS SDK—from its parameters, queries the index, and transforms the returned items into an OrderHistory object. 
 
-Listing 7.5 The **findOrderHistory()** method retrieves a consumer’s matching orders public class OrderHistoryDaoDynamoDb ... 
+Listing 7.5 The **findOrderHistory()** method retrieves a consumer’s matching orders 
 
-@Override public OrderHistory findOrderHistory(String consumerId, OrderHistoryFilter filter) { **Specifies that query must** QuerySpec spec = new QuerySpec() **return the orders in order** .withScanIndexForward(false) **of increasing age** .withHashKey("consumerId", consumerId) .withRangeKeyCondition(new RangeKeyCondition("creationDate") .gt(filter.getSince().getMillis())); filter.getStartKeyToken().ifPresent(token -> spec.withExclusiveStartKey(toStartingPrimaryKey(token))); Map<String, Object> valuesMap = new HashMap<>(); String filterExpression = Expressions.and( keywordFilterExpression(valuesMap, filter.getKeywords()), statusFilterExpression(valuesMap, filter.getStatus())); if (!valuesMap.isEmpty()) **Construct a filter expression** spec.withValueMap(valuesMap); **and placeholder value map from the OrderHistoryFilter.** if (StringUtils.isNotBlank(filterExpression)) { spec.withFilterExpression(filterExpression); } filter.getPageSize().ifPresent(spec::withMaxResultSize); ItemCollection<QueryOutcome> result = index.query(spec); **a page size.** return new OrderHistory( StreamSupport.stream(result.spliterator(), false) 
+```java
+public class OrderHistoryDaoDynamoDb ... { 
+  @Override 
+  public OrderHistory findOrderHistory(String consumerId, OrderHistoryFilter filter) { 
+    QuerySpec spec = new QuerySpec() 
+      .withScanIndexForward(false) 
+      .withHashKey("consumerId", consumerId) 
+      .withRangeKeyCondition(new RangeKeyCondition("creationDate") 
+        .gt(filter.getSince().getMillis())); 
 
-**The maximum age of the orders to return** 
+    filter.getStartKeyToken().ifPresent(token -> spec.withExclusiveStartKey(toStartingPrimaryKey(token))); 
 
-**Limit the number of results if the caller has specified a page size.** 
+    Map<String, Object> valuesMap = new HashMap<>(); 
+    String filterExpression = Expressions.and( 
+      keywordFilterExpression(valuesMap, filter.getKeywords()), 
+      statusFilterExpression(valuesMap, filter.getStatus())); 
 
+    if (!valuesMap.isEmpty()) 
+      spec.withValueMap(valuesMap); 
 
-.map(this::toOrder) .collect(toList()), Optional.ofNullable(result .getLastLowLevelResult() .getQueryResult().getLastEvaluatedKey()) .map(this::toStartKeyToken)); 
+    if (StringUtils.isNotBlank(filterExpression)) { 
+      spec.withFilterExpression(filterExpression); 
+    } 
 
-**Create an Order from an item returned by the query.** 
+    filter.getPageSize().ifPresent(spec::withMaxResultSize); 
 
-} 
+    ItemCollection<QueryOutcome> result = index.query(spec); 
+
+    return new OrderHistory( 
+      StreamSupport.stream(result.spliterator(), false) 
+        .map(this::toOrder) 
+        .collect(toList()), 
+      Optional.ofNullable(result.getLastLowLevelResult().getQueryResult().getLastEvaluatedKey()) 
+        .map(this::toStartKeyToken)); 
+  } 
+}
+```
 
 After building a QuerySpec, this method then executes a query and builds an OrderHistory, which contains the list of Orders, from the returned items. 
 

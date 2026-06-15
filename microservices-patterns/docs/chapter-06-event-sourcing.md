@@ -138,7 +138,14 @@ When an application creates or updates an aggregate, it inserts the events emitt
 
 For example, the Eventuate Client framework, covered later in section 6.2.2, uses code similar to the following to reconstruct an aggregate: 
 
-Class aggregateClass = ...; Aggregate aggregate = aggregateClass.newInstance(); for (Event event : events) { aggregate = aggregate.applyEvent(event); } // use aggregate... 
+```java
+Class aggregateClass = ...; 
+Aggregate aggregate = aggregateClass.newInstance(); 
+for (Event event : events) { 
+  aggregate = aggregate.applyEvent(event); 
+} 
+// use aggregate... 
+```
 
 It creates an instance of the class and iterates through the events, calling the aggregate’s applyEvent() method. If you’re familiar with functional programming, you may recognize this as a _fold or reduce_ operation. 
 
@@ -243,43 +250,80 @@ To see this in action, let’s now look at the event sourcing version of the Ord
 
 Listing 6.1 shows the Order aggregate’s fields and the methods responsible for creating it. The event sourcing version of the Order aggregate has some similarities to the JPA-based version shown in chapter 5. Its fields are almost identical, and it emits similar events. What’s different is that its business logic is implemented in terms of processing commands that emit events and applying those events, which updates its state. Each method that creates or updates the JPA-based aggregate, such as createOrder() and reviseOrder(), is replaced in the event sourcing version by process() and apply() methods. 
 
-Listing 6.1 The **Order** aggregate’s fields and its methods that initialize an instance public class Order { private OrderState state; private Long consumerId; private Long restaurantId; private OrderLineItems orderLineItems; private DeliveryInformation deliveryInformation; private PaymentInformation paymentInformation; private Money orderMinimum; 
+Listing 6.1 The **Order** aggregate’s fields and its methods that initialize an instance 
 
+```java
+public class Order { 
+  private OrderState state; 
+  private Long consumerId; 
+  private Long restaurantId; 
+  private OrderLineItems orderLineItems; 
+  private DeliveryInformation deliveryInformation; 
+  private PaymentInformation paymentInformation; 
+  private Money orderMinimum; 
 
-public Order() { } 
+  public Order() { } 
 
-**Validates the command and returns an OrderCreatedEvent**
-public List<Event> process(CreateOrderCommand command) { ... validate command ... return events(new OrderCreatedEvent(command.getOrderDetails())); } public void apply(OrderCreatedEvent event) { OrderDetails orderDetails = event.getOrderDetails(); this.orderLineItems = new OrderLineItems(orderDetails.getLineItems()); this.orderMinimum = orderDetails.getOrderMinimum(); this.state = APPROVAL_PENDING; } **Apply the OrderCreatedEvent by** 
+  public List<Event> process(CreateOrderCommand command) { 
+    ... validate command ... 
+    return events(new OrderCreatedEvent(command.getOrderDetails())); 
+  } 
 
-**Apply the OrderCreatedEvent by initializing the fields of the Order.** 
+  public void apply(OrderCreatedEvent event) { 
+    OrderDetails orderDetails = event.getOrderDetails(); 
+    this.orderLineItems = new OrderLineItems(orderDetails.getLineItems()); 
+    this.orderMinimum = orderDetails.getOrderMinimum(); 
+    this.state = APPROVAL_PENDING; 
+  } 
+}
+```
 
 This class’s fields are similar to those of the JPA-based Order. The only difference is that the aggregate’s id isn’t stored in the aggregate. The Order’s methods are quite different. The createOrder() factory method has been replaced by process() and apply() methods. The process() method takes a CreateOrder command and emits an OrderCreated event. The apply() method takes the OrderCreated and initializes the fields of the Order. 
 
 We’ll now look at the slightly more complex business logic for revising an order. Previously this business logic consisted of three methods: reviseOrder(), confirmRevision(), and rejectRevision(). The event sourcing version replaces these three methods with three process() methods and some apply() methods. The following listing shows the event sourcing version of reviseOrder() and confirmRevision(). 
 
-Listing 6.2 The **process()** and **apply()** methods that revise an **Order** aggregate public class Order { **Verify that the Order can be revised and** public List<Event> process(ReviseOrder command) { **that the revised** OrderRevision orderRevision = command.getOrderRevision(); **order meets the** switch (state) { **order minimum.** case APPROVED: LineItemQuantityChange change = orderLineItems.lineItemQuantityChange(orderRevision); if (change.newOrderTotal.isGreaterThanOrEqual(orderMinimum)) { throw new OrderMinimumNotMetException(); } return singletonList(new OrderRevisionProposed(orderRevision, change.currentOrderTotal, change.newOrderTotal)); 
+Listing 6.2 The **process()** and **apply()** methods that revise an **Order** aggregate 
 
-**Verify that the Order can be revised and that the revised order meets the order minimum.**
-default: throw new UnsupportedStateTransitionException(state); 
+```java
+public class Order { 
+  public List<Event> process(ReviseOrder command) { 
+    OrderRevision orderRevision = command.getOrderRevision(); 
+    switch (state) { 
+      case APPROVED: 
+        LineItemQuantityChange change = orderLineItems.lineItemQuantityChange(orderRevision); 
+        if (change.newOrderTotal.isGreaterThanOrEqual(orderMinimum)) { 
+          throw new OrderMinimumNotMetException(); 
+        } 
+        return singletonList(new OrderRevisionProposed(orderRevision, change.currentOrderTotal, change.newOrderTotal)); 
+      default: 
+        throw new UnsupportedStateTransitionException(state); 
+    } 
+  } 
 
-} } public void apply(OrderRevisionProposed event) { this.state = REVISION_PENDING; 
+  public void apply(OrderRevisionProposed event) { 
+    this.state = REVISION_PENDING; 
+  } 
 
-**Change the state of the Order to REVISION_PENDING.** 
+  public List<Event> process(ConfirmReviseOrder command) { 
+    OrderRevision orderRevision = command.getOrderRevision(); 
+    switch (state) { 
+      case REVISION_PENDING: 
+        LineItemQuantityChange licd = orderLineItems.lineItemQuantityChange(orderRevision); 
+        return singletonList(new OrderRevised(orderRevision, licd.currentOrderTotal, licd.newOrderTotal)); 
+      default: 
+        throw new UnsupportedStateTransitionException(state); 
+    } 
+  } 
 
-} 
-
-
-_**Developing business logic using event sourcing**_ 
-
-
-public List<Event> process(ConfirmReviseOrder command) { OrderRevision orderRevision = command.getOrderRevision(); switch (state) { case REVISION_PENDING: LineItemQuantityChange licd = orderLineItems.lineItemQuantityChange(orderRevision); return singletonList(new OrderRevised(orderRevision, licd.currentOrderTotal, licd.newOrderTotal)); default: throw new UnsupportedStateTransitionException(state); } 
-
-**Verify that the revision can be confirmed and return an OrderRevised event.** 
-
-} 
-
-**Revise the Order.**
-public void apply(OrderRevised event) { OrderRevision orderRevision = event.getOrderRevision(); if (!orderRevision.getRevisedLineItemQuantities().isEmpty()) { orderLineItems.updateLineItems(orderRevision); } this.state = APPROVED; } 
+  public void apply(OrderRevised event) { 
+    OrderRevision orderRevision = event.getOrderRevision(); 
+    if (!orderRevision.getRevisedLineItemQuantities().isEmpty()) { 
+      orderLineItems.updateLineItems(orderRevision); 
+    } 
+    this.state = APPROVED; 
+  } 
+}
+```
 
 As you can see, each method has been replaced by a process() method and one or more apply() methods. The reviseOrder() method has been replaced by process (ReviseOrder) and apply(OrderRevisionProposed). Similarly, confirmRevision() has been replaced by process(ConfirmReviseOrder) and apply(OrderRevised). 
 
@@ -287,7 +331,11 @@ As you can see, each method has been replaced by a process() method and one or m
 
 It’s not uncommon for two or more requests to simultaneously update the same aggregate. An application that uses traditional persistence often uses optimistic locking to prevent one transaction from overwriting another’s changes. _Optimistic locking_ typically uses a version column to detect whether an aggregate has changed since it was read. The application maps the aggregate root to a table that has a VERSION column, which is incremented whenever the aggregate is updated. The application updates the aggregate using an UPDATE statement like this: 
 
-UPDATE AGGREGATE_ROOT_TABLE SET VERSION = VERSION + 1 ... WHERE VERSION = <original version> 
+```sql
+UPDATE AGGREGATE_ROOT_TABLE 
+SET VERSION = VERSION + 1 ... 
+WHERE VERSION = <original version> 
+```
 
 This UPDATE statement will only succeed if the version is unchanged from when the application read the aggregate. If two transactions read the same aggregate, the first one that updates the aggregate will succeed. The second one will fail because the version number has changed, so it won’t accidentally overwrite the first transaction’s changes. 
 
@@ -304,7 +352,11 @@ Chapter 3 describes a couple of different mechanisms—polling and transaction l
 
 # USING POLLING TO PUBLISH EVENTS 
 
-If events are stored in the EVENTS table shown in figure 6.6, an event publisher can poll the table for new events by executing a SELECT statement and publish the events to a message broker. The challenge is determining which events are new. For example, imagine that eventIds are monotonically increasing. The superficially appealing approach is for the event publisher to record the last eventId that it has processed. It would then retrieve new events using a query like this: SELECT * FROM EVENTS where event_id > ? ORDER BY event_id ASC. 
+If events are stored in the EVENTS table shown in figure 6.6, an event publisher can poll the table for new events by executing a SELECT statement and publish the events to a message broker. The challenge is determining which events are new. For example, imagine that eventIds are monotonically increasing. The superficially appealing approach is for the event publisher to record the last eventId that it has processed. It would then retrieve new events using a query like this: 
+
+```sql
+SELECT * FROM EVENTS where event_id > ? ORDER BY event_id ASC 
+```
 
 The problem with this approach is that transactions can commit in an order that’s different from the order in which they generate events. As a result, the event publisher can accidentally skip over an event. Figure 6.6 shows such as a scenario. 
 
@@ -326,11 +378,19 @@ In this scenario, Transaction _A_ inserts an event with an EVENT_ID of 1010. Nex
 
 One solution to this problem is to add an extra column to the EVENTS table that tracks whether an event has been published. The event publisher would then use the following process: 
 
-- 1 Find unpublished events by executing this SELECT statement: SELECT * FROM EVENTS where PUBLISHED = 0 ORDER BY event_id ASC. 
+- 1 Find unpublished events by executing this SELECT statement: 
+
+```sql
+SELECT * FROM EVENTS where PUBLISHED = 0 ORDER BY event_id ASC 
+```
 
 - 2 Publish events to the message broker. 
 
-- 3 Mark the events as having been published: UPDATE EVENTS SET PUBLISHED = 1 WHERE EVENT_ID in. 
+- 3 Mark the events as having been published: 
+
+```sql
+UPDATE EVENTS SET PUBLISHED = 1 WHERE EVENT_ID in (...) 
+```
 
 This approach prevents the event publisher from skipping events. 
 
@@ -363,7 +423,15 @@ In this example, the snapshot version is _N_ . The application only needs to loa
 
 When restoring the state of an aggregate from a snapshot, an application first creates an aggregate instance from the snapshot and then iterates through the events, applying them. For example, the Eventuate Client framework, described in section 6.2.2, uses code similar to the following to reconstruct an aggregate: 
 
-Class aggregateClass = ...; Snapshot snapshot = ...; Aggregate aggregate = recreateFromSnapshot(aggregateClass, snapshot); for (Event event : events) { aggregate = aggregate.applyEvent(event); } // use aggregate... 
+```java
+Class aggregateClass = ...; 
+Snapshot snapshot = ...; 
+Aggregate aggregate = recreateFromSnapshot(aggregateClass, snapshot); 
+for (Event event : events) { 
+  aggregate = aggregate.applyEvent(event); 
+} 
+// use aggregate... 
+```
 
 When using snapshots, the aggregate instance is recreated from the snapshot instead of being created using its default constructor. If an aggregate has a simple, easily serializable structure, the snapshot can be, for example, its JSON serialization. More complex aggregates can be snapshotted using the Memento pattern (https://en.wikipedia .org/wiki/Memento_pattern). 
 
@@ -594,16 +662,45 @@ The event database consists of three tables:
 
 The central table is the events table. The structure of this table is very similar to the table shown in figure 6.2. Here’s its definition: 
 
-
-create table events ( event_id varchar(1000) PRIMARY KEY, event_type varchar(1000), event_data varchar(1000) NOT NULL, entity_type VARCHAR(1000) NOT NULL, entity_id VARCHAR(1000) NOT NULL, triggering_event VARCHAR(1000) ); 
+```sql
+create table events ( 
+  event_id varchar(1000) PRIMARY KEY, 
+  event_type varchar(1000), 
+  event_data varchar(1000) NOT NULL, 
+  entity_type VARCHAR(1000) NOT NULL, 
+  entity_id VARCHAR(1000) NOT NULL, 
+  triggering_event VARCHAR(1000) 
+); 
+```
 
 The triggering_event column is used to detect duplicate events/messages. It stores the ID of the message/event whose processing generated this event. 
 
-The entities table stores the current version of each entity. It’s used to implement optimistic locking. Here’s the definition of this table: create table entities ( entity_type VARCHAR(1000), entity_id VARCHAR(1000), entity_version VARCHAR(1000) NOT NULL, PRIMARY KEY(entity_type, entity_id) ); 
+The entities table stores the current version of each entity. It’s used to implement optimistic locking. Here’s the definition of this table: 
+
+```sql
+create table entities ( 
+  entity_type VARCHAR(1000), 
+  entity_id VARCHAR(1000), 
+  entity_version VARCHAR(1000) NOT NULL, 
+  PRIMARY KEY(entity_type, entity_id) 
+); 
+```
 
 When an entity is created, a row is inserted into this table. Each time an entity is updated, the entity_version column is updated. 
 
-The snapshots table stores the snapshots of each entity. Here’s the definition of this table: create table snapshots ( entity_type VARCHAR(1000), entity_id VARCHAR(1000), entity_version VARCHAR(1000), snapshot_type VARCHAR(1000) NOT NULL, snapshot_json VARCHAR(1000) NOT NULL, triggering_events VARCHAR(1000), PRIMARY KEY(entity_type, entity_id, entity_version) ) 
+The snapshots table stores the snapshots of each entity. Here’s the definition of this table: 
+
+```sql
+create table snapshots ( 
+  entity_type VARCHAR(1000), 
+  entity_id VARCHAR(1000), 
+  entity_version VARCHAR(1000), 
+  snapshot_type VARCHAR(1000) NOT NULL, 
+  snapshot_json VARCHAR(1000) NOT NULL, 
+  triggering_events VARCHAR(1000), 
+  PRIMARY KEY(entity_type, entity_id, entity_version) 
+); 
+```
 
 The entity_type and entity_id columns specify the snapshot’s entity. The snapshot _json column is the serialized representation of the snapshot, and the snapshot_type is its type. The entity_version specifies the version of the entity that this is a snapshot of. 
 
@@ -617,11 +714,14 @@ _**Implementing an event store**_
 
 also performs an optimistic locking check by updating the entity version in the entities table using this UPDATE statement: 
 
-# UPDATE entities SET entity_version = ? 
-
+```sql
+UPDATE entities 
+SET entity_version = ? 
 WHERE entity_type = ? and entity_id = ? and entity_version = ? 
+```
 
-This statement verifies that the version is unchanged since it was retrieved by the find() operation. It also updates the entity_version to the new version. The update() operation performs these updates within a transaction in order to ensure atomicity. 
+This statement verifies that the version is unchanged since it was retrieved by the find() operation. 
+ It also updates the entity_version to the new version. The update() operation performs these updates within a transaction in order to ensure atomicity. 
 
 Now that we’ve looked at how Eventuate Local stores an aggregate’s events and snapshots, let’s see how a client subscribes to events using Eventuate Local’s event broker. 
 
@@ -673,16 +773,13 @@ The Order class you saw earlier extends ReflectiveMutableCommandProcessingAggreg
 
 Listing 6.3 The Eventuate version of the **Order** class 
 
-- public class Order extends ReflectiveMutableCommandProcessingAggregate<Order, OrderCommand> { 
-
-public List<Event> process(CreateOrderCommand command) { ... } public void apply(OrderCreatedEvent event) { ... } 
-
-
-_**Implementing an event store**_ 
-
-... 
-
-} 
+```java
+public class Order extends ReflectiveMutableCommandProcessingAggregate<Order, OrderCommand> { 
+  public List<Event> process(CreateOrderCommand command) { ... } 
+  public void apply(OrderCreatedEvent event) { ... } 
+  ... 
+}
+```
 
 The two type parameters passed to ReflectiveMutableCommandProcessingAggregate are Order and OrderCommand, which is the base interface for Order’s commands. 
 
@@ -735,13 +832,19 @@ The AggregateRepository class is primarily used by services, which create and up
 
 Listing 6.4 **OrderService** uses an **AggregateRepository** 
 
-- public class OrderService { private AggregateRepository<Order, OrderCommand> orderRepository; 
+```java
+public class OrderService { 
+  private AggregateRepository<Order, OrderCommand> orderRepository; 
 
-public OrderService(AggregateRepository<Order, OrderCommand> orderRepository) { this.orderRepository = orderRepository; 
+  public OrderService(AggregateRepository<Order, OrderCommand> orderRepository) { 
+    this.orderRepository = orderRepository; 
+  } 
 
-} public EntityWithIdAndVersion<Order> createOrder(OrderDetails orderDetails) { return orderRepository.save(new CreateOrder(orderDetails)); } 
-
-} 
+  public EntityWithIdAndVersion<Order> createOrder(OrderDetails orderDetails) { 
+    return orderRepository.save(new CreateOrder(orderDetails)); 
+  } 
+}
+```
 
 OrderService is injected with an AggregateRepository for Orders. Its create() method invokes AggregateRepository.save() with a CreateOrder command. 
 
@@ -751,15 +854,16 @@ The Eventuate Client framework also provides an API for writing event handlers. 
 
 Listing 6.5 An event handler for **OrderCreatedEvent** 
 
-@EventSubscriber(id="orderServiceEventHandlers") public class OrderServiceEventHandlers { 
-
-- @EventHandlerMethod 
-
-> public void creditReserved(EventHandlerContext<CreditReserved> ctx) { CreditReserved event = ctx.getEvent(); 
-
-... 
-
-} 
+```java
+@EventSubscriber(id="orderServiceEventHandlers") 
+public class OrderServiceEventHandlers { 
+  @EventHandlerMethod 
+  public void creditReserved(EventHandlerContext<CreditReserved> ctx) { 
+    CreditReserved event = ctx.getEvent(); 
+    ... 
+  } 
+}
+```
 
 
 _**Using sagas and event sourcing together**_ 
@@ -931,11 +1035,22 @@ _**Using sagas and event sourcing together**_
 
 The AccountingServiceCommandHandler shown in the following listing handles the AuthorizeAccount command message by calling AggregateRepository.update() to update the Account aggregate. 
 
-Listing 6.6 Handles command messages sent by sagas public class AccountingServiceCommandHandler { 
+Listing 6.6 Handles command messages sent by sagas 
 
-@Autowired private AggregateRepository<Account, AccountCommand> accountRepository; public void authorize(CommandMessage<AuthorizeCommand> cm) { AuthorizeCommand command = cm.getCommand(); accountRepository.update(command.getOrderId(), command, replyingTo(cm) .catching(AccountDisabledException.class, () -> withFailure(new AccountDisabledReply())) .build()); } 
+```java
+public class AccountingServiceCommandHandler { 
+  @Autowired 
+  private AggregateRepository<Account, AccountCommand> accountRepository; 
 
-... 
+  public void authorize(CommandMessage<AuthorizeCommand> cm) { 
+    AuthorizeCommand command = cm.getCommand(); 
+    accountRepository.update(command.getOrderId(), command, replyingTo(cm) 
+      .catching(AccountDisabledException.class, () -> withFailure(new AccountDisabledReply())) 
+      .build()); 
+  } 
+  ... 
+}
+```
 
 The authorize() method invokes an AggregateRepository to update the Account aggregate. The third argument to update(), which is the UpdateOptions, is computed by this expression: replyingTo(cm) .catching(AccountDisabledException.class, () -> withFailure(new AccountDisabledReply())) .build() 
 

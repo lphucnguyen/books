@@ -153,11 +153,16 @@ Sometimes you must make major, incompatible changes to an API. Because you can�
 
 _**Overview of interprocess communication in a microservice architecture**_ 
 
-Another option is to use HTTP’s content negotiation mechanism and include the version number in the MIME type. For example, a client would request version 1.x of an Order using a request like this: 
+another option is to use HTTP’s content negotiation mechanism and include the version number in the MIME type. For example, a client would request version 1.x of an Order using a request like this: 
 
-GET /orders/xyz HTTP/1.1 Accept: application/vnd.example.resource+json; version=1 ... 
+```http
+GET /orders/xyz HTTP/1.1 
+Accept: application/vnd.example.resource+json; version=1 
+... 
+```
 
 This request tells the Order Service that the client expects a version 1.x response. 
+
 
 In order to support multiple versions of an API, the service’s adapters that implement the APIs will contain logic that translates between the old and new versions. Also, as described in chapter 8, the API gateway will almost certainly use versioned APIs. It may even have to support numerous older versions of an API. 
 
@@ -308,11 +313,32 @@ A gRPC API consists of one or more services and request/response message definit
 Listing 3.1 shows an excerpt of the gRPC API for the Order Service. It defines several methods, including createOrder(). This method takes a CreateOrderRequest as a parameter and returns a CreateOrderReply. 
 
 Listing 3.1 An excerpt of the gRPC API for the **Order Service**
-service OrderService { rpc createOrder(CreateOrderRequest) returns (CreateOrderReply) {} 
 
+```protobuf
+service OrderService { 
+  rpc createOrder(CreateOrderRequest) returns (CreateOrderReply) {} 
+  rpc cancelOrder(CancelOrderRequest) returns (CancelOrderReply) {} 
+  rpc reviseOrder(ReviseOrderRequest) returns (ReviseOrderReply) {} 
+  ... 
+} 
 
-_**Communicating using the synchronous Remote procedure invocation pattern**_
-rpc cancelOrder(CancelOrderRequest) returns (CancelOrderReply) {} rpc reviseOrder(ReviseOrderRequest) returns (ReviseOrderReply) {} ... } message CreateOrderRequest { int64 restaurantId = 1; int64 consumerId = 2; repeated LineItem lineItems = 3; ... } message LineItem { string menuItemId = 1; int32 quantity = 2; } message CreateOrderReply { int64 orderId = 1; } ... 
+message CreateOrderRequest { 
+  int64 restaurantId = 1; 
+  int64 consumerId = 2; 
+  repeated LineItem lineItems = 3; 
+  ... 
+} 
+
+message LineItem { 
+  string menuItemId = 1; 
+  int32 quantity = 2; 
+} 
+
+message CreateOrderReply { 
+  int64 orderId = 1; 
+} 
+... 
+```
 
 CreateOrderRequest and CreateOrderReply are typed messages. For example, CreateOrderRequest message has a restaurantId field of type int64. The field’s tag value is 1. gRPC has several benefits: 
 
@@ -907,11 +933,17 @@ PUBLISHING EVENTS BY USING THE POLLING PUBLISHER PATTERN
 
 If the application uses a relational database, a very simple way to publish the messages inserted into the OUTBOX table is for the MessageRelay to poll the table for unpublished messages. It periodically queries the table: 
 
+```sql
 SELECT * FROM OUTBOX ORDERED BY ... ASC 
+```
 
 Next, the MessageRelay publishes those messages to the message broker, sending one to its destination message channel. Finally, it deletes those messages from the OUTBOX table: 
 
-BEGIN DELETE FROM OUTBOX WHERE ID in (....) COMMIT 
+```sql
+BEGIN 
+DELETE FROM OUTBOX WHERE ID in (....) 
+COMMIT 
+```
 
 # Pattern: Polling publisher 
 
@@ -994,30 +1026,45 @@ Let’s take a look at the Eventuate Tram APIs.
 
 The basic messaging API consists of two Java interfaces: MessageProducer and MessageConsumer. A producer service uses the MessageProducer interface to publish messages to message channels. Here’s an example of using this interface: 
 
-MessageProducer messageProducer = ...; String channel = ...; String payload = ...; messageProducer.send(destination, MessageBuilder.withPayload(payload).build()) 
+```java
+MessageProducer messageProducer = ...; 
+String channel = ...; 
+String payload = ...; 
+messageProducer.send(destination, MessageBuilder.withPayload(payload).build());
+```
 
 A consumer service uses the MessageConsumer interface to subscribe to messages: 
 
-MessageConsumer messageConsumer; messageConsumer.subscribe(subscriberId, Collections.singleton(destination), message -> { ... }) 
+```java
+MessageConsumer messageConsumer; 
+messageConsumer.subscribe(subscriberId, Collections.singleton(destination), message -> { ... });
+```
 
 MessageProducer and MessageConsumer are the foundation of the higher-level APIs for asynchronous request/response and domain event publishing. 
 
 Let’s talk about how to publish and subscribe to events. 
 
-
 # DOMAIN EVENT PUBLISHING 
 
 Eventuate Tram has APIs for publishing and consuming domain events. Chapter 5 explains that domain events are events that are emitted by an _aggregate_ (business object) when it’s created, updated, or deleted. A service publishes a domain event using the DomainEventPublisher interface. Here is an example: 
 
+```java
 DomainEventPublisher domainEventPublisher; 
-
 String accountId = ...; 
-
-DomainEvent domainEvent = new AccountDebited(...); domainEventPublisher.publish("Account", accountId, Collections.singletonList( domainEvent)); 
+DomainEvent domainEvent = new AccountDebited(...); 
+domainEventPublisher.publish("Account", accountId, Collections.singletonList(domainEvent));
+```
 
 A service consumes domain events using the DomainEventDispatcher. An example follows: 
 
-DomainEventHandlers domainEventHandlers = DomainEventHandlersBuilder .forAggregateType("Order") .onEvent(AccountDebited.class, domainEvent -> { ... }) .build(); new DomainEventDispatcher("eventDispatcherId", domainEventHandlers, messageConsumer); 
+```java
+DomainEventHandlers domainEventHandlers = DomainEventHandlersBuilder 
+  .forAggregateType("Order") 
+  .onEvent(AccountDebited.class, domainEvent -> { ... }) 
+  .build(); 
+
+new DomainEventDispatcher("eventDispatcherId", domainEventHandlers, messageConsumer);
+```
 
 Events aren’t the only high-level messaging pattern supported by Eventuate Tram. It also supports command/reply-based messaging. 
 
@@ -1025,21 +1072,23 @@ Events aren’t the only high-level messaging pattern supported by Eventuate Tra
 
 A client can send a command message to a service using the CommandProducer interface. For example 
 
+```java
 CommandProducer commandProducer = ...; 
-
 Map<String, String> extraMessageHeaders = Collections.emptyMap(); 
-
-String commandId = commandProducer.send("CustomerCommandChannel", new DoSomethingCommand(), "ReplyToChannel", extraMessageHeaders); 
+String commandId = commandProducer.send("CustomerCommandChannel", new DoSomethingCommand(), "ReplyToChannel", extraMessageHeaders);
+```
 
 A service consumes command messages using the CommandDispatcher class. CommandDispatcher uses the MessageConsumer interface to subscribe to specified events. It dispatches each command message to the appropriate handler method. Here’s an example: 
 
-CommandHandlers commandHandlers =CommandHandlersBuilder .fromChannel(commandChannel) .onMessage(DoSomethingCommand.class, (command) - > { ... ; return withSuccess(); }) .build(); 
+```java
+CommandHandlers commandHandlers = CommandHandlersBuilder 
+  .fromChannel(commandChannel) 
+  .onMessage(DoSomethingCommand.class, (command) -> { ... ; return withSuccess(); }) 
+  .build(); 
 
-
-_**Using asynchronous messaging to improve availability**_ 
-
-
-CommandDispatcher dispatcher = new CommandDispatcher("subscribeId", commandHandlers, messageConsumer, messageProducer); 
+CommandDispatcher dispatcher = new CommandDispatcher("subscribeId", commandHandlers, messageConsumer, messageProducer);
+```
+ 
 
 Throughout this book, you’ll see code examples that use these APIs for sending and receiving messages. 
 

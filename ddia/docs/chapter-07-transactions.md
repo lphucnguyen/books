@@ -1,4 +1,4 @@
-# **CHAPTER 7 Transactions** 
+# Transactions
 
 _Some authors have claimed that general two-phase commit is too expensive to support, because of the performance or availability problems that it brings. We believe it is better to have application programmers deal with performance problems due to overuse of transactions as bottlenecks arise, rather than always coding around the lack of transactions._ 
 
@@ -33,7 +33,7 @@ In this chapter, we will examine many examples of things that can go wrong, and 
 
 This chapter applies to both single-node and distributed databases; in Chapter 8 we will focus the discussion on the particular challenges that arise only in distributed systems. 
 
-# **The Slippery Concept of a Transaction** 
+## The slippery concept of a transaction
 
 Almost all relational databases today, and some nonrelational databases, support transactions. Most of them follow the style that was introduced in 1975 by IBM System R, the first SQL database [1, 2, 3]. Although some implementation details have changed, the general idea has remained virtually the same for 40 years: the transaction support in MySQL, PostgreSQL, Oracle, SQL Server, etc., is uncannily similar to that of System R. 
 
@@ -156,8 +156,8 @@ Concurrently running transactions shouldn’t interfere with each other. For exa
 
 These definitions assume that you want to modify several objects (rows, documents, records) at once. Such _multi-object transactions_ are often needed if several pieces of data need to be kept in sync. Figure 7-2 shows an example from an email application. To display the number of unread messages for a user, you could query something like: 
 
-```
-SELECTCOUNT(*) FROMemailsWHERErecipient_id=2ANDunread_flag=true
+```sql
+SELECT COUNT(*) FROM emails WHERE recipient_id = 2 AND unread_flag = true;
 ```
 
 However, you might find this query to be too slow if there are many emails, and decide to store the number of unread messages in a separate field (a kind of denormalization). Now, whenever a new message comes in, you have to increment the unread counter as well, and whenever a message is marked as read, you also have to decrement the unread counter. 
@@ -246,7 +246,7 @@ Although retrying an aborted transaction is a simple and effective error handlin
 - If the client process fails while retrying, any data it was trying to write to the database is lost. 
 
 
-# **Weak Isolation Levels** 
+## Weak isolation levels
 
 If two transactions don’t touch the same data, they can safely be run in parallel, because neither depends on the other. Concurrency issues (race conditions) only come into play when one transaction reads data that is concurrently modified by another transaction, or when two transactions try to simultaneously modify the same data. 
 
@@ -462,8 +462,8 @@ Because this is such a common problem, a variety of solutions have been develope
 
 Many databases provide atomic update operations, which remove the need to implement read-modify-write cycles in application code. They are usually the best solution if your code can be expressed in terms of those operations. For example, the following instruction is concurrency-safe in most relational databases: 
 
-```
-UPDATEcountersSETvalue=value+1WHEREkey='foo';
+```sql
+UPDATE counters SET value = value + 1 WHERE key = 'foo';
 ```
 
 Similarly, document databases such as MongoDB provide atomic operations for making local modifications to a part of a JSON document, and Redis provides atomic operations for modifying data structures such as priority queues. Not all writes can easily be expressed in terms of atomic operations—for example, updates to a wiki page involve arbitrary text editing[viii] —but in situations where atomic operations can be used, they are usually the best choice. 
@@ -485,21 +485,19 @@ For example, consider a multiplayer game in which several players can move the s
 
 _Example 7-1. Explicitly locking rows to prevent lost updates_ 
 
-# **`BEGIN`** `TRANSACTION;` 
+```sql
+BEGIN TRANSACTION;
 
-```
-SELECT*FROMfigures
-WHEREname='robot'ANDgame_id=222
-FORUPDATE;
-```
+SELECT * FROM figures
+WHERE name = 'robot' AND game_id = 222
+FOR UPDATE;
 
-```
 -- Check whether move is valid, then update the position
 -- of the piece that was returned by the previous SELECT.
-UPDATEfiguresSETposition='c4'WHEREid=1234;
-```
+UPDATE figures SET position = 'c4' WHERE id = 1234;
 
-# **`COMMIT`** `;` 
+COMMIT;
+```
 
 The `FOR UPDATE` clause indicates that the database should take a lock on all rows returned by this query. 
 
@@ -520,7 +518,11 @@ In databases that don’t provide transactions, you sometimes find an atomic com
 
 For example, to prevent two users concurrently updating the same wiki page, you might try something like this, expecting the update to occur only if the content of the page hasn’t changed since the user started editing it: 
 
-- _`-- This may or may not be safe, depending on the database implementation`_ **`UPDATE`** `wiki_pages` **`SET`** `content = 'new content'` **`WHERE`** `id = 1234` **`AND`** `content = 'old content';` 
+```sql
+-- This may or may not be safe, depending on the database implementation
+UPDATE wiki_pages SET content = 'new content'
+WHERE id = 1234 AND content = 'old content';
+```
 
 If the content has changed and no longer matches `'old content'` , this update will have no effect, so you need to check whether the update took effect and retry if necessary. However, if the database allows the `WHERE` clause to read from an old snapshot, this statement may not prevent lost updates, because the condition may be true even though another concurrent write is occurring. Check whether your database’s compare-and-set operation is safe before relying on it. 
 
@@ -577,24 +579,19 @@ We saw that there are various different ways of preventing lost updates. With wr
 
 - If you can’t use a serializable isolation level, the second-best option in this case is probably to explicitly lock the rows that the transaction depends on. In the doctors example, you could write something like the following: 
 
-```
-BEGINTRANSACTION;
-```
+```sql
+BEGIN TRANSACTION;
 
-```
-SELECT*FROMdoctors
-WHEREon_call=true
-ANDshift_id=1234FORUPDATE;
-```
+SELECT * FROM doctors
+WHERE on_call = true
+AND shift_id = 1234
+FOR UPDATE;
 
-```
-UPDATEdoctors
-SETon_call=false
-WHEREname='Alice'
-ANDshift_id=1234;
-```
+UPDATE doctors
+SET on_call = false
+WHERE name = 'Alice'
+AND shift_id = 1234;
 
-```
 COMMIT;
 ```
 
@@ -611,23 +608,21 @@ Say you want to enforce that there cannot be two bookings for the same meeting r
 
 _Example 7-2. A meeting room booking system tries to avoid double-booking (not safe under snapshot isolation)_ 
 
-# **`BEGIN`** `TRANSACTION;` 
+```sql
+BEGIN TRANSACTION;
 
-```
 -- Check for any existing bookings that overlap with the period of noon-1pm
-SELECTCOUNT(*) FROMbookings
-WHEREroom_id=123AND
-end_time>'2015-01-01 12:00'ANDstart_time<'2015-01-01 13:00';
-```
+SELECT COUNT(*) FROM bookings
+WHERE room_id = 123 AND
+      end_time > '2015-01-01 12:00' AND start_time < '2015-01-01 13:00';
 
-```
 -- If the previous query returned zero:
-INSERTINTObookings
+INSERT INTO bookings
   (room_id, start_time, end_time, user_id)
 VALUES (123, '2015-01-01 12:00', '2015-01-01 13:00', 666);
-```
 
-# **`COMMIT`** `;` 
+COMMIT;
+```
 
 Unfortunately, snapshot isolation does not prevent another user from concurrently inserting a conflicting meeting. In order to guarantee you won’t get scheduling conflicts, you once again need serializable isolation. 
 
@@ -675,7 +670,7 @@ Now a transaction that wants to create a booking can lock ( `SELECT FOR UPDATE` 
 
 This approach is called _materializing conflicts_ , because it takes a phantom and turns it into a lock conflict on a concrete set of rows that exist in the database [11]. Unfortunately, it can be hard and error-prone to figure out how to materialize conflicts, and it’s ugly to let a concurrency control mechanism leak into the application data model. For those reasons, materializing conflicts should be considered a last resort if no alternative is possible. A serializable isolation level is much preferable in most cases. 
 
-# **Serializability** 
+## Serializability
 
 In this chapter we have seen several examples of transactions that are prone to race conditions. Some race conditions are prevented by the read committed and snapshot isolation levels, but others are not. We encountered some particularly tricky examples with write skew and phantoms. It’s a sad situation: 
 
@@ -845,11 +840,11 @@ In the meeting room booking example this means that if one transaction has searc
 
 How do we implement this? Conceptually, we need a _predicate lock_ [3]. It works similarly to the shared/exclusive lock described earlier, but rather than belonging to a particular object (e.g., one row in a table), it belongs to all objects that match some search condition, such as: 
 
-```
-SELECT*FROMbookings
-WHEREroom_id=123AND
-end_time>'2018-01-01 12:00'AND
-start_time<'2018-01-01 13:00';
+```sql
+SELECT * FROM bookings
+WHERE room_id = 123 AND
+      end_time > '2018-01-01 12:00' AND
+      start_time < '2018-01-01 13:00';
 ```
 
 A predicate lock restricts access as follows: 
