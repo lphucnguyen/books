@@ -1,4 +1,4 @@
-# The trouble with distributed systems
+# Chapter 8. The Trouble with Distributed Systems
 
 _Hey I just met you The network’s laggy But here’s my data So store it maybe_ 
 
@@ -36,7 +36,7 @@ In a distributed system, there may well be some parts of the system that are bro
 
 This nondeterminism and possibility of partial failures is what makes distributed systems hard to work with [5]. 
 
-# **Cloud Computing and Supercomputing** 
+### Cloud Computing and Supercomputing 
 
 There is a spectrum of philosophies on how to build large-scale computing systems: 
 
@@ -118,7 +118,7 @@ The sender can’t even tell whether the packet was delivered: the only option i
 
 The usual way of handling this issue is a _timeout_ : after some time you give up waiting and assume that the response is not going to arrive. However, when a timeout occurs, you still don’t know whether the remote node got your request or not (and if the request is still queued somewhere, it may still be delivered to the recipient, even if the sender has given up on it). 
 
-# **Network Faults in Practice** 
+### Network Faults in Practice 
 
 We have been building computer networks for decades—one might hope that by now we would have figured out how to make them reliable. However, it seems that we have not yet succeeded. 
 
@@ -141,7 +141,7 @@ If the error handling of network faults is not defined and tested, arbitrarily b
 
 Handling network faults doesn’t necessarily mean _tolerating_ them: if your network is normally fairly reliable, a valid approach may be to simply show an error message to users while your network is experiencing problems. However, you do need to know how your software reacts to network problems and ensure that the system can recover from them. It may make sense to deliberately trigger network problems and test the system’s response (this is the idea behind Chaos Monkey; see “Reliability” on page 6). 
 
-# **Detecting Faults** 
+### Detecting Faults 
 
 Many systems need to automatically detect faulty nodes. For example: 
 
@@ -164,7 +164,7 @@ Rapid feedback about a remote node being down is useful, but you can’t count o
 
 Conversely, if something has gone wrong, you may get an error response at some level of the stack, but in general you have to assume that you will get no response at all. You can retry a few times (TCP retries transparently, but you may also retry at the application level), wait for a timeout to elapse, and eventually declare the node dead if you don’t hear back within the timeout. 
 
-# **Timeouts and Unbounded Delays** 
+### Timeouts and Unbounded Delays 
 
 If a timeout is the only sure way of detecting a fault, then how long should the timeout be? There is unfortunately no simple answer. 
 
@@ -219,7 +219,7 @@ In such environments, you can only choose timeouts experimentally: measure the d
 
 Even better, rather than using configured constant timeouts, systems can continually measure response times and their variability ( _jitter_ ), and automatically adjust timeouts according to the observed response time distribution. This can be done with a Phi Accrual failure detector [30], which is used for example in Akka and Cassandra [31]. TCP retransmission timeouts also work similarly [27]. 
 
-# **Synchronous Versus Asynchronous Networks** 
+### Synchronous Versus Asynchronous Networks 
 
 Distributed systems would be a lot simpler if we could rely on the network to deliver packets with some fixed maximum delay, and not to drop packets. Why can’t we solve this at the hardware level and make the network reliable so that the software doesn’t need to worry about it? 
 
@@ -297,7 +297,7 @@ Moreover, each machine on the network has its own clock, which is an actual hard
 
 slower than on other machines. It is possible to synchronize clocks to some degree: the most commonly used mechanism is the Network Time Protocol (NTP), which allows the computer clock to be adjusted according to the time reported by a group of servers [37]. The servers in turn get their time from a more accurate time source, such as a GPS receiver. 
 
-# **Monotonic Versus Time-of-Day Clocks** 
+### Monotonic Versus Time-of-Day Clocks 
 
 Modern computers have at least two different kinds of clocks: a _time-of-day clock_ and a _monotonic clock_ . Although they both measure time, it is important to distinguish the two, since they serve different purposes. 
 
@@ -324,7 +324,7 @@ NTP may adjust the frequency at which the monotonic clock moves forward (this is
 
 In a distributed system, using a monotonic clock for measuring elapsed time (e.g., timeouts) is usually fine, because it doesn’t assume any synchronization between different nodes’ clocks and is not sensitive to slight inaccuracies of measurement. 
 
-# **Clock Synchronization and Accuracy** 
+### Clock Synchronization and Accuracy 
 
 Monotonic clocks don’t need synchronization, but time-of-day clocks need to be set according to an NTP server or other external time source in order to be useful. Unfortunately, our methods for getting a clock to tell the correct time aren’t nearly as reliable or accurate as you might hope—hardware clocks and NTP can be fickle beasts. To give just a few examples: 
 
@@ -352,7 +352,7 @@ Such accuracy can be achieved using GPS receivers, the Precision Time Protocol (
 
 wrong. If your NTP daemon is misconfigured, or a firewall is blocking NTP traffic, the clock error due to drift can quickly become large. 
 
-# **Relying on Synchronized Clocks** 
+### Relying on Synchronized Clocks 
 
 The problem with clocks is that while they seem simple and easy to use, they have a surprising number of pitfalls: a day may not have exactly 86,400 seconds, time-of-day clocks may move backward in time, and the time on one node may be quite different from the time on another node. 
 
@@ -429,7 +429,7 @@ In order to ensure that transaction timestamps reflect causality, Spanner delibe
 
 Using clock synchronization for distributed transaction semantics is an area of active research [57, 61, 62]. These ideas are interesting, but they have not yet been implemented in mainstream databases outside of Google. 
 
-# **Process Pauses** 
+### Process Pauses 
 
 Let’s consider another example of dangerous clock use in a distributed system. Say you have a database with a single leader per partition. Only the leader is allowed to accept writes. How does a node know that it is still leader (that it hasn’t been declared dead by the others), and that it may safely accept writes? 
 
@@ -535,7 +535,7 @@ Fortunately, we don’t need to go as far as figuring out the meaning of life. I
 
 However, although it is possible to make software well behaved in an unreliable system model, it is not straightforward to do so. In the rest of this chapter we will further explore the notions of knowledge and truth in distributed systems, which will help us think about the kinds of assumptions we can make and the guarantees we may want to provide. In Chapter 9 we will proceed to look at some examples of distributed systems, algorithms that provide particular guarantees under particular assumptions. 
 
-# **The Truth Is Defined by the Majority** 
+### The Truth Is Defined by the Majority 
 
 Imagine a network with an asymmetric fault: a node is able to receive all messages sent to it, but any outgoing messages from that node are dropped or delayed [19]. Even though that node is working perfectly well, and is receiving requests from other nodes, the other nodes cannot hear its responses. After some timeout, the other nodes declare it dead, because they haven’t heard from the node. The situation unfolds like a nightmare: the semi-disconnected node is dragged to the graveyard, kicking and screaming “I’m not dead!”—but since nobody can hear its screaming, the funeral procession continues with stoic determination. 
 
@@ -597,7 +597,7 @@ Note that this mechanism requires the resource itself to take an active role in 
 
 Checking a token on the server side may seem like a downside, but it is arguably a good thing: it is unwise for a service to assume that its clients will always be well behaved, because the clients are often run by people whose priorities are very different from the priorities of the people running the service [76]. Thus, it is a good idea for any service to protect itself from accidentally abusive clients. 
 
-# **Byzantine Faults** 
+### Byzantine Faults 
 
 Fencing tokens can detect and block a node that is _inadvertently_ acting in error (e.g., because it hasn’t yet found out that its lease has expired). However, if the node deliberately wanted to subvert the system’s guarantees, it could easily do so by sending messages with a fake fencing token. 
 
@@ -639,7 +639,7 @@ Although we assume that nodes are generally honest, it can be worth adding mecha
 
 - NTP clients can be configured with multiple server addresses. When synchronizing, the client contacts all of them, estimates their errors, and checks that a majority of servers agree on some time range. As long as most of the servers are okay, a misconfigured NTP server that is reporting an incorrect time is detected as an outlier and is excluded from synchronization [37]. The use of multiple servers makes NTP more robust than if it only uses a single server. 
 
-# **System Model and Reality** 
+### System Model and Reality 
 
 Many algorithms have been designed to solve distributed systems problems—for example, we will examine solutions for the consensus problem in Chapter 9. In order to be useful, these algorithms need to tolerate the various faults of distributed systems that we discussed in this chapter. 
 
@@ -731,7 +731,7 @@ That is not to say that theoretical, abstract system models are worthless—quit
 
 Proving an algorithm correct does not mean its _implementation_ on a real system will necessarily always behave correctly. But it’s a very good first step, because the theoretical analysis can uncover problems in an algorithm that might remain hidden for a long time in a real system, and that only come to bite you when your assumptions (e.g., about timing) are defeated due to unusual circumstances. Theoretical analysis and empirical testing are equally important. 
 
-# **Summary** 
+## Summary 
 
 In this chapter we have discussed a wide range of problems that can occur in distributed systems, including: 
 

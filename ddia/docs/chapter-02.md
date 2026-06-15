@@ -1,5 +1,5 @@
 
-# Data models and query language 
+# Chapter 2. Data Models and Query Languages 
 
 _The limits of my language mean the limits of my world._ 
 
@@ -28,7 +28,7 @@ It can take a lot of effort to master just one data model (think how many books 
 
 In this chapter we will look at a range of general-purpose data models for data storage and querying (point 2 in the preceding list). In particular, we will compare the relational model, the document model, and a few graph-based data models. We will also look at various query languages and compare their use cases. In Chapter 3 we will discuss how storage engines work; that is, how these data models are actually implemented (point 3 in the list). 
 
-## Relational model vs document model 
+## Relational Model Versus Document Model 
 
 The best-known data model today is probably that of SQL, based on the relational model proposed by Edgar Codd in 1970 [1]: data is organized into _relations_ (called _tables_ in SQL), where each relation is an unordered collection of _tuples_ ( _rows_ in SQL). 
 
@@ -45,7 +45,7 @@ were the main alternatives, but the relational model came to dominate them. Obje
 
 As computers became vastly more powerful and networked, they started being used for increasingly diverse purposes. And remarkably, relational databases turned out to generalize very well, beyond their original scope of business data processing, to a broad variety of use cases. Much of what you see on the web today is still powered by relational databases, be it online publishing, discussion, social networking, ecommerce, games, software-as-a-service productivity applications, or much more. 
 
-# **The Birth of NoSQL** 
+### The Birth of NoSQL 
 
 Now, in the 2010s, _NoSQL_ is the latest attempt to overthrow the relational model’s dominance. The name “NoSQL” is unfortunate, since it doesn’t actually refer to any particular technology—it was originally intended simply as a catchy Twitter hashtag for a meetup on open source, distributed, nonrelational databases in 2009 [3]. Nevertheless, the term struck a nerve and quickly spread through the web startup community and beyond. A number of interesting database systems are now associated with the #NoSQL hashtag, and it has been retroactively reinterpreted as _Not Only SQL_ [4]. 
 
@@ -61,7 +61,7 @@ There are several driving forces behind the adoption of NoSQL databases, includi
 
 Different applications have different requirements, and the best choice of technology for one use case may well be different from the best choice for another use case. It therefore seems likely that in the foreseeable future, relational databases will continue to be used alongside a broad variety of nonrelational datastores—an idea that is sometimes called _polyglot persistence_ [3]. 
 
-# **The Object-Relational Mismatch** 
+### The Object-Relational Mismatch 
 
 Most application development today is done in object-oriented programming languages, which leads to a common criticism of the SQL data model: if data is stored in relational tables, an awkward translation layer is required between the objects in the 
 
@@ -90,37 +90,26 @@ For a data structure like a résumé, which is mostly a self-contained _document
 
 _Example 2-1. Representing a LinkedIn profile as a JSON document_ 
 
-```
+```json
 {
-"user_id":     251,
-"first_name":  "Bill",
-"last_name":   "Gates",
-```
-
-```
-"summary":     "Co-chair of the Bill & Melinda Gates... Active blogger.",
-```
-
-```
-"region_id":   "us:91",
-"industry_id": 131,
-```
-
-- **`"photo_url"`** `:   "/p/7/000/253/05b/308dd6e.jpg",` 
-
-
-```
-"positions": [
+  "user_id":     251,
+  "first_name":  "Bill",
+  "last_name":   "Gates",
+  "summary":     "Co-chair of the Bill & Melinda Gates... Active blogger.",
+  "region_id":   "us:91",
+  "industry_id": 131,
+  "photo_url":   "/p/7/000/253/05b/308dd6e.jpg",
+  "positions": [
     {"job_title": "Co-chair", "organization": "Bill & Melinda Gates Foundation"},
     {"job_title": "Co-founder, Chairman", "organization": "Microsoft"}
   ],
-"education": [
+  "education": [
     {"school_name": "Harvard University",       "start": 1973, "end": 1975},
     {"school_name": "Lakeside School, Seattle", "start": null, "end": null}
   ],
-"contact_info": {
-"blog":    "http://thegatesnotes.com",
-"twitter": "http://twitter.com/BillGates"
+  "contact_info": {
+    "blog":    "http://thegatesnotes.com",
+    "twitter": "http://twitter.com/BillGates"
   }
 }
 ```
@@ -138,7 +127,7 @@ The one-to-many relationships from the user profile to the user’s positions, e
 _Figure 2-2. One-to-many relationships forming a tree structure._ 
 
 
-# **Many-to-One and Many-to-Many Relationships** 
+### Many-to-One and Many-to-Many Relationships 
 
 In Example 2-1 in the preceding section, `region_id` and `industry_id` are given as IDs, not as plain-text strings `"Greater Seattle Area"` and `"Philanthropy"` . Why? 
 
@@ -197,7 +186,7 @@ Figure 2-4 illustrates how these new features require many-to-many relationships
 _Figure 2-4. Extending résumés with many-to-many relationships._ 
 
 
-# **Are Document Databases Repeating History?** 
+### Are Document Databases Repeating History? 
 
 While many-to-many relationships and joins are routinely used in relational databases, document databases and NoSQL reopened the debate on how best to represent such relationships in a database. This debate is much older than NoSQL—in fact, it goes back to the very earliest computerized database systems. 
 
@@ -211,7 +200,7 @@ Various solutions were proposed to solve the limitations of the hierarchical mod
 
 Since the problem that the two models were solving is still so relevant today, it’s worth briefly revisiting this debate in today’s light. 
 
-# **The network model** 
+#### The network model 
 
 The network model was standardized by a committee called the Conference on Data Systems Languages (CODASYL) and implemented by several different database vendors; it is also known as the _CODASYL model_ [16]. 
 
@@ -226,7 +215,7 @@ A query in CODASYL was performed by moving a cursor through the database by iter
 
 Although manual access path selection was able to make the most efficient use of the very limited hardware capabilities in the 1970s (such as tape drives, whose seeks are extremely slow), the problem was that they made the code for querying and updating the database complicated and inflexible. With both the hierarchical and the network model, if you didn’t have a path to the data you wanted, you were in a difficult situation. You could change the access paths, but then you had to go through a lot of handwritten database query code and rewrite it to handle the new access paths. It was difficult to make changes to an application’s data model. 
 
-# **The relational model** 
+#### The relational model 
 
 What the relational model did, by contrast, was to lay out all the data in the open: a relation (table) is simply a collection of tuples (rows), and that’s it. There are no labyrinthine nested structures, no complicated access paths to follow if you want to look at the data. You can read any or all of the rows in a table, selecting those that match an arbitrary condition. You can read a particular row by designating some columns as a key and matching on those. You can insert a new row into any table without worrying about foreign key relationships to and from other tables.[iv] 
 
@@ -241,19 +230,19 @@ If you want to query your data in new ways, you can just declare a new index, an
 
 Query optimizers for relational databases are complicated beasts, and they have consumed many years of research and development effort [18]. But a key insight of the relational model was this: you only need to build a query optimizer once, and then all applications that use the database can benefit from it. If you don’t have a query optimizer, it’s easier to handcode the access paths for a particular query than to write a general-purpose optimizer—but the general-purpose solution wins in the long run. 
 
-# **Comparison to document databases** 
+#### Comparison to document databases 
 
 Document databases reverted back to the hierarchical model in one aspect: storing nested records (one-to-many relationships, like `positions` , `education` , and `contact_info` in Figure 2-1) within their parent record rather than in a separate table. 
 
 However, when it comes to representing many-to-one and many-to-many relationships, relational and document databases are not fundamentally different: in both cases, the related item is referenced by a unique identifier, which is called a _foreign key_ in the relational model and a _document reference_ in the document model [9]. That identifier is resolved at read time by using a join or follow-up queries. To date, document databases have not followed the path of CODASYL. 
 
-# **Relational Versus Document Databases Today** 
+### Relational Versus Document Databases Today 
 
 There are many differences to consider when comparing relational databases to document databases, including their fault-tolerance properties (see Chapter 5) and handling of concurrency (see Chapter 7). In this chapter, we will concentrate only on the differences in the data model. 
 
 The main arguments in favor of the document data model are schema flexibility, better performance due to locality, and that for some applications it is closer to the data structures used by the application. The relational model counters by providing better support for joins, and many-to-one and many-to-many relationships. 
 
-# **Which data model leads to simpler application code?** 
+#### Which data model leads to simpler application code? 
 
 If the data in your application has a document-like structure (i.e., a tree of one-tomany relationships, where typically the entire tree is loaded at once), then it’s proba‐ 
 
@@ -268,7 +257,7 @@ However, if your application does use many-to-many relationships, the document m
 
 It’s not possible to say in general which data model leads to simpler application code; it depends on the kinds of relationships that exist between data items. For highly interconnected data, the document model is awkward, the relational model is acceptable, and graph models (see “Graph-Like Data Models” on page 49) are the most natural. 
 
-# **Schema flexibility in the document model** 
+#### Schema flexibility in the document model 
 
 Most document databases, and the JSON support in relational databases, do not enforce any schema on the data in documents. XML support in relational databases usually comes with optional schema validation. No schema means that arbitrary keys and values can be added to a document, and when reading, clients have no guarantees as to what fields the documents may contain. 
 
@@ -281,20 +270,19 @@ Schema-on-read is similar to dynamic (runtime) type checking in programming lang
 
 The difference between the approaches is particularly noticeable in situations where an application wants to change the format of its data. For example, say you are currently storing each user’s full name in one field, and you instead want to store the first name and last name separately [23]. In a document database, you would just start writing new documents with the new fields and have code in the application that handles the case when old documents are read. For example: 
 
+```javascript
+if (user && user.name && !user.first_name) {
+  // Documents written before Dec 8, 2013 don't have first_name
+  user.first_name = user.name.split(" ")[0];
+}
 ```
-if (user&&user.name&&!user.first_name) {
-```
-
-- _`// Documents written before Dec 8, 2013 don't have first_name`_ `user.first_name = user.name.split(" ")[0];` 
-
-- `}` 
 
 On the other hand, in a “statically typed” database schema, you would typically perform a _migration_ along the lines of: 
 
-```
-ALTERTABLEusersADDCOLUMNfirst_nametext;
-UPDATEusersSETfirst_name=split_part(name, ' ', 1);      -- PostgreSQL
-UPDATEusersSETfirst_name=substring_index(name, ' ', 1);      -- MySQL
+```sql
+ALTER TABLE users ADD COLUMN first_name text;
+UPDATE users SET first_name = split_part(name, ' ', 1);      -- PostgreSQL
+UPDATE users SET first_name = substring_index(name, ' ', 1);      -- MySQL
 ```
 
 Schema changes have a bad reputation of being slow and requiring downtime. This reputation is not entirely deserved: most relational database systems execute the `ALTER TABLE` statement in a few milliseconds. MySQL is a notable exception—it copies the entire table on `ALTER TABLE` , which can mean minutes or even hours of downtime when altering a large table—although various tools exist to work around this limitation [24, 25, 26]. 
@@ -310,7 +298,7 @@ The schema-on-read approach is advantageous if the items in the collection don�
 
 In situations like these, a schema may hurt more than it helps, and schemaless documents can be a much more natural data model. But in cases where all records are expected to have the same structure, schemas are a useful mechanism for documenting and enforcing that structure. We will discuss schemas and schema evolution in more detail in Chapter 4. 
 
-# **Data locality for queries** 
+#### Data locality for queries 
 
 A document is usually stored as a single continuous string, encoded as JSON, XML, or a binary variant thereof (such as MongoDB’s BSON). If your application often needs to access the entire document (for example, to render it on a web page), there is a performance advantage to this _storage locality_ . If data is split across multiple tables, like in Figure 2-1, multiple index lookups are required to retrieve it all, which may require more disk seeks and take more time. 
 
@@ -320,7 +308,7 @@ It’s worth pointing out that the idea of grouping related data together for lo
 
 We will also see more on locality in Chapter 3. 
 
-# **Convergence of document and relational databases** 
+#### Convergence of document and relational databases 
 
 Most relational database systems (other than MySQL) have supported XML since the mid-2000s. This includes functions to make local modifications to XML documents and the ability to index and query inside XML documents, which allows applications to use data models very similar to what they would do when using a document database. 
 
@@ -333,21 +321,21 @@ It seems that relational and document databases are becoming more similar over t
 
 A hybrid of the relational and document models is a good route for databases to take in the future. 
 
-## Query languages for data 
+## Query Languages for Data 
 
 When the relational model was introduced, it included a new way of querying data: SQL is a _declarative_ query language, whereas IMS and CODASYL queried the database using _imperative_ code. What does that mean? 
 
 Many commonly used programming languages are imperative. For example, if you have a list of animal species, you might write something like this to return only the sharks in the list: 
 
-```
-functiongetSharks() {
-varsharks= [];
-for (vari=0; i<animals.length; i++) {
-if (animals[i].family==="Sharks") {
-sharks.push(animals[i]);
-        }
+```javascript
+function getSharks() {
+  var sharks = [];
+  for (var i = 0; i < animals.length; i++) {
+    if (animals[i].family === "Sharks") {
+      sharks.push(animals[i]);
     }
-returnsharks;
+  }
+  return sharks;
 }
 ```
 
@@ -360,8 +348,8 @@ where σ (the Greek letter sigma) is the selection operator, returning only thos
 
 When SQL was defined, it followed the structure of the relational algebra fairly closely: 
 
-```
-SELECT*FROManimalsWHEREfamily='Sharks';
+```sql
+SELECT * FROM animals WHERE family = 'Sharks';
 ```
 
 An imperative language tells the computer to perform certain operations in a certain order. You can imagine stepping through the code line by line, evaluating conditions, updating variables, and deciding whether to go around the loop one more time. 
@@ -377,30 +365,30 @@ The SQL example doesn’t guarantee any particular ordering, and so it doesn’t
 Finally, declarative languages often lend themselves to parallel execution. Today, CPUs are getting faster by adding more cores, not by running at significantly higher clock speeds than before [31]. Imperative code is very hard to parallelize across multiple cores and multiple machines, because it specifies instructions that must be performed in a particular order. Declarative languages have a better chance of getting faster in parallel execution because they specify only the pattern of the results, not the algorithm that is used to determine the results. The database is free to use a parallel implementation of the query language, if appropriate [32]. 
 
 
-# **Declarative Queries on the Web** 
+### Declarative Queries on the Web 
 
 The advantages of declarative query languages are not limited to just databases. To illustrate the point, let’s compare declarative and imperative approaches in a completely different environment: a web browser. 
 
 Say you have a website about animals in the ocean. The user is currently viewing the page on sharks, so you mark the navigation item “Sharks” as currently selected, like this: 
 
-```
+```html
 <ul>
-<liclass="selected">
-<p>Sharks</p>
-<ul>
-<li>Great White Shark</li>
-<li>Tiger Shark</li>
-<li>Hammerhead Shark</li>
-</ul>
-</li>
-<li>
-<p>Whales</p>
-<ul>
-<li>Blue Whale</li>
-<li>Humpback Whale</li>
-<li>Fin Whale</li>
-</ul>
-</li>
+  <li class="selected">
+    <p>Sharks</p>
+    <ul>
+      <li>Great White Shark</li>
+      <li>Tiger Shark</li>
+      <li>Hammerhead Shark</li>
+    </ul>
+  </li>
+  <li>
+    <p>Whales</p>
+    <ul>
+      <li>Blue Whale</li>
+      <li>Humpback Whale</li>
+      <li>Fin Whale</li>
+    </ul>
+  </li>
 </ul>
 ```
 
@@ -410,9 +398,9 @@ The selected item is marked with the CSS class `"selected"` .
 
 Now say you want the title of the currently selected page to have a blue background, so that it is visually highlighted. This is easy, using CSS: 
 
-```
-li.selected>p {
-background-color:blue;
+```css
+li.selected > p {
+  background-color: blue;
 }
 ```
 
@@ -421,18 +409,11 @@ Here the CSS selector `li.selected > p` declares the pattern of elements to whic
 
 If you were using XSL instead of CSS, you could do something similar: 
 
-- **`<xsl:template`** `match="li[@class='selected']/p"` **`>`** 
-
-```
-<fo:blockbackground-color="blue">
-```
-
-```
-<xsl:apply-templates/>
-```
-
-```
-</fo:block>
+```xml
+<xsl:template match="li[@class='selected']/p">
+  <fo:block background-color="blue">
+    <xsl:apply-templates/>
+  </fo:block>
 </xsl:template>
 ```
 
@@ -440,18 +421,18 @@ Here, the XPath expression `li[@class='selected']/p` is equivalent to the CSS se
 
 Imagine what life would be like if you had to use an imperative approach. In JavaScript, using the core Document Object Model (DOM) API, the result might look something like this: 
 
-```
-varliElements=document.getElementsByTagName("li");
-for (vari=0; i<liElements.length; i++) {
-if (liElements[i].className==="selected") {
-varchildren=liElements[i].childNodes;
-for (varj=0; j<children.length; j++) {
-varchild=children[j];
-if (child.nodeType===Node.ELEMENT_NODE&&child.tagName==="P") {
-child.setAttribute("style", "background-color: blue");
-            }
-        }
+```javascript
+var liElements = document.getElementsByTagName("li");
+for (var i = 0; i < liElements.length; i++) {
+  if (liElements[i].className === "selected") {
+    var children = liElements[i].childNodes;
+    for (var j = 0; j < children.length; j++) {
+      var child = children[j];
+      if (child.nodeType === Node.ELEMENT_NODE && child.tagName === "P") {
+        child.setAttribute("style", "background-color: blue");
+      }
     }
+  }
 }
 ```
 
@@ -464,7 +445,7 @@ This JavaScript imperatively sets the element `<p>Sharks</p>` to have a blue bac
 
 In a web browser, using declarative CSS styling is much better than manipulating styles imperatively in JavaScript. Similarly, in databases, declarative query languages like SQL turned out to be much better than imperative query APIs.[vi] 
 
-# **MapReduce Querying** 
+### MapReduce Querying 
 
 _MapReduce_ is a programming model for processing large amounts of data in bulk across many machines, popularized by Google [33]. A limited form of MapReduce is supported by some NoSQL datastores, including MongoDB and CouchDB, as a mechanism for performing read-only queries across many documents. 
 
@@ -476,12 +457,12 @@ To give an example, imagine you are a marine biologist, and you add an observati
 
 In PostgreSQL you might express that query like this: 
 
-```
-SELECTdate_trunc('month', observation_timestamp) ASobservation_month,
-sum(num_animals) AStotal_animals
-FROMobservations
-WHEREfamily='Sharks'
-GROUPBYobservation_month;
+```sql
+SELECT date_trunc('month', observation_timestamp) AS observation_month,
+       sum(num_animals) AS total_animals
+FROM observations
+WHERE family = 'Sharks'
+GROUP BY observation_month;
 ```
 
 The `date_trunc('month', timestamp)` function determines the calendar month containing `timestamp` , and returns another timestamp representing the beginning of that month. In other words, it rounds a timestamp down to the nearest month. 
@@ -491,24 +472,25 @@ This query first filters the observations to only show species in the `Sharks` f
 The same can be expressed with MongoDB’s MapReduce feature as follows: 
 
 > vi. IMS and CODASYL both used imperative query APIs. Applications typically used COBOL code to iterate over records in the database, one record at a time [2, 16]. 
+MongoDB’s MapReduce feature as follows: 
 
-
-```
+```javascript
 db.observations.mapReduce(
-functionmap() {
-varyear=this.observationTimestamp.getFullYear();
-varmonth=this.observationTimestamp.getMonth() +1;
-emit(year+"-"+month, this.numAnimals);
-    },
-functionreduce(key, values) {
-returnArray.sum(values);
-    },
-    {
-query: { family:"Sharks" },
-out:"monthlySharkReport"
-    }
+  function map() {
+    var year = this.observationTimestamp.getFullYear();
+    var month = this.observationTimestamp.getMonth() + 1;
+    emit(year + "-" + month, this.numAnimals);
+  },
+  function reduce(key, values) {
+    return Array.sum(values);
+  },
+  {
+    query: { family: "Sharks" },
+    out: "monthlySharkReport"
+  }
 );
 ```
+
 
 The filter to consider only shark species can be specified declaratively (this is a MongoDB-specific extension to MapReduce). 
 
@@ -524,18 +506,18 @@ The final output is written to the collection `monthlySharkReport` .
 
 For example, say the `observations` collection contains these two documents: 
 
-```
+```json
 {
-observationTimestamp:Date.parse("Mon, 25 Dec 1995 12:34:56 GMT"),
-family:"Sharks",
-species:"Carcharodon carcharias",
-numAnimals:3
+  "observationTimestamp": Date.parse("Mon, 25 Dec 1995 12:34:56 GMT"),
+  "family": "Sharks",
+  "species": "Carcharodon carcharias",
+  "numAnimals": 3
 }
 {
-observationTimestamp:Date.parse("Tue, 12 Dec 1995 16:17:18 GMT"),
-family:"Sharks",
-species:"Carcharias taurus",
-numAnimals:4
+  "observationTimestamp": Date.parse("Tue, 12 Dec 1995 16:17:18 GMT"),
+  "family": "Sharks",
+  "species": "Carcharias taurus",
+  "numAnimals": 4
 }
 ```
 
@@ -550,23 +532,23 @@ Being able to use JavaScript code in the middle of a query is a great feature fo
 
 A usability problem with MapReduce is that you have to write two carefully coordinated JavaScript functions, which is often harder than writing a single query. Moreover, a declarative query language offers more opportunities for a query optimizer to improve the performance of a query. For these reasons, MongoDB 2.2 added support for a declarative query language called the _aggregation pipeline_ [9]. In this language, the same shark-counting query looks like this: 
 
-```
+```json
 db.observations.aggregate([
-    { $match: { family:"Sharks" } },
-    { $group: {
-_id: {
-year:  { $year:"$observationTimestamp" },
-month: { $month:"$observationTimestamp" }
-        },
-totalAnimals: { $sum:"$numAnimals" }
-    } }
+  { $match: { family: "Sharks" } },
+  { $group: {
+    _id: {
+      year:  { $year: "$observationTimestamp" },
+      month: { $month: "$observationTimestamp" }
+    },
+    totalAnimals: { $sum: "$numAnimals" }
+  } }
 ]);
 ```
 
 The aggregation pipeline language is similar in expressiveness to a subset of SQL, but it uses a JSON-based syntax rather than SQL’s English-sentence-style syntax; the difference is perhaps a matter of taste. The moral of the story is that a NoSQL system may find itself accidentally reinventing SQL, albeit in disguise. 
 
 
-## Graph-like data models 
+## Graph-Like Data Models 
 
 We saw earlier that many-to-many relationships are an important distinguishing feature between different data models. If your application has mostly one-to-many relationships (tree-structured data) or no relationships between records, the document model is appropriate. 
 
@@ -602,7 +584,7 @@ _Figure 2-5. Example of graph-structured data (boxes represent vertices, arrows 
 
 There are several different, but related, ways of structuring and querying data in graphs. In this section we will discuss the _property graph_ model (implemented by Neo4j, Titan, and InfiniteGraph) and the _triple-store_ model (implemented by Datomic, AllegroGraph, and others). We will look at three declarative query languages for graphs: Cypher, SPARQL, and Datalog. Besides these, there are also imperative graph query languages such as Gremlin [36] and graph processing frameworks like Pregel (see Chapter 10). 
 
-# **Property Graphs** 
+### Property Graphs 
 
 In the property graph model, each vertex consists of: 
 
@@ -631,20 +613,22 @@ You can think of a graph store as consisting of two relational tables, one for v
 
 _Example 2-2. Representing a property graph using a relational schema_ 
 
-```
-CREATETABLEvertices (
-vertex_idintegerPRIMARYKEY,
-propertiesjson
+```sql
+CREATE TABLE vertices (
+  vertex_id  integer PRIMARY KEY,
+  properties json
 );
-CREATETABLEedges (
-edge_idintegerPRIMARYKEY,
-tail_vertexintegerREFERENCESvertices (vertex_id),
-head_vertexintegerREFERENCESvertices (vertex_id),
-labeltext,
-propertiesjson
+
+CREATE TABLE edges (
+  edge_id     integer PRIMARY KEY,
+  tail_vertex integer REFERENCES vertices (vertex_id),
+  head_vertex integer REFERENCES vertices (vertex_id),
+  label       text,
+  properties  json
 );
-CREATEINDEXedges_tailsONedges (tail_vertex);
-CREATEINDEXedges_headsONedges (head_vertex);
+
+CREATE INDEX edges_tails ON edges (tail_vertex);
+CREATE INDEX edges_heads ON edges (head_vertex);
 ```
 
 Some important aspects of this model are: 
@@ -664,7 +648,7 @@ intricacies of sovereign states and nations), and varying granularity of data (L
 
 You could imagine extending the graph to also include many other facts about Lucy and Alain, or other people. For instance, you could use it to indicate any food allergies they have (by introducing a vertex for each allergen, and an edge between a person and an allergen to indicate an allergy), and link the allergens with a set of vertices that show which foods contain which substances. Then you could write a query to find out what is safe for each person to eat. Graphs are good for evolvability: as you add features to your application, a graph can easily be extended to accommodate changes in your application’s data structures. 
 
-# **The Cypher Query Language** 
+### The Cypher Query Language 
 
 _Cypher_ is a declarative query language for property graphs, created for the Neo4j graph database [37]. (It is named after a character in the movie _The Matrix_ and is not related to ciphers in cryptography [38].) 
 
@@ -672,9 +656,8 @@ Example 2-3 shows the Cypher query to insert the lefthand portion of Figure 2-5 
 
 _Example 2-3. A subset of the data in Figure 2-5, represented as a Cypher query_ 
 
-# **`CREATE`** 
-
-```
+```cypher
+CREATE
   (NAmerica:Location {name:'North America', type:'continent'}),
   (USA:Location      {name:'United States', type:'country'  }),
   (Idaho:Location    {name:'Idaho',         type:'state'    }),
@@ -690,11 +673,10 @@ Example 2-4 shows how to express that query in Cypher. The same arrow notation i
 
 matches any two vertices that are related by an edge labeled `BORN_IN` . The tail vertex of that edge is bound to the variable `person` , and the head vertex is left unnamed. 
 
-# _Example 2-4. Cypher query to find people who emigrated from the US to Europe_ 
+_Example 2-4. Cypher query to find people who emigrated from the US to Europe_ 
 
-# **`MATCH`** 
-
-```
+```cypher
+MATCH
   (person) -[:BORN_IN]->  () -[:WITHIN*0..]-> (us:Location {name:'United States'}),
   (person) -[:LIVES_IN]-> () -[:WITHIN*0..]-> (eu:Location {name:'Europe'})
 RETURN person.name
@@ -716,7 +698,7 @@ But equivalently, you could start with the two `Location` vertices and work back
 
 As is typical for a declarative query language, you don’t need to specify such execution details when writing the query: the query optimizer automatically chooses the strategy that is predicted to be the most efficient, so you can get on with writing the rest of your application. 
 
-# **Graph Queries in SQL** 
+### Graph Queries in SQL 
 
 Example 2-2 suggested that graph data can be represented in a relational database. But if we put graph data in a relational structure, can we also query it using SQL? 
 
@@ -735,52 +717,41 @@ Since SQL:1999, this idea of variable-length traversal paths in a query can be e
 
 _Example 2-5. The same query as Example 2-4, expressed in SQL using recursive common table expressions_ 
 
-# **`WITH RECURSIVE`** 
-
-```
--- in_usa is the set of vertex IDs of all locations within the United States
-in_usa(vertex_id) AS (
-SELECTvertex_idFROMverticesWHEREproperties->>'name'='United States'
-UNION
-SELECTedges.tail_vertexFROMedges
-JOINin_usaONedges.head_vertex=in_usa.vertex_id
-WHEREedges.label='within'
+```sql
+WITH RECURSIVE
+  -- in_usa is the set of vertex IDs of all locations within the United States
+  in_usa(vertex_id) AS (
+    SELECT vertex_id FROM vertices WHERE properties->>'name' = 'United States'
+    UNION
+    SELECT edges.tail_vertex FROM edges
+    JOIN in_usa ON edges.head_vertex = in_usa.vertex_id
+    WHERE edges.label = 'within'
   ),
--- in_europe is the set of vertex IDs of all locations within Europe
-in_europe(vertex_id) AS (
-SELECTvertex_idFROMverticesWHEREproperties->>'name'='Europe'
-UNION
-SELECTedges.tail_vertexFROMedges
-JOINin_europeONedges.head_vertex=in_europe.vertex_id
-WHEREedges.label='within'
+  -- in_europe is the set of vertex IDs of all locations within Europe
+  in_europe(vertex_id) AS (
+    SELECT vertex_id FROM vertices WHERE properties->>'name' = 'Europe'
+    UNION
+    SELECT edges.tail_vertex FROM edges
+    JOIN in_europe ON edges.head_vertex = in_europe.vertex_id
+    WHERE edges.label = 'within'
   ),
--- born_in_usa is the set of vertex IDs of all people born in the US
-born_in_usa(vertex_id) AS (
-SELECTedges.tail_vertexFROMedges
-JOINin_usaONedges.head_vertex=in_usa.vertex_id
-WHEREedges.label='born_in'
+  -- born_in_usa is the set of vertex IDs of all people born in the US
+  born_in_usa(vertex_id) AS (
+    SELECT edges.tail_vertex FROM edges
+    JOIN in_usa ON edges.head_vertex = in_usa.vertex_id
+    WHERE edges.label = 'born_in'
   ),
-```
-
-
-```
--- lives_in_europe is the set of vertex IDs of all people living in Europe
-lives_in_europe(vertex_id) AS (
-SELECTedges.tail_vertexFROMedges
-JOINin_europeONedges.head_vertex=in_europe.vertex_id
-WHEREedges.label='lives_in'
+  -- lives_in_europe is the set of vertex IDs of all people living in Europe
+  lives_in_europe(vertex_id) AS (
+    SELECT edges.tail_vertex FROM edges
+    JOIN in_europe ON edges.head_vertex = in_europe.vertex_id
+    WHERE edges.label = 'lives_in'
   )
-```
-
-```
-SELECTvertices.properties->>'name'
-FROMvertices
-```
-
-```
+SELECT vertices.properties->>'name'
+FROM vertices
 -- join to find those people who were both born in the US *and* live in Europe
-JOINborn_in_usaONvertices.vertex_id=born_in_usa.vertex_id
-JOINlives_in_europeONvertices.vertex_id=lives_in_europe.vertex_id;
+JOIN born_in_usa ON vertices.vertex_id = born_in_usa.vertex_id
+JOIN lives_in_europe ON vertices.vertex_id = lives_in_europe.vertex_id;
 ```
 
 First find the vertex whose `name` property has the value `"United States"` , and make it the first element of the set of vertices `in_usa` . 
@@ -797,7 +768,7 @@ Finally, intersect the set of people born in the USA with the set of people livi
 
 If the same query can be written in 4 lines in one query language but requires 29 lines in another, that just shows that different data models are designed to satisfy different use cases. It’s important to pick a data model that is suitable for your application. 
 
-# **Triple-Stores and SPARQL** 
+### Triple-Stores and SPARQL 
 
 The triple-store model is mostly equivalent to the property graph model, using different words to describe the same ideas. It is nevertheless worth discussing, because there are various tools and languages for triple-stores that can be valuable additions to your toolbox for building applications. 
 
@@ -963,7 +934,7 @@ No. They differ in several important ways:
 
 - In CODASYL, all queries were imperative, difficult to write and easily broken by changes in the schema. In a graph database, you can write your traversal in imperative code if you want to, but most graph databases also support high-level, declarative query languages such as Cypher or SPARQL. 
 
-# **The Foundation: Datalog** 
+### The Foundation: Datalog 
 
 _Datalog_ is a much older language than SPARQL or Cypher, having been studied extensively by academics in the 1980s [44, 45, 46]. It is less well known among software engineers, but it is nevertheless important, because it provides the foundation that later query languages build upon. 
 
@@ -1039,7 +1010,7 @@ Now rule 3 can find people who were born in some location `BornIn` and live in s
 
 The Datalog approach requires a different kind of thinking to the other query languages discussed in this chapter, but it’s a very powerful approach, because rules can be combined and reused in different queries. It’s less convenient for simple one-off queries, but it can cope better if your data is complex. 
 
-# **Summary** 
+## Summary 
 
 Data models are a huge subject, and in this chapter we have taken a quick look at a broad variety of different models. We didn’t have space to go into all the details of each model, but hopefully the overview has been enough to whet your appetite to find out more about the model that best fits your application’s requirements. 
 

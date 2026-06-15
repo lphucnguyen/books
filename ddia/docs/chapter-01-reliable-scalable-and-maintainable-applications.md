@@ -1,4 +1,4 @@
-# Reliable, scalable, and maintainable applications 
+# Chapter 1. Reliable, Scalable, and Maintainable Applications 
 
 _The Internet was done so well that most people think of it as a natural resource like the Pacific Ocean, rather than something that was man-made. When was the last time a technology with a scale like that was so error-free?_ 
 
@@ -148,7 +148,7 @@ How do we make our systems reliable, in spite of unreliable humans? The best sys
 
 - Implement good management practices and training—a complex and important aspect, and beyond the scope of this book. 
 
-# **How Important Is Reliability?** 
+### How Important Is Reliability? 
 
 Reliability is not just for nuclear power stations and air traffic control software— more mundane applications are also expected to work reliably. Bugs in business applications cause lost productivity (and legal risks if figures are reported incorrectly), and outages of ecommerce sites can have huge costs in terms of lost revenue and damage to reputation. 
 
@@ -183,11 +183,11 @@ Simply handling 12,000 writes per second (the peak rate for posting tweets) woul
 
 1. Posting a tweet simply inserts the new tweet into a global collection of tweets. When a user requests their home timeline, look up all the people they follow, find all the tweets for each of those users, and merge them (sorted by time). In a relational database like in Figure 1-2, you could write a query such as: 
 
-```
-SELECTtweets.*, users.*FROMtweets
-JOINusersONtweets.sender_id=users.id
-JOINfollowsONfollows.followee_id=users.id
-WHEREfollows.follower_id=current_user
+```sql
+SELECT tweets.*, users.* FROM tweets
+JOIN users ON tweets.sender_id = users.id
+JOIN follows ON follows.followee_id = users.id
+WHERE follows.follower_id = current_user
 ```
 
 > ii. A term borrowed from electronic engineering, where it describes the number of logic gate inputs that are attached to another gate’s output. The output needs to supply enough current to drive all the attached inputs. In transaction processing systems, we use it to describe the number of requests to other services that we need to make in order to serve one incoming request. 
@@ -333,7 +333,7 @@ Make it easy for engineers to make changes to the system in the future, adapting
 
 As previously with reliability and scalability, there are no easy solutions for achieving these goals. Rather, we will try to think about systems with operability, simplicity, and evolvability in mind. 
 
-# **Operability: Making Life Easy for Operations** 
+### Operability: Making Life Easy for Operations 
 
 It has been suggested that “good operations can often work around the limitations of bad (or incomplete) software, but good software cannot run reliably with bad operations” [12]. While some aspects of operations can and should be automated, it is still up to humans to set up that automation in the first place and to make sure it’s working correctly. 
 
@@ -376,7 +376,7 @@ Good operability means making routine tasks easy, allowing the operations team t
 
 - Exhibiting predictable behavior, minimizing surprises 
 
-# **Simplicity: Managing Complexity** 
+### Simplicity: Managing Complexity 
 
 Small software projects can have delightfully simple and expressive code, but as projects get larger, they often become very complex and difficult to understand. This complexity slows down everyone who needs to work on the system, further increasing the cost of maintenance. A software project mired in complexity is sometimes described as a _big ball of mud_ [30]. 
 
@@ -395,7 +395,7 @@ However, finding good abstractions is very hard. In the field of distributed sys
 
 Throughout this book, we will keep our eyes open for good abstractions that allow us to extract parts of a large system into well-defined, reusable components. 
 
-# **Evolvability: Making Change Easy** 
+### Evolvability: Making Change Easy 
 
 It’s extremely unlikely that your system’s requirements will remain unchanged forever. They are much more likely to be in constant flux: you learn new facts, previously unanticipated use cases emerge, business priorities change, users request new 
 

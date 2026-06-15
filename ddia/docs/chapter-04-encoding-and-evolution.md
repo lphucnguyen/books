@@ -1,4 +1,4 @@
-# Encoding and evolution 
+# Chapter 4. Encoding and Evolution 
 
 _Everything changes and nothing stands still._ 
 
@@ -31,7 +31,7 @@ Backward compatibility is normally not hard to achieve: as author of the newer c
 
 In this chapter we will look at several formats for encoding data, including JSON, XML, Protocol Buffers, Thrift, and Avro. In particular, we will look at how they handle schema changes and how they support systems where old and new data and code need to coexist. We will then discuss how those formats are used for data storage and for communication: in web services, Representational State Transfer (REST), and remote procedure calls (RPC), as well as message-passing systems such as actors and message queues. 
 
-## Formats for encoding data 
+## Formats for Encoding Data 
 
 Programs usually work with data in (at least) two different representations: 
 
@@ -54,7 +54,7 @@ _Serialization_ is unfortunately also used in the context of transactions (see C
 
 As this is such a common problem, there are a myriad different libraries and encoding formats to choose from. Let’s do a brief overview. 
 
-# **Language-Specific Formats** 
+### Language-Specific Formats 
 
 Many programming languages come with built-in support for encoding in-memory objects into byte sequences. For example, Java has `java.io.Serializable` [1], Ruby has `Marshal` [2], Python has `pickle` [3], and so on. Many third-party libraries also exist, such as Kryo for Java [4]. 
 
@@ -75,7 +75,7 @@ These encoding libraries are very convenient, because they allow in-memory objec
 
 For these reasons it’s generally a bad idea to use your language’s built-in encoding for anything other than very transient purposes. 
 
-# **JSON, XML, and Binary Variants** 
+### JSON, XML, and Binary Variants 
 
 Moving to standardized encodings that can be written and read by many programming languages, JSON and XML are the obvious contenders. They are widely known, widely supported, and almost as widely disliked. XML is often criticized for being too verbose and unnecessarily complicated [9]. JSON’s popularity is mainly due to its built-in support in web browsers (by virtue of being a subset of JavaScript) and simplicity relative to XML. CSV is another popular language-independent format, albeit less powerful. 
 
@@ -105,11 +105,11 @@ Some of these formats extend the set of datatypes (e.g., distinguishing integers
 
 _Example 4-1. Example record which we will encode in several binary formats in this chapter_ 
 
-```
+```json
 {
-"userName":"Martin",
-"favoriteNumber":1337,
-"interests": ["daydreaming", "hacking"]
+  "userName": "Martin",
+  "favoriteNumber": 1337,
+  "interests": ["daydreaming", "hacking"]
 }
 ```
 
@@ -133,28 +133,23 @@ In the following sections we will see how we can do much better, and encode the 
 
 _Figure 4-1. Example record (Example 4-1) encoded using MessagePack._ 
 
-# **Thrift and Protocol Buffers** 
-
-Apache Thrift [15] and Protocol Buffers (protobuf) [16] are binary encoding libraries that are based on the same principle. Protocol Buffers was originally developed at Google, Thrift was originally developed at Facebook, and both were made open source in 2007–08 [17]. 
-
-Both Thrift and Protocol Buffers require a schema for any data that is encoded. To encode the data in Example 4-1 in Thrift, you would describe the schema in the Thrift interface definition language (IDL) like this: 
-
-```
-structPerson {
-1:requiredstringuserName,
-2:optionali64favoriteNumber,
-3:optionallist<string>interests
+### Thrift and Protocol Buffers
+```thrift
+struct Person {
+  1: required string       userName,
+  2: optional i64          favoriteNumber,
+  3: optional list<string> interests
 }
 ```
 
 
 The equivalent schema definition for Protocol Buffers looks very similar: 
 
-```
-messagePerson {
-requiredstringuser_name=1;
-optionalint64favorite_number=2;
-repeatedstringinterests=3;
+```protobuf
+message Person {
+  required string user_name       = 1;
+  optional int64  favorite_number = 2;
+  repeated string interests       = 3;
 }
 ```
 
@@ -218,7 +213,7 @@ A curious detail of Protocol Buffers is that it does not have a list or array da
 Thrift has a dedicated list datatype, which is parameterized with the datatype of the list elements. This does not allow the same evolution from single-valued to multivalued as Protocol Buffers does, but it has the advantage of supporting nested lists. 
 
 
-# **Avro** 
+### Avro 
 
 Apache Avro [20] is another binary encoding format that is interestingly different from Protocol Buffers and Thrift. It was started in 2009 as a subproject of Hadoop, as a result of Thrift not being a good fit for Hadoop’s use cases [21]. 
 
@@ -226,25 +221,25 @@ Avro also uses a schema to specify the structure of the data being encoded. It h
 
 Our example schema, written in Avro IDL, might look like this: 
 
-```
-recordPerson {
-stringuserName;
-union { null, long } favoriteNumber=null;
-array<string>interests;
+```avro
+record Person {
+  string userName;
+  union { null, long } favoriteNumber = null;
+  array<string> interests;
 }
 ```
 
 The equivalent JSON representation of that schema is as follows: 
 
-```
+```json
 {
-"type":"record",
-"name":"Person",
-"fields": [
-        {"name":"userName",       "type":"string"},
-        {"name":"favoriteNumber", "type": ["null", "long"], "default":null},
-        {"name":"interests",      "type": {"type":"array", "items":"string"}}
-    ]
+  "type": "record",
+  "name": "Person",
+  "fields": [
+    {"name": "userName",       "type": "string"},
+    {"name": "favoriteNumber", "type": ["null", "long"], "default": null},
+    {"name": "interests",      "type": {"type": "array", "items": "string"}}
+  ]
 }
 ```
 
@@ -344,7 +339,7 @@ Avro provides optional code generation for statically typed programming language
 
 This property is especially useful in conjunction with dynamically typed data processing languages like Apache Pig [26]. In Pig, you can just open some Avro files, start analyzing them, and write derived datasets to output files in Avro format without even thinking about schemas. 
 
-# **The Merits of Schemas** 
+### The Merits of Schemas 
 
 As we saw, Protocol Buffers, Thrift, and Avro all use a schema to describe a binary encoding format. Their schema languages are much simpler than XML Schema or JSON Schema, which support much more detailed validation rules (e.g., “the string value of this field must match this regular expression” or “the integer value of this field must be between 0 and 100”). As Protocol Buffers, Thrift, and Avro are simpler to implement and simpler to use, they have grown to support a fairly wide range of programming languages. 
 
@@ -367,7 +362,7 @@ So, we can see that although textual data formats such as JSON, XML, and CSV are
 
 In summary, schema evolution allows the same kind of flexibility as schemaless/ schema-on-read JSON databases provide (see “Schema flexibility in the document model” on page 39), while also providing better guarantees about your data and better tooling. 
 
-## Modes of dataflow 
+## Modes of Dataflow 
 
 At the beginning of this chapter we said that whenever you want to send some data to another process with which you don’t share memory—for example, whenever you want to send data over the network or write it to a file—you need to encode it as a sequence of bytes. We then discussed a variety of different encodings for doing this. 
 
@@ -382,7 +377,7 @@ That’s a fairly abstract idea—there are many ways data can flow from one pro
 
 - Via asynchronous message passing (see “Message-Passing Dataflow” on page 136) 
 
-# **Dataflow Through Databases** 
+### Dataflow Through Databases 
 
 In a database, the process that writes to the database encodes the data, and the process that reads from the database decodes it. There may just be a single process accessing the database, in which case the reader is simply a later version of the same process—in that case you can think of storing something in the database as _sending a message to your future self_ . 
 
@@ -423,7 +418,7 @@ As the data dump is written in one go and is thereafter immutable, formats like 
 
 In Chapter 10 we will talk more about using data in archival storage. 
 
-# **Dataflow Through Services: REST and RPC** 
+### Dataflow Through Services: REST and RPC 
 
 When you have processes that need to communicate over a network, there are a few different ways of arranging that communication. The most common arrangement is to have two roles: _clients_ and _servers_ . The servers expose an API over the network, and the clients can connect to the servers to make requests to that API. The API exposed by the server is known as a _service_ . 
 
@@ -520,7 +515,7 @@ Service compatibility is made harder by the fact that RPC is often used for comm
 
 There is no agreement on how API versioning should work (i.e., how a client can indicate which version of the API it wants to use [48]). For RESTful APIs, common approaches are to use a version number in the URL or in the HTTP `Accept` header. For services that use API keys to identify a particular client, another option is to store a client’s requested API version on the server and to allow this version selection to be updated through a separate administrative interface [49]. 
 
-# **Message-Passing Dataflow** 
+### Message-Passing Dataflow 
 
 We have been looking at the different ways encoded data flows from one process to another. So far, we’ve discussed REST and RPC (where one process sends a request over the network to another process and expects a response as quickly as possible), 
 
