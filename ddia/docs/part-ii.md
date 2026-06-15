@@ -1,4 +1,4 @@
-# **PART II Distributed Data** 
+# Part II. Distributed Data
 
 _For a successful technology, reality must take precedence over public relations, for nature cannot be fooled._ 
 
@@ -8,20 +8,20 @@ In Part I of this book, we discussed aspects of data systems that apply when dat
 
 There are various reasons why you might want to distribute a database across multiple machines: 
 
-# _Scalability_ 
+**Scalability**
 
 If your data volume, read load, or write load grows bigger than a single machine can handle, you can potentially spread the load across multiple machines. 
 
-# _Fault tolerance/high availability_ 
+**Fault tolerance/high availability**
 
 If your application needs to continue working even if one machine (or several machines, or the network, or an entire datacenter) goes down, you can use multiple machines to give you redundancy. When one fails, another one can take over. 
 
-# _Latency_ 
+**Latency**
 
 If you have users around the world, you might want to have servers at various locations worldwide so that each user can be served from a datacenter that is geographically close to them. That avoids the users having to wait for network packets to travel halfway around the world. 
 
 
-# **Scaling to Higher Load** 
+**Scaling to Higher Load**
 
 If all you need is to scale to higher load, the simplest approach is to buy a more powerful machine (sometimes called _vertical scaling_ or _scaling up_ ). Many CPUs, many RAM chips, and many disks can be joined together under one operating system, and a fast interconnect allows any CPU to access any part of the memory or disk. In this kind of _shared-memory architecture_ , all the components can be treated as a single machine [1].[i] 
 
@@ -31,7 +31,7 @@ A shared-memory architecture may offer limited fault tolerance—high-end machin
 
 Another approach is the _shared-disk architecture_ , which uses several machines with independent CPUs and RAM, but stores data on an array of disks that is shared between the machines, which are connected via a fast network.[ii] This architecture is used for some data warehousing workloads, but contention and the overhead of locking limit the scalability of the shared-disk approach [2]. 
 
-# **Shared-Nothing Architectures** 
+**Shared-Nothing Architectures**
 
 By contrast, _shared-nothing architectures_ [3] (sometimes called _horizontal scaling_ or _scaling out_ ) have gained a lot of popularity. In this approach, each machine or virtual machine running the database software is called a _node_ . Each node uses its CPUs, RAM, and disks independently. Any coordination between nodes is done at the software level, using a conventional network. 
 
@@ -48,15 +48,15 @@ In this part of the book, we focus on shared-nothing architectures—not because
 
 While a distributed shared-nothing architecture has many advantages, it usually also incurs additional complexity for applications and sometimes limits the expressiveness of the data models you can use. In some cases, a simple single-threaded program can perform significantly better than a cluster with over 100 CPU cores [4]. On the other hand, shared-nothing systems can be very powerful. The next few chapters go into details on the issues that arise when data is distributed. 
 
-# **Replication Versus Partitioning** 
+**Replication Versus Partitioning**
 
 There are two common ways data is distributed across multiple nodes: 
 
-# _Replication_ 
+**Replication**
 
 Keeping a copy of the same data on several different nodes, potentially in different locations. Replication provides redundancy: if some nodes are unavailable, the data can still be served from the remaining nodes. Replication can also help improve performance. We discuss replication in Chapter 5. 
 
-# _Partitioning_ 
+**Partitioning**
 
 Splitting a big database into smaller subsets called _partitions_ so that different partitions can be assigned to different nodes (also known as _sharding_ ). We discuss partitioning in Chapter 6. 
 
@@ -72,7 +72,7 @@ With an understanding of those concepts, we can discuss the difficult trade-offs
 
 Later, in Part III of this book, we will discuss how you can take several (potentially distributed) datastores and integrate them into a larger system, satisfying the needs of a complex application. But first, let’s talk about distributed data. 
 
-# **References** 
+**References**
 
 [1] Ulrich Drepper: “What Every Programmer Should Know About Memory,” _akkadia.org_ , November 21, 2007. 
 

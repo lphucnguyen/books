@@ -1,4 +1,4 @@
-# Chapter 12. The Future of Data Systems
+## Chapter 12. The Future of Data Systems
 
 _If a thing be ordained to another as to its end, its last end cannot consist in the preservation of its being. Hence a captain does not intend as a last end, the preservation of the ship entrusted to him, since a ship is ordained to something else as its end, viz. to navigation. (Often quoted as: If the highest aim of a captain was the preserve his ship, he would keep it in port forever.)_ 
 
@@ -11,7 +11,7 @@ Opinions and speculation about the future are of course subjective, and so I wil
 The goal of this book was outlined in Chapter 1: to explore how to create applications and systems that are _reliable_ , _scalable_ , and _maintainable_ . These themes have run through all of the chapters: for example, we discussed many fault-tolerance algorithms that help improve reliability, partitioning to improve scalability, and mechanisms for evolution and abstraction that improve maintainability. In this chapter we will bring all of these ideas together, and build on them to envisage the future. Our goal is to discover how to design applications that are better than the ones of today— robust, correct, evolvable, and ultimately beneficial to humanity. 
 
 
-## Data Integration
+### Data Integration
 
 A recurring theme in this book has been that for any given problem, there are several solutions, all of which have different pros, cons, and trade-offs. For example, when discussing storage engines in Chapter 3, we saw log-structured storage, B-trees, and column-oriented storage. When discussing replication in Chapter 5, we saw singleleader, multi-leader, and leaderless approaches. 
 
@@ -23,7 +23,7 @@ Faced with this profusion of alternatives, the first challenge is then to figure
 
 However, even if you perfectly understand the mapping between tools and circumstances for their use, there is another challenge: in complex applications, data is often used in several different ways. There is unlikely to be one piece of software that is suitable for _all_ the different circumstances in which the data is used, so you inevitably end up having to cobble together several different pieces of software in order to provide your application’s functionality. 
 
-### Combining Specialized Tools by Deriving Data 
+#### Combining Specialized Tools by Deriving Data
 
 For example, it is common to need to integrate an OLTP database with a full-text search index in order to handle queries for arbitrary keywords. Although some databases (such as PostgreSQL) include a full-text indexing feature, which can be sufficient for simple applications [1], more sophisticated search facilities require specialist information retrieval tools. Conversely, search indexes are generally not very suitable as a durable system of record, and so many applications need to combine two different tools in order to satisfy all of the requirements. 
 
@@ -31,7 +31,7 @@ We touched on the issue of integrating data systems in “Keeping Systems in Syn
 
 Surprisingly often I see software engineers make statements like, “In my experience, 99% of people only need X” or “…don’t need X” (for various values of X). I think that such statements say more about the experience of the speaker than about the actual usefulness of a technology. The range of different things you might want to do with data is dizzyingly wide. What one person considers to be an obscure and pointless feature may well be a central requirement for someone else. The need for data integration often only becomes apparent if you zoom out and consider the dataflows across an entire organization. 
 
-# **Reasoning about dataflows** 
+**Reasoning about dataflows**
 
 When copies of the same data need to be maintained in several storage systems in order to satisfy different access patterns, you need to be very clear about the inputs and outputs: where is data written first, and which representations are derived from which sources? How do you get data into all the right places, in the right formats? 
 
@@ -44,7 +44,7 @@ If it is possible for you to funnel all user input through a single system that 
 
 Updating a derived data system based on an event log can often be made deterministic and idempotent (see “Idempotence” on page 478), making it quite easy to recover from faults. 
 
-# **Derived data versus distributed transactions** 
+**Derived data versus distributed transactions**
 
 The classic approach for keeping different data systems consistent with each other involves distributed transactions, as discussed in “Atomic Commit and Two-Phase Commit (2PC)” on page 354. How does the approach of using derived data systems fare in comparison to distributed transactions? 
 
@@ -59,7 +59,7 @@ In the absence of widespread support for a good distributed transaction protocol
 In “Aiming for Correctness” on page 515 we will discuss some approaches for implementing stronger guarantees on top of asynchronously derived systems, and work toward a middle ground between distributed transactions and asynchronous logbased systems. 
 
 
-# **The limits of total ordering** 
+**The limits of total ordering**
 
 With systems that are small enough, constructing a totally ordered event log is entirely feasible (as demonstrated by the popularity of databases with single-leader replication, which construct precisely such a log). However, as systems are scaled toward bigger and more complex workloads, limitations begin to emerge: 
 
@@ -73,7 +73,7 @@ With systems that are small enough, constructing a totally ordered event log is 
 
 In formal terms, deciding on a total order of events is known as _total order broadcast_ , which is equivalent to consensus (see “Consensus algorithms and total order broadcast” on page 366). Most consensus algorithms are designed for situations in which the throughput of a single node is sufficient to process the entire stream of events, and these algorithms do not provide a mechanism for multiple nodes to share the work of ordering the events. It is still an open research problem to design consensus algorithms that can scale beyond the throughput of a single node and that work well in a geographically distributed setting. 
 
-# **Ordering events to capture causality** 
+**Ordering events to capture causality**
 
 In cases where there is no causal link between events, the lack of a total order is not a big problem, since concurrent events can be ordered arbitrarily. Some other cases are easy to handle: for example, when there are multiple updates of the same object, they can be totally ordered by routing all updates for a particular object ID to the same log 
 
@@ -94,7 +94,7 @@ In this example, the notifications are effectively a join between the messages a
 
 Perhaps, over time, patterns for application development will emerge that allow causal dependencies to be captured efficiently, and derived state to be maintained correctly, without forcing all events to go through the bottleneck of total order broadcast. 
 
-### Batch and Stream Processing 
+#### Batch and Stream Processing
 
 I would say that the goal of data integration is to make sure that data ends up in the right form in all the right places. Doing so requires consuming inputs, transforming, joining, filtering, aggregating, training models, evaluating, and eventually writing to 
 
@@ -107,7 +107,7 @@ As we saw in Chapter 10 and Chapter 11, batch and stream processing have a lot o
 
 Spark performs stream processing on top of a batch processing engine by breaking the stream into _microbatches_ , whereas Apache Flink performs batch processing on top of a stream processing engine [5]. In principle, one type of processing can be emulated on top of the other, although the performance characteristics vary: for example, microbatching may perform poorly on hopping or sliding windows [6]. 
 
-# **Maintaining derived state** 
+**Maintaining derived state**
 
 Batch processing has a quite strong functional flavor (even if the code is not written in a functional programming language): it encourages deterministic, pure functions whose output depends only on the input and which have no side effects other than the explicit outputs, treating inputs as immutable and outputs as append-only. Stream processing is similar, but it extends operators to allow managed, fault-tolerant state (see “Rebuilding state after a failure” on page 478). 
 
@@ -120,13 +120,13 @@ We saw in “Partitioning and Secondary Indexes” on page 206 that secondary in
 
 needs to send writes to multiple partitions (if the index is term-partitioned) or send reads to all partitions (if the index is document-partitioned). Such cross-partition communication is also most reliable and scalable if the index is maintained asynchronously [8] (see also “Multi-partition data processing” on page 514). 
 
-# **Reprocessing data for application evolution** 
+**Reprocessing data for application evolution**
 
 When maintaining derived data, batch and stream processing are both useful. Stream processing allows changes in the input to be reflected in derived views with low delay, whereas batch processing allows large amounts of accumulated historical data to be reprocessed in order to derive new views onto an existing dataset. 
 
 In particular, reprocessing existing data provides a good mechanism for maintaining a system, evolving it to support new features and changed requirements (see Chapter 4). Without reprocessing, schema evolution is limited to simple changes like adding a new optional field to a record, or adding a new type of record. This is the case both in a schema-on-write and in a schema-on-read context (see “Schema flexibility in the document model” on page 39). On the other hand, with reprocessing it is possible to restructure a dataset into a completely different model in order to better serve new requirements. 
 
-# **Schema Migrations on Railways** 
+**Schema Migrations on Railways**
 
 Large-scale “schema migrations” occur in noncomputer systems as well. For example, in the early days of railway building in 19th-century England there were various competing standards for the gauge (the distance between the two rails). Trains built for one gauge couldn’t run on tracks of another gauge, which restricted the possible interconnections in the train network [9]. 
 
@@ -139,7 +139,7 @@ Derived views allow _gradual_ evolution. If you want to restructure a dataset, y
 
 The beauty of such a gradual migration is that every stage of the process is easily reversible if something goes wrong: you always have a working system to go back to. By reducing the risk of irreversible damage, you can be more confident about going ahead, and thus move faster to improve your system [11]. 
 
-# **The lambda architecture** 
+**The lambda architecture**
 
 If batch processing is used to reprocess historical data, and stream processing is used to process recent updates, then how do you combine the two? The _lambda architecture_ [12] is a proposal in this area that has gained a lot of attention. 
 
@@ -156,7 +156,7 @@ The lambda architecture was an influential idea that shaped the design of data s
 
 - Although it is great to have the ability to reprocess the entire historical dataset, doing so frequently is expensive on large datasets. Thus, the batch pipeline often needs to be set up to process incremental batches (e.g., an hour’s worth of data at the end of every hour) rather than reprocessing everything. This raises the problems discussed in “Reasoning About Time” on page 468, such as handling stragglers and handling windows that cross boundaries between batches. Incrementalizing a batch computation adds complexity, making it more akin to the streaming layer, which runs counter to the goal of keeping the batch layer as simple as possible. 
 
-# **Unifying batch and stream processing** 
+**Unifying batch and stream processing**
 
 More recent work has enabled the benefits of the lambda architecture to be enjoyed without its downsides, by allowing both batch computations (reprocessing historical data) and stream computations (processing events as they arrive) to be implemented in the same system [15]. 
 
@@ -169,7 +169,7 @@ Unifying batch and stream processing in one system requires the following featur
 - Tools for windowing by event time, not by processing time, since processing time is meaningless when reprocessing historical events (see “Reasoning About Time” on page 468). For example, Apache Beam provides an API for expressing such computations, which can then be run using Apache Flink or Google Cloud Dataflow. 
 
 
-## Unbundling Databases
+### Unbundling Databases
 
 At a most abstract level, databases, Hadoop, and operating systems all perform the same functions: they store some data, and they allow you to process and query that data [16]. A database stores data in records of some data model (rows in tables, documents, vertices in a graph, etc.) while an operating system’s filesystem stores data in files—but at their core, both are “information management” systems [17]. As we saw in Chapter 10, the Hadoop ecosystem is somewhat like a distributed version of Unix. 
 
@@ -183,7 +183,7 @@ The tension between these philosophies has lasted for decades (both Unix and the
 
 In this section I will attempt to reconcile the two philosophies, in the hope that we can combine the best of both worlds. 
 
-### Composing Data Storage Technologies 
+#### Composing Data Storage Technologies
 
 Over the course of this book we have discussed various features provided by databases and how they work, including: 
 
@@ -200,7 +200,7 @@ In Chapters 10 and 11, similar themes emerged. We talked about building full-tex
 
 It seems that there are parallels between the features that are built into databases and the derived data systems that people are building with batch and stream processors. 
 
-# **Creating an index** 
+**Creating an index**
 
 Think about what happens when you run `CREATE INDEX` to create a new index in a relational database. The database has to scan over a consistent snapshot of a table, pick out all of the field values being indexed, sort them, and write out the index. Then it must process the backlog of writes that have been made since the consistent snapshot was taken (assuming the table was not locked while creating the index, so writes could continue). Once that is done, the database must continue to keep the index up to date whenever a transaction writes to the table. 
 
@@ -208,7 +208,7 @@ This process is remarkably similar to setting up a new follower replica (see “
 
 Whenever you run `CREATE INDEX` , the database essentially reprocesses the existing dataset (as discussed in “Reprocessing data for application evolution” on page 496) and derives the index as a new view onto the existing data. The existing data may be a snapshot of the state rather than a log of all changes that ever happened, but the two are closely related (see “State, Streams, and Immutability” on page 459). 
 
-# **The meta-database of everything** 
+**The meta-database of everything**
 
 In this light, I think that the dataflow across an entire organization starts looking like one huge database [7]. Whenever a batch, stream, or ETL process transports data from one place and form to another place and form, it is acting like the database subsystem that keeps indexes or materialized views up to date. 
 
@@ -217,19 +217,19 @@ Viewed like this, batch and stream processors are like elaborate implementations
 
 Where will these developments take us in the future? If we start from the premise that there is no single data model or storage format that is suitable for all access patterns, I speculate that there are two avenues by which different storage and processing tools can nevertheless be composed into a cohesive system: 
 
-# _Federated databases: unifying reads_ 
+**Federated databases: unifying reads**
 
 It is possible to provide a unified query interface to a wide variety of underlying storage engines and processing methods—an approach known as a _federated database_ or _polystore_ [18, 19]. For example, PostgreSQL’s _foreign data wrapper_ feature fits this pattern [20]. Applications that need a specialized data model or query interface can still access the underlying storage engines directly, while users who want to combine data from disparate places can do so easily through the federated interface. 
 
 A federated query interface follows the relational tradition of a single integrated system with a high-level query language and elegant semantics, but a complicated implementation. 
 
-# _Unbundled databases: unifying writes_ 
+**Unbundled databases: unifying writes**
 
 While federation addresses read-only querying across several different systems, it does not have a good answer to synchronizing writes across those systems. We said that within a single database, creating a consistent index is a built-in feature. When we compose several storage systems, we similarly need to ensure that all data changes end up in all the right places, even in the face of faults. Making it easier to reliably plug together storage systems (e.g., through change data capture and event logs) is like _unbundling_ a database’s index-maintenance features in a way that can synchronize writes across disparate technologies [7, 21]. 
 
 The unbundled approach follows the Unix tradition of small tools that do one thing well [22], that communicate through a uniform low-level API (pipes), and that can be composed using a higher-level language (the shell) [16]. 
 
-# **Making unbundling work** 
+**Making unbundling work**
 
 Federation and unbundling are two sides of the same coin: composing a reliable, scalable, and maintainable system out of diverse components. Federated read-only 
 
@@ -246,7 +246,7 @@ The big advantage of log-based integration is _loose coupling_ between the vario
 
 2. At a human level, unbundling data systems allows different software components and services to be developed, improved, and maintained independently from each other by different teams. Specialization allows each team to focus on doing one thing well, with well-defined interfaces to other teams’ systems. Event logs provide an interface that is powerful enough to capture fairly strong consistency properties (due to durability and ordering of events), but also general enough to be applicable to almost any kind of data. 
 
-# **Unbundled versus integrated systems** 
+**Unbundled versus integrated systems**
 
 If unbundling does indeed become the way of the future, it will not replace databases in their current form—they will still be needed as much as ever. Databases are still 
 
@@ -259,7 +259,7 @@ The goal of unbundling is not to compete with individual databases on performanc
 
 Thus, if there is a single technology that does everything you need, you’re most likely best off simply using that product rather than trying to reimplement it yourself from lower-level components. The advantages of unbundling and composition only come into the picture when there is no single piece of software that satisfies all your requirements. 
 
-# **What’s missing?** 
+**What’s missing?**
 
 The tools for composing data systems are getting better, but I think one major part is missing: we don’t yet have the unbundled-database equivalent of the Unix shell (i.e., a high-level language for composing storage and processing systems in a simple and declarative way). 
 
@@ -268,7 +268,7 @@ For example, I would love it if we could simply declare `mysql | elasticsearch` 
 
 Similarly, it would be great to be able to precompute and update caches more easily. Recall that a materialized view is essentially a precomputed cache, so you could imagine creating a cache by declaratively specifying materialized views for complex queries, including recursive queries on graphs (see “Graph-Like Data Models” on page 49) and application logic. There is interesting early-stage research in this area, such as _differential dataflow_ [24, 25], and I hope that these ideas will find their way into production systems. 
 
-### Designing Applications Around Dataflow 
+#### Designing Applications Around Dataflow
 
 The approach of unbundling databases by composing specialized storage and processing systems with application code is also becoming known as the “database inside-out” approach [26], after the title of a conference talk I gave in 2014 [27]. However, calling it a “new architecture” is too grandiose. I see it more as a design pattern, a starting point for discussion, and we give it a name simply so that we can better talk about it. 
 
@@ -281,7 +281,7 @@ Thus, I think that most data systems still have something to learn from the feat
 In this section I will expand on these ideas and explore some ways of building applications around the ideas of unbundled databases and dataflow. 
 
 
-# **Application code as a derivation function** 
+**Application code as a derivation function**
 
 When one dataset is derived from another, it goes through some kind of transformation function. For example: 
 
@@ -297,7 +297,7 @@ The derivation function for a secondary index is so commonly required that it is
 
 When the function that creates a derived dataset is not a standard cookie-cutter function like creating a secondary index, custom code is required to handle the application-specific aspects. And this custom code is where many databases struggle. Although relational databases commonly support triggers, stored procedures, and user-defined functions, which can be used to execute application code within the database, they have been somewhat of an afterthought in database design (see “Transmitting Event Streams” on page 440). 
 
-# **Separation of application code and state** 
+**Separation of application code and state**
 
 In theory, databases could be deployment environments for arbitrary application code, like an operating system. However, in practice they have turned out to be 
 
@@ -319,7 +319,7 @@ Databases have inherited this passive approach to mutable data: if you want to f
 > i. Explaining a joke rarely improves it, but I don’t want anyone to feel left out. Here, _Church_ is a reference to the mathematician Alonzo Church, who created the lambda calculus, an early form of computation that is the basis for most functional programming languages. The lambda calculus has no mutable state (i.e., no variables that can be overwritten), so one could say that mutable state is separate from Church’s work. 
 
 
-# **Dataflow: Interplay between state changes and application code** 
+**Dataflow: Interplay between state changes and application code**
 
 Thinking about applications in terms of dataflow implies renegotiating the relationship between application code and state management. Instead of treating a database as a passive variable that is manipulated by the application, we think much more about the interplay and collaboration between state, state changes, and code that processes them. Application code responds to state changes in one place by triggering state changes in another place. 
 
@@ -338,7 +338,7 @@ Stable message ordering and fault-tolerant message processing are quite stringen
 
 This application code can do the arbitrary processing that built-in derivation functions in databases generally don’t provide. Like Unix tools chained by pipes, stream operators can be composed to build large systems around dataflow. Each operator takes streams of state changes as input, and produces other streams of state changes as output. 
 
-# **Stream processors and services** 
+**Stream processors and services**
 
 The currently trendy style of application development involves breaking down functionality into a set of _services_ that communicate via synchronous network requests such as REST APIs (see “Dataflow Through Services: REST and RPC” on page 131). The advantage of such a service-oriented architecture over a single monolithic application is primarily organizational scalability through loose coupling: different teams can work on different services, which reduces coordination effort between teams (as long as the services can be deployed and updated independently). 
 
@@ -361,7 +361,7 @@ The join is time-dependent: if the purchase events are reprocessed at a later po
 
 Subscribing to a stream of changes, rather than querying the current state when needed, brings us closer to a spreadsheet-like model of computation: when some piece of data changes, any derived data that depends on it can swiftly be updated. There are still many open questions, for example around issues like time-dependent joins, but I believe that building applications around dataflow ideas is a very promising direction to go in. 
 
-### Observing Derived State 
+#### Observing Derived State
 
 At an abstract level, the dataflow systems discussed in the last section give you a process for creating derived datasets (such as search indexes, materialized views, and predictive models) and keeping them up to date. Let’s call that process the _write path_ : whenever some piece of information is written to the system, it may go through multiple stages of batch and stream processing, and eventually every derived dataset is updated to incorporate the data that was written. Figure 12-1 shows an example of updating a search index. 
 
@@ -380,7 +380,7 @@ Taken together, the write path and the read path encompass the whole journey of 
 
 The derived dataset is the place where the write path and the read path meet, as illustrated in Figure 12-1. It represents a trade-off between the amount of work that needs to be done at write time and the amount that needs to be done at read time. 
 
-# **Materialized views and caching** 
+**Materialized views and caching**
 
 A full-text search index is a good example: the write path updates the index, and the read path searches the index for keywords. Both reads and writes need to do some work. Writes need to update the index entries for all terms that appear in the document. Reads need to search for each of the words in the query, and apply Boolean logic to find documents that contain _all_ of the words in the query (an `AND` operator), or _any_ synonym of each of the words (an `OR` operator). 
 
@@ -399,7 +399,7 @@ From this example we can see that an index is not the only possible boundary bet
 
 Shifting the boundary between work done on the write path and the read path was in fact the topic of the Twitter example at the beginning of this book, in “Describing Load” on page 11. In that example, we also saw how the boundary between write path and read path might be drawn differently for celebrities compared to ordinary users. After 500 pages we have come full circle! 
 
-# **Stateful, offline-capable clients** 
+**Stateful, offline-capable clients**
 
 I find the idea of a boundary between write and read paths interesting because we can discuss shifting that boundary and explore what that shift means in practical terms. Let’s look at the idea in a different context. 
 
@@ -412,7 +412,7 @@ These changing capabilities have led to a renewed interest in _offline-first_ ap
 
 When we move away from the assumption of stateless clients talking to a central database and toward state that is maintained on end-user devices, a world of new opportunities opens up. In particular, we can think of the on-device state as a _cache of state on the server_ . The pixels on the screen are a materialized view onto model objects in the client app; the model objects are a local replica of state in a remote datacenter [27]. 
 
-# **Pushing state changes to clients** 
+**Pushing state changes to clients**
 
 In a typical web page, if you load the page in a web browser and the data subsequently changes on the server, the browser does not find out about the change until you reload the page. The browser only reads the data at one point in time, assuming that it is static—it does not subscribe to updates from the server. Thus, the state on the device is a stale cache that is not updated unless you explicitly poll for changes. (HTTP-based feed subscription protocols like RSS are really just a basic form of polling.) 
 
@@ -422,7 +422,7 @@ In terms of our model of write path and read path, actively pushing state change
 
 The devices will be offline some of the time, and unable to receive any notifications of state changes from the server during that time. But we already solved that problem: in “Consumer offsets” on page 449 we discussed how a consumer of a log-based message broker can reconnect after failing or becoming disconnected, and ensure that it doesn’t miss any messages that arrived while it was disconnected. The same technique works for individual users, where each device is a small subscriber to a small stream of events. 
 
-# **End-to-end event streams** 
+**End-to-end event streams**
 
 Recent tools for developing stateful clients and user interfaces, such as the Elm language [30] and Facebook’s toolchain of React, Flux, and Redux [44], already manage 
 
@@ -437,7 +437,7 @@ The challenge is that the assumption of stateless clients and request/response i
 
 In order to extend the write path all the way to the end user, we would need to fundamentally rethink the way we build many of these systems: moving away from request/ response interaction and toward publish/subscribe dataflow [27]. I think that the advantages of more responsive user interfaces and better offline support would make it worth the effort. If you are designing data systems, I hope that you will keep in mind the option of subscribing to changes, not just querying the current state. 
 
-# **Reads are events too** 
+**Reads are events too**
 
 We discussed that when a stream processor writes derived data to a store (database, cache, or index), and when user requests query that store, the store acts as the boundary between the write path and the read path. The store allows random-access read queries to the data that would otherwise require scanning the whole event log. 
 
@@ -456,7 +456,7 @@ Recording a log of read events potentially also has benefits with regard to trac
 
 Writing read events to durable storage thus enables better tracking of causal dependencies (see “Ordering events to capture causality” on page 493), but it incurs additional storage and I/O cost. Optimizing such systems to reduce the overhead is still an open research problem [2]. But if you already log read requests for operational purposes, as a side effect of request processing, it is not such a great change to make the log the source of the requests instead. 
 
-# **Multi-partition data processing** 
+**Multi-partition data processing**
 
 For queries that only touch a single partition, the effort of sending queries through a stream and collecting a stream of responses is perhaps overkill. However, this idea opens the possibility of distributed execution of complex queries that need to combine data from several partitions, taking advantage of the infrastructure for message routing, partitioning, and joining that is already provided by stream processors. 
 
@@ -467,7 +467,7 @@ Another example of this pattern occurs in fraud prevention: in order to assess t
 
 The internal query execution graphs of MPP databases have similar characteristics (see “Comparing Hadoop to Distributed Databases” on page 414). If you need to perform this kind of multi-partition join, it is probably simpler to use a database that provides this feature than to implement it using a stream processor. However, treating queries as streams provides an option for implementing large-scale applications that run against the limits of conventional off-the-shelf solutions. 
 
-## Aiming for correctness
+### Aiming for Correctness
 
 With stateless services that only read data, it is not a big deal if something goes wrong: you can fix the bug and restart the service, and everything returns to normal. Stateful systems such as databases are not so simple: they are designed to remember things forever (more or less), so if something goes wrong, the effects also potentially last forever—which means they require more careful thought [50]. 
 
@@ -486,7 +486,7 @@ If your application can tolerate occasionally corrupting or losing data in unpre
 
 While the traditional transaction approach is not going away, I also believe it is not the last word in making applications correct and resilient to faults. In this section I will suggest some ways of thinking about correctness in the context of dataflow architectures. 
 
-### The End-to-End Argument for Databases 
+#### The End-to-End Argument for Databases
 
 Just because an application uses a data system that provides comparatively strong safety properties, such as serializable transactions, that does not mean the application is guaranteed to be free from data loss or corruption. For example, if an application has a bug that causes it to write incorrect data, or delete data from a database, serializable transactions aren’t going to save you. 
 
@@ -494,7 +494,7 @@ This example may seem frivolous, but it is worth taking seriously: application b
 
 Although immutability is useful, it is not a cure-all by itself. Let’s look at a more subtle example of data corruption that can occur. 
 
-# **Exactly-once execution of an operation** 
+**Exactly-once execution of an operation**
 
 In “Fault Tolerance” on page 476 we encountered an idea called _exactly-once_ (or _effectively-once_ ) semantics. If something goes wrong while processing a message, you can either give up (drop the message—i.e., incur data loss) or try again. If you try again, there is the risk that it actually succeeded the first time, but you just didn’t find out about the success, and so the message ends up being processed twice. 
 
@@ -505,15 +505,15 @@ Processing twice is a form of data corruption: it is undesirable to charge a cus
 
 One of the most effective approaches is to make the operation _idempotent_ (see “Idempotence” on page 478); that is, to ensure that it has the same effect, no matter whether it is executed once or multiple times. However, taking an operation that is not naturally idempotent and making it idempotent requires some effort and care: you may need to maintain some additional metadata (such as the set of operation IDs that have updated a value), and ensure fencing when failing over from one node to another (see “The leader and the lock” on page 301). 
 
-# **Duplicate suppression** 
+**Duplicate suppression**
 
 The same pattern of needing to suppress duplicates occurs in many other places besides stream processing. For example, TCP uses sequence numbers on packets to put them in the correct order at the recipient, and to determine whether any packets were lost or duplicated on the network. Any lost packets are retransmitted and any duplicates are removed by the TCP stack before it hands the data to an application. 
 
 However, this duplicate suppression only works within the context of a single TCP connection. Imagine the TCP connection is a client’s connection to a database, and it is currently executing the transaction in Example 12-1. In many databases, a transaction is tied to a client connection (if the client sends several queries, the database knows that they belong to the same transaction because they are sent on the same TCP connection). If the client suffers a network interruption and connection timeout after sending the `COMMIT` , but before hearing back from the database server, it does not know whether the transaction has been committed or aborted (Figure 8-1). 
 
-# _Example 12-1. A nonidempotent transfer of money from one account to another_ 
+**Example 12-1. A nonidempotent transfer of money from one account to another**
 
-# **`BEGIN`** `TRANSACTION;` 
+**`BEGIN` `TRANSACTION;`**
 
 ```
 UPDATEaccountsSETbalance=balance+11.00WHEREaccount_id=1234;
@@ -532,13 +532,13 @@ Even if we can suppress duplicate transactions between the database client and s
 
 In this case, the user will probably be shown an error message, and they may retry manually. Web browsers warn, “Are you sure you want to submit this form again?”— and the user says yes, because they wanted the operation to happen. (The Post/Redirect/Get pattern [54] avoids this warning message in normal operation, but it doesn’t help if the POST request times out.) From the web server’s point of view the retry is a separate request, and from the database’s point of view it is a separate transaction. The usual deduplication mechanisms don’t help. 
 
-# **Operation identifiers** 
+**Operation identifiers**
 
 To make the operation idempotent through several hops of network communication, it is not sufficient to rely just on a transaction mechanism provided by a database— you need to consider the _end-to-end_ flow of the request. 
 
 For example, you could generate a unique identifier for an operation (such as a UUID) and include it as a hidden form field in the client application, or calculate a hash of all the relevant form fields to derive the operation ID [3]. If the web browser submits the POST request twice, the two requests will have the same operation ID. You can then pass that operation ID all the way through to the database and check that you only ever execute one operation with a given ID, as shown in Example 12-2. 
 
-# _Example 12-2. Suppressing duplicate requests using a unique ID_ 
+**Example 12-2. Suppressing duplicate requests using a unique ID**
 
 ```
 ALTERTABLErequestsADDUNIQUE (request_id);
@@ -568,7 +568,7 @@ Example 12-2 relies on a uniqueness constraint on the `request_id` column. If a 
 
 Besides suppressing duplicate requests, the `requests` table in Example 12-2 acts as a kind of event log, hinting in the direction of event sourcing (see “Event Sourcing” on page 457). The updates to the account balances don’t actually have to happen in the same transaction as the insertion of the event, since they are redundant and could be derived from the request event in a downstream consumer—as long as the event is processed exactly once, which can again be enforced using the request ID. 
 
-# **The end-to-end argument** 
+**The end-to-end argument**
 
 This scenario of suppressing duplicate transactions is just one example of a more general principle called the _end-to-end argument_ , which was articulated by Saltzer, Reed, and Clark in 1984 [55]: 
 
@@ -585,7 +585,7 @@ against network attackers, but not against compromises of the server. Only end-t
 
 Although the low-level features (TCP duplicate suppression, Ethernet checksums, WiFi encryption) cannot provide the desired end-to-end features by themselves, they are still useful, since they reduce the probability of problems at the higher levels. For example, HTTP requests would often get mangled if we didn’t have TCP putting the packets back in the right order. We just need to remember that the low-level reliability features are not by themselves sufficient to ensure end-to-end correctness. 
 
-# **Applying end-to-end thinking in data systems** 
+**Applying end-to-end thinking in data systems**
 
 This brings me back to my original thesis: just because an application uses a data system that provides comparatively strong safety properties, such as serializable transactions, that does not mean the application is guaranteed to be free from data loss or corruption. The application itself needs to take end-to-end measures, such as duplicate suppression, as well. 
 
@@ -598,7 +598,7 @@ Transactions are expensive, especially when they involve heterogeneous storage t
 For these reasons, I think it is worth exploring fault-tolerance abstractions that make it easy to provide application-specific end-to-end correctness properties, but also maintain good performance and good operational characteristics in a large-scale distributed environment. 
 
 
-### Enforcing Constraints 
+#### Enforcing Constraints
 
 Let’s think about correctness in the context of the ideas around unbundling databases (“Unbundling Databases” on page 499). We saw that end-to-end duplicate suppression can be achieved with a request ID that is passed all the way from the client to the database that records the write. What about other kinds of constraints? 
 
@@ -606,7 +606,7 @@ In particular, let’s focus on uniqueness constraints—such as the one we reli
 
 Other kinds of constraints are very similar: for example, ensuring that an account balance never goes negative, that you don’t sell more items than you have in stock in the warehouse, or that a meeting room does not have overlapping bookings. Techniques that enforce uniqueness can often be used for these kinds of constraints as well. 
 
-# **Uniqueness constraints require consensus** 
+**Uniqueness constraints require consensus**
 
 In Chapter 9 we saw that in a distributed setting, enforcing a uniqueness constraint requires consensus: if there are several concurrent requests with the same value, the system somehow needs to decide which one of the conflicting operations is accepted, and reject the others as violations of the constraint. 
 
@@ -617,7 +617,7 @@ Uniqueness checking can be scaled out by partitioning based on the value that ne
 However, asynchronous multi-master replication is ruled out, because it could happen that different masters concurrently accept conflicting writes, and thus the values are no longer unique (see “Implementing Linearizable Systems” on page 332). If you want to be able to immediately reject any writes that would violate the constraint, synchronous coordination is unavoidable [56]. 
 
 
-# **Uniqueness in log-based messaging** 
+**Uniqueness in log-based messaging**
 
 The log ensures that all consumers see messages in the same order—a guarantee that is formally known as _total order broadcast_ and is equivalent to consensus (see “Total Order Broadcast” on page 348). In the unbundled database approach with log-based messaging, we can use a very similar approach to enforce uniqueness constraints. 
 
@@ -633,7 +633,7 @@ This algorithm is basically the same as in “Implementing linearizable storage 
 
 The approach works not only for uniqueness constraints, but also for many other kinds of constraints. Its fundamental principle is that any writes that may conflict are routed to the same partition and processed sequentially. As discussed in “What is a conflict?” on page 174 and “Write Skew and Phantoms” on page 246, the definition of a conflict may depend on the application, but the stream processor can use arbitrary logic to validate a request. This idea is similar to the approach pioneered by Bayou in the 1990s [58]. 
 
-# **Multi-partition request processing** 
+**Multi-partition request processing**
 
 Ensuring that an operation is executed atomically, while satisfying constraints, becomes more interesting when several partitions are involved. In Example 12-2, there are potentially three partitions: the one containing the request ID, the one containing the payee account, and the one containing the payer account. There is no reason why those three things should be in the same partition, since they are all independent from each other. 
 
@@ -658,7 +658,7 @@ By breaking down the multi-partition transaction into two differently partitione
 
 idea of using multiple differently partitioned stages is similar to what we discussed in “Multi-partition data processing” on page 514 (see also “Concurrency control” on page 462). 
 
-### Timeliness and Integrity 
+#### Timeliness and Integrity
 
 A convenient property of transactions is that they are typically linearizable (see “Linearizability” on page 324): that is, a writer waits until a transaction is committed, and thereafter its writes are immediately visible to all readers. 
 
@@ -668,13 +668,13 @@ In this example, the correctness of the uniqueness check does not depend on whet
 
 More generally, I think the term _consistency_ conflates two different requirements that are worth considering separately: 
 
-# _Timeliness_ 
+**Timeliness**
 
 Timeliness means ensuring that users observe the system in an up-to-date state. We saw previously that if a user reads from a stale copy of the data, they may observe it in an inconsistent state (see “Problems with Replication Lag” on page 161). However, that inconsistency is temporary, and will eventually be resolved simply by waiting and trying again. 
 
 The CAP theorem (see “The Cost of Linearizability” on page 335) uses consistency in the sense of linearizability, which is a strong way of achieving timeliness. Weaker timeliness properties like _read-after-write_ consistency (see “Reading Your Own Writes” on page 162) can also be useful. 
 
-# _Integrity_ 
+**Integrity**
 
 Integrity means absence of corruption; i.e., no data loss, and no contradictory or false data. In particular, if some derived dataset is maintained as a view onto some underlying data (see “Deriving current state from the event log” on page 458), the derivation must be correct. For example, a database index must correctly reflect the contents of the database—an index in which some records are missing is not very useful. 
 
@@ -687,7 +687,7 @@ I am going to assert that in most applications, integrity is much more important
 
 For example, on your credit card statement, it is not surprising if a transaction that you made within the last 24 hours does not yet appear—it is normal that these systems have a certain lag. We know that banks reconcile and settle transactions asynchronously, and timeliness is not very important here [3]. However, it would be very bad if the statement balance was not equal to the sum of the transactions plus the previous statement balance (an error in the sums), or if a transaction was charged to you but not paid to the merchant (disappearing money). Such problems would be violations of the integrity of the system. 
 
-# **Correctness of dataflow systems** 
+**Correctness of dataflow systems**
 
 ACID transactions usually provide both timeliness (e.g., linearizability) and integrity (e.g., atomic commit) guarantees. Thus, if you approach application correctness from the point of view of ACID transactions, the distinction between timeliness and integrity is fairly inconsequential. 
 
@@ -710,7 +710,7 @@ performance and operational robustness. We achieved this integrity through a com
 
 This combination of mechanisms seems to me a very promising direction for building fault-tolerant applications in the future. 
 
-# **Loosely interpreted constraints** 
+**Loosely interpreted constraints**
 
 As discussed previously, enforcing a uniqueness constraint requires consensus, typically implemented by funneling all events in a particular partition through a single node. This limitation is unavoidable if we want the traditional form of uniqueness constraint, and stream processing cannot avoid it. 
 
@@ -730,7 +730,7 @@ Whether the cost of the apology is acceptable is a business decision. If it is a
 
 These applications _do_ require integrity: you would not want to lose a reservation, or have money disappear due to mismatched credits and debits. But they _don’t_ require timeliness on the enforcement of the constraint: if you have sold more items than you have in the warehouse, you can patch up the problem after the fact by apologizing. Doing so is similar to the conflict resolution approaches we discussed in “Handling Write Conflicts” on page 171. 
 
-# **Coordination-avoiding data systems** 
+**Coordination-avoiding data systems**
 
 We have now made two interesting observations: 
 
@@ -747,7 +747,7 @@ In this context, serializable transactions are still useful as part of maintaini
 
 Another way of looking at coordination and constraints: they reduce the number of apologies you have to make due to inconsistencies, but potentially also reduce the performance and availability of your system, and thus potentially increase the number of apologies you have to make due to outages. You cannot reduce the number of apologies to zero, but you can aim to find the best trade-off for your needs—the sweet spot where there are neither too many inconsistencies nor too many availability problems. 
 
-### Trust, but Verify 
+#### Trust, but Verify
 
 All of our discussion of correctness, integrity, and fault-tolerance has been under the assumption that certain things might go wrong, but other things won’t. We call these assumptions our _system model_ (see “Mapping system models to the real world” on page 309): for example, we should assume that processes can crash, machines can suddenly lose power, and the network can arbitrarily delay or drop messages. But we might also assume that data written to disk is not lost after `fsync` , that data in memory is not corrupted, and that the multiplication instruction of our CPU always returns the correct result. 
 
@@ -762,7 +762,7 @@ One application that I worked on in the past collected crash reports from client
 
 To be clear, random bit-flips are still very rare on modern hardware [64]. I just want to point out that they are not beyond the realm of possibility, and so they deserve some attention. 
 
-# **Maintaining integrity in the face of software bugs** 
+**Maintaining integrity in the face of software bugs**
 
 Besides such hardware issues, there is always the risk of software bugs, which would not be caught by lower-level network, memory, or filesystem checksums. Even widely used database software has bugs: I have personally seen cases of MySQL failing to correctly maintain a uniqueness constraint [65] and PostgreSQL’s serializable isolation level exhibiting write skew anomalies [66], even though MySQL and PostgreSQL are robust and well-regarded databases that have been battle-tested by many people for many years. In less mature software, the situation is likely to be much worse. 
 
@@ -775,7 +775,7 @@ Consistency in the sense of ACID (see “Consistency” on page 224) is based on
 
 in some way, for example using a weak isolation level unsafely, the integrity of the database cannot be guaranteed. 
 
-# **Don’t just blindly trust what they promise** 
+**Don’t just blindly trust what they promise**
 
 With both hardware and software not always living up to the ideal that we would like them to be, it seems that data corruption is inevitable sooner or later. Thus, we should at least have a way of finding out if data has been corrupted so that we can fix it and try to track down the source of the error. Checking the integrity of data is known as _auditing_ . 
 
@@ -785,7 +785,7 @@ Mature systems similarly tend to consider the possibility of unlikely things goi
 
 If you want to be sure that your data is still there, you have to actually read it and check. Most of the time it will still be there, but if it isn’t, you really want to find out sooner rather than later. By the same argument, it is important to try restoring from your backups from time to time—otherwise you may only find out that your backup is broken when it is too late and you have already lost data. Don’t just blindly trust that it is all working. 
 
-# **A culture of verification** 
+**A culture of verification**
 
 Systems like HDFS and S3 still have to assume that disks work correctly most of the time—which is a reasonable assumption, but not the same as assuming that they _always_ work correctly. However, not many systems currently have this kind of “trust, but verify” approach of continually auditing themselves. Many assume that correctness guarantees are absolute and make no provision for the possibility of rare data corruption. I hope that in the future we will see more _self-validating_ or _self-auditing_ systems that continually check their own integrity, rather than relying on blind trust [68]. 
 
@@ -794,7 +794,7 @@ I fear that the culture of ACID databases has led us toward developing applicati
 
 But then the database landscape changed: weaker consistency guarantees became the norm under the banner of NoSQL, and less mature storage technologies became widely used. Yet, because the audit mechanisms had not been developed, we continued building applications on the basis of blind trust, even though this approach had now become more dangerous. Let’s think for a moment about designing for auditability. 
 
-# **Designing for auditability** 
+**Designing for auditability**
 
 If a transaction mutates several objects in a database, it is difficult to tell after the fact what that transaction means. Even if you capture the transaction logs (see “Change Data Capture” on page 454), the insertions, updates, and deletions in various tables do not necessarily give a clear picture of _why_ those mutations were performed. The invocation of the application logic that decided on those mutations is transient and cannot be reproduced. 
 
@@ -804,7 +804,7 @@ Being explicit about dataflow (see “Philosophy of batch process outputs” on 
 
 A deterministic and well-defined dataflow also makes it easier to debug and trace the execution of a system in order to determine why it did something [4, 69]. If something unexpected occurred, it is valuable to have the diagnostic capability to reproduce the exact circumstances that led to the unexpected event—a kind of time-travel debugging capability. 
 
-# **The end-to-end argument again** 
+**The end-to-end argument again**
 
 If we cannot fully trust that every individual component of the system will be free from corruption—that every piece of hardware is fault-free and that every piece of software is bug-free—then we must at least periodically check the integrity of our data. If we don’t check, we won’t find out about corruption until it is too late and it has caused some downstream damage, at which point it will be much harder and more expensive to track down the problem. 
 
@@ -815,7 +815,7 @@ include in an integrity check, the fewer opportunities there are for corruption 
 
 Having continuous end-to-end integrity checks gives you increased confidence about the correctness of your systems, which in turn allows you to move faster [70]. Like automated testing, auditing increases the chances that bugs will be found quickly, and thus reduces the risk that a change to the system or a new storage technology will cause damage. If you are not afraid of making changes, you can much better evolve an application to meet changing requirements. 
 
-# **Tools for auditable data systems** 
+**Tools for auditable data systems**
 
 At present, not many data systems make auditability a top-level concern. Some applications implement their own audit mechanisms, for example by logging all changes to a separate audit table, but guaranteeing the integrity of the audit log and the database state is still difficult. A transaction log can be made tamper-proof by periodically signing it with a hardware security module, but that does not guarantee that the right transactions went into the log in the first place. 
 
@@ -830,7 +830,7 @@ Cryptographic auditing and integrity checking often relies on _Merkle trees_ [74
 
 I could imagine integrity-checking and auditing algorithms, like those of certificate transparency and distributed ledgers, becoming more widely used in data systems in general. Some work will be needed to make them equally scalable as systems without cryptographic auditing, and to keep the performance penalty as low as possible. But I think this is an interesting area to watch in the future. 
 
-## Doing the right thing
+### Doing the Right Thing
 
 In the final section of this book, I would like to take a step back. Throughout this book we have examined a wide range of different architectures for data systems, evaluated their pros and cons, and explored techniques for building reliable, scalable, and maintainable applications. However, we have left out an important and fundamental part of the discussion, which I would now like to fill in. 
 
@@ -842,7 +842,7 @@ Software development increasingly involves making important ethical choices. The
 
 A technology is not good or bad in itself—what matters is how it is used and how it affects people. This is true for a software system like a search engine in much the same way as it is for a weapon like a gun. I think it is not sufficient for software engineers to focus exclusively on the technology and ignore its consequences: the ethical responsibility is ours to bear also. Reasoning about ethics is difficult, but it is too important to ignore. 
 
-### Predictive Analytics 
+#### Predictive Analytics
 
 For example, predictive analytics is a major part of the “Big Data” hype. Using data analysis to predict the weather, or the spread of diseases, is one thing [81]; it is another matter to predict whether a convict is likely to reoffend, whether an applicant for a loan is likely to default, or whether an insurance customer is likely to make expensive claims. The latter have a direct effect on individual people’s lives. 
 
@@ -851,7 +851,7 @@ Naturally, payment networks want to prevent fraudulent transactions, banks want 
 
 However, as algorithmic decision-making becomes more widespread, someone who has (accurately or falsely) been labeled as risky by some algorithm may suffer a large number of those “no” decisions. Systematically being excluded from jobs, air travel, insurance coverage, property rental, financial services, and other key aspects of society is such a large constraint of the individual’s freedom that it has been called “algorithmic prison” [82]. In countries that respect human rights, the criminal justice system presumes innocence until proven guilty; on the other hand, automated systems can systematically and arbitrarily exclude a person from participating in society without any proof of guilt, and with little chance of appeal. 
 
-# **Bias and discrimination** 
+**Bias and discrimination**
 
 Decisions made by an algorithm are not necessarily any better or any worse than those made by a human. Every person is likely to have biases, even if they actively try to counteract them, and discriminatory practices can become culturally institutionalized. There is hope that basing decisions on data, rather than subjective and instinctive assessments by people, could be more fair and give a better chance to people who are often overlooked in the traditional system [83]. 
 
@@ -864,7 +864,7 @@ Predictive analytics systems merely extrapolate from the past; if the past is di
 
 past, moral imagination is required, and that’s something only humans can provide [87]. Data and models should be our tools, not our masters. 
 
-# **Responsibility and accountability** 
+**Responsibility and accountability**
 
 Automated decision making opens the question of responsibility and accountability [87]. If a human makes a mistake, they can be held accountable, and the person affected by the decision can appeal. Algorithms make mistakes too, but who is accountable if they go wrong [88]? When a self-driving car causes an accident, who is responsible? If an automated credit scoring algorithm systematically discriminates against people of a particular race or religion, is there any recourse? If a decision by your machine learning system comes under judicial review, can you explain to the judge how the algorithm made its decision? 
 
@@ -881,7 +881,7 @@ We will also need to figure out how to prevent data being used to harm people, a
 
 social characteristics of people’s lives. On the one hand, this power could be used to focus aid and support to help those people who most need it. On the other hand, it is sometimes used by predatory business seeking to identify vulnerable people and sell them risky products such as high-cost loans and worthless college degrees [87, 90]. 
 
-# **Feedback loops** 
+**Feedback loops**
 
 Even with predictive applications that have less immediately far-reaching effects on people, such as recommendation systems, there are difficult issues that we must confront. When services become good at predicting what content users want to see, they may end up showing people only opinions they already agree with, leading to echo chambers in which stereotypes, misinformation, and polarization can breed. We are already seeing the impact of social media echo chambers on election campaigns [91]. 
 
@@ -889,7 +889,7 @@ When predictive analytics affect people’s lives, particularly pernicious probl
 
 We can’t always predict when such feedback loops happen. However, many consequences can be predicted by thinking about the entire system (not just the computerized parts, but also the people interacting with it)—an approach known as _systems thinking_ [92]. We can try to understand how a data analysis system responds to different behaviors, structures, or characteristics. Does the system reinforce and amplify existing differences between people (e.g., making the rich richer or the poor poorer), or does it try to combat injustice? And even with the best intentions, we must beware of unintended consequences. 
 
-### Privacy and Tracking 
+#### Privacy and Tracking
 
 Besides the problems of predictive analytics—i.e., using data to make automated decisions about people—there are ethical problems with data collection itself. What is the relationship between the organizations collecting data and the people whose data is being collected? 
 
@@ -904,7 +904,7 @@ However, depending on a company’s business model, tracking often doesn’t sto
 
 Now the relationship between the company and the user whose data is being collected starts looking quite different. The user is given a free service and is coaxed into engaging with it as much as possible. The tracking of the user serves not primarily that individual, but rather the needs of the advertisers who are funding the service. I think this relationship can be appropriately described with a word that has more sinister connotations: _surveillance_ . 
 
-# **Surveillance** 
+**Surveillance**
 
 As a thought experiment, try replacing the word _data_ with _surveillance_ , and observe if common phrases still sound so good [93]. How about this: “In our surveillancedriven organization we collect real-time surveillance streams and store them in our surveillance warehouse. Our surveillance scientists use advanced analytics and surveillance processing in order to derive new insights.” 
 
@@ -919,7 +919,7 @@ Not all data collection necessarily qualifies as surveillance, but examining it 
 
 We are already seeing car insurance premiums linked to tracking devices in cars, and health insurance coverage that depends on people wearing a fitness tracking device. When surveillance is used to determine things that hold sway over important aspects of life, such as insurance coverage or employment, it starts to appear less benign. Moreover, data analysis can reveal surprisingly intrusive things: for example, the movement sensor in a smartwatch or fitness tracker can be used to work out what you are typing (for example, passwords) with fairly good accuracy [98]. And algorithms for analysis are only going to get better. 
 
-# **Consent and freedom of choice** 
+**Consent and freedom of choice**
 
 We might assert that users voluntarily choose to use a service that tracks their activity, and they have agreed to the terms of service and privacy policy, so they consent to data collection. We might even claim that users are receiving a valuable service in return for the data they provide, and that the tracking is necessary in order to provide the service. Undoubtedly, social networks, search engines, and various other free online services are valuable to users—but there are problems with this argument. 
 
@@ -934,7 +934,7 @@ For a user who does not consent to surveillance, the only real alternative is si
 
 Declining to use a service due to its tracking of users is only an option for the small number of people who are privileged enough to have the time and knowledge to understand its privacy policy, and who can afford to potentially miss out on social participation or professional opportunities that may have arisen if they had participated in the service. For people in a less privileged position, there is no meaningful freedom of choice: surveillance becomes inescapable. 
 
-# **Privacy and use of data** 
+**Privacy and use of data**
 
 Sometimes people claim that “privacy is dead” on the grounds that some users are willing to post all sorts of things about their lives to social media, sometimes mundane and sometimes deeply personal. However, this claim is false and rests on a misunderstanding of the word _privacy_ . 
 
@@ -953,7 +953,7 @@ Privacy settings that allow a user of an online service to control which aspects
 
 This kind of large-scale transfer of privacy rights from individuals to corporations is historically unprecedented [99]. Surveillance has always existed, but it used to be expensive and manual, not scalable and automated. Trust relationships have always existed, for example between a patient and their doctor, or between a defendant and their attorney—but in these cases the use of data has been strictly governed by ethical, legal, and regulatory constraints. Internet services have made it much easier to amass huge amounts of sensitive information without meaningful consent, and to use it at massive scale without users understanding what is happening to their private data. 
 
-# **Data as assets and power** 
+**Data as assets and power**
 
 Since behavioral data is a byproduct of users interacting with a service, it is sometimes called “data exhaust”—suggesting that the data is worthless waste material. Viewed this way, behavioral and predictive analytics can be seen as a form of recycling that extracts value from data that would have otherwise been thrown away. 
 
@@ -969,7 +969,7 @@ When collecting data, we need to consider not just today’s political environme
 
 “Knowledge is power,” as the old adage goes. And furthermore, “to scrutinize others while avoiding scrutiny oneself is one of the most important forms of power” [105]. This is why totalitarian governments want surveillance: it gives them the power to control the population. Although today’s technology companies are not overtly seeking political power, the data and knowledge they have accumulated nevertheless gives them a lot of power over our lives, much of which is surreptitious, outside of public oversight [106]. 
 
-# **Remembering the Industrial Revolution** 
+**Remembering the Industrial Revolution**
 
 Data is the defining feature of the information age. The internet, data storage, processing, and software-driven automation are having a major impact on the global economy and human society. As our daily lives and social organization have changed in the past decade, and will probably continue to radically change in the coming decades, comparisons to the Industrial Revolution come to mind [87, 96]. 
 
@@ -984,7 +984,7 @@ Data is the pollution problem of the information age, and protecting privacy is 
 
 We should try to make them proud. 
 
-# **Legislation and self-regulation** 
+**Legislation and self-regulation**
 
 Data protection laws might be able to help preserve individuals’ rights. For example, the 1995 European Data Protection Directive states that personal data must be “collected for specified, explicit and legitimate purposes and not further processed in a way incompatible with those purposes,” and furthermore that data must be “adequate, relevant and not excessive in relation to the purposes for which they are collected” [107]. 
 
@@ -999,7 +999,7 @@ We should allow each individual to maintain their privacy—i.e., their control 
 
 How exactly we might achieve this is an open question. To begin with, we should not retain data forever, but purge it as soon as it is no longer needed [111, 112]. Purging data runs counter to the idea of immutability (see “Limitations of immutability” on page 463), but that issue can be solved. A promising approach I see is to enforce access control through cryptographic protocols, rather than merely by policy [113, 114]. Overall, culture and attitude changes will be necessary. 
 
-## Summary 
+### Summary
 
 In this chapter we discussed new approaches to designing data systems, and I included my personal opinions and speculations about the future. We started with the observation that there is no one single tool that can efficiently serve all possible use cases, and so applications necessarily need to compose several different pieces of software to accomplish their goals. We discussed how to solve this _data integration_ problem by using batch processing and event streams to let data changes flow between different systems. 
 
@@ -1023,7 +1023,7 @@ Finally, we took a step back and examined some ethical aspects of building datai
 As software and data are having such a large impact on the world, we engineers must remember that we carry a responsibility to work toward the kind of world that we want to live in: a world that treats people with humanity and respect. I hope that we can work together toward that goal. 
 
 
-# **References** 
+**References**
 
 [1] Rachid Belaid: “Postgres Full-Text Search is Good Enough!,” _rachbelaid.com_ , July 13, 2015. 
 
@@ -1263,7 +1263,7 @@ _29th European Conference on Object-Oriented Programming_ (ECOOP), July 2015. do
 [114] Phillip Rogaway: “The Moral Character of Cryptographic Work,” Cryptology ePrint 2015/1162, December 2015. 
 
 
-# **Glossary** 
+**Glossary**
 
 
 ![](../images/Designing_Data_Intensive_Applications-0575-01.png)
@@ -1271,33 +1271,33 @@ _29th European Conference on Object-Oriented Programming_ (ECOOP), July 2015. do
 
 Please note that the definitions in this glossary are short and simple, intended to convey the core idea but not the full subtleties of a term. For more detail, please follow the references into the main text. 
 
-# **asynchronous** 
+**asynchronous**
 
 Not waiting for something to complete (e.g., sending data over the network to another node), and not making any assumptions about how long it is going to take. See “Synchronous Versus Asynchronous Replication” on page 153, “Synchronous Versus Asynchronous Networks” on page 284, and “System Model and Reality” on page 306. 
 
-# **atomic** 
+**atomic**
 
 1. In the context of concurrent operations: describing an operation that appears to take effect at a single point in time, so another concurrent process can never encounter the operation in a “halffinished” state. See also _isolation_ . 
 
 2. In the context of transactions: grouping together a set of writes that must either all be committed or all be rolled back, even if faults occur. See “Atomicity” on page 223 and “Atomic Commit and Two-Phase Commit (2PC)” on page 354. 
 
-# **backpressure** 
+**backpressure**
 
 Forcing the sender of some data to slow down because the recipient cannot keep up with it. Also known as _flow control_ . See “Messaging Systems” on page 441. 
 
-# **batch process** 
+**batch process**
 
 A computation that takes some fixed (and usually large) set of data as input and produces some other data as output, without modifying the input. See Chapter 10. 
 
-# **bounded** 
+**bounded**
 
 Having some known upper limit or size. Used for example in the context of network delay (see “Timeouts and Unbounded Delays” on page 281) and datasets (see the introduction to Chapter 11). 
 
-# **Byzantine fault** 
+**Byzantine fault**
 
 A node that behaves incorrectly in some arbitrary way, for example by sending contradictory or malicious messages to other nodes. See “Byzantine Faults” on page 304. 
 
-# **cache** 
+**cache**
 
 A component that remembers recently used data in order to speed up future reads of the same data. It is generally not complete: thus, if some data is missing from the cache, it has to be fetched from some underlying, slower data storage 
 
@@ -1305,161 +1305,161 @@ A component that remembers recently used data in order to speed up future reads 
 **CAP theorem**
 system that has a complete copy of the data. 
 
-# **CAP theorem** 
+**CAP theorem**
 
 A widely misunderstood theoretical result that is not useful in practice. See “The CAP theorem” on page 336. 
 
-# **causality** 
+**causality**
 
 The dependency between events that arises when one thing “happens before” another thing in a system. For example, a later event that is in response to an earlier event, or builds upon an earlier event, or should be understood in the light of an earlier event. See “The “happens-before” relationship and concurrency” on page 186 and “Ordering and Causality” on page 339. 
 
-# **consensus** 
+**consensus**
 
 A fundamental problem in distributed computing, concerning getting several nodes to agree on something (for example, which node should be the leader for a database cluster). The problem is much harder than it seems at first glance. See “Fault-Tolerant Consensus” on page 364. 
 
-# **data warehouse** 
+**data warehouse**
 
 A database in which data from several different OLTP systems has been combined and prepared to be used for analytics purposes. See “Data Warehousing” on page 91. 
 
-# **declarative** 
+**declarative**
 
 Describing the properties that something should have, but not the exact steps for how to achieve it. In the context of queries, a query optimizer takes a declarative query and decides how it should best be executed. See “Query Languages for Data” on page 42. ized view. See “Single-Object and MultiObject Operations” on page 228 and “Deriving several views from the same event log” on page 461. 
 
-# **derived data** 
+**derived data**
 
 A dataset that is created from some other data through a repeatable process, which you could run again if necessary. Usually, derived data is needed to speed up a particular kind of read access to the data. Indexes, caches, and materialized views are examples of derived data. See the introduction to Part III. 
 
-# **deterministic** 
+**deterministic**
 
 Describing a function that always produces the same output if you give it the same input. This means it cannot depend on random numbers, the time of day, network communication, or other unpredictable things. 
 
-# **distributed** 
+**distributed**
 
 Running on several nodes connected by a network. Characterized by _partial failures_ : some part of the system may be broken while other parts are still working, and it is often impossible for the software to know what exactly is broken. See “Faults and Partial Failures” on page 274. 
 
-# **durable** 
+**durable**
 
 Storing data in a way such that you believe it will not be lost, even if various faults occur. See “Durability” on page 226. 
 
-# **ETL** 
+**ETL**
 
 Extract–Transform–Load. The process of extracting data from a source database, transforming it into a form that is more suitable for analytic queries, and loading it into a data warehouse or batch processing system. See “Data Warehousing” on page 91. 
 
-# **denormalize** 
+**denormalize**
 
 To introduce some amount of redundancy or duplication in a _normalized_ dataset, typically in the form of a _cache_ or _index_ , in order to speed up reads. A denormalized value is a kind of precomputed query result, similar to a material‐ 
 
-# **failover** 
+**failover**
 
 In systems that have a single leader, failover is the process of moving the leadership role from one node to another. See “Handling Node Outages” on page 156. 
 
 
 **locality** 
 
-# **fault-tolerant** 
+**fault-tolerant**
 
 Able to recover automatically if something goes wrong (e.g., if a machine crashes or a network link fails). See “Reliability” on page 6. 
 
-# **flow control** 
+**flow control**
 
 See _backpressure_ . 
 
-# **follower** 
+**follower**
 
 A replica that does not directly accept any writes from clients, but only processes data changes that it receives from a leader. Also known as a _secondary_ , _slave_ , _read replica_ , or _hot standby_ . See “Leaders and Followers” on page 152. 
 
-# **full-text search** 
+**full-text search**
 
 Searching text by arbitrary keywords, often with additional features such as matching similarly spelled words or synonyms. A full-text index is a kind of _secondary index_ that supports such queries. See “Full-text search and fuzzy indexes” on page 88. 
 
-# **graph** 
+**graph**
 
 A data structure consisting of _vertices_ (things that you can refer to, also known as _nodes_ or _entities_ ) and _edges_ (connections from one vertex to another, also known as _relationships_ or _arcs_ ). See “Graph-Like Data Models” on page 49. 
 
-# **hash** 
+**hash**
 
 A function that turns an input into a random-looking number. The same input always returns the same number as output. Two different inputs are very likely to have two different numbers as output, although it is possible that two different inputs produce the same output (this is called a _collision_ ). See “Partitioning by Hash of Key” on page 203. 
 
-# **idempotent** 
+**idempotent**
 
 Describing an operation that can be safely retried; if it is executed more than once, it has the same effect as if it was only executed once. See “Idempotence” on page 478. 
 
-# **index** 
+**index**
 
 A data structure that lets you efficiently search for all records that have a particular value in a particular field. See “Data Structures That Power Your Database” on page 70. 
 
-# **isolation** 
+**isolation**
 
 In the context of transactions, describing the degree to which concurrently executing transactions can interfere with each other. _Serializable_ isolation provides the strongest guarantees, but weaker isolation levels are also used. See “Isolation” on page 225. 
 
-# **join** 
+**join**
 
 To bring together records that have something in common. Most commonly used in the case where one record has a reference to another (a foreign key, a document reference, an edge in a graph) and a query needs to get the record that the reference points to. See “Many-to-One and Many-to-Many Relationships” on page 33 and “Reduce-Side Joins and Grouping” on page 403. 
 
-# **leader** 
+**leader**
 
 When data or a service is replicated across several nodes, the leader is the designated replica that is allowed to make changes. A leader may be elected through some protocol, or manually chosen by an administrator. Also known as the _primary_ or _master_ . See “Leaders and Followers” on page 152. 
 
-# **linearizable** 
+**linearizable**
 
 Behaving as if there was only a single copy of data in the system, which is updated by atomic operations. See “Linearizability” on page 324. 
 
-# **locality** 
+**locality**
 
 A performance optimization: putting several pieces of data in the same place if they are frequently needed at the same time. See “Data locality for queries” on page 41. 
 
 
 **lock** 
 
-# **lock** 
+**lock**
 
 A mechanism to ensure that only one thread, node, or transaction can access something, and anyone else who wants to access the same thing must wait until the lock is released. See “Two-Phase Locking (2PL)” on page 257 and “The leader and the lock” on page 301. 
 
-# **log** 
+**log**
 
 An append-only file for storing data. A _write-ahead log_ is used to make a storage engine resilient against crashes (see “Making B-trees reliable” on page 82), a _logstructured_ storage engine uses logs as its primary storage format (see “SSTables and LSM-Trees” on page 76), a _replication log_ is used to copy writes from a leader to followers (see “Leaders and Followers” on page 152), and an _event log_ can represent a data stream (see “Partitioned Logs” on page 446). 
 
-# **materialize** 
+**materialize**
 
 To perform a computation eagerly and write out its result, as opposed to calculating it on demand when requested. See “Aggregation: Data Cubes and Materialized Views” on page 101 and “Materialization of Intermediate State” on page 419. 
 
-# **node** 
+**node**
 
 An instance of some software running on a computer, which communicates with other nodes via a network in order to accomplish some task. 
 
-# **normalized** 
+**normalized**
 
 Structured in such a way that there is no redundancy or duplication. In a normalized database, when some piece of data changes, you only need to change it in one place, not many copies in many different places. See “Many-to-One and Many-toMany Relationships” on page 33. 
 
-# **OLAP** 
+**OLAP**
 
 Online analytic processing. Access pattern characterized by aggregating (e.g., count, sum, average) over a large number of records. See “Transaction Processing or Analytics?” on page 90. 
 
-# **OLTP** 
+**OLTP**
 
 Online transaction processing. Access pattern characterized by fast queries that read or write a small number of records, usually indexed by key. See “Transaction Processing or Analytics?” on page 90. 
 
-# **partitioning** 
+**partitioning**
 
 Splitting up a large dataset or computation that is too big for a single machine into smaller parts and spreading them across several machines. Also known as _sharding_ . See Chapter 6. 
 
-# **percentile** 
+**percentile**
 
 A way of measuring the distribution of values by counting how many values are above or below some threshold. For example, the 95th percentile response time during some period is the time _t_ such that 95% of requests in that period complete in less than _t_ , and 5% take longer than _t_ . See “Describing Performance” on page 13. 
 
-# **primary key** 
+**primary key**
 
 A value (typically a number or a string) that uniquely identifies a record. In many applications, primary keys are generated by the system when a record is created (e.g., sequentially or randomly); they are not usually set by users. See also _secondary index_ . 
 
-# **quorum** 
+**quorum**
 
 The minimum number of nodes that need to vote on an operation before it can be considered successful. See “Quorums for reading and writing” on page 179. 
 
-# **rebalance** 
+**rebalance**
 
 To move data or services from one node to another in order to spread the load fairly. See “Rebalancing Partitions” on page 209. 
 
-# **replication** 
+**replication**
 
 Keeping a copy of the same data on several nodes ( _replicas_ ) so that it remains 
 
@@ -1469,45 +1469,45 @@ accessible if a node becomes unreachable. See Chapter 5.
 
 _skew_ in “Timestamps for ordering events” on page 291. 
 
-# **schema** 
+**schema**
 
 A description of the structure of some data, including its fields and datatypes. Whether some data conforms to a schema can be checked at various points in the data’s lifetime (see “Schema flexibility in the document model” on page 39), and a schema can change over time (see Chapter 4). 
 
-# **secondary index** 
+**secondary index**
 
 An additional data structure that is maintained alongside the primary data storage and which allows you to efficiently search for records that match a certain kind of condition. See “Other Indexing Structures” on page 85 and “Partitioning and Secondary Indexes” on page 206. 
 
-# **serializable** 
+**serializable**
 
 A guarantee that if several transactions execute concurrently, they behave the same as if they had executed one at a time, in some serial order. See “Serializability” on page 251. 
 
-# **shared-nothing** 
+**shared-nothing**
 
 An architecture in which independent nodes—each with their own CPUs, memory, and disks—are connected via a conventional network, in contrast to sharedmemory or shared-disk architectures. See the introduction to Part II. 
 
-# **split brain** 
+**split brain**
 
 A scenario in which two nodes simultaneously believe themselves to be the leader, and which may cause system guarantees to be violated. See “Handling Node Outages” on page 156 and “The Truth Is Defined by the Majority” on page 300. 
 
-# **stored procedure** 
+**stored procedure**
 
 A way of encoding the logic of a transaction such that it can be entirely executed on a database server, without communicating back and forth with a client during the transaction. See “Actual Serial Execution” on page 252. 
 
-# **stream process** 
+**stream process**
 
 A continually running computation that consumes a never-ending stream of events as input, and derives some output from it. See Chapter 11. 
 
-# **synchronous** 
+**synchronous**
 
 The opposite of _asynchronous_ . 
 
-# **system of record** 
+**system of record**
 
 A system that holds the primary, authoritative version of some data, also known as the _source of truth_ . Changes are first written here, and other datasets may be derived from the system of record. See the introduction to Part III. 
 
-# **timeout** 
+**timeout**
 
-# **skew** 
+**skew**
 
 1. Imbalanced load across partitions, such that some partitions have lots of requests or data, and others have much less. Also known as _hot spots_ . See “Skewed Workloads and Relieving Hot Spots” on page 205 and “Handling skew” on page 407. 
 
@@ -1515,7 +1515,7 @@ A system that holds the primary, authoritative version of some data, also known 
 
 One of the simplest ways of detecting a fault, namely by observing the lack of a response within some amount of time. However, it is impossible to know whether a timeout is due to a problem with the remote node, or an issue in the network. See “Timeouts and Unbounded Delays” on page 281. 
 
-# **total order** 
+**total order**
 
 A way of comparing things (e.g., timestamps) that allows you to always say which one of two things is greater and which one is lesser. An ordering in which 
 
@@ -1523,26 +1523,26 @@ A way of comparing things (e.g., timestamps) that allows you to always say which
 **transaction**
 some things are incomparable (you cannot say which is greater or smaller) is called a _partial order_ . See “The causal order is not a total order” on page 341. 
 
-# **transaction** 
+**transaction**
 
 Grouping together several reads and writes into a logical unit, in order to simplify error handling and concurrency issues. See Chapter 7. 
 
-# **two-phase commit (2PC)** 
+**two-phase commit (2PC)**
 
 An algorithm to ensure that several database nodes either all commit or all abort a transaction. See “Atomic Commit and Two-Phase Commit (2PC)” on page 354. 
 
-# **two-phase locking (2PL)** 
+**two-phase locking (2PL)**
 
 An algorithm for achieving serializable isolation that works by a transaction acquiring a lock on all data it reads or writes, and holding the lock until the end of the transaction. See “Two-Phase Locking (2PL)” on page 257. 
 
-# **unbounded** 
+**unbounded**
 
 Not having any known upper limit or size. The opposite of _bounded_ . 
 
 
-# **Index** 
+**Index**
 
-# **A** 
+**A**
 
 aborts (transactions), 222, 224 in two-phase commit, 356 performance of optimistic concurrency control, 266 retrying aborted transactions, 231 abstraction, 21, 27, 222, 266, 321 access path (in network model), 37, 60 accidental complexity, removing, 21 accountability, 535 ACID properties (transactions), 90, 223 atomicity, 223, 228 consistency, 224, 529 durability, 226 isolation, 225, 228 acknowledgements (messaging), 445 active/active replication (see multi-leader replication) active/passive replication (see leader-based replication) ActiveMQ (messaging), 137, 444 distributed transaction support, 361 ActiveRecord (object-relational mapper), 30, 232 actor model, 138 (see also message-passing) comparison to Pregel model, 425 comparison to stream processing, 468 Advanced Message Queuing Protocol (see AMQP) aerospace systems, 6, 10, 305, 372 aggregation data cubes and materialized views, 101 in batch processes, 406 in stream processes, 466 aggregation pipeline query language, 48 Agile, 22 minimizing irreversibility, 414, 497 moving faster with confidence, 532 Unix philosophy, 394 agreement, 365 (see also consensus) Airflow (workflow scheduler), 402 Ajax, 131 Akka (actor framework), 139 algorithms algorithm correctness, 308 B-trees, 79-83 for distributed systems, 306 hash indexes, 72-75 mergesort, 76, 402, 405 red-black trees, 78 SSTables and LSM-trees, 76-79 all-to-all replication topologies, 175 AllegroGraph (database), 50 ALTER TABLE statement (SQL), 40, 111 Amazon Dynamo (database), 177 Amazon Web Services (AWS), 8 Kinesis Streams (messaging), 448 network reliability, 279 postmortems, 9 RedShift (database), 93 S3 (object storage), 398 checking data integrity, 530 amplification of bias, 534 of failures, 364, 495 
 
@@ -1554,7 +1554,7 @@ Apache Storm (see Storm) Apache Tajo (see Tajo) Apache Tez (see Tez) Apache Thri
 
 for multi-object transactions, 229 for single-object writes, 230 auditability, 528-533 designing for, 531 self-auditing systems, 530 through immutability, 460 tools for auditable data systems, 532 availability, 8 (see also fault tolerance) in CAP theorem, 337 in service level agreements (SLAs), 15 Avro (data format), 122-127 code generation, 127 dynamically generated schemas, 126 object container files, 125, 131, 414 reader determining writer’s schema, 125 schema evolution, 123 use in Hadoop, 414 awk (Unix tool), 391 AWS (see Amazon Web Services) Azure (see Microsoft) 
 
-# **B** 
+**B**
 
 B-trees (indexes), 79-83 append-only/copy-on-write variants, 82, 242 branching factor, 81 comparison to LSM-trees, 83-85 crash recovery, 82 growing by splitting a page, 81 optimizations, 82 similarity to dynamic partitioning, 212 backpressure, 441, 553 in TCP, 282 backups database snapshot for replication, 156 integrity of, 530 snapshot isolation for, 238 use for ETL processes, 405 backward compatibility, 112 BASE, contrast to ACID, 223 bash shell (Unix), 70, 395, 503 batch processing, 28, 389-431, 553 combining with stream processing lambda architecture, 497 unifying technologies, 498 comparison to MPP databases, 414-418 comparison to stream processing, 464 comparison to Unix, 413-414 dataflow engines, 421-423 fault tolerance, 406, 414, 422, 442 for data integration, 494-498 graphs and iterative processing, 424-426 high-level APIs and languages, 403, 426-429 log-based messaging and, 451 maintaining derived state, 495 MapReduce and distributed filesystems, 397-413 (see also MapReduce) measuring performance, 13, 390 outputs, 411-413 key-value stores, 412 search indexes, 411 using Unix tools (example), 391-394 Bayou (database), 522 Beam (dataflow library), 498 bias, 534 big ball of mud, 20 Bigtable data model, 41, 99 binary data encodings, 115-128 Avro, 122-127 MessagePack, 116-117 Thrift and Protocol Buffers, 117-121 binary encoding based on schemas, 127 by network drivers, 128 binary strings, lack of support in JSON and XML, 114 BinaryProtocol encoding (Thrift), 118 Bitcask (storage engine), 72 crash recovery, 74 Bitcoin (cryptocurrency), 532 Byzantine fault tolerance, 305 concurrency bugs in exchanges, 233 bitmap indexes, 97 blockchains, 532 Byzantine fault tolerance, 305 blocking atomic commit, 359 Bloom (programming language), 504 Bloom filter (algorithm), 79, 466 BookKeeper (replicated log), 372 Bottled Water (change data capture), 455 bounded datasets, 430, 439, 553 (see also batch processing) bounded delays, 553 in networks, 285 process pauses, 298 broadcast hash joins, 409 
 
@@ -1576,7 +1576,7 @@ copy-on-write (B-trees), 82, 242 CORBA (Common Object Request Broker Architectur
 
 Crunch (batch processing), 419, 427 hash joins, 409 sharded joins, 408 workflows, 403 cryptography defense against attackers, 306 end-to-end encryption and authentication, 519, 543 proving integrity of data, 532 CSS (Cascading Style Sheets), 44 CSV (comma-separated values), 70, 114, 396 Curator (ZooKeeper recipes), 330, 371 curl (Unix tool), 135, 397 cursor stability, 243 Cypher (query language), 52 comparison to SPARQL, 59 
 
-# **D** 
+**D**
 
 data corruption (see corruption of data) data cubes, 102 data formats (see encoding) data integration, 490-498, 543 batch and stream processing, 494-498 lambda architecture, 497 maintaining derived state, 495 reprocessing data, 496 unifying, 498 by unbundling databases, 499-515 comparison to federated databases, 501 combining tools by deriving data, 490-494 derived data versus distributed transactions, 492 limits of total ordering, 493 ordering events to capture causality, 493 reasoning about dataflows, 491 need for, 385 data lakes, 415 data locality (see locality) data models, 27-64 graph-like models, 49-63 Datalog language, 60-63 property graphs, 50 RDF and triple-stores, 55-59 query languages, 42-48 relational model versus document model, 28-42 data protection regulations, 542 data systems, 3 about, 4 
 
@@ -1586,7 +1586,7 @@ concerns when designing, 5 future of, 489-544 correctness, constraints, and inte
 
 delays bounded network delays, 285 bounded process pauses, 298 unbounded network delays, 282 unbounded process pauses, 296 deleting data, 463 denormalization (data representation), 34, 554 costs, 39 in derived data systems, 386 materialized views, 101 updating derived data, 228, 231, 490 versus normalization, 462 derived data, 386, 439, 554 from change data capture, 454 in event sourcing, 458-458 maintaining derived state through logs, 452-457, 459-463 observing, by subscribing to streams, 512 outputs of batch and stream processing, 495 through application code, 505 versus distributed transactions, 492 deterministic operations, 255, 274, 554 accidental nondeterminism, 423 and fault tolerance, 423, 426 and idempotence, 478, 492 computing derived data, 495, 526, 531 in state machine replication, 349, 452, 458 joins, 476 DevOps, 394 differential dataflow, 504 dimension tables, 94 dimensional modeling (see star schemas) directed acyclic graphs (DAGs), 424 dirty reads (transaction isolation), 234 dirty writes (transaction isolation), 235 discrimination, 534 disks (see hard disks) distributed actor frameworks, 138 distributed filesystems, 398-399 decoupling from query engines, 417 indiscriminately dumping data into, 415 use by MapReduce, 402 distributed systems, 273-312, 554 Byzantine faults, 304-306 cloud versus supercomputing, 275 detecting network faults, 280 faults and partial failures, 274-277 formalization of consensus, 365 impossibility results, 338, 353 issues with failover, 157 limitations of distributed transactions, 363 multi-datacenter, 169, 335 network problems, 277-286 quorums, relying on, 301 reasons for using, 145, 151 synchronized clocks, relying on, 291-295 system models, 306-310 use of clocks and time, 287 distributed transactions (see transactions) Django (web framework), 232 DNS (Domain Name System), 216, 372 Docker (container manager), 506 document data model, 30-42 comparison to relational model, 38-42 document references, 38, 403 document-oriented databases, 31 many-to-many relationships and joins, 36 multi-object transactions, need for, 231 versus relational model convergence of models, 41 data locality, 41 document-partitioned indexes, 206, 217, 411 domain-driven design (DDD), 457 DRBD (Distributed Replicated Block Device), 153 drift (clocks), 289 Drill (query engine), 93 Druid (database), 461 Dryad (dataflow engine), 421 dual writes, problems with, 452, 507 duplicates, suppression of, 517 (see also idempotence) using a unique ID, 518, 522 durability (transactions), 226, 554 duration (time), 287 measurement with monotonic clocks, 288 dynamic partitioning, 212 dynamically typed languages analogy to schema-on-read, 40 code generation and, 127 Dynamo-style databases (see leaderless replication) 
 
-# **E** 
+**E**
 
 edges (in graphs), 49, 403 property graph model, 50 edit distance (full-text search), 88 effectively-once semantics, 476, 516 
 
@@ -1603,20 +1603,20 @@ schema-on-read, 39, 111, 128 exactly-once semantics, 360, 476, 516 parity with b
 
 Fossil (version control system), 463 shunning (deleting data), 463 FoundationDB (database) serializable transactions, 261, 265, 364 fractal trees, 83 full table scans, 403 full-text search, 555 and fuzzy indexes, 88 building search indexes, 411 Lucene storage engine, 79 functional reactive programming (FRP), 504 functional requirements, 22 futures (asynchronous operations), 135 fuzzy search (see similarity search) 
 
-# **G** 
+**G**
 
 garbage collection immutability and, 463 process pauses for, 14, 296-299, 301 (see also process pauses) genome analysis, 63, 429 geographically distributed datacenters, 145, 164, 278, 493 geospatial indexes, 87 Giraph (graph processing), 425 Git (version control system), 174, 342, 463 GitHub, postmortems, 157, 158, 309 global indexes (see term-partitioned indexes) GlusterFS (distributed filesystem), 398 GNU Coreutils (Linux), 394 GoldenGate (change data capture), 161, 170, 455 (see also Oracle) Google Bigtable (database) data model (see Bigtable data model) partitioning scheme, 199, 202 storage layout, 78 Chubby (lock service), 370 Cloud Dataflow (stream processor), 466, 477, 498 (see also Beam) Cloud Pub/Sub (messaging), 444, 448 Docs (collaborative editor), 170 Dremel (query engine), 93, 96 FlumeJava (dataflow library), 403, 427 GFS (distributed file system), 398 gRPC (RPC framework), 135 MapReduce (batch processing), 390 
 
 (see also MapReduce) building search indexes, 411 task preemption, 418 Pregel (graph processing), 425 Spanner (see Spanner) TrueTime (clock API), 294 gossip protocol, 216 government use of data, 541 GPS (Global Positioning System) use for clock synchronization, 287, 290, 294, 295 GraphChi (graph processing), 426 graphs, 555 as data models, 49-63 example of graph-structured data, 49 property graphs, 50 RDF and triple-stores, 55-59 versus the network model, 60 processing and analysis, 424-426 fault tolerance, 425 Pregel processing model, 425 query languages Cypher, 52 Datalog, 60-63 recursive SQL queries, 53 SPARQL, 59-59 Gremlin (graph query language), 50 grep (Unix tool), 392 GROUP BY clause (SQL), 406 grouping records in MapReduce, 406 handling skew, 407 
 
-# **H** 
+**H**
 
 Hadoop (data infrastructure) comparison to distributed databases, 390 comparison to MPP databases, 414-418 comparison to Unix, 413-414, 499 diverse processing models in ecosystem, 417 HDFS distributed filesystem (see HDFS) higher-level tools, 403 join algorithms, 403-410 (see also MapReduce) MapReduce (see MapReduce) YARN (see YARN) happens-before relationship, 340 capturing, 187 concurrency and, 186 hard disks access patterns, 84 
 
 
 detecting corruption, 519, 530 faults in, 7, 227 sequential write throughput, 75, 450 hardware faults, 7 hash indexes, 72-75 broadcast hash joins, 409 partitioned hash joins, 409 hash partitioning, 203-205, 217 consistent hashing, 204 problems with hash mod N, 210 range queries, 204 suitable hash functions, 203 with fixed number of partitions, 210 HAWQ (database), 428 HBase (database) bug due to lack of fencing, 302 bulk loading, 413 column-family data model, 41, 99 dynamic partitioning, 212 key-range partitioning, 202 log-structured storage, 78 request routing, 216 size-tiered compaction, 79 use of HDFS, 417 use of ZooKeeper, 370 HDFS (Hadoop Distributed File System), 398-399 (see also distributed filesystems) checking data integrity, 530 decoupling from query engines, 417 indiscriminately dumping data into, 415 metadata about datasets, 410 NameNode, 398 use by Flink, 479 use by HBase, 212 use by MapReduce, 402 HdrHistogram (numerical library), 16 head (Unix tool), 392 head vertex (property graphs), 51 head-of-line blocking, 15 heap files (databases), 86 Helix (cluster manager), 216 heterogeneous distributed transactions, 360, 364 heuristic decisions (in 2PC), 363 Hibernate (object-relational mapper), 30 hierarchical model, 36 high availability (see fault tolerance) high-frequency trading, 290, 299 high-performance computing (HPC), 275 hinted handoff, 183 histograms, 16 Hive (query engine), 419, 427 for data warehouses, 93 HCatalog and metastore, 410 map-side joins, 409 query optimizer, 427 skewed joins, 408 workflows, 403 Hollerith machines, 390 hopping windows (stream processing), 472 (see also windows) horizontal scaling (see scaling out) HornetQ (messaging), 137, 444 distributed transaction support, 361 hot spots, 201 due to celebrities, 205 for time-series data, 203 in batch processing, 407 relieving, 205 hot standbys (see leader-based replication) HTTP, use in APIs (see services) human errors, 9, 279, 414 HyperDex (database), 88 HyperLogLog (algorithm), 466 
 
-# **I** 
+**I**
 
 I/O operations, waiting for, 297 IBM DB2 (database) distributed transaction support, 361 recursive query support, 54 serializable isolation, 242, 257 XML and JSON support, 30, 42 electromechanical card-sorting machines, 390 IMS (database), 36 imperative query APIs, 46 InfoSphere Streams (CEP engine), 466 MQ (messaging), 444 distributed transaction support, 361 System R (database), 222 WebSphere (messaging), 137 idempotence, 134, 478, 555 by giving operations unique IDs, 518, 522 idempotent operations, 517 immutability advantages of, 460, 531 
 
@@ -1628,17 +1628,17 @@ B-trees, 79-83 building in batch processes, 411 clustered, 86 comparison of B-tr
 
 unreliability of, 277 ISDN (Integrated Services Digital Network), 284 isolation (in transactions), 225, 228, 555 correctness and, 515 for single-object writes, 230 serializability, 251-266 actual serial execution, 252-256 serializable snapshot isolation (SSI), 261-266 two-phase locking (2PL), 257-261 violating, 228 weak isolation levels, 233-251 preventing lost updates, 242-246 read committed, 234-237 snapshot isolation, 237-242 iterative processing, 424-426 
 
-# **J** 
+**J**
 
 Java Database Connectivity (JDBC) distributed transaction support, 361 network drivers, 128 Java Enterprise Edition (EE), 134, 356, 361 Java Message Service (JMS), 444 (see also messaging systems) comparison to log-based messaging, 448, 451 distributed transaction support, 361 message ordering, 446 Java Transaction API (JTA), 355, 361 Java Virtual Machine (JVM) bytecode generation, 428 garbage collection pauses, 296 process reuse in batch processors, 422 JavaScript in MapReduce querying, 46 setting element styles (example), 45 use in advanced queries, 48 Jena (RDF framework), 57 Jepsen (fault tolerance testing), 515 jitter (network delay), 284 joins, 555 by index lookup, 403 expressing as relational operators, 427 in relational and document databases, 34 MapReduce map-side joins, 408-410 broadcast hash joins, 409 merge joins, 410 partitioned hash joins, 409 
 
 MapReduce reduce-side joins, 403-408 handling skew, 407 sort-merge joins, 405 parallel execution of, 415 secondary indexes and, 85 stream joins, 472-476 stream-stream join, 473 stream-table join, 473 table-table join, 474 time-dependence of, 475 support in document databases, 42 JOTM (transaction coordinator), 356 JSON Avro schema representation, 122 binary variants, 115 for application data, issues with, 114 in relational databases, 30, 42 representing a résumé (example), 31 Juttle (query language), 504 
 
-# **K** 
+**K**
 
 k-nearest neighbors, 429 Kafka (messaging), 137, 448 Kafka Connect (database integration), 457, 461 Kafka Streams (stream processor), 466, 467 fault tolerance, 479 leader-based replication, 153 log compaction, 456, 467 message offsets, 447, 478 request routing, 216 transaction support, 477 usage example, 4 Ketama (partitioning library), 213 key-value stores, 70 as batch process output, 412 hash indexes, 72-75 in-memory, 89 partitioning, 201-205 by hash of key, 203, 217 by key range, 202, 217 dynamic partitioning, 212 skew and hot spots, 205 Kryo (Java), 113 Kubernetes (cluster manager), 418, 506 
 
-# **L** 
+**L**
 
 lambda architecture, 497 Lamport timestamps, 345 
 
@@ -1648,7 +1648,7 @@ Large Hadron Collider (LHC), 64 last write wins (LWW), 173, 334 discarding concu
 
 in batch processing, 400, 405, 421 in stateful clients, 170, 511 in stream processing, 474, 478, 508, 522 location transparency, 134 in the actor model, 138 locks, 556 deadlock, 258 distributed locking, 301-304, 330 fencing tokens, 303 implementation with ZooKeeper, 370 relation to consensus, 374 for transaction isolation in snapshot isolation, 239 in two-phase locking (2PL), 257-261 making operations atomic, 243 performance, 258 preventing dirty writes, 236 preventing phantoms with index-range locks, 260, 265 read locks (shared mode), 236, 258 shared mode and exclusive mode, 258 in two-phase commit (2PC) deadlock detection, 364 in-doubt transactions holding locks, 362 materializing conflicts with, 251 preventing lost updates by explicit locking, 244 log sequence number, 156, 449 logic programming languages, 504 logical clocks, 293, 343, 494 for read-after-write consistency, 164 logical logs, 160 logs (data structure), 71, 556 advantages of immutability, 460 compaction, 73, 79, 456, 460 for stream operator state, 479 creating using total order broadcast, 349 implementing uniqueness constraints, 522 log-based messaging, 446-451 comparison to traditional messaging, 448, 451 consumer offsets, 449 disk space usage, 450 replaying old messages, 451, 496, 498 slow consumers, 450 using logs for message storage, 447 log-structured storage, 71-79 log-structured merge tree (see LSMtrees) replication, 152, 158-161 change data capture, 454-457 (see also changelogs) coordination with snapshot, 156 logical (row-based) replication, 160 statement-based replication, 158 trigger-based replication, 161 write-ahead log (WAL) shipping, 159 scalability limits, 493 loose coupling, 396, 419, 502 lost updates (see updates) LSM-trees (indexes), 78-79 comparison to B-trees, 83-85 Lucene (storage engine), 79 building indexes in batch processes, 411 similarity search, 88 Luigi (workflow scheduler), 402 LWW (see last write wins) 
 
-# **M** 
+**M**
 
 machine learning ethical considerations, 534 (see also ethics) iterative processing, 424 models derived from training data, 505 statistical and numerical algorithms, 428 MADlib (machine learning toolkit), 428 magic scaling sauce, 18 Mahout (machine learning toolkit), 428 maintainability, 18-22, 489 defined, 23 design principles for software systems, 19 evolvability (see evolvability) operability, 19 simplicity and managing complexity, 20 many-to-many relationships in document model versus relational model, 39 modeling as graphs, 49 many-to-one and many-to-many relationships, 33-36 many-to-one relationships, 34 MapReduce (batch processing), 390, 399-400 accessing external services within job, 404, 412 comparison to distributed databases designing for frequent faults, 417 diversity of processing models, 416 diversity of storage, 415 
 
@@ -1658,32 +1658,32 @@ comparison to stream processing, 464 comparison to Unix, 413-414 disadvantages a
 
 Meteor (web framework), 456 microbatching, 477, 495 microservices, 132 (see also services) causal dependencies across services, 493 loose coupling, 502 relation to batch/stream processors, 389, 508 Microsoft Azure Service Bus (messaging), 444 Azure Storage, 155, 398 Azure Stream Analytics, 466 DCOM (Distributed Component Object Model), 134 MSDTC (transaction coordinator), 356 Orleans (see Orleans) SQL Server (see SQL Server) migrating (rewriting) data, 40, 130, 461, 497 modulus operator (%), 210 MongoDB (database) aggregation pipeline, 48 atomic operations, 243 BSON, 41 document data model, 31 hash partitioning (sharding), 203-204 key-range partitioning, 202 lack of join support, 34, 42 leader-based replication, 153 MapReduce support, 46, 400 oplog parsing, 455, 456 partition splitting, 212 request routing, 216 secondary indexes, 207 Mongoriver (change data capture), 455 monitoring, 10, 19 monotonic clocks, 288 monotonic reads, 164 MPP (see massively parallel processing) MSMQ (messaging), 361 multi-column indexes, 87 multi-leader replication, 168-177 (see also replication) handling write conflicts, 171 conflict avoidance, 172 converging toward a consistent state, 172 custom conflict resolution logic, 173 determining what is a conflict, 174 linearizability, lack of, 333 replication topologies, 175-177 use cases, 168 clients with offline operation, 170 collaborative editing, 170 multi-datacenter replication, 168, 335 multi-object transactions, 228 need for, 231 Multi-Paxos (total order broadcast), 367 multi-table index cluster tables (Oracle), 41 multi-tenancy, 284 multi-version concurrency control (MVCC), 239, 266 detecting stale MVCC reads, 263 indexes and snapshot isolation, 241 mutual exclusion, 261 (see also locks) MySQL (database) binlog coordinates, 156 binlog parsing for change data capture, 455 circular replication topology, 175 consistent snapshots, 156 distributed transaction support, 361 InnoDB storage engine (see InnoDB) JSON support, 30, 42 leader-based replication, 153 performance of XA transactions, 360 row-based replication, 160 schema changes in, 40 snapshot isolation support, 242 (see also InnoDB) statement-based replication, 159 Tungsten Replicator (multi-leader replication), 170 conflict detection, 177 
 
-# **N** 
+**N**
 
 nanomsg (messaging library), 442 Narayana (transaction coordinator), 356 NATS (messaging), 137 near-real-time (nearline) processing, 390 (see also stream processing) Neo4j (database) Cypher query language, 52 graph data model, 50 Nephele (dataflow engine), 421 netcat (Unix tool), 397 Netflix Chaos Monkey, 7, 280 Network Attached Storage (NAS), 146, 398 network model, 36 
 
 
 graph databases versus, 60 imperative query APIs, 46 Network Time Protocol (see NTP) networks congestion and queueing, 282 datacenter network topologies, 276 faults (see faults) linearizability and network delays, 338 network partitions, 279, 337 timeouts and unbounded delays, 281 next-key locking, 260 nodes (in graphs) (see vertices) nodes (processes), 556 handling outages in leader-based replication, 156 system models for failure, 307 noisy neighbors, 284 nonblocking atomic commit, 359 nondeterministic operations accidental nondeterminism, 423 partial failures in distributed systems, 275 nonfunctional requirements, 22 nonrepeatable reads, 238 (see also read skew) normalization (data representation), 33, 556 executing joins, 39, 42, 403 foreign key references, 231 in systems of record, 386 versus denormalization, 462 NoSQL, 29, 499 transactions and, 223 Notation3 (N3), 56 npm (package manager), 428 NTP (Network Time Protocol), 287 accuracy, 289, 293 adjustments to monotonic clocks, 289 multiple server addresses, 306 numbers, in XML and JSON encodings, 114 
 
-# **O** 
+**O**
 
 object-relational mapping (ORM) frameworks, 30 error handling and aborted transactions, 232 unsafe read-modify-write cycle code, 244 object-relational mismatch, 29 observer pattern, 506 offline systems, 390 (see also batch processing) stateful, offline-capable clients, 170, 511 offline-first applications, 511 offsets consumer offsets in partitioned logs, 449 messages in partitioned logs, 447 OLAP (online analytic processing), 91, 556 data cubes, 102 OLTP (online transaction processing), 90, 556 analytics queries versus, 411 workload characteristics, 253 one-to-many relationships, 30 JSON representation, 32 online systems, 389 (see also services) Oozie (workflow scheduler), 402 OpenAPI (service definition format), 133 OpenStack Nova (cloud infrastructure) use of ZooKeeper, 370 Swift (object storage), 398 operability, 19 operating systems versus databases, 499 operation identifiers, 518, 522 operational transformation, 174 operators, 421 flow of data between, 424 in stream processing, 464 optimistic concurrency control, 261 Oracle (database) distributed transaction support, 361 GoldenGate (change data capture), 161, 170, 455 lack of serializability, 226 leader-based replication, 153 multi-table index cluster tables, 41 not preventing write skew, 248 partitioned indexes, 209 PL/SQL language, 255 preventing lost updates, 245 read committed isolation, 236 Real Application Clusters (RAC), 330 recursive query support, 54 snapshot isolation support, 239, 242 TimesTen (in-memory database), 89 WAL-based replication, 160 XML support, 30 ordering, 339-352 by sequence numbers, 343-348 causal ordering, 339-343 
 
 
 partial order, 341 limits of total ordering, 493 total order broadcast, 348-352 Orleans (actor framework), 139 outliers (response time), 14 Oz (programming language), 504 
 
-# **P** 
+**P**
 
 package managers, 428, 505 packet switching, 285 packets corruption of, 306 sending via UDP, 442 PageRank (algorithm), 49, 424 paging (see virtual memory) ParAccel (database), 93 parallel databases (see massively parallel processing) parallel execution of graph analysis algorithms, 426 queries in MPP databases, 216 Parquet (data format), 96, 131 (see also column-oriented storage) use in Hadoop, 414 partial failures, 275, 310 limping, 311 partial order, 341 partitioning, 199-218, 556 and replication, 200 in batch processing, 429 multi-partition operations, 514 enforcing constraints, 522 secondary index maintenance, 495 of key-value data, 201-205 by key range, 202 skew and hot spots, 205 rebalancing partitions, 209-214 automatic or manual rebalancing, 213 problems with hash mod N, 210 using dynamic partitioning, 212 using fixed number of partitions, 210 using N partitions per node, 212 replication and, 147 request routing, 214-216 secondary indexes, 206-209 document-based partitioning, 206 term-based partitioning, 208 serial execution of transactions and, 255 Paxos (consensus algorithm), 366 ballot number, 368 Multi-Paxos (total order broadcast), 367 percentiles, 14, 556 calculating efficiently, 16 importance of high percentiles, 16 use in service level agreements (SLAs), 15 Percona XtraBackup (MySQL tool), 156 performance describing, 13 of distributed transactions, 360 of in-memory databases, 89 of linearizability, 338 of multi-leader replication, 169 perpetual inconsistency, 525 pessimistic concurrency control, 261 phantoms (transaction isolation), 250 materializing conflicts, 251 preventing, in serializability, 259 physical clocks (see clocks) pickle (Python), 113 Pig (dataflow language), 419, 427 replicated joins, 409 skewed joins, 407 workflows, 403 Pinball (workflow scheduler), 402 pipelined execution, 423 in Unix, 394 point in time, 287 polyglot persistence, 29 polystores, 501 PostgreSQL (database) BDR (multi-leader replication), 170 causal ordering of writes, 177 Bottled Water (change data capture), 455 Bucardo (trigger-based replication), 161, 173 distributed transaction support, 361 foreign data wrappers, 501 full text search support, 490 leader-based replication, 153 log sequence number, 156 MVCC implementation, 239, 241 PL/pgSQL language, 255 PostGIS geospatial indexes, 87 preventing lost updates, 245 preventing write skew, 248, 261 read committed isolation, 236 recursive query support, 54 representing graphs, 51 
 
 
 serializable snapshot isolation (SSI), 261 snapshot isolation support, 239, 242 WAL-based replication, 160 XML and JSON support, 30, 42 pre-splitting, 212 Precision Time Protocol (PTP), 290 predicate locks, 259 predictive analytics, 533-536 amplifying bias, 534 ethics of (see ethics) feedback loops, 536 preemption of datacenter resources, 418 of threads, 298 Pregel processing model, 425 primary keys, 85, 556 compound primary key (Cassandra), 204 primary-secondary replication (see leaderbased replication) privacy, 536-543 consent and freedom of choice, 538 data as assets and power, 540 deleting data, 463 ethical considerations (see ethics) legislation and self-regulation, 542 meaning of, 539 surveillance, 537 tracking behavioral data, 536 probabilistic algorithms, 16, 466 process pauses, 295-299 processing time (of events), 469 producers (message streams), 440 programming languages dataflow languages, 504 for stored procedures, 255 functional reactive programming (FRP), 504 logic programming, 504 Prolog (language), 61 (see also Datalog) promises (asynchronous operations), 135 property graphs, 50 Cypher query language, 52 Protocol Buffers (data format), 117-121 field tags and schema evolution, 120 provenance of data, 531 publish/subscribe model, 441 publishers (message streams), 440 punch card tabulating machines, 390 pure functions, 48 putting computation near data, 400 
 
-# **Q** 
+**Q**
 
 Qpid (messaging), 444 quality of service (QoS), 285 Quantcast File System (distributed filesystem), 398 query languages, 42-48 aggregation pipeline, 48 CSS and XSL, 44 Cypher, 52 Datalog, 60 Juttle, 504 MapReduce querying, 46-48 recursive SQL queries, 53 relational algebra and SQL, 42 SPARQL, 59 query optimizers, 37, 427 queueing delays (networks), 282 head-of-line blocking, 15 latency and response time, 14 queues (messaging), 137 quorums, 179-182, 556 for leaderless replication, 179 in consensus algorithms, 368 limitations of consistency, 181-183, 334 making decisions in distributed systems, 301 monitoring staleness, 182 multi-datacenter replication, 184 relying on durability, 309 sloppy quorums and hinted handoff, 183 
 
-# **R** 
+**R**
 
 R-trees (indexes), 87 RabbitMQ (messaging), 137, 444 leader-based replication, 153 race conditions, 225 (see also concurrency) avoiding with linearizability, 331 caused by dual writes, 452 dirty writes, 235 in counter increments, 235 lost updates, 242-246 preventing with event logs, 462, 507 preventing with serializable isolation, 252 write skew, 246-251 Raft (consensus algorithm), 366 
 
@@ -1710,7 +1710,7 @@ stock market feeds, 442 STONITH (Shoot The Other Node In The Head), 158 stop-the
 
 conflict detection, 172 system models, 300, 306-310 assumptions in, 528 correctness of algorithms, 308 mapping to the real world, 309 safety and liveness, 308 systems of record, 386, 557 change data capture, 454, 491 treating event log as, 460 systems thinking, 536 
 
-# **T** 
+**T**
 
 t-digest (algorithm), 16 table-table joins, 474 Tableau (data visualization software), 416 tail (Unix tool), 447 tail vertex (property graphs), 51 Tajo (query engine), 93 Tandem NonStop SQL (database), 200 TCP (Transmission Control Protocol), 277 comparison to circuit switching, 285 comparison to UDP, 283 connection failures, 280 flow control, 282, 441 packet checksums, 306, 519, 529 reliability and duplicate suppression, 517 retransmission timeouts, 284 use for transaction sessions, 229 telemetry (see monitoring) Teradata (database), 93, 200 term-partitioned indexes, 208, 217 termination (consensus), 365 Terrapin (database), 413 Tez (dataflow engine), 421-423 fault tolerance, 422 support by higher-level tools, 427 thrashing (out of memory), 297 threads (concurrency) actor model, 138, 468 (see also message-passing) atomic operations, 223 background threads, 73, 85 execution pauses, 286, 296-298 memory barriers, 338 preemption, 298 single (see single-threaded execution) three-phase commit, 359 Thrift (data format), 117-121 BinaryProtocol, 118 
 
@@ -1728,37 +1728,37 @@ uncertain (transaction status) (see in doubt) uniform consensus, 365
 
 (see also consensus) uniform interfaces, 395 union type (in Avro), 125 uniq (Unix tool), 392 uniqueness constraints asynchronously checked, 526 requiring consensus, 521 requiring linearizability, 330 uniqueness in log-based messaging, 522 Unix philosophy, 394-397 command-line batch processing, 391-394 Unix pipes versus dataflow engines, 423 comparison to Hadoop, 413-414 comparison to relational databases, 499, 501 comparison to stream processing, 464 composability and uniform interfaces, 395 loose coupling, 396 pipes, 394 relation to Hadoop, 499 UPDATE statement (SQL), 40 updates preventing lost updates, 242-246 atomic write operations, 243 automatically detecting lost updates, 245 compare-and-set operations, 245 conflict resolution and replication, 246 using explicit locking, 244 preventing write skew, 246-251 
 
-# **V** 
+**V**
 
 validity (consensus), 365 vBuckets (partitioning), 199 vector clocks, 191 (see also version vectors) vectorized processing, 99, 428 verification, 528-533 avoiding blind trust, 530 culture of, 530 designing for auditability, 531 end-to-end integrity checks, 531 tools for auditable data systems, 532 version control systems, reliance on immutable data, 463 version vectors, 177, 191 capturing causal dependencies, 343 versus vector clocks, 191 Vertica (database), 93 handling writes, 101 replicas using different sort orders, 100 vertical scaling (see scaling up) vertices (in graphs), 49 property graph model, 50 Viewstamped Replication (consensus algorithm), 366 view number, 368 virtual machines, 146 (see also cloud computing) context switches, 297 network performance, 282 noisy neighbors, 284 reliability in cloud services, 8 virtualized clocks in, 290 virtual memory process pauses due to page faults, 14, 297 versus memory management by databases, 89 VisiCalc (spreadsheets), 504 vnodes (partitioning), 199 Voice over IP (VoIP), 283 Voldemort (database) building read-only stores in batch processes, 413 hash partitioning, 203-204, 211 leaderless replication, 177 multi-datacenter support, 184 rebalancing, 213 reliance on read repair, 179 sloppy quorums, 184 VoltDB (database) cross-partition serializability, 256 deterministic stored procedures, 255 in-memory storage, 89 output streams, 456 secondary indexes, 207 serial execution of transactions, 253 statement-based replication, 159, 479 transactions in stream processing, 477 
 
-# **W** 
+**W**
 
 WAL (write-ahead log), 82 web services (see services) Web Services Description Language (WSDL), 133 webhooks, 443 webMethods (messaging), 137 WebSocket (protocol), 512 
 
 
 windows (stream processing), 466, 468-472 infinite windows for changelogs, 467, 474 knowing when all events have arrived, 470 stream joins within a window, 473 types of windows, 472 winners (conflict resolution), 173 WITH RECURSIVE syntax (SQL), 54 workflows (MapReduce), 402 outputs, 411-414 key-value stores, 412 search indexes, 411 with map-side joins, 410 working set, 393 write amplification, 84 write path (derived data), 509 write skew (transaction isolation), 246-251 characterizing, 246-251, 262 examples of, 247, 249 materializing conflicts, 251 occurrence in practice, 529 phantoms, 250 preventing in snapshot isolation, 262-265 in two-phase locking, 259-261 options for, 248 write-ahead log (WAL), 82, 159 writes (database) atomic write operations, 243 detecting writes affecting prior reads, 264 preventing dirty writes with read committed, 235 WS-* framework, 133 (see also services) WS-AtomicTransaction (2PC), 355 
 
-# **X** 
+**X**
 
 XA transactions, 355, 361-364 heuristic decisions, 363 limitations of, 363 xargs (Unix tool), 392, 396 XML binary variants, 115 encoding RDF data, 57 for application data, issues with, 114 in relational databases, 30, 41 XSL/XPath, 45 
 
-# **Y** 
+**Y**
 
 Yahoo! Pistachio (database), 461 Sherpa (database), 455 YARN (job scheduler), 416, 506 preemption of jobs, 418 use of ZooKeeper, 370 
 
-# **Z** 
+**Z**
 
 Zab (consensus algorithm), 366 use in ZooKeeper, 353 ZeroMQ (messaging library), 442 ZooKeeper (coordination service), 370-373 generating fencing tokens, 303, 349, 370 linearizable operations, 333, 351 locks and leader election, 330 service discovery, 372 use for partition assignment, 215, 371 use of Zab algorithm, 349, 353, 366 
 
 
-# **About the Author** 
+**About the Author**
 
 **Martin Kleppmann** is a researcher in distributed systems at the University of Cambridge, UK. Previously he was a software engineer and entrepreneur at internet companies including LinkedIn and Rapportive, where he worked on large-scale data infrastructure. In the process he learned a few things the hard way, and he hopes this book will save you from repeating the same mistakes. 
 
 Martin is a regular conference speaker, blogger, and open source contributor. He believes that profound technical ideas should be accessible to everyone, and that deeper understanding will help us develop better software. 
 
-# **Colophon** 
+**Colophon**
 
 The animal on the cover of _Designing Data-Intensive Applications_ is an Indian wild boar ( _Sus scrofa cristatus_ ), a subspecies of wild boar found in India, Myanmar, Nepal, Sri Lanka, and Thailand. They are distinctive from European boars in that they have higher back bristles, no woolly undercoat, and a larger, straighter skull. 
 

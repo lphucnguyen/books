@@ -1,6 +1,4 @@
-# **PART I** 
-
-# **Foundations of Data Systems** 
+# Part I. Foundations of Data Systems
 
 The first four chapters go through the fundamental ideas that apply to all data systems, whether running on a single machine or distributed across a cluster of machines: 
 

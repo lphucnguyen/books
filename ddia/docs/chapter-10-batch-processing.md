@@ -1,4 +1,4 @@
-# Chapter 10. Batch Processing 
+## Chapter 10. Batch Processing
 
 _A system cannot be successful if it is too strongly influenced by a single person. Once the initial design is complete and fairly robust, the real test begins as people with many different viewpoints undertake their own experiments._ 
 
@@ -10,16 +10,16 @@ In such _online_ systems, whether it’s a web browser requesting a page or a se
 
 The web, and increasing numbers of HTTP/REST-based APIs, has made the request/ response style of interaction so common that it’s easy to take it for granted. But we should remember that it’s not the only way of building systems, and that other approaches have their merits too. Let’s distinguish three different types of systems: 
 
-# _Services (online systems)_ 
+**Services (online systems)**
 
 A service waits for a request or instruction from a client to arrive. When one is received, the service tries to handle it as quickly as possible and sends a response back. Response time is usually the primary measure of performance of a service, and availability is often very important (if the client can’t reach the service, the user will probably get an error message). 
 
 
-# _Batch processing systems (offline systems)_ 
+**Batch processing systems (offline systems)**
 
 A batch processing system takes a large amount of input data, runs a _job_ to process it, and produces some output data. Jobs often take a while (from a few minutes to several days), so there normally isn’t a user waiting for the job to finish. Instead, batch jobs are often scheduled to run periodically (for example, once a day). The primary performance measure of a batch job is usually _throughput_ (the time it takes to crunch through an input dataset of a certain size). We discuss batch processing in this chapter. 
 
-# _Stream processing systems (near-real-time systems)_ 
+**Stream processing systems (near-real-time systems)**
 
 Stream processing is somewhere between online and offline/batch processing (so it is sometimes called _near-real-time_ or _nearline_ processing). Like a batch processing system, a stream processor consumes inputs and produces outputs (rather than responding to requests). However, a stream job operates on events shortly after they happen, whereas a batch job operates on a fixed set of input data. This difference allows stream processing systems to have lower latency than the equivalent batch systems. As stream processing builds upon batch processing, we discuss it in Chapter 11. 
 
@@ -31,7 +31,7 @@ In fact, batch processing is a very old form of computing. Long before programma
 
 In this chapter, we will look at MapReduce and several other batch processing algorithms and frameworks, and explore how they are used in modern data systems. But first, to get started, we will look at data processing using standard Unix tools. Even if you are already familiar with them, a reminder about the Unix philosophy is worthwhile because the ideas and lessons from Unix carry over to large-scale, heterogeneous distributed data systems. 
 
-## Batch Processing with Unix Tools
+### Batch Processing with Unix Tools
 
 Let’s start with a simple example. Say you have a web server that appends a line to a log file every time it serves a request. For example, using the nginx default access log format, one line of the log might look like this: 
 
@@ -51,7 +51,7 @@ $status $body_bytes_sent "$http_referer" "$http_user_agent"
 
 So, this one line of the log indicates that on February 27, 2015, at 17:55:11 UTC, the server received a request for the file _/css/typography.css_ from the client IP address 216.58.210.78. The user was not authenticated, so `$remote_user` is set to a hyphen `-` ( ). The response status was 200 (i.e., the request was successful), and the response was 3,377 bytes in size. The web browser was Chrome 40, and it loaded the file because it was referenced in the page at the URL _http://martin.kleppmann.com/_ . 
 
-### Simple Log Analysis 
+#### Simple Log Analysis
 
 Various tools can take these log files and produce pretty reports about your website traffic, but for the sake of exercise, let’s build our own, using basic Unix tools. For example, say you want to find the five most popular pages on your website. You can do this in a Unix shell as follows:[i] 
 
@@ -93,7 +93,7 @@ Although the preceding command line likely looks a bit obscure if you’re unfam
 
 We don’t have space in this book to explore Unix tools in detail, but they are very much worth learning about. Surprisingly many data analyses can be done in a few minutes using some combination of `awk` , `sed` , `grep` , `sort` , `uniq` , and `xargs` , and they perform surprisingly well [8]. 
 
-# **Chain of commands versus custom program** 
+**Chain of commands versus custom program**
 
 Instead of the chain of Unix commands, you could write a simple program to do the same thing. For example, in Ruby, it might look something like this: 
 
@@ -128,7 +128,7 @@ Print out those top five entries.
 
 This program is not as concise as the chain of Unix pipes, but it’s fairly readable, and which of the two you prefer is partly a matter of taste. However, besides the superficial syntactic differences between the two, there is a big difference in the execution flow, which becomes apparent if you run this analysis on a large file. 
 
-# **Sorting versus in-memory aggregation** 
+**Sorting versus in-memory aggregation**
 
 The Ruby script keeps an in-memory hash table of URLs, where each URL is mapped to the number of times it has been seen. The Unix pipeline example does not have such a hash table, but instead relies on sorting a list of URLs in which multiple occurrences of the same URL are simply repeated. 
 
@@ -141,7 +141,7 @@ same principle as we discussed in “SSTables and LSM-Trees” on page 76: chunk
 
 The `sort` utility in GNU Coreutils (Linux) automatically handles larger-thanmemory datasets by spilling to disk, and automatically parallelizes sorting across multiple CPU cores [9]. This means that the simple chain of Unix commands we saw earlier easily scales to large datasets, without running out of memory. The bottleneck is likely to be the rate at which the input file can be read from disk. 
 
-### The Unix Philosophy 
+#### The Unix Philosophy
 
 It’s no coincidence that we were able to analyze a log file quite easily, using a chain of commands like in the previous example: this was in fact one of the key design ideas of Unix, and it remains astonishingly relevant today. Let’s look at it in some more depth so that we can borrow some ideas from Unix [10]. 
 
@@ -162,7 +162,7 @@ The `sort` tool is a great example of a program that does one thing well. It is 
 
 A Unix shell like `bash` lets us easily _compose_ these small programs into surprisingly powerful data processing jobs. Even though many of these programs are written by different groups of people, they can be joined together in flexible ways. What does Unix do to enable this composability? 
 
-# **A uniform interface** 
+**A uniform interface**
 
 If you expect the output of one program to become the input to another program, that means those programs must use the same data format—in other words, a compatible interface. If you want to be able to connect _any_ program’s output to _any_ program’s input, that means that _all_ programs must use the same input/output interface. 
 
@@ -181,7 +181,7 @@ Although it’s not perfect, even decades later, the uniform interface of Unix i
 
 Even databases with the _same data model_ often don’t make it easy to get data out of one and into the other. This lack of integration leads to Balkanization of data. 
 
-# **Separation of logic and wiring** 
+**Separation of logic and wiring**
 
 Another characteristic feature of Unix tools is their use of standard input ( `stdin` ) and standard output ( `stdout` ). If you run a program and don’t specify anything else, `stdin` comes from the keyboard and `stdout` goes to the screen. However, you can also take input from a file and/or redirect output to a file. Pipes let you attach the `stdout` of one process to the `stdin` of another process (with a small in-memory buffer, and without writing the entire intermediate data stream to disk). 
 
@@ -192,7 +192,7 @@ You can even write your own programs and combine them with the tools provided by
 
 However, there are limits to what you can do with `stdin` and `stdout` . Programs that need multiple inputs or outputs are possible but tricky. You can’t pipe a program’s output into a network connection [17, 18].[iii] If a program directly opens files for reading and writing, or starts another program as a subprocess, or opens a network connection, then that I/O is wired up by the program itself. It can still be configurable (through command-line options, for example), but the flexibility of wiring up inputs and outputs in a shell is reduced. 
 
-# **Transparency and experimentation** 
+**Transparency and experimentation**
 
 Part of what makes Unix tools so successful is that they make it quite easy to see what is going on: 
 
@@ -206,7 +206,7 @@ Thus, even though Unix tools are quite blunt, simple tools compared to a query o
 
 However, the biggest limitation of Unix tools is that they run only on a single machine—and that’s where tools like Hadoop come in. 
 
-## MapReduce and Distributed Filesystems
+### MapReduce and Distributed Filesystems
 
 MapReduce is a bit like Unix tools, but distributed across potentially thousands of machines. Like Unix tools, it is a fairly blunt, brute-force, but surprisingly effective tool. A single MapReduce job is comparable to a single Unix process: it takes one or more inputs and produces one or more outputs. 
 
@@ -232,7 +232,7 @@ In order to tolerate machine and disk failures, file blocks are replicated on mu
 
 HDFS has scaled well: at the time of writing, the biggest HDFS deployments run on tens of thousands of machines, with combined storage capacity of hundreds of petabytes [23]. Such large scale has become viable because the cost of data storage and access on HDFS, using commodity hardware and open source software, is much lower than that of the equivalent capacity on a dedicated storage appliance [24]. 
 
-### MapReduce Job Execution 
+#### MapReduce Job Execution
 
 MapReduce is a programming framework with which you can write code to process large datasets in a distributed filesystem like HDFS. The easiest way of understanding it is by referring back to the web server log analysis example in “Simple Log Analysis” on page 391. The pattern of data processing in MapReduce is very similar to this example: 
 
@@ -248,18 +248,18 @@ Those four steps can be performed by one MapReduce job. Steps 2 (map) and 4 (red
 
 To create a MapReduce job, you need to implement two callback functions, the mapper and reducer, which behave as follows (see also “MapReduce Querying” on page 46): 
 
-# _Mapper_ 
+**Mapper**
 
 The mapper is called once for every input record, and its job is to extract the key and value from the input record. For each input, it may generate any number of key-value pairs (including none). It does not keep any state from one input record to the next, so each record is handled independently. 
 
 
-# _Reducer_ 
+**Reducer**
 
 The MapReduce framework takes the key-value pairs produced by the mappers, collects all the values belonging to the same key, and calls the reducer with an iterator over that collection of values. The reducer can produce output records (such as the number of occurrences of the same URL). 
 
 In the web server log example, we had a second `sort` command in step 5, which ranked URLs by number of requests. In MapReduce, if you need a second sorting stage, you can implement it by writing a second MapReduce job and using the output of the first job as input to the second job. Viewed like this, the role of the mapper is to prepare the data by putting it into a form that is suitable for sorting, and the role of the reducer is to process the data that has been sorted. 
 
-# **Distributed execution of MapReduce** 
+**Distributed execution of MapReduce**
 
 The main difference from pipelines of Unix commands is that MapReduce can parallelize a computation across many machines, without you having to write code to explicitly handle the parallelism. The mapper and reducer only operate on one record at a time; they don’t need to know where their input is coming from or their output is going to, so the framework can handle the complexities of moving data between machines. 
 
@@ -288,7 +288,7 @@ The reduce task takes the files from the mappers and merges them together, prese
 
 The reducer is called with a key and an iterator that incrementally scans over all records with the same key (which may in some cases not all fit in memory). The reducer can use arbitrary logic to process these records, and can generate any number of output records. These output records are written to a file on the distributed filesystem (usually, one copy on the local disk of the machine running the reducer, with replicas on other machines). 
 
-# **MapReduce workflows** 
+**MapReduce workflows**
 
 The range of problems you can solve with a single MapReduce job is limited. Referring back to the log analysis example, a single MapReduce job could determine the number of page views per URL, but not the most popular URLs, since that requires a second round of sorting. 
 
@@ -305,7 +305,7 @@ These schedulers also have management features that are useful when maintaining 
 
 Various higher-level tools for Hadoop, such as Pig [30], Hive [31], Cascading [32], Crunch [33], and FlumeJava [34], also set up workflows of multiple MapReduce stages that are automatically wired together appropriately. 
 
-### Reduce-Side Joins and Grouping 
+#### Reduce-Side Joins and Grouping
 
 We discussed joins in Chapter 2 in the context of data models and query languages, but we have not delved into how joins are actually implemented. It is time that we pick up that thread again. 
 
@@ -320,7 +320,7 @@ When a MapReduce job is given a set of files as input, it reads the entire conte
 
 When we talk about joins in the context of batch processing, we mean resolving all occurrences of some association within a dataset. For example, we assume that a job is processing the data for all users simultaneously, not merely looking up the data for one particular user (which would be done far more efficiently with an index). 
 
-# **Example: analysis of user activity events** 
+**Example: analysis of user activity events**
 
 A typical example of a join in a batch job is illustrated in Figure 10-2. On the left is a log of events describing the things that logged-in users did on a website (known as _activity events_ or _clickstream data_ ), and on the right is a database of users. You can think of this example as being part of a star schema (see “Stars and Snowflakes: Schemas for Analytics” on page 93): the log of events is the fact table, and the user database is one of the dimensions. 
 
@@ -339,7 +339,7 @@ In order to achieve good throughput in a batch process, the computation must be 
 
 Thus, a better approach would be to take a copy of the user database (for example, extracted from a database backup using an ETL process—see “Data Warehousing” on page 91) and to put it in the same distributed filesystem as the log of user activity events. You would then have the user database in one set of files in HDFS and the user activity records in another set of files, and could use MapReduce to bring together all of the relevant records in the same place and process them efficiently. 
 
-# **Sort-merge joins** 
+**Sort-merge joins**
 
 Recall that the purpose of the mapper is to extract a key and value from each input record. In the case of Figure 10-2, this key would be the user ID: one set of mappers would go over the activity events (extracting the user ID as the key and the activity event as the value), while another set of mappers would go over the user database (extracting the user ID as the key and the user’s date of birth as the value). This process is illustrated in Figure 10-3. 
 
@@ -358,7 +358,7 @@ The reducer can then perform the actual join logic easily: the reducer function 
 
 Since the reducer processes all of the records for a particular user ID in one go, it only needs to keep one user record in memory at any one time, and it never needs to make any requests over the network. This algorithm is known as a _sort-merge join_ , since mapper output is sorted by key, and the reducers then merge together the sorted lists of records from both sides of the join. 
 
-# **Bringing related data together in the same place** 
+**Bringing related data together in the same place**
 
 In a sort-merge join, the mappers and the sorting process make sure that all the necessary data to perform the join operation for a particular user ID is brought together in the same place: a single call to the reducer. Having lined up all the required data in advance, the reducer can be a fairly simple, single-threaded piece of code that can churn through records with high throughput and low memory overhead. 
 
@@ -366,7 +366,7 @@ One way of looking at this architecture is that mappers “send messages” to t
 
 Using the MapReduce programming model has separated the physical network communication aspects of the computation (getting the data to the right machine) from the application logic (processing the data once you have it). This separation contrasts with the typical use of databases, where a request to fetch data from a database often occurs somewhere deep inside a piece of application code [36]. Since MapReduce handles all network communication, it also shields the application code from having to worry about partial failures, such as the crash of another node: MapReduce transparently retries failed tasks without affecting the application logic. 
 
-# **GROUP BY** 
+**GROUP BY**
 
 Besides joins, another common use of the “bringing related data to the same place” pattern is grouping records by some key (as in the `GROUP BY` clause in SQL). All 
 
@@ -385,7 +385,7 @@ Another common use for grouping is collating all the activity events for a parti
 
 If you have multiple web servers handling user requests, the activity events for a particular user are most likely scattered across various different servers’ log files. You can implement sessionization by using a session cookie, user ID, or similar identifier as the grouping key and bringing all the activity events for a particular user together in one place, while distributing different users’ events across different partitions. 
 
-# **Handling skew** 
+**Handling skew**
 
 The pattern of “bringing all records with the same key to the same place” breaks down if there is a very large amount of data related to a single key. For example, in a social network, most users might be connected to a few hundred people, but a small number of celebrities may have many millions of followers. Such disproportionately active database records are known as _linchpin objects_ [38] or _hot keys_ . 
 
@@ -402,7 +402,7 @@ Hive’s skewed join optimization takes an alternative approach. It requires hot
 
 When grouping records by a hot key and aggregating them, you can perform the grouping in two stages. The first MapReduce stage sends records to a random reducer, so that each reducer performs the grouping on a subset of records for the hot key and outputs a more compact aggregated value per key. The second MapReduce job then combines the values from all of the first-stage reducers into a single value per key. 
 
-### Map-Side Joins 
+#### Map-Side Joins
 
 The join algorithms described in the last section perform the actual join logic in the reducers, and are hence known as _reduce-side joins_ . The mappers take the role of preparing the input data: extracting the key and value from each input record, assigning the key-value pairs to a reducer partition, and sorting by key. 
 
@@ -411,7 +411,7 @@ The reduce-side approach has the advantage that you do not need to make any assu
 On the other hand, if you _can_ make certain assumptions about your input data, it is possible to make joins faster by using a so-called _map-side join_ . This approach uses a cut-down MapReduce job in which there are no reducers and no sorting. Instead, each mapper simply reads one input file block from the distributed filesystem and writes one output file to the filesystem—that is all. 
 
 
-# **Broadcast hash joins** 
+**Broadcast hash joins**
 
 The simplest way of performing a map-side join applies in the case where a large dataset is joined with a small dataset. In particular, the small dataset needs to be small enough that it can be loaded entirely into memory in each of the mappers. 
 
@@ -423,7 +423,7 @@ This simple but effective algorithm is called a _broadcast hash join_ : the word
 
 Instead of loading the small join input into an in-memory hash table, an alternative is to store the small join input in a read-only index on the local disk [42]. The frequently used parts of this index will remain in the operating system’s page cache, so this approach can provide random-access lookups almost as fast as an in-memory hash table, but without actually requiring the dataset to fit in memory. 
 
-# **Partitioned hash joins** 
+**Partitioned hash joins**
 
 If the inputs to the map-side join are partitioned in the same way, then the hash join approach can be applied to each partition independently. In the case of Figure 10-2, you might arrange for the activity events and the user database to each be partitioned based on the last decimal digit of the user ID (so there are 10 partitions on either side). For example, mapper 3 first loads all users with an ID ending in 3 into a hash table, and then scans over all the activity events for each user whose ID ends in 3. 
 
@@ -436,13 +436,13 @@ This approach only works if both of the join’s inputs have the same number of 
 
 Partitioned hash joins are known as _bucketed map joins_ in Hive [37]. 
 
-# **Map-side merge joins** 
+**Map-side merge joins**
 
 Another variant of a map-side join applies if the input datasets are not only partitioned in the same way, but also _sorted_ based on the same key. In this case, it does not matter whether the inputs are small enough to fit in memory, because a mapper can perform the same merging operation that would normally be done by a reducer: reading both input files incrementally, in order of ascending key, and matching records with the same key. 
 
 If a map-side merge join is possible, it probably means that prior MapReduce jobs brought the input datasets into this partitioned and sorted form in the first place. In principle, this join could have been performed in the reduce stage of the prior job. However, it may still be appropriate to perform the merge join in a separate maponly job, for example if the partitioned and sorted datasets are also needed for other purposes besides this particular join. 
 
-# **MapReduce workflows with map-side joins** 
+**MapReduce workflows with map-side joins**
 
 When the output of a MapReduce join is consumed by downstream jobs, the choice of map-side or reduce-side join affects the structure of the output. The output of a reduce-side join is partitioned and sorted by the join key, whereas the output of a map-side join is partitioned and sorted in the same way as the large input (since one map task is started for each file block of the join’s large input, regardless of whether a partitioned or broadcast join is used). 
 
@@ -451,7 +451,7 @@ As discussed, map-side joins also make more assumptions about the size, sorting,
 In the Hadoop ecosystem, this kind of metadata about the partitioning of datasets is often maintained in HCatalog and the Hive metastore [37]. 
 
 
-### The Output of Batch Workflows 
+#### The Output of Batch Workflows
 
 We have talked a lot about the various algorithms for implementing workflows of MapReduce jobs, but we neglected an important question: what is the result of all of that processing, once it is done? Why are we running all these jobs in the first place? 
 
@@ -459,7 +459,7 @@ In the case of database queries, we distinguished transaction processing (OLTP) 
 
 Where does batch processing fit in? It is not transaction processing, nor is it analytics. It is closer to analytics, in that a batch process typically scans over large portions of an input dataset. However, a workflow of MapReduce jobs is not the same as a SQL query used for analytic purposes (see “Comparing Hadoop to Distributed Databases” on page 414). The output of a batch process is often not a report, but some other kind of structure. 
 
-# **Building search indexes** 
+**Building search indexes**
 
 Google’s original use of MapReduce was to build indexes for its search engine, which was implemented as a workflow of 5 to 10 MapReduce jobs [1]. Although Google later moved away from using MapReduce for this purpose [43], it helps to understand MapReduce if you look at it through the lens of building a search index. (Even today, Hadoop MapReduce remains a good way of building indexes for Lucene/Solr [44].) 
 
@@ -474,7 +474,7 @@ If the indexed set of documents changes, one option is to periodically rerun the
 
 Alternatively, it is possible to build indexes incrementally. As discussed in Chapter 3, if you want to add, remove, or update documents in an index, Lucene writes out new segment files and asynchronously merges and compacts segment files in the background. We will see more on such incremental processing in Chapter 11. 
 
-# **Key-value stores as batch process output** 
+**Key-value stores as batch process output**
 
 Search indexes are just one example of the possible outputs of a batch processing workflow. Another common use for batch processing is to build machine learning systems such as classifiers (e.g., spam filters, anomaly detection, image recognition) and recommendation systems (e.g., people you may know, products you may be interested in, or related searches [29]). 
 
@@ -496,7 +496,7 @@ Building these database files is a good use of MapReduce: using a mapper to extr
 
 When loading data into Voldemort, the server continues serving requests to the old data files while the new data files are copied from the distributed filesystem to the server’s local disk. Once the copying is complete, the server atomically switches over to querying the new files. If anything goes wrong in this process, it can easily switch back to the old files again, since they are still there and immutable [46]. 
 
-# **Philosophy of batch process outputs** 
+**Philosophy of batch process outputs**
 
 The Unix philosophy that we discussed earlier in this chapter (“The Unix Philosophy” on page 394) encourages experimentation by being very explicit about dataflow: a program reads its input and writes its output. In the process, the input is left unchanged, any previous output is completely replaced with the new output, and there are no other side effects. This means that you can rerun a command as often as you like, tweaking or debugging it, without messing up the state of your system. 
 
@@ -515,7 +515,7 @@ The handling of output from MapReduce jobs follows the same philosophy. By treat
 
 In these areas, the design principles that worked well for Unix also seem to be working well for Hadoop—but Unix and Hadoop also differ in some ways. For example, because most Unix tools assume untyped text files, they have to do a lot of input parsing (our log analysis example at the beginning of the chapter used `{print $7}` to extract the URL). On Hadoop, some of those low-value syntactic conversions are eliminated by using more structured file formats: Avro (see “Avro” on page 122) and Parquet (see “Column-Oriented Storage” on page 95) are often used, as they provide efficient schema-based encoding and allow evolution of their schemas over time (see Chapter 4). 
 
-### Comparing Hadoop to Distributed Databases 
+#### Comparing Hadoop to Distributed Databases
 
 As we have seen, Hadoop is somewhat like a distributed version of Unix, where HDFS is the filesystem and MapReduce is a quirky implementation of a Unix process 
 
@@ -526,7 +526,7 @@ When the MapReduce paper [1] was published, it was—in some sense—not at all 
 
 The biggest difference is that MPP databases focus on parallel execution of analytic SQL queries on a cluster of machines, while the combination of MapReduce and a distributed filesystem [19] provides something much more like a general-purpose operating system that can run arbitrary programs. 
 
-# **Diversity of storage** 
+**Diversity of storage**
 
 Databases require you to structure data according to a particular model (e.g., relational or documents), whereas files in a distributed filesystem are just byte sequences, which can be written using any data model and encoding. They might be collections of database records, but they can equally well be text, images, videos, sensor readings, sparse matrices, feature vectors, genome sequences, or any other kind of data. 
 
@@ -543,7 +543,7 @@ Indiscriminate data dumping shifts the burden of interpreting the data: instead 
 
 Thus, Hadoop has often been used for implementing ETL processes (see “Data Warehousing” on page 91): data from transaction processing systems is dumped into the distributed filesystem in some raw form, and then MapReduce jobs are written to clean up that data, transform it into a relational form, and import it into an MPP data warehouse for analytic purposes. Data modeling still happens, but it is in a separate step, decoupled from the data collection. This decoupling is possible because a distributed filesystem supports data encoded in any format. 
 
-# **Diversity of processing models** 
+**Diversity of processing models**
 
 MPP databases are monolithic, tightly integrated pieces of software that take care of storage layout on disk, query planning, scheduling, and execution. Since these components can all be tuned and optimized for the specific needs of the database, the system as a whole can achieve very good performance on the types of queries for which it is designed. Moreover, the SQL query language allows expressive queries and elegant semantics without the need to write code, making it accessible to graphical tools used by business analysts (such as Tableau). 
 
@@ -557,7 +557,7 @@ Crucially, those various processing models can all be run on a single shared-use
 
 The Hadoop ecosystem includes both random-access OLTP databases such as HBase (see “SSTables and LSM-Trees” on page 76) and MPP-style analytic databases such as Impala [41]. Neither HBase nor Impala uses MapReduce, but both use HDFS for storage. They are very different approaches to accessing and processing data, but they can nevertheless coexist and be integrated in the same system. 
 
-# **Designing for frequent faults** 
+**Designing for frequent faults**
 
 When comparing MapReduce to MPP databases, two more differences in design approach stand out: the handling of faults and the use of memory and disk. Batch processes are less sensitive to faults than online systems, because they do not immediately affect users if they fail and they can always be run again. 
 
@@ -583,7 +583,7 @@ And this is why MapReduce is designed to tolerate frequent unexpected task termi
 Among open source cluster schedulers, preemption is less widely used. YARN’s CapacityScheduler supports preemption for balancing the resource allocation of different queues [58], but general priority preemption is not supported in YARN, Mesos, or Kubernetes at the time of writing [60]. In an environment where tasks are not so often terminated, the design decisions of MapReduce make less sense. In the next section, we will look at some alternatives to MapReduce that make different design decisions. 
 
 
-## Beyond MapReduce
+### Beyond MapReduce
 
 Although MapReduce became very popular and received a lot of hype in the late 2000s, it is just one among many possible programming models for distributed systems. Depending on the volume of data, the structure of the data, and the type of processing being done with it, other tools may be more appropriate for expressing a computation. 
 
@@ -595,7 +595,7 @@ However, there are also problems with the MapReduce execution model itself, whic
 
 In the rest of this chapter, we will look at some of those alternatives for batch processing. In Chapter 11 we will move to stream processing, which can be regarded as another way of speeding up batch processing. 
 
-### Materialization of Intermediate State 
+#### Materialization of Intermediate State
 
 As discussed previously, every MapReduce job is independent from every other job. The main contact points of a job with the rest of the world are its input and output directories on the distributed filesystem. If you want the output of one job to become the input to a second job, you need to configure the second job’s input directory to be the same as the first job’s output directory, and an external workflow scheduler must start the second job only once the first job has completed. 
 
@@ -619,7 +619,7 @@ MapReduce’s approach of fully materializing intermediate state has downsides c
 - Storing intermediate state in a distributed filesystem means those files are replicated across several nodes, which is often overkill for such temporary data. 
 
 
-# **Dataflow engines** 
+**Dataflow engines**
 
 In order to fix these problems with MapReduce, several new execution engines for distributed batch computations were developed, the most well known of which are Spark [61, 62], Tez [63, 64], and Flink [65, 66]. There are various differences in the way they are designed, but they have one thing in common: they handle an entire workflow as one job, rather than breaking it up into independent subjobs. 
 
@@ -654,7 +654,7 @@ You can use dataflow engines to implement the same computations as MapReduce wor
 
 Tez is a fairly thin library that relies on the YARN shuffle service for the actual copying of data between nodes [58], whereas Spark and Flink are big frameworks that include their own network communication layer, scheduler, and user-facing APIs. We will discuss those high-level APIs shortly. 
 
-# **Fault tolerance** 
+**Fault tolerance**
 
 An advantage of fully materializing intermediate state to a distributed filesystem is that it is durable, which makes fault tolerance fairly easy in MapReduce: if a task fails, it can just be restarted on another machine and read the same input again from the filesystem. 
 
@@ -669,7 +669,7 @@ In order to avoid such cascading faults, it is better to make operators determin
 
 Recovering from faults by recomputing data is not always the right answer: if the intermediate data is much smaller than the source data, or if the computation is very CPU-intensive, it is probably cheaper to materialize the intermediate data to files than to recompute it. 
 
-# **Discussion of materialization** 
+**Discussion of materialization**
 
 Returning to the Unix analogy, we saw that MapReduce is like writing the output of each command to a temporary file, whereas dataflow engines look much more like Unix pipes. Flink especially is built around the idea of pipelined execution: that is, incrementally passing the output of an operator to other operators, and not waiting for the input to be complete before starting to process it. 
 
@@ -678,7 +678,7 @@ A sorting operation inevitably needs to consume its entire input before it can p
 When the job completes, its output needs to go somewhere durable so that users can find it and use it—most likely, it is written to the distributed filesystem again. Thus, when using a dataflow engine, materialized datasets on HDFS are still usually the inputs and the final outputs of a job. Like with MapReduce, the inputs are immutable and the output is completely replaced. The improvement over MapReduce is that you save yourself writing all the intermediate state to the filesystem as well. 
 
 
-### Graphs and Iterative Processing 
+#### Graphs and Iterative Processing
 
 In “Graph-Like Data Models” on page 49 we discussed using graphs for modeling data, and using graph query languages to traverse the edges and vertices in a graph. The discussion in Chapter 2 was focused around OLTP-style use: quickly executing queries to find a small number of vertices matching certain criteria. 
 
@@ -703,7 +703,7 @@ It is possible to store a graph in a distributed filesystem (in files containing
 
 This approach works, but implementing it with MapReduce is often very inefficient, because MapReduce does not account for the iterative nature of the algorithm: it will always read the entire input dataset and produce a completely new output dataset, even if only a small part of the graph has changed compared to the last iteration. 
 
-# **The Pregel processing model** 
+**The Pregel processing model**
 
 As an optimization for batch processing graphs, the _bulk synchronous parallel_ (BSP) model of computation [70] has become popular. Among others, it is implemented by Apache Giraph [37], Spark’s GraphX API, and Flink’s Gelly API [71]. It is also known as the _Pregel_ model, as Google’s Pregel paper popularized this approach for processing graphs [72]. 
 
@@ -713,7 +713,7 @@ In each iteration, a function is called for each vertex, passing it all the mess
 
 It’s a bit similar to the actor model (see “Distributed actor frameworks” on page 138), if you think of each vertex as an actor, except that vertex state and messages between vertices are fault-tolerant and durable, and communication proceeds in fixed rounds: at every iteration, the framework delivers all messages sent in the previous iteration. Actors normally have no such timing guarantee. 
 
-# **Fault tolerance** 
+**Fault tolerance**
 
 The fact that vertices can only communicate by message passing (not by querying each other directly) helps improve the performance of Pregel jobs, since messages can be batched and there is less waiting for communication. The only waiting is between iterations: since the Pregel model guarantees that all messages sent in one iteration are delivered in the next iteration, the prior iteration must completely finish, and all of its messages must be copied over the network, before the next one can start. 
 
@@ -722,7 +722,7 @@ Even though the underlying network may drop, duplicate, or arbitrarily delay mes
 
 This fault tolerance is achieved by periodically checkpointing the state of all vertices at the end of an iteration—i.e., writing their full state to durable storage. If a node fails and its in-memory state is lost, the simplest solution is to roll back the entire graph computation to the last checkpoint and restart the computation. If the algorithm is deterministic and messages are logged, it is also possible to selectively recover only the partition that was lost (like we previously discussed for dataflow engines) [72]. 
 
-# **Parallel execution** 
+**Parallel execution**
 
 A vertex does not need to know on which physical machine it is executing; when it sends messages to other vertices, it simply sends them to a vertex ID. It is up to the framework to partition the graph—i.e., to decide which vertex runs on which machine, and how to route messages over the network so that they end up in the right place. 
 
@@ -732,7 +732,7 @@ As a result, graph algorithms often have a lot of cross-machine communication ov
 
 For this reason, if your graph can fit in memory on a single computer, it’s quite likely that a single-machine (maybe even single-threaded) algorithm will outperform a distributed batch process [73, 74]. Even if the graph is bigger than memory, it can fit on the disks of a single computer, single-machine processing using a framework such as GraphChi is a viable option [75]. If the graph is too big to fit on a single machine, a distributed approach such as Pregel is unavoidable; efficiently parallelizing graph algorithms is an area of ongoing research [76]. 
 
-### High-Level APIs and Languages 
+#### High-Level APIs and Languages
 
 Over the years since MapReduce first became popular, the execution engines for distributed batch processing have matured. By now, the infrastructure has become robust enough to store and process many petabytes of data on clusters of over 10,000 machines. As the problem of physically operating batch processes at such scale has been considered more or less solved, attention has turned to other areas: improving the programming model, improving the efficiency of processing, and broadening the set of problems that these technologies can solve. 
 
@@ -745,7 +745,7 @@ Besides the obvious advantage of requiring less code, these high-level interface
 
 Moreover, these high-level interfaces not only make the humans using the system more productive, but they also improve the job execution efficiency at a machine level. 
 
-# **The move toward declarative query languages** 
+**The move toward declarative query languages**
 
 An advantage of specifying joins as relational operators, compared to spelling out the code that performs the join, is that the framework can analyze the properties of the join inputs and automatically decide which of the aforementioned join algorithms would be most suitable for the task at hand. Hive, Spark, and Flink have cost-based query optimizers that can do this, and even change the order of joins so that the amount of intermediate state is minimized [66, 77, 78, 79]. 
 
@@ -762,7 +762,7 @@ However, dataflow engines have found that there are also advantages to incorpora
 
 By incorporating declarative aspects in their high-level APIs, and having query optimizers that can take advantage of them during execution, batch processing frameworks begin to look more like MPP databases (and can achieve comparable performance). At the same time, by having the extensibility of being able to run arbitrary code and read data in arbitrary formats, they retain their flexibility advantage. 
 
-# **Specialization for different domains** 
+**Specialization for different domains**
 
 While the extensibility of being able to run arbitrary code is useful, there are also many common cases where standard processing patterns keep reoccurring, and so it is worth having reusable implementations of the common building blocks. Traditionally, MPP databases have served the needs of business intelligence analysts and business reporting, but that is just one among many domains in which batch processing is used. 
 
@@ -773,7 +773,7 @@ Also useful are spatial algorithms such as _k-nearest neighbors_ [80], which sea
 
 Batch processing engines are being used for distributed execution of algorithms from an increasingly wide range of domains. As batch processing systems gain built-in functionality and high-level declarative operators, and as MPP databases become more programmable and flexible, the two are beginning to look more alike: in the end, they are all just systems for storing and processing data. 
 
-## Summary 
+### Summary
 
 In this chapter we explored the topic of batch processing. We started by looking at Unix tools such as `awk` , `grep` , and `sort` , and we saw how the design philosophy of those tools is carried forward into MapReduce and more recent dataflow engines. Some of those design principles are that inputs are immutable, outputs are intended to become the input to another (as yet unknown) program, and complex problems are solved by composing small tools that “do one thing well.” 
 
@@ -781,28 +781,28 @@ In the Unix world, the uniform interface that allows one program to be composed 
 
 The two main problems that distributed batch processing frameworks need to solve are: 
 
-# _Partitioning_ 
+**Partitioning**
 
 In MapReduce, mappers are partitioned according to input file blocks. The output of mappers is repartitioned, sorted, and merged into a configurable number of reducer partitions. The purpose of this process is to bring all the related data— e.g., all the records with the same key—together in the same place. 
 
 Post-MapReduce dataflow engines try to avoid sorting unless it is required, but they otherwise take a broadly similar approach to partitioning. 
 
-# _Fault tolerance_ 
+**Fault tolerance**
 
 MapReduce frequently writes to disk, which makes it easy to recover from an individual failed task without restarting the entire job but slows down execution in the failure-free case. Dataflow engines perform less materialization of intermediate state and keep more in memory, which means that they need to recompute more data if a node fails. Deterministic operators reduce the amount of data that needs to be recomputed. 
 
 
 We discussed several join algorithms for MapReduce, most of which are also internally used in MPP databases and dataflow engines. They also provide a good illustration of how partitioned algorithms work: 
 
-# _Sort-merge joins_ 
+**Sort-merge joins**
 
 Each of the inputs being joined goes through a mapper that extracts the join key. By partitioning, sorting, and merging, all the records with the same key end up going to the same call of the reducer. This function can then output the joined records. 
 
-# _Broadcast hash joins_ 
+**Broadcast hash joins**
 
 One of the two join inputs is small, so it is not partitioned and it can be entirely loaded into a hash table. Thus, you can start a mapper for each partition of the large join input, load the hash table for the small input into each mapper, and then scan over the large input one record at a time, querying the hash table for each record. 
 
-# _Partitioned hash joins_ 
+**Partitioned hash joins**
 
 If the two join inputs are partitioned in the same way (using the same key, same hash function, and same number of partitions), then the hash table approach can be used independently for each partition. 
 
@@ -817,7 +817,7 @@ In the next chapter, we will turn to stream processing, in which the input is _u
 
 this case, a job is never complete, because at any time there may still be more work coming in. We shall see that stream and batch processing are similar in some respects, but the assumption of unbounded streams also changes a lot about how we build systems. 
 
-# **References** 
+**References**
 
 [1] Jeffrey Dean and Sanjay Ghemawat: “MapReduce: Simplified Data Processing on Large Clusters,” at _6th USENIX Symposium on Operating System Design and Implementation_ (OSDI), December 2004. 
 
