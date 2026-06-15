@@ -1,4 +1,3 @@
-<!-- PAGE 174 -->
  174 -->
 
 # 6 Common services for functional partitioning
@@ -42,7 +41,6 @@ data that is processed by multiple components within a system.
 ¡ Service discovery is for clients to identify which service hosts are available.
 
 
-<!-- PAGE 175 -->
  175 -->
 
 	
@@ -76,12 +74,10 @@ tion. It has more overhead on both the client and server than other communica-
 tion paradigms.
 
 
-<!-- PAGE 176 -->
  176 -->
 
 
 
-<!-- PAGE 177 -->
  177 -->
 
 Part 2
@@ -115,12 +111,10 @@ while chapter 17 discusses a data analytics service that aggregates large amount
 of data into a dashboard that can be used to make decisions. 
 
 
-<!-- PAGE 178 -->
  178 -->
 
 
 
-<!-- PAGE 179 -->
  179 -->
 # 7 Design Craigslist
 This chapter covers

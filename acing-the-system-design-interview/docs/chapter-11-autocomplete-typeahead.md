@@ -1,4 +1,3 @@
-<!-- PAGE 296 -->
  296 -->
 
 # Chapter 11  Autocomplete/typeahead
@@ -43,7 +42,6 @@ such as A/B testing or multi-armed bandit to measure the effect of various fuzzy
 matching functions on user churn. 
 
 
-<!-- PAGE 297 -->
  297 -->
 
 	
@@ -73,7 +71,6 @@ ing content, personalization, Lambda architecture, graceful degradation, and
 ### rate limiting.
 
 
-<!-- PAGE 298 -->
  298 -->
 
 **Design Flickr**
@@ -94,7 +91,6 @@ preprocessing operations that need to be done on uploaded content before they ar
 ready for download. 
 
 
-<!-- PAGE 299 -->
  299 -->
 
 	

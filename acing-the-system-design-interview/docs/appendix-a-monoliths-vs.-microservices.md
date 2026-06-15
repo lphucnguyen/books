@@ -22,7 +22,6 @@ This appendix uses material from the book Microservices for the Enterprise: Desi
 Developing, and Deploying by Kasun Indrasiri and Prabath Siriwardena (2018, Apress).
 
 
-<!-- PAGE 435 -->
  435 -->
 
 B
@@ -49,6 +48,5 @@ oauthacademy.com/talk, an excellent introductory lecture by Nate Barbettini, and
 Also refer to https://oauth.net/2/ for more information.
 
 
-<!-- PAGE 436 -->
  436 -->
 

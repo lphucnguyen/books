@@ -1,4 +1,3 @@
-<!-- PAGE 404 -->
  404 -->
 
 # Chapter 16  Design a news feed
@@ -43,7 +42,6 @@ handling UTF or language transations.
 –	 Ads and promoted posts. 
 
 
-<!-- PAGE 405 -->
  405 -->
 
 	
@@ -67,7 +65,6 @@ vice, ETL jobs, and backend service.
 events that we may be interested in.
 
 
-<!-- PAGE 406 -->
  406 -->
 
 Design a dashboard 
@@ -92,7 +89,6 @@ product is unpopular, we may decide to either discontinue it to save the costs o
 ing it, or we may decide to spend more resources to promote it to increase its sales.
 
 
-<!-- PAGE 407 -->
  407 -->
 
 	

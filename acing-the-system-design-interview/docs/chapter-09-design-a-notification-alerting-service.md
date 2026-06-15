@@ -1,4 +1,3 @@
-<!-- PAGE 254 -->
  254 -->
 
 # 9 Design a notification/alerting service
@@ -17,7 +16,6 @@ message broker queue.
 other metrics missed.
 
 
-<!-- PAGE 255 -->
  255 -->
 
 # 10 Design a database batch auditing service

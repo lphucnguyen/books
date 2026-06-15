@@ -1,4 +1,3 @@
-<!-- PAGE 202 -->
  202 -->
 
 # 7 Design Craigslist
@@ -45,7 +44,6 @@ posts, analytics and recommendations, A/B testing, subscriptions and saved
 searches, rate limiting, serving more posts to each user, and local regulations.
 
 
-<!-- PAGE 203 -->
  203 -->
 
 # 8 Design a rate-limiting service

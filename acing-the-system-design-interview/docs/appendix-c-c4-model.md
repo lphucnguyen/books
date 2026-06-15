@@ -82,7 +82,6 @@ Figure C.3    A component diagram. Image adapted from https://c4model.com/, lice
 creativecommons.org/licenses/by/4.0/.
 
 
-<!-- PAGE 449 -->
  449 -->
 
 	
@@ -128,7 +127,6 @@ rather about recognizing its levels of abstraction and fluently zooming in and o
 system design.
 
 
-<!-- PAGE 450 -->
  450 -->
 
 D
@@ -147,7 +145,6 @@ request to every database.
 **Two-phase commit (2PC)**
 
 
-<!-- PAGE 451 -->
  451 -->
 
 	
@@ -167,6 +164,5 @@ database writes from occurring.
 
 
 
-<!-- PAGE 452 -->
  452 -->
 

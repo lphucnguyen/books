@@ -1,4 +1,3 @@
-<!-- PAGE 338 -->
  338 -->
 
 # Chapter 13  Design a Content Distribution Network
@@ -38,7 +37,6 @@ a particular sequence? We can also discuss other possible video streaming optimi
 strategies. 
 
 
-<!-- PAGE 339 -->
  339 -->
 
 	
@@ -76,7 +74,6 @@ can redistribute files across data centers and replicate them to the appropriate
 number of hosts.
 
 
-<!-- PAGE 340 -->
  340 -->
 
 Design a text 
@@ -94,7 +91,6 @@ This is the first example system in this book that considers exactly-once delive
 Messages should not be lost, nor should they be sent more than once. 
 
 
-<!-- PAGE 341 -->
  341 -->
 
 	

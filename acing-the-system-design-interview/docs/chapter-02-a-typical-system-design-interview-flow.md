@@ -1,4 +1,3 @@
-<!-- PAGE 84 -->
  84 -->
 
 # Chapter 2  A typical system design interview flow
@@ -44,7 +43,6 @@ set back your long-term growth as an engineer by years. They may also be financi
 worse for you because companies that you rejected for short-term financial gain end 
 
 
-<!-- PAGE 85 -->
  85 -->
 
 	
@@ -85,7 +83,6 @@ and easy to follow, and continuously refine your runbook and approach based on
 the common patterns you identify.
 
 
-<!-- PAGE 86 -->
  86 -->
 
 Non-functional 
@@ -108,7 +105,6 @@ and with little fuss to cost-efficiently support its load.
 the desired response.
 
 
-<!-- PAGE 87 -->
  87 -->
 
 	

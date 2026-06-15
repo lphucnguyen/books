@@ -1,4 +1,3 @@
-<!-- PAGE 54 -->
  54 -->
 
 # Chapter 1  A walkthrough of system design concepts
@@ -45,7 +44,6 @@ especially significant at scale, when FaaS may become much more expensive than b
 metal. 
 
 
-<!-- PAGE 55 -->
  55 -->
 
 	
@@ -89,7 +87,6 @@ advantage of not having to keep hosts constantly running, it imposes limited
 functionality.
 
 
-<!-- PAGE 56 -->
  56 -->
 
 A typical system 
@@ -114,7 +111,6 @@ design more features or start with immediately designing a scalable system.
 that is entirely positive and without tradeoffs. Any new addition to a system to 
 
 
-<!-- PAGE 57 -->
  57 -->
 
 	

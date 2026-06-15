@@ -1,4 +1,3 @@
-<!-- PAGE 318 -->
  318 -->
 
 # Chapter 12  Design Flickr
@@ -19,7 +18,6 @@ computational cost of client-side and the reliability of server-side.
 cesses to improve scalability and reduce hardware costs.
 
 
-<!-- PAGE 319 -->
  319 -->
 
 Design a Content 

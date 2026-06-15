@@ -1,4 +1,3 @@
-<!-- PAGE 360 -->
  360 -->
 
 # Chapter 14  Design a text messaging app
@@ -29,7 +28,6 @@ and error events.
 ¡ We can monitor usage metrics to adjust cluster size and monitor for fraud.
 
 
-<!-- PAGE 361 -->
  361 -->
 
 **Design Airbnb**

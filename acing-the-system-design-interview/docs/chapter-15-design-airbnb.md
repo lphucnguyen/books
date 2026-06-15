@@ -1,4 +1,3 @@
-<!-- PAGE 384 -->
  384 -->
 
 # Chapter 15  Design Airbnb
@@ -34,7 +33,6 @@ ditions, and the specifics may differ by each specific country, state, city, or 
 (e.g., certain apartment complexes may impose their own rules).
 
 
-<!-- PAGE 385 -->
  385 -->
 
 	
@@ -61,7 +59,6 @@ quickly becomes stale.
 complex transaction.
 
 
-<!-- PAGE 386 -->
  386 -->
 
 **Design a news feed**
@@ -80,7 +77,6 @@ However, in this news feed, users get posts written by other people in general, 
 than by their connections. 
 
 
-<!-- PAGE 387 -->
  387 -->
 
 	

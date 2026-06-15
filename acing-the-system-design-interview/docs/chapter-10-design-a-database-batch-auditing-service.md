@@ -1,4 +1,3 @@
-<!-- PAGE 276 -->
  276 -->
 
 # 10 Design a database batch auditing service
@@ -22,7 +21,6 @@ discussed in appendix B.
 ¡ We can provide a query service for users to make ad hoc queries. 
 
 
-<!-- PAGE 277 -->
  277 -->
 
 Autocomplete/typeahead

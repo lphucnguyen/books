@@ -75,7 +75,6 @@ ZooKeeper  68, 296
 message sending service and  317
 
 
-<!-- PAGE 473 -->
  473 -->
 
 Zhiyong Tan ● Forewords by Anthony Asta, Michael Elder

@@ -1,4 +1,3 @@
-<!-- PAGE 140 -->
  140 -->
 
 # Chapter 4  Scaling databases
@@ -33,7 +32,6 @@ have access to the hosts in the former but not the latter.
 subsequent users, but cache warming has many disadvantages.
 
 
-<!-- PAGE 141 -->
  141 -->
 
 ### Distributed transactions

@@ -1,4 +1,3 @@
-<!-- PAGE 426 -->
  426 -->
 
 # Chapter 17  Design a dashboard of top 10 products on Amazon by sales volume
@@ -28,7 +27,6 @@ mate large-scale aggregation operations.
 data stream. 
 
 
-<!-- PAGE 427 -->
  427 -->
 
 A
@@ -46,6 +44,5 @@ A.1
 Table A.1 discusses the advantages of monoliths over services. 
 
 
-<!-- PAGE 428 -->
  428 -->
 

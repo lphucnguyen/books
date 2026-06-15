@@ -22,7 +22,6 @@ which is a stateless protocol.
 
 
 
-<!-- PAGE 453 -->
  453 -->
 
 	
@@ -65,6 +64,5 @@ A transaction can be split into
 multiple steps.
 
 
-<!-- PAGE 454 -->
  454 -->
 

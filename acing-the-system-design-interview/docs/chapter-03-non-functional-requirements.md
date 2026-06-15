@@ -1,4 +1,3 @@
-<!-- PAGE 108 -->
  108 -->
 
 # Chapter 3  Non-functional requirements
@@ -41,7 +40,6 @@ tion or obfuscation of user data, and prevention and mitigation of data breaches
 niques to achieve common non-functional requirements.
 
 
-<!-- PAGE 109 -->
  109 -->
 
 **Scaling databases**

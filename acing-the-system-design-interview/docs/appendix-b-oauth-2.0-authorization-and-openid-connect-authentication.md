@@ -35,7 +35,6 @@ Microservices and APIs
 Client credentials flow
 
 
-<!-- PAGE 445 -->
  445 -->
 
 C
@@ -56,6 +55,5 @@ them.
 **C4 Model**
 
 
-<!-- PAGE 446 -->
  446 -->
 

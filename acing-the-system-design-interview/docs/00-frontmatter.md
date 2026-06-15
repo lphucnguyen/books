@@ -1,4 +1,3 @@
-<!-- PAGE 1 -->
  1 -->
 
 M A N N I N G
@@ -15,7 +14,6 @@ Forewords by Anthony Asta
 
 
 
-<!-- PAGE 2 -->
  2 -->
 
 This is a quick lookup guide for common considerations in system design. After you read the book, 
@@ -57,7 +55,6 @@ Authentication and authorization
 13.3, appendix B
 
 
-<!-- PAGE 3 -->
  3 -->
 
 M A N N I N G
@@ -67,7 +64,6 @@ Design Interview
 ZHIYONG TAN
 
 
-<!-- PAGE 4 -->
  4 -->
 
 For online information and ordering of this and other Manning books, please visit www.manning.com. 
@@ -121,13 +117,11 @@ Typesetter: 	 Tamara ŠveliÊ SabljiÊ
 Cover designer: 	 Marija Tudor
 
 
-<!-- PAGE 5 -->
  5 -->
 
 To Mom and Dad.
 
 
-<!-- PAGE 6 -->
  6 -->
 
 foreword	
@@ -167,7 +161,6 @@ Conclusion—Scaling backend services   23
 	 	
 
 
-<!-- PAGE 7 -->
  7 -->
 
 	
@@ -225,7 +218,6 @@ concepts  57
 Availability  59
 
 
-<!-- PAGE 8 -->
  8 -->
 
 	 3.3	
@@ -282,7 +274,6 @@ Partitioning    90  ■  Handling a large key space    91
 Replication and fault-tolerance    92
 
 
-<!-- PAGE 9 -->
  9 -->
 
 	
@@ -343,7 +334,6 @@ availability  124  ■  Logging and analytics  124
 Service mesh / sidecar pattern   125
 
 
-<!-- PAGE 10 -->
  10 -->
 
 	 6.3	
@@ -402,7 +392,6 @@ Email service   161
 Search   162
 
 
-<!-- PAGE 11 -->
  11 -->
 
 	
@@ -463,7 +452,6 @@ Further reading  195
 	 	
 
 
-<!-- PAGE 12 -->
  12 -->
 
 	
@@ -523,7 +511,6 @@ An audit script  229  ■  An audit service  230
 Requirements   232
 
 
-<!-- PAGE 13 -->
  13 -->
 
 	
@@ -577,7 +564,6 @@ words  259  ■  Managing new popular unknown words  259
 Generate and deliver the weighted trie  259
 
 
-<!-- PAGE 14 -->
  14 -->
 
 	 11.8	
@@ -630,7 +616,6 @@ CDN to serve images   290
 Requirements   291
 
 
-<!-- PAGE 15 -->
  15 -->
 
 	
@@ -684,7 +669,6 @@ Logging, monitoring, and alerting   326
 	 	
 
 
-<!-- PAGE 16 -->
  16 -->
 
 	
@@ -744,7 +728,6 @@ Requirements   375
 Initial thoughts  376
 
 
-<!-- PAGE 17 -->
  17 -->
 
 	
@@ -801,7 +784,6 @@ services   400  ■  Interfaces   401
 References  402
 
 
-<!-- PAGE 18 -->
  18 -->
 
 	
@@ -842,7 +824,6 @@ Two-phase commit (2PC)  418
 index  422
 
 
-<!-- PAGE 19 -->
  19 -->
 
 foreword
@@ -872,7 +853,6 @@ breaks down each topic, providing concise explanations and real-world examples t
 illustrate their practical application. He is able to demystify the system design interview 
 
 
-<!-- PAGE 20 -->
  20 -->
 
 xviii
@@ -906,7 +886,6 @@ Director of Engineering at LinkedIn
 (ex-Engineering Management at Google, Twitter, and Uber)
 
 
-<!-- PAGE 21 -->
  21 -->
 
 xix
@@ -940,7 +919,6 @@ Following an elaboration on , you will walk through how to organize the applicat
 gramming interface (API) specification to explain how your system design addresses 
 
 
-<!-- PAGE 22 -->
  22 -->
 
 xx
@@ -969,7 +947,6 @@ Distinguished Engineer & Senior Director, PayPal
 Former IBM Distinguished Engineer and IBM Master Inventor, IBM
 
 
-<!-- PAGE 23 -->
  23 -->
 
 xxi
@@ -1004,7 +981,6 @@ dream company, you read through all the engineering blog posts and watched all t
 engineering talks published in the last three years. You have also read every highly rated 
 
 
-<!-- PAGE 24 -->
  24 -->
 
 xxii
@@ -1043,7 +1019,6 @@ the hiring bar, and you cannot truly understand a complex system or ascend to a 
 senior engineering leadership or mentorship role. 
 
 
-<!-- PAGE 25 -->
  25 -->
 
 xxiii
@@ -1074,7 +1049,6 @@ Sadrieh, Mike B., Muneeb Shaikh, Najeeb Arif, Narendran Solai Sridharan, Nolan T
 Nouran Mahmoud, Patrick Wanjau, Peiti Li, Péter Szabó, Pierre-Michel Ansel, Pradeep 
 
 
-<!-- PAGE 26 -->
  26 -->
 
 xxiv
@@ -1095,7 +1069,6 @@ tinoviÊ did a great job on formatting. Stjepan JurekoviÊ and Nikola Dimitrijev
 me through my promo video. 
 
 
-<!-- PAGE 27 -->
  27 -->
 
 xxv
@@ -1127,7 +1100,6 @@ the organization you join. It can also be a resource for interviewers who conduc
 design interviews.
 
 
-<!-- PAGE 28 -->
  28 -->
 
 xxvi
@@ -1174,7 +1146,6 @@ is not a commitment to any specific amount of participation on the part of the a
 whose contribution to the forum remains voluntary (and unpaid). We suggest you try 
 
 
-<!-- PAGE 29 -->
  29 -->
 
 	
@@ -1195,7 +1166,6 @@ Other online resources
 ¡ https://bigmachine.io/products/mission-interview/ 
 
 
-<!-- PAGE 30 -->
  30 -->
 
 xxviii
@@ -1211,7 +1181,6 @@ Architect and has designed an Alternative Investment Trading Platform for Morgan
 Stanley and a Retail Platform for Tekion Corp.
 
 
-<!-- PAGE 31 -->
  31 -->
 
 xxix
@@ -1226,12 +1195,10 @@ computer business with book covers based on the rich diversity of regional cultu
 turies ago, brought back to life by pictures from collections such as this one.
 
 
-<!-- PAGE 32 -->
  32 -->
 
 
 
-<!-- PAGE 33 -->
  33 -->
 
 Part 1
@@ -1260,12 +1227,10 @@ cuss how we can centralize such cross-cutting functionalities into services that
 serve many other systems.
 
 
-<!-- PAGE 34 -->
  34 -->
 
 
 
-<!-- PAGE 35 -->
  35 -->
 
 A walkthrough of 

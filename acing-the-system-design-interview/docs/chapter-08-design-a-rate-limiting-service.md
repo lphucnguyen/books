@@ -1,4 +1,3 @@
-<!-- PAGE 226 -->
  226 -->
 
 # 8 Design a rate-limiting service
@@ -43,7 +42,6 @@ vice if the request rate exceeds a set threshold? A problem with this is that si
 do not communicate with each other, a client can only measure the request rate on the 
 
 
-<!-- PAGE 227 -->
  227 -->
 
 	
@@ -89,7 +87,6 @@ ory than sliding window log, but it is less accurate than sliding window log.
 ¡ We can consider a sidecar pattern for our rate-limiting service.
 
 
-<!-- PAGE 228 -->
  228 -->
 
 Design a notification/ 
@@ -116,7 +113,6 @@ many possible features that a notification service can provide. Given our limite
 time, we should clearly define some use cases and features for our notification 
 
 
-<!-- PAGE 229 -->
  229 -->
 
 ## Functional requirements

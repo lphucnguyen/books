@@ -1,4 +1,3 @@
-<!-- PAGE 152 -->
  152 -->
 
 # Chapter 5  Distributed transactions
@@ -51,7 +50,6 @@ cations, 2019). Chapter 3.3.7 discusses the transaction log tailing pattern. Cha
 ter 4 is a detailed chapter on saga.
 
 
-<!-- PAGE 153 -->
  153 -->
 
 	
@@ -69,7 +67,6 @@ all rolled back.
 sagas. 
 
 
-<!-- PAGE 154 -->
  154 -->
 
 Common services for 
@@ -96,7 +93,6 @@ NOTE    Istio, a popular service mesh implementation, had its first production
 release in 2018.
 
 
-<!-- PAGE 155 -->
  155 -->
 
 	
