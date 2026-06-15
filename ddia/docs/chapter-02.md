@@ -1,5 +1,5 @@
 
-## Chapter 2. Data Models and Query Languages
+# Chapter 2. Data Models and Query Languages
 
 _The limits of my language mean the limits of my world._ 
 
@@ -28,7 +28,7 @@ It can take a lot of effort to master just one data model (think how many books 
 
 In this chapter we will look at a range of general-purpose data models for data storage and querying (point 2 in the preceding list). In particular, we will compare the relational model, the document model, and a few graph-based data models. We will also look at various query languages and compare their use cases. In Chapter 3 we will discuss how storage engines work; that is, how these data models are actually implemented (point 3 in the list). 
 
-### Relational Model Versus Document Model
+## Relational Model Versus Document Model
 
 The best-known data model today is probably that of SQL, based on the relational model proposed by Edgar Codd in 1970 [1]: data is organized into _relations_ (called _tables_ in SQL), where each relation is an unordered collection of _tuples_ ( _rows_ in SQL). 
 
@@ -45,7 +45,7 @@ were the main alternatives, but the relational model came to dominate them. Obje
 
 As computers became vastly more powerful and networked, they started being used for increasingly diverse purposes. And remarkably, relational databases turned out to generalize very well, beyond their original scope of business data processing, to a broad variety of use cases. Much of what you see on the web today is still powered by relational databases, be it online publishing, discussion, social networking, ecommerce, games, software-as-a-service productivity applications, or much more. 
 
-#### The Birth of NoSQL
+### The Birth of NoSQL
 
 Now, in the 2010s, _NoSQL_ is the latest attempt to overthrow the relational model’s dominance. The name “NoSQL” is unfortunate, since it doesn’t actually refer to any particular technology—it was originally intended simply as a catchy Twitter hashtag for a meetup on open source, distributed, nonrelational databases in 2009 [3]. Nevertheless, the term struck a nerve and quickly spread through the web startup community and beyond. A number of interesting database systems are now associated with the #NoSQL hashtag, and it has been retroactively reinterpreted as _Not Only SQL_ [4]. 
 
@@ -61,7 +61,7 @@ There are several driving forces behind the adoption of NoSQL databases, includi
 
 Different applications have different requirements, and the best choice of technology for one use case may well be different from the best choice for another use case. It therefore seems likely that in the foreseeable future, relational databases will continue to be used alongside a broad variety of nonrelational datastores—an idea that is sometimes called _polyglot persistence_ [3]. 
 
-#### The Object-Relational Mismatch
+### The Object-Relational Mismatch
 
 Most application development today is done in object-oriented programming languages, which leads to a common criticism of the SQL data model: if data is stored in relational tables, an awkward translation layer is required between the objects in the 
 
@@ -127,7 +127,7 @@ The one-to-many relationships from the user profile to the user’s positions, e
 _Figure 2-2. One-to-many relationships forming a tree structure._ 
 
 
-#### Many-to-One and Many-to-Many Relationships
+### Many-to-One and Many-to-Many Relationships
 
 In Example 2-1 in the preceding section, `region_id` and `industry_id` are given as IDs, not as plain-text strings `"Greater Seattle Area"` and `"Philanthropy"` . Why? 
 
@@ -186,7 +186,7 @@ Figure 2-4 illustrates how these new features require many-to-many relationships
 _Figure 2-4. Extending résumés with many-to-many relationships._ 
 
 
-#### Are Document Databases Repeating History?
+### Are Document Databases Repeating History?
 
 While many-to-many relationships and joins are routinely used in relational databases, document databases and NoSQL reopened the debate on how best to represent such relationships in a database. This debate is much older than NoSQL—in fact, it goes back to the very earliest computerized database systems. 
 
@@ -236,7 +236,7 @@ Document databases reverted back to the hierarchical model in one aspect: storin
 
 However, when it comes to representing many-to-one and many-to-many relationships, relational and document databases are not fundamentally different: in both cases, the related item is referenced by a unique identifier, which is called a _foreign key_ in the relational model and a _document reference_ in the document model [9]. That identifier is resolved at read time by using a join or follow-up queries. To date, document databases have not followed the path of CODASYL. 
 
-#### Relational Versus Document Databases Today
+### Relational Versus Document Databases Today
 
 There are many differences to consider when comparing relational databases to document databases, including their fault-tolerance properties (see Chapter 5) and handling of concurrency (see Chapter 7). In this chapter, we will concentrate only on the differences in the data model. 
 
@@ -321,7 +321,7 @@ It seems that relational and document databases are becoming more similar over t
 
 A hybrid of the relational and document models is a good route for databases to take in the future. 
 
-### Query Languages for Data
+## Query Languages for Data
 
 When the relational model was introduced, it included a new way of querying data: SQL is a _declarative_ query language, whereas IMS and CODASYL queried the database using _imperative_ code. What does that mean? 
 
@@ -365,7 +365,7 @@ The SQL example doesn’t guarantee any particular ordering, and so it doesn’t
 Finally, declarative languages often lend themselves to parallel execution. Today, CPUs are getting faster by adding more cores, not by running at significantly higher clock speeds than before [31]. Imperative code is very hard to parallelize across multiple cores and multiple machines, because it specifies instructions that must be performed in a particular order. Declarative languages have a better chance of getting faster in parallel execution because they specify only the pattern of the results, not the algorithm that is used to determine the results. The database is free to use a parallel implementation of the query language, if appropriate [32]. 
 
 
-#### Declarative Queries on the Web
+### Declarative Queries on the Web
 
 The advantages of declarative query languages are not limited to just databases. To illustrate the point, let’s compare declarative and imperative approaches in a completely different environment: a web browser. 
 
@@ -445,7 +445,7 @@ This JavaScript imperatively sets the element `<p>Sharks</p>` to have a blue bac
 
 In a web browser, using declarative CSS styling is much better than manipulating styles imperatively in JavaScript. Similarly, in databases, declarative query languages like SQL turned out to be much better than imperative query APIs.[vi] 
 
-#### MapReduce Querying
+### MapReduce Querying
 
 _MapReduce_ is a programming model for processing large amounts of data in bulk across many machines, popularized by Google [33]. A limited form of MapReduce is supported by some NoSQL datastores, including MongoDB and CouchDB, as a mechanism for performing read-only queries across many documents. 
 
@@ -548,7 +548,7 @@ db.observations.aggregate([
 The aggregation pipeline language is similar in expressiveness to a subset of SQL, but it uses a JSON-based syntax rather than SQL’s English-sentence-style syntax; the difference is perhaps a matter of taste. The moral of the story is that a NoSQL system may find itself accidentally reinventing SQL, albeit in disguise. 
 
 
-### Graph-Like Data Models
+## Graph-Like Data Models
 
 We saw earlier that many-to-many relationships are an important distinguishing feature between different data models. If your application has mostly one-to-many relationships (tree-structured data) or no relationships between records, the document model is appropriate. 
 
@@ -584,7 +584,7 @@ _Figure 2-5. Example of graph-structured data (boxes represent vertices, arrows 
 
 There are several different, but related, ways of structuring and querying data in graphs. In this section we will discuss the _property graph_ model (implemented by Neo4j, Titan, and InfiniteGraph) and the _triple-store_ model (implemented by Datomic, AllegroGraph, and others). We will look at three declarative query languages for graphs: Cypher, SPARQL, and Datalog. Besides these, there are also imperative graph query languages such as Gremlin [36] and graph processing frameworks like Pregel (see Chapter 10). 
 
-#### Property Graphs
+### Property Graphs
 
 In the property graph model, each vertex consists of: 
 
@@ -648,7 +648,7 @@ intricacies of sovereign states and nations), and varying granularity of data (L
 
 You could imagine extending the graph to also include many other facts about Lucy and Alain, or other people. For instance, you could use it to indicate any food allergies they have (by introducing a vertex for each allergen, and an edge between a person and an allergen to indicate an allergy), and link the allergens with a set of vertices that show which foods contain which substances. Then you could write a query to find out what is safe for each person to eat. Graphs are good for evolvability: as you add features to your application, a graph can easily be extended to accommodate changes in your application’s data structures. 
 
-#### The Cypher Query Language
+### The Cypher Query Language
 
 _Cypher_ is a declarative query language for property graphs, created for the Neo4j graph database [37]. (It is named after a character in the movie _The Matrix_ and is not related to ciphers in cryptography [38].) 
 
@@ -698,7 +698,7 @@ But equivalently, you could start with the two `Location` vertices and work back
 
 As is typical for a declarative query language, you don’t need to specify such execution details when writing the query: the query optimizer automatically chooses the strategy that is predicted to be the most efficient, so you can get on with writing the rest of your application. 
 
-#### Graph Queries in SQL
+### Graph Queries in SQL
 
 Example 2-2 suggested that graph data can be represented in a relational database. But if we put graph data in a relational structure, can we also query it using SQL? 
 
@@ -768,7 +768,7 @@ Finally, intersect the set of people born in the USA with the set of people livi
 
 If the same query can be written in 4 lines in one query language but requires 29 lines in another, that just shows that different data models are designed to satisfy different use cases. It’s important to pick a data model that is suitable for your application. 
 
-#### Triple-Stores and SPARQL
+### Triple-Stores and SPARQL
 
 The triple-store model is mostly equivalent to the property graph model, using different words to describe the same ideas. It is nevertheless worth discussing, because there are various tools and languages for triple-stores that can be valuable additions to your toolbox for building applications. 
 
@@ -934,7 +934,7 @@ No. They differ in several important ways:
 
 - In CODASYL, all queries were imperative, difficult to write and easily broken by changes in the schema. In a graph database, you can write your traversal in imperative code if you want to, but most graph databases also support high-level, declarative query languages such as Cypher or SPARQL. 
 
-#### The Foundation: Datalog
+### The Foundation: Datalog
 
 _Datalog_ is a much older language than SPARQL or Cypher, having been studied extensively by academics in the 1980s [44, 45, 46]. It is less well known among software engineers, but it is nevertheless important, because it provides the foundation that later query languages build upon. 
 
@@ -1010,7 +1010,7 @@ Now rule 3 can find people who were born in some location `BornIn` and live in s
 
 The Datalog approach requires a different kind of thinking to the other query languages discussed in this chapter, but it’s a very powerful approach, because rules can be combined and reused in different queries. It’s less convenient for simple one-off queries, but it can cope better if your data is complex. 
 
-### Summary
+## Summary
 
 Data models are a huge subject, and in this chapter we have taken a quick look at a broad variety of different models. We didn’t have space to go into all the details of each model, but hopefully the overview has been enough to whet your appetite to find out more about the model that best fits your application’s requirements. 
 

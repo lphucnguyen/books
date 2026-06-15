@@ -1,4 +1,4 @@
-# Part II. Distributed Data
+**Part II. Distributed Data**
 
 _For a successful technology, reality must take precedence over public relations, for nature cannot be fooled._ 
 
@@ -8,7 +8,7 @@ In Part I of this book, we discussed aspects of data systems that apply when dat
 
 There are various reasons why you might want to distribute a database across multiple machines: 
 
-**Scalability**
+## Scalability
 
 If your data volume, read load, or write load grows bigger than a single machine can handle, you can potentially spread the load across multiple machines. 
 

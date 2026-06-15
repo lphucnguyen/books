@@ -1,4 +1,4 @@
-## Chapter 9. Consistency and Consensus
+# Chapter 9. Consistency and Consensus
 
 _Is it better to be alive and wrong or right and dead?_ 
 
@@ -23,7 +23,7 @@ We need to understand the scope of what can and cannot be done: in some situatio
 
 Researchers in the field of distributed systems have been studying these topics for decades, so there is a lot of material—we’ll only be able to scratch the surface. In this book we don’t have space to go into details of the formal models and proofs, so we will stick with informal intuitions. The literature references offer plenty of additional depth if you’re interested. 
 
-### Consistency Guarantees
+## Consistency Guarantees
 
 In “Problems with Replication Lag” on page 161 we looked at some timing issues that occur in a replicated database. If you look at two database nodes at the same moment in time, you’re likely to see different data on the two nodes, because write requests arrive on different nodes at different times. These inconsistencies occur no matter what replication method the database uses (single-leader, multi-leader, or leaderless replication). 
 
@@ -49,7 +49,7 @@ This chapter covers a broad range of topics, but as we shall see, these areas ar
 - In the third section (“Distributed Transactions and Consensus” on page 352) we will explore how to atomically commit a distributed transaction, which will finally lead us toward solutions for the consensus problem. 
 
 
-### Linearizability
+## Linearizability
 
 In an eventually consistent database, if you ask two different replicas the same question at the same time, you may get two different answers. That’s confusing. Wouldn’t it be a lot simpler if the database could give the illusion that there is only one replica (i.e., only one copy of the data)? Then every client would have the same view of the data, and you wouldn’t have to worry about replication lag. 
 
@@ -68,7 +68,7 @@ Figure 9-1 shows an example of a nonlinearizable sports website [9]. Alice and B
 
 If Alice and Bob had hit reload at the same time, it would have been less surprising if they had gotten two different query results, because they wouldn’t know at exactly what time their respective requests were processed by the server. However, Bob knows that he hit the reload button (initiated his query) _after_ he heard Alice exclaim the final score, and therefore he expects his query result to be at least as recent as Alice’s. The fact that his query returned a stale result is a violation of linearizability. 
 
-#### What Makes a System Linearizable?
+### What Makes a System Linearizable?
 
 The basic idea behind linearizability is simple: to make a system appear as if there is only a single copy of the data. However, nailing down precisely what that means actually requires some care. In order to understand linearizability better, let’s look at some more examples. 
 
@@ -156,11 +156,11 @@ That is the intuition behind linearizability; the formal definition [6] describe
 
 Linearizability is easily confused with serializability (see “Serializability” on page 251), as both words seem to mean something like “can be arranged in a sequential order.” However, they are two quite different guarantees, and it is important to distinguish between them: 
 
-**Serializability**
+## Serializability
 
 Serializability is an isolation property of _transactions_ , where every transaction may read and write multiple objects (rows, documents, records)—see “SingleObject and Multi-Object Operations” on page 228. It guarantees that transactions behave the same as if they had executed in _some_ serial order (each transaction running to completion before the next transaction starts). It is okay for that serial order to be different from the order in which transactions were actually run [12]. 
 
-### Linearizability
+## Linearizability
 
 Linearizability is a recency guarantee on reads and writes of a register (an _individual object_ ). It doesn’t group operations together into transactions, so it does not prevent problems such as write skew (see “Write Skew and Phantoms” on page 246), unless you take additional measures such as materializing conflicts (see “Materializing conflicts” on page 251). 
 
@@ -169,7 +169,7 @@ A database may provide both serializability and linearizability, and this combin
 However, serializable snapshot isolation (see “Serializable Snapshot Isolation (SSI)” on page 261) is not linearizable: by design, it makes reads from a consistent snapshot, to avoid lock contention between readers and writers. The whole point of a consistent snapshot is that it does not include writes that are more recent than the snapshot, and thus reads from the snapshot are not linearizable. 
 
 
-#### Relying on Linearizability
+### Relying on Linearizability
 
 In what circumstances is linearizability useful? Viewing the final score of a sporting match is perhaps a frivolous example: a result that is outdated by a few seconds is unlikely to cause any real harm in this situation. However, there a few areas in which linearizability is an important requirement for making a system work correctly. 
 
@@ -216,7 +216,7 @@ This problem arises because there are two different communication channels betwe
 
 Linearizability is not the only way of avoiding this race condition, but it’s the simplest to understand. If you control the additional communication channel (like in the case of the message queue, but not in the case of Alice and Bob), you can use alternative approaches similar to what we discussed in “Reading Your Own Writes” on page 162, at the cost of additional complexity. 
 
-#### Implementing Linearizable Systems
+### Implementing Linearizable Systems
 
 Now that we’ve looked at a few examples in which linearizability is useful, let’s think about how we might implement a system that offers linearizable semantics. 
 
@@ -273,7 +273,7 @@ Moreover, only linearizable read and write operations can be implemented in this
 
 In summary, it is safest to assume that a leaderless system with Dynamo-style replication does not provide linearizability. 
 
-#### The Cost of Linearizability
+### The Cost of Linearizability
 
 As some replication methods can provide linearizability and others cannot, it is interesting to explore the pros and cons of linearizability in more depth. 
 
@@ -341,7 +341,7 @@ The same is true of many distributed databases that choose not to provide linear
 Can’t we maybe find a more efficient implementation of linearizable storage? It seems the answer is no: Attiya and Welch [47] prove that if you want linearizability, the response time of read and write requests is at least proportional to the uncertainty of delays in the network. In a network with highly variable delays, like most computer networks (see “Timeouts and Unbounded Delays” on page 281), the response time of linearizable reads and writes is inevitably going to be high. A faster algorithm for linearizability does not exist, but weaker consistency models can be much faster, so this trade-off is important for latency-sensitive systems. In Chapter 12 we will discuss some approaches for avoiding linearizability without sacrificing correctness. 
 
 
-### Ordering Guarantees
+## Ordering Guarantees
 
 We said previously that a linearizable register behaves as if there is only a single copy of the data, and that every operation appears to take effect atomically at one point in time. This definition implies that operations are executed in some well-defined order. We illustrated the ordering in Figure 9-4 by joining up the operations in the order in which they seem to have executed. 
 
@@ -355,7 +355,7 @@ Ordering has been a recurring theme in this book, which suggests that it might b
 
 It turns out that there are deep connections between ordering, linearizability, and consensus. Although this notion is a bit more theoretical and abstract than the rest of this book, it is very helpful for clarifying our understanding of what systems can and cannot do. We will explore this topic in the next few sections. 
 
-#### Ordering and Causality
+### Ordering and Causality
 
 There are several reasons why ordering keeps coming up, and one of the reasons is that it helps preserve _causality_ . We have already seen several examples over the course of this book where causality has been important: 
 
@@ -385,7 +385,7 @@ However, mathematical sets are not totally ordered: is { _a_ , _b_ } greater tha
 
 The difference between a total order and a partial order is reflected in different database consistency models: 
 
-### Linearizability
+## Linearizability
 
 In a linearizable system, we have a _total order_ of operations: if the system behaves as if there is only a single copy of the data, and every operation is atomic, this means that for any two operations we can always say which one happened first. This total ordering is illustrated as a timeline in Figure 9-4. 
 
@@ -425,7 +425,7 @@ The techniques for determining which operation happened before which other opera
 
 In order to determine the causal ordering, the database needs to know which version of the data was read by the application. This is why, in Figure 5-13, the version number from the prior operation is passed back to the database on a write. A similar idea appears in the conflict detection of SSI, as discussed in “Serializable Snapshot Isolation (SSI)” on page 261: when a transaction wants to commit, the database checks whether the version of the data that it read is still up to date. To this end, the database keeps track of which data has been read by which transaction. 
 
-#### Sequence Number Ordering
+### Sequence Number Ordering
 
 Although causality is an important theoretical concept, actually keeping track of all causal dependencies can become impractical. In many applications, clients read lots of data before writing something, and then it is not clear whether the write is causally dependent on all or only some of those prior reads. Explicitly tracking all the data that has been read would mean a large overhead. 
 
@@ -509,7 +509,7 @@ To conclude: in order to implement something like a uniqueness constraint for us
 
 This idea of knowing when your total order is finalized is captured in the topic of _total order broadcast_ . 
 
-#### Total Order Broadcast
+### Total Order Broadcast
 
 If your program runs only on a single CPU core, it is easy to define a total ordering of operations: it is simply the order in which they were executed by the CPU. However, in a distributed system, getting all nodes to agree on the same total ordering of operations is tricky. In the last section we discussed ordering by timestamps or sequence numbers, but found that it is not as powerful as single-leader replication (if you use timestamp ordering to implement a uniqueness constraint, you cannot tolerate any faults). 
 
@@ -607,7 +607,7 @@ This is no coincidence: it can be proved that a linearizable compare-and-set (or
 
 It is time to finally tackle the consensus problem head-on, which we will do in the rest of this chapter. 
 
-### Distributed Transactions and Consensus
+## Distributed Transactions and Consensus
 
 Consensus is one of the most important and fundamental problems in distributed computing. On the surface, it seems simple: informally, the goal is simply to _get several nodes to agree on something_ . You might think that this shouldn’t be too hard. Unfortunately, many broken systems have been built in the mistaken belief that this problem is easy to solve. 
 
@@ -639,7 +639,7 @@ By learning from 2PC we will then work our way toward better consensus algorithm
 > xii. Atomic commit is formalized slightly differently from consensus: an atomic transaction can commit only if _all_ participants vote to commit, and must abort if any participant needs to abort. Consensus is allowed to decide on _any_ value that is proposed by one of the participants. However, atomic commit and consensus are reducible to each other [70, 71]. _Nonblocking_ atomic commit is harder than consensus—see “Three-phase commit” on page 359. 
 
 
-#### Atomic Commit and Two-Phase Commit (2PC)
+### Atomic Commit and Two-Phase Commit (2PC)
 
 In Chapter 7 we learned that the purpose of transaction atomicity is to provide simple semantics in the case where something goes wrong in the middle of making several writes. The outcome of a transaction is either a successful _commit_ , in which case all of the transaction’s writes are made durable, or an _abort_ , in which case all of the transaction’s writes are rolled back (i.e., undone or discarded). 
 
@@ -755,7 +755,7 @@ As an alternative to 2PC, an algorithm called _three-phase commit_ (3PC) has bee
 In general, nonblocking atomic commit requires a _perfect failure detector_ [67, 71]— i.e., a reliable mechanism for telling whether a node has crashed or not. In a network with unbounded delay a timeout is not a reliable failure detector, because a request may time out due to a network problem even if no node has crashed. For this reason, 2PC continues to be used, despite the known problem with coordinator failure. 
 
 
-#### Distributed Transactions in Practice
+### Distributed Transactions in Practice
 
 Distributed transactions, especially those implemented with two-phase commit, have a mixed reputation. On the one hand, they are seen as providing an important safety guarantee that would be hard to achieve otherwise; on the other hand, they are criticized for causing operational problems, killing performance, and promising more than they can deliver [81, 82, 83, 84]. Many cloud services choose not to implement distributed transactions due to the operational problems they engender [85, 86]. 
 
@@ -837,7 +837,7 @@ that application servers can be added and removed at will. However, when the coo
 
 Do these facts mean we should give up all hope of keeping several systems consistent with each other? Not quite—there are alternative methods that allow us to achieve the same thing without the pain of heterogeneous distributed transactions. We will return to these in Chapters 11 and 12. But first, we should wrap up the topic of consensus. 
 
-#### Fault-Tolerant Consensus
+### Fault-Tolerant Consensus
 
 Informally, consensus means getting several nodes to agree on something. For example, if several people concurrently try to book the last seat on an airplane, or the same seat in a theater, or try to register an account with the same username, then a consensus algorithm could be used to determine which one of these mutually incompatible operations should be the winner. 
 
@@ -945,7 +945,7 @@ Consensus systems generally rely on timeouts to detect failed nodes. In environm
 Sometimes, consensus algorithms are particularly sensitive to network problems. For example, Raft has been shown to have unpleasant edge cases [106]: if the entire network is working correctly except for one particular network link that is consistently unreliable, Raft can get into situations where leadership continually bounces between two nodes, or the current leader is continually forced to resign, so the system effectively never makes progress. Other consensus algorithms have similar problems, and designing algorithms that are more robust to unreliable networks is still an open research problem. 
 
 
-#### Membership and Coordination Services
+### Membership and Coordination Services
 
 Projects like ZooKeeper or etcd are often described as “distributed key-value stores” or “coordination and configuration services.” The API of such a service looks pretty much like that of a database: you can read and write the value for a given key, and iterate over keys. So if they’re basically databases, why do they go to all the effort of implementing a consensus algorithm? What makes them different from any other kind of database? 
 
@@ -1004,7 +1004,7 @@ A membership service determines which nodes are currently active and live member
 
 It could still happen that a node is incorrectly declared dead by consensus, even though it is actually alive. But it is nevertheless very useful for a system to have agreement on which nodes constitute the current membership. For example, choosing a leader could mean simply choosing the lowest-numbered among the current members, but this approach would not work if different nodes have divergent opinions on who the current members are. 
 
-### Summary
+## Summary
 
 In this chapter we examined the topics of consistency and consensus from several different angles. We looked in depth at linearizability, a popular consistency model: its goal is to make replicated data appear as though there were only a single copy, and to make all operations act on it atomically. Although linearizability is appealing because it is easy to understand—it makes a database behave like a variable in a singlethreaded program—it has the downside of being slow, especially in environments with large network delays. 
 
@@ -1023,7 +1023,7 @@ The register needs to atomically _decide_ whether to set its value, based on whe
 
 A database must _decide_ whether to commit or abort a distributed transaction. 
 
-#### Total Order Broadcast
+### Total Order Broadcast
 
 The messaging system must _decide_ on the order in which to deliver messages. 
 

@@ -1,4 +1,4 @@
-## Chapter 12. The Future of Data Systems
+# Chapter 12. The Future of Data Systems
 
 _If a thing be ordained to another as to its end, its last end cannot consist in the preservation of its being. Hence a captain does not intend as a last end, the preservation of the ship entrusted to him, since a ship is ordained to something else as its end, viz. to navigation. (Often quoted as: If the highest aim of a captain was the preserve his ship, he would keep it in port forever.)_ 
 
@@ -11,7 +11,7 @@ Opinions and speculation about the future are of course subjective, and so I wil
 The goal of this book was outlined in Chapter 1: to explore how to create applications and systems that are _reliable_ , _scalable_ , and _maintainable_ . These themes have run through all of the chapters: for example, we discussed many fault-tolerance algorithms that help improve reliability, partitioning to improve scalability, and mechanisms for evolution and abstraction that improve maintainability. In this chapter we will bring all of these ideas together, and build on them to envisage the future. Our goal is to discover how to design applications that are better than the ones of today— robust, correct, evolvable, and ultimately beneficial to humanity. 
 
 
-### Data Integration
+## Data Integration
 
 A recurring theme in this book has been that for any given problem, there are several solutions, all of which have different pros, cons, and trade-offs. For example, when discussing storage engines in Chapter 3, we saw log-structured storage, B-trees, and column-oriented storage. When discussing replication in Chapter 5, we saw singleleader, multi-leader, and leaderless approaches. 
 
@@ -23,7 +23,7 @@ Faced with this profusion of alternatives, the first challenge is then to figure
 
 However, even if you perfectly understand the mapping between tools and circumstances for their use, there is another challenge: in complex applications, data is often used in several different ways. There is unlikely to be one piece of software that is suitable for _all_ the different circumstances in which the data is used, so you inevitably end up having to cobble together several different pieces of software in order to provide your application’s functionality. 
 
-#### Combining Specialized Tools by Deriving Data
+### Combining Specialized Tools by Deriving Data
 
 For example, it is common to need to integrate an OLTP database with a full-text search index in order to handle queries for arbitrary keywords. Although some databases (such as PostgreSQL) include a full-text indexing feature, which can be sufficient for simple applications [1], more sophisticated search facilities require specialist information retrieval tools. Conversely, search indexes are generally not very suitable as a durable system of record, and so many applications need to combine two different tools in order to satisfy all of the requirements. 
 
@@ -94,7 +94,7 @@ In this example, the notifications are effectively a join between the messages a
 
 Perhaps, over time, patterns for application development will emerge that allow causal dependencies to be captured efficiently, and derived state to be maintained correctly, without forcing all events to go through the bottleneck of total order broadcast. 
 
-#### Batch and Stream Processing
+### Batch and Stream Processing
 
 I would say that the goal of data integration is to make sure that data ends up in the right form in all the right places. Doing so requires consuming inputs, transforming, joining, filtering, aggregating, training models, evaluating, and eventually writing to 
 
@@ -169,7 +169,7 @@ Unifying batch and stream processing in one system requires the following featur
 - Tools for windowing by event time, not by processing time, since processing time is meaningless when reprocessing historical events (see “Reasoning About Time” on page 468). For example, Apache Beam provides an API for expressing such computations, which can then be run using Apache Flink or Google Cloud Dataflow. 
 
 
-### Unbundling Databases
+## Unbundling Databases
 
 At a most abstract level, databases, Hadoop, and operating systems all perform the same functions: they store some data, and they allow you to process and query that data [16]. A database stores data in records of some data model (rows in tables, documents, vertices in a graph, etc.) while an operating system’s filesystem stores data in files—but at their core, both are “information management” systems [17]. As we saw in Chapter 10, the Hadoop ecosystem is somewhat like a distributed version of Unix. 
 
@@ -183,7 +183,7 @@ The tension between these philosophies has lasted for decades (both Unix and the
 
 In this section I will attempt to reconcile the two philosophies, in the hope that we can combine the best of both worlds. 
 
-#### Composing Data Storage Technologies
+### Composing Data Storage Technologies
 
 Over the course of this book we have discussed various features provided by databases and how they work, including: 
 
@@ -268,7 +268,7 @@ For example, I would love it if we could simply declare `mysql | elasticsearch` 
 
 Similarly, it would be great to be able to precompute and update caches more easily. Recall that a materialized view is essentially a precomputed cache, so you could imagine creating a cache by declaratively specifying materialized views for complex queries, including recursive queries on graphs (see “Graph-Like Data Models” on page 49) and application logic. There is interesting early-stage research in this area, such as _differential dataflow_ [24, 25], and I hope that these ideas will find their way into production systems. 
 
-#### Designing Applications Around Dataflow
+### Designing Applications Around Dataflow
 
 The approach of unbundling databases by composing specialized storage and processing systems with application code is also becoming known as the “database inside-out” approach [26], after the title of a conference talk I gave in 2014 [27]. However, calling it a “new architecture” is too grandiose. I see it more as a design pattern, a starting point for discussion, and we give it a name simply so that we can better talk about it. 
 
@@ -361,7 +361,7 @@ The join is time-dependent: if the purchase events are reprocessed at a later po
 
 Subscribing to a stream of changes, rather than querying the current state when needed, brings us closer to a spreadsheet-like model of computation: when some piece of data changes, any derived data that depends on it can swiftly be updated. There are still many open questions, for example around issues like time-dependent joins, but I believe that building applications around dataflow ideas is a very promising direction to go in. 
 
-#### Observing Derived State
+### Observing Derived State
 
 At an abstract level, the dataflow systems discussed in the last section give you a process for creating derived datasets (such as search indexes, materialized views, and predictive models) and keeping them up to date. Let’s call that process the _write path_ : whenever some piece of information is written to the system, it may go through multiple stages of batch and stream processing, and eventually every derived dataset is updated to incorporate the data that was written. Figure 12-1 shows an example of updating a search index. 
 
@@ -467,7 +467,7 @@ Another example of this pattern occurs in fraud prevention: in order to assess t
 
 The internal query execution graphs of MPP databases have similar characteristics (see “Comparing Hadoop to Distributed Databases” on page 414). If you need to perform this kind of multi-partition join, it is probably simpler to use a database that provides this feature than to implement it using a stream processor. However, treating queries as streams provides an option for implementing large-scale applications that run against the limits of conventional off-the-shelf solutions. 
 
-### Aiming for Correctness
+## Aiming for Correctness
 
 With stateless services that only read data, it is not a big deal if something goes wrong: you can fix the bug and restart the service, and everything returns to normal. Stateful systems such as databases are not so simple: they are designed to remember things forever (more or less), so if something goes wrong, the effects also potentially last forever—which means they require more careful thought [50]. 
 
@@ -486,7 +486,7 @@ If your application can tolerate occasionally corrupting or losing data in unpre
 
 While the traditional transaction approach is not going away, I also believe it is not the last word in making applications correct and resilient to faults. In this section I will suggest some ways of thinking about correctness in the context of dataflow architectures. 
 
-#### The End-to-End Argument for Databases
+### The End-to-End Argument for Databases
 
 Just because an application uses a data system that provides comparatively strong safety properties, such as serializable transactions, that does not mean the application is guaranteed to be free from data loss or corruption. For example, if an application has a bug that causes it to write incorrect data, or delete data from a database, serializable transactions aren’t going to save you. 
 
@@ -598,7 +598,7 @@ Transactions are expensive, especially when they involve heterogeneous storage t
 For these reasons, I think it is worth exploring fault-tolerance abstractions that make it easy to provide application-specific end-to-end correctness properties, but also maintain good performance and good operational characteristics in a large-scale distributed environment. 
 
 
-#### Enforcing Constraints
+### Enforcing Constraints
 
 Let’s think about correctness in the context of the ideas around unbundling databases (“Unbundling Databases” on page 499). We saw that end-to-end duplicate suppression can be achieved with a request ID that is passed all the way from the client to the database that records the write. What about other kinds of constraints? 
 
@@ -658,7 +658,7 @@ By breaking down the multi-partition transaction into two differently partitione
 
 idea of using multiple differently partitioned stages is similar to what we discussed in “Multi-partition data processing” on page 514 (see also “Concurrency control” on page 462). 
 
-#### Timeliness and Integrity
+### Timeliness and Integrity
 
 A convenient property of transactions is that they are typically linearizable (see “Linearizability” on page 324): that is, a writer waits until a transaction is committed, and thereafter its writes are immediately visible to all readers. 
 
@@ -747,7 +747,7 @@ In this context, serializable transactions are still useful as part of maintaini
 
 Another way of looking at coordination and constraints: they reduce the number of apologies you have to make due to inconsistencies, but potentially also reduce the performance and availability of your system, and thus potentially increase the number of apologies you have to make due to outages. You cannot reduce the number of apologies to zero, but you can aim to find the best trade-off for your needs—the sweet spot where there are neither too many inconsistencies nor too many availability problems. 
 
-#### Trust, but Verify
+### Trust, but Verify
 
 All of our discussion of correctness, integrity, and fault-tolerance has been under the assumption that certain things might go wrong, but other things won’t. We call these assumptions our _system model_ (see “Mapping system models to the real world” on page 309): for example, we should assume that processes can crash, machines can suddenly lose power, and the network can arbitrarily delay or drop messages. But we might also assume that data written to disk is not lost after `fsync` , that data in memory is not corrupted, and that the multiplication instruction of our CPU always returns the correct result. 
 
@@ -830,7 +830,7 @@ Cryptographic auditing and integrity checking often relies on _Merkle trees_ [74
 
 I could imagine integrity-checking and auditing algorithms, like those of certificate transparency and distributed ledgers, becoming more widely used in data systems in general. Some work will be needed to make them equally scalable as systems without cryptographic auditing, and to keep the performance penalty as low as possible. But I think this is an interesting area to watch in the future. 
 
-### Doing the Right Thing
+## Doing the Right Thing
 
 In the final section of this book, I would like to take a step back. Throughout this book we have examined a wide range of different architectures for data systems, evaluated their pros and cons, and explored techniques for building reliable, scalable, and maintainable applications. However, we have left out an important and fundamental part of the discussion, which I would now like to fill in. 
 
@@ -842,7 +842,7 @@ Software development increasingly involves making important ethical choices. The
 
 A technology is not good or bad in itself—what matters is how it is used and how it affects people. This is true for a software system like a search engine in much the same way as it is for a weapon like a gun. I think it is not sufficient for software engineers to focus exclusively on the technology and ignore its consequences: the ethical responsibility is ours to bear also. Reasoning about ethics is difficult, but it is too important to ignore. 
 
-#### Predictive Analytics
+### Predictive Analytics
 
 For example, predictive analytics is a major part of the “Big Data” hype. Using data analysis to predict the weather, or the spread of diseases, is one thing [81]; it is another matter to predict whether a convict is likely to reoffend, whether an applicant for a loan is likely to default, or whether an insurance customer is likely to make expensive claims. The latter have a direct effect on individual people’s lives. 
 
@@ -889,7 +889,7 @@ When predictive analytics affect people’s lives, particularly pernicious probl
 
 We can’t always predict when such feedback loops happen. However, many consequences can be predicted by thinking about the entire system (not just the computerized parts, but also the people interacting with it)—an approach known as _systems thinking_ [92]. We can try to understand how a data analysis system responds to different behaviors, structures, or characteristics. Does the system reinforce and amplify existing differences between people (e.g., making the rich richer or the poor poorer), or does it try to combat injustice? And even with the best intentions, we must beware of unintended consequences. 
 
-#### Privacy and Tracking
+### Privacy and Tracking
 
 Besides the problems of predictive analytics—i.e., using data to make automated decisions about people—there are ethical problems with data collection itself. What is the relationship between the organizations collecting data and the people whose data is being collected? 
 
@@ -999,7 +999,7 @@ We should allow each individual to maintain their privacy—i.e., their control 
 
 How exactly we might achieve this is an open question. To begin with, we should not retain data forever, but purge it as soon as it is no longer needed [111, 112]. Purging data runs counter to the idea of immutability (see “Limitations of immutability” on page 463), but that issue can be solved. A promising approach I see is to enforce access control through cryptographic protocols, rather than merely by policy [113, 114]. Overall, culture and attitude changes will be necessary. 
 
-### Summary
+## Summary
 
 In this chapter we discussed new approaches to designing data systems, and I included my personal opinions and speculations about the future. We started with the observation that there is no one single tool that can efficiently serve all possible use cases, and so applications necessarily need to compose several different pieces of software to accomplish their goals. We discussed how to solve this _data integration_ problem by using batch processing and event streams to let data changes flow between different systems. 
 

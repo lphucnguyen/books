@@ -1,4 +1,4 @@
-## Chapter 1. Reliable, Scalable, and Maintainable Applications
+# Chapter 1. Reliable, Scalable, and Maintainable Applications
 
 _The Internet was done so well that most people think of it as a natural resource like the Pacific Ocean, rather than something that was man-made. When was the last time a technology with a scale like that was so error-free?_ 
 
@@ -27,7 +27,7 @@ This book is a journey through both the principles and the practicalities of dat
 
 In this chapter, we will start by exploring the fundamentals of what we are trying to achieve: reliable, scalable, and maintainable data systems. We’ll clarify what those things mean, outline some ways of thinking about them, and go over the basics that we will need for later chapters. In the following chapters we will continue layer by layer, looking at different design decisions that need to be considered when working on a data-intensive application. 
 
-### Thinking About Data Systems
+## Thinking About Data Systems
 
 We typically think of databases, queues, caches, etc. as being very different categories of tools. Although a database and a message queue have some superficial similarity— both store data for some time—they have very different access patterns, which means different performance characteristics, and thus very different implementations. 
 
@@ -54,21 +54,21 @@ There are many factors that may influence the design of a data system, including
 
 In this book, we focus on three concerns that are important in most software systems: 
 
-### Reliability
+## Reliability
 
 The system should continue to work _correctly_ (performing the correct function at the desired level of performance) even in the face of _adversity_ (hardware or software faults, and even human error). See “Reliability” on page 6. 
 
-### Scalability
+## Scalability
 
 As the system _grows_ (in data volume, traffic volume, or complexity), there should be reasonable ways of dealing with that growth. See “Scalability” on page 10. 
 
-### Maintainability
+## Maintainability
 
 Over time, many different people will work on the system (engineering and operations, both maintaining current behavior and adapting the system to new use cases), and they should all be able to work on it _productively_ . See “Maintainability” on page 18. 
 
 These words are often cast around without a clear understanding of what they mean. In the interest of thoughtful engineering, we will spend the rest of this chapter exploring ways of thinking about reliability, scalability, and maintainability. Then, in the following chapters, we will look at various techniques, architectures, and algorithms that are used in order to achieve those goals. 
 
-### Reliability
+## Reliability
 
 Everybody has an intuitive idea of what it means for something to be reliable or unreliable. For software, typical expectations include: 
 
@@ -93,7 +93,7 @@ Counterintuitively, in such fault-tolerant systems, it can make sense to _increa
 
 Although we generally prefer tolerating faults over preventing faults, there are cases where prevention is better than cure (e.g., because no cure exists). This is the case with security matters, for example: if an attacker has compromised a system and gained access to sensitive data, that event cannot be undone. However, this book mostly deals with the kinds of faults that can be cured, as described in the following sections. 
 
-#### Hardware Faults
+### Hardware Faults
 
 When we think of causes of system failure, hardware faults quickly come to mind. Hard disks crash, RAM becomes faulty, the power grid has a blackout, someone unplugs the wrong network cable. Anyone who has worked with large datacenters can tell you that these things happen _all the time_ when you have a lot of machines. 
 
@@ -108,7 +108,7 @@ However, as data volumes and applications’ computing demands have increased, m
 
 Hence there is a move toward systems that can tolerate the loss of entire machines, by using software fault-tolerance techniques in preference or in addition to hardware redundancy. Such systems also have operational advantages: a single-server system requires planned downtime if you need to reboot the machine (to apply operating system security patches, for example), whereas a system that can tolerate machine failure can be patched one node at a time, without downtime of the entire system (a _rolling upgrade_ ; see Chapter 4). 
 
-#### Software Errors
+### Software Errors
 
 We usually think of hardware faults as being random and independent from each other: one machine’s disk failing does not imply that another machine’s disk is going to fail. There may be weak correlations (for example due to a common cause, such as the temperature in the server rack), but otherwise it is unlikely that a large number of hardware components will fail at the same time. 
 
@@ -129,7 +129,7 @@ The bugs that cause these kinds of software faults often lie dormant for a long 
 
 There is no quick solution to the problem of systematic faults in software. Lots of small things can help: carefully thinking about assumptions and interactions in the system; thorough testing; process isolation; allowing processes to crash and restart; measuring, monitoring, and analyzing system behavior in production. If a system is expected to provide some guarantee (for example, in a message queue, that the number of incoming messages equals the number of outgoing messages), it can constantly check itself while it is running and raise an alert if a discrepancy is found [12]. 
 
-#### Human Errors
+### Human Errors
 
 Humans design and build software systems, and the operators who keep the systems running are also human. Even when they have the best intentions, humans are known to be unreliable. For example, one study of large internet services found that configuration errors by operators were the leading cause of outages, whereas hardware faults (servers or network) played a role in only 10–25% of outages [13]. 
 
@@ -148,7 +148,7 @@ How do we make our systems reliable, in spite of unreliable humans? The best sys
 
 - Implement good management practices and training—a complex and important aspect, and beyond the scope of this book. 
 
-#### How Important Is Reliability?
+### How Important Is Reliability?
 
 Reliability is not just for nuclear power stations and air traffic control software— more mundane applications are also expected to work reliably. Bugs in business applications cause lost productivity (and legal risks if figures are reported incorrectly), and outages of ecommerce sites can have huge costs in terms of lost revenue and damage to reputation. 
 
@@ -156,7 +156,7 @@ Even in “noncritical” applications we have a responsibility to our users. Co
 
 There are situations in which we may choose to sacrifice reliability in order to reduce development cost (e.g., when developing a prototype product for an unproven market) or operational cost (e.g., for a service with a very narrow profit margin)—but we should be very conscious of when we are cutting corners. 
 
-### Scalability
+## Scalability
 
 Even if a system is working reliably today, that doesn’t mean it will necessarily work reliably in the future. One common reason for degradation is increased load: perhaps the system has grown from 10,000 concurrent users to 100,000 concurrent users, or from 1 million to 10 million. Perhaps it is processing much larger volumes of data than it did before. 
 
@@ -165,7 +165,7 @@ _Scalability_ is the term we use to describe a system’s ability to cope with i
 
 scalability means considering questions like “If the system grows in a particular way, what are our options for coping with the growth?” and “How can we add computing resources to handle the additional load?” 
 
-#### Describing Load
+### Describing Load
 
 First, we need to succinctly describe the current load on the system; only then can we discuss growth questions (what happens if our load doubles?). Load can be described with a few numbers which we call _load parameters_ . The best choice of parameters depends on the architecture of your system: it may be requests per second to a web server, the ratio of reads to writes in a database, the number of simultaneously active users in a chat room, the hit rate on a cache, or something else. Perhaps the average case is what matters for you, or perhaps your bottleneck is dominated by a small number of extreme cases. 
 
@@ -218,7 +218,7 @@ In the example of Twitter, the distribution of followers per user (maybe weighte
 
 The final twist of the Twitter anecdote: now that approach 2 is robustly implemented, Twitter is moving to a hybrid of both approaches. Most users’ tweets continue to be fanned out to home timelines at the time when they are posted, but a small number of users with a very large number of followers (i.e., celebrities) are excepted from this fan-out. Tweets from any celebrities that a user may follow are fetched separately and merged with that user’s home timeline when it is read, like in approach 1. This hybrid approach is able to deliver consistently good performance. We will revisit this example in Chapter 12 after we have covered some more technical ground. 
 
-#### Describing Performance
+### Describing Performance
 
 Once you have described the load on your system, you can investigate what happens when the load increases. You can look at it in two ways: 
 
@@ -288,7 +288,7 @@ The naïve implementation is to keep a list of response times for all requests w
 
 _Figure 1-5. When several backend calls are needed to serve a request, it takes just a single slow backend request to slow down the entire end-user request._ 
 
-#### Approaches for Coping with Load
+### Approaches for Coping with Load
 
 Now that we have discussed the parameters for describing load and metrics for measuring performance, we can start discussing scalability in earnest: how do we maintain good performance even when our load parameters increase by some amount? 
 
@@ -311,7 +311,7 @@ An architecture that scales well for a particular application is built around as
 
 Even though they are specific to a particular application, scalable architectures are nevertheless usually built from general-purpose building blocks, arranged in familiar patterns. In this book we discuss those building blocks and patterns. 
 
-### Maintainability
+## Maintainability
 
 It is well known that the majority of the cost of software is not in its initial development, but in its ongoing maintenance—fixing bugs, keeping its systems operational, investigating failures, adapting it to new platforms, modifying it for new use cases, repaying technical debt, and adding new features. 
 
@@ -333,7 +333,7 @@ Make it easy for engineers to make changes to the system in the future, adapting
 
 As previously with reliability and scalability, there are no easy solutions for achieving these goals. Rather, we will try to think about systems with operability, simplicity, and evolvability in mind. 
 
-#### Operability: Making Life Easy for Operations
+### Operability: Making Life Easy for Operations
 
 It has been suggested that “good operations can often work around the limitations of bad (or incomplete) software, but good software cannot run reliably with bad operations” [12]. While some aspects of operations can and should be automated, it is still up to humans to set up that automation in the first place and to make sure it’s working correctly. 
 
@@ -376,7 +376,7 @@ Good operability means making routine tasks easy, allowing the operations team t
 
 - Exhibiting predictable behavior, minimizing surprises 
 
-#### Simplicity: Managing Complexity
+### Simplicity: Managing Complexity
 
 Small software projects can have delightfully simple and expressive code, but as projects get larger, they often become very complex and difficult to understand. This complexity slows down everyone who needs to work on the system, further increasing the cost of maintenance. A software project mired in complexity is sometimes described as a _big ball of mud_ [30]. 
 
@@ -395,7 +395,7 @@ However, finding good abstractions is very hard. In the field of distributed sys
 
 Throughout this book, we will keep our eyes open for good abstractions that allow us to extract parts of a large system into well-defined, reusable components. 
 
-#### Evolvability: Making Change Easy
+### Evolvability: Making Change Easy
 
 It’s extremely unlikely that your system’s requirements will remain unchanged forever. They are much more likely to be in constant flux: you learn new facts, previously unanticipated use cases emerge, business priorities change, users request new 
 
@@ -408,7 +408,7 @@ Most discussions of these Agile techniques focus on a fairly small, local scale 
 
 The ease with which you can modify a data system, and adapt it to changing requirements, is closely linked to its simplicity and its abstractions: simple and easy-tounderstand systems are usually easier to modify than complex ones. But since this is such an important idea, we will use a different word to refer to agility on a data system level: _evolvability_ [34]. 
 
-### Summary
+## Summary
 
 In this chapter, we have explored some fundamental ways of thinking about dataintensive applications. These principles will guide us through the rest of the book, where we dive into deep technical detail. 
 

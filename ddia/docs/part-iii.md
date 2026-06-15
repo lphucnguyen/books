@@ -1,4 +1,4 @@
-# Part III. Derived Data
+**Part III. Derived Data**
 
 In Parts I and II of this book, we assembled from the ground up all the major considerations that go into a distributed database, from the layout of data on disk all the way to the limits of distributed consistency in the presence of faults. However, this discussion assumed that there was only one database in the application. 
 
