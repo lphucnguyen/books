@@ -14,8 +14,6 @@ Some applications are inherently distributed. For example, the web is a distribu
 
 Another reason for building distributed systems is that some applications require high availability and need to be resilient to singlenode failures. For example, Dropbox replicates your data across multiple nodes so that the loss of a single one doesn’t cause your data to be lost. 
 
-
-
 Some applications need to tackle workloads that are just too big to fit on a single node, no matter how powerful. For example, Google receives tens of thousands of search requests per second from all over the globe. There is no way a single node could handle that. 
 
 And finally, some applications have performance requirements that would be physically impossible to achieve with a single node. Netflix can seamlessly stream movies to your TV at high resolution because it has a data center close to you. 
@@ -30,8 +28,6 @@ How are the request and response messages represented on the wire? What happens 
 
 > 1“The Law of Leaky Abstractions,” https://www.joelonsoftware.com/2002/ 11/11/the-law-of-leaky-abstractions/ 
 
-
-
 # **1.2 Coordination** 
 
 Another hard challenge of building distributed systems is that some form of coordination is required to make individual nodes work in unison towards a shared objective. This is particularly challenging to do in the presence of failures. The “two generals” problem is a famous thought experiment that showcases this. 
@@ -44,22 +40,15 @@ Because coordination is such a key topic, the second part of the book is dedicat
 
 # **1.3 Scalability** 
 
-The performance of an application represents how efficiently it can handle _load_ . Intuitively, load is anything that consumes the system’s resources such as CPU, memory, and network bandwidth. Since the nature of load depends on the application’s use cases and architecture, there are different ways to measure it. For example, 
-
-
-the number of concurrent users or the ratio of writes to reads are different forms of load. 
+The performance of an application represents how efficiently it can handle _load_ . Intuitively, load is anything that consumes the system’s resources such as CPU, memory, and network bandwidth. Since the nature of load depends on the application’s use cases and architecture, there are different ways to measure it. For example, the number of concurrent users or the ratio of writes to reads are different forms of load. 
 
 For the type of applications discussed in this book, performance is generally measured in terms of throughput and response time. _Throughput_ is the number of requests processed per second by the application, while _response time_ is the time elapsed in seconds between sending a request to the application and receiving a response. 
 
 As load increases, the application will eventually reach its _capacity_ , i.e., the maximum load it can withstand, when a resource is exhausted. The performance either plateaus or worsens at that point, as shown in Figure 1.1. If the load on the system continues to grow, it will eventually hit a point where most operations fail or time out. 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0022-05.png)
 
-
 Figure 1.1: The system throughput on the y axis is the subset of client requests (x axis) that can be handled without errors and with low response times, also referred to as its goodput. 
-
-
 
 The capacity of a distributed system depends on its architecture, its implementation, and an intricate web of physical limitations like the nodes’ memory size and clock cycle and the bandwidth and latency of network links. For an application to be scalable, a load increase should not degrade the application’s performance. This requires increasing the capacity of the application at will. 
 
@@ -75,8 +64,6 @@ A distributed system is resilient when it can continue to do its job even when f
 
 2“Amazon EC2,” https://aws.amazon.com/ec2/ 
 
-
-
 Failures that are left unchecked can impact the system’s _availability_[3] , i.e., the percentage of time the system is available for use. It’s a ratio defined as the amount of time the application can serve requests ( _uptime_ ) divided by the total time measured ( _uptime_ plus _downtime_ , i.e., the time the application can’t serve requests). 
 
 Availability is often described with nines, a shorthand way of expressing percentages of availability. Three nines are typically considered acceptable by users, and anything above four is considered to be highly available. 
@@ -89,19 +76,15 @@ Availability is often described with nines, a shorthand way of expressing percen
 |99.99% (“four nines”)|8.64 seconds|
 |99.999% (“fve nines”)|864 milliseconds|
 
-
 If the system isn’t resilient to failures, its availability will inevitably drop. Because of that, a distributed system needs to embrace failures and be prepared to withstand them using techniques such as redundancy, fault isolation, and self-healing mechanisms, which we will discuss in Part IV, _Resiliency_ . 
 
 # **1.5 Maintainability** 
 
 It’s a well-known fact that the majority of the cost of software is spent after its initial development in maintenance activities, such as fixing bugs, adding new features, and operating it. Thus, we should aspire to make our systems easy to modify, extend and operate so that they are easy to maintain. 
 
-Any change is a potential incident waiting to happen. Good testing — in the form of unit, integration, and end-to-end tests — is a 
+Any change is a potential incident waiting to happen. Good testing — in the form of unit, integration, and end-to-end tests — is aminimum requirement to modify or extend a system without worrying it will break. And once a change has been merged into the codebase, it needs to be released to production safely without affecting the system’s availability.
 
-> 3“AWS Well-Architected Framework, Availability,” https://docs.aws.amazon. com/wellarchitected/latest/reliability-pillar/availability.html 
-
-
-7 minimum requirement to modify or extend a system without worrying it will break. And once a change has been merged into the codebase, it needs to be released to production safely without affecting the system’s availability. 
+> 3“AWS Well-Architected Framework, Availability,” https://docs.aws.amazon. com/wellarchitected/latest/reliability-pillar/availability.html
 
 Also, operators need to monitor the system’s health, investigate degradations and restore the service when it can’t self-heal. This requires altering the system’s behavior without code changes, e.g., toggling a feature flag or scaling out a service with a configuration change. 
 
@@ -111,10 +94,7 @@ Historically, developers, testers, and operators were part of different teams, b
 
 Distributed systems come in all shapes and sizes. In this book, we are mainly concerned with backend applications that run on commodity machines and implement some kind of business service. So you could say a distributed system is a group of machines that communicate over network links. However, from a run-time point of view, a distributed system is a group of software processes that communicate via _inter-process communication_ (IPC) mechanisms like HTTP. And from an implementation perspective, a distributed system is a group of loosely-coupled components (services) that communicate via APIs. All these are valid and useful architectural points of view. In the rest of the book, we will switch between them depending on which one is more appropriate to discuss a particular topic. 
 
-A _service_ implements one specific part of the overall system’s capabilities. At the core of a service sits the business logic, which exposes interfaces to communicate with the outside world. Some 
-
-
-8 interfaces define the operations that the service offers to its users. In contrast, others define the operations that the service can invoke on other services, like data stores, message brokers, etc. 
+A _service_ implements one specific part of the overall system’s capabilities. At the core of a service sits the business logic, which exposes interfaces to communicate with the outside world. Some interfaces define the operations that the service offers to its users. In contrast, others define the operations that the service can invoke on other services, like data stores, message brokers, etc. 
 
 Since processes can’t call each other’s interfaces directly, _adapters_ are needed to connect IPC mechanisms to service interfaces. An inbound adapter is part of the service’s _Application Programming Interface_ (API); it handles the requests received from an IPC mechanism, like HTTP, by invoking operations defined in the service interfaces. In contrast, outbound adapters grant the business logic access to external services, like data stores. This architectural style is also referred to as the ports and adapters architecture[4] . The idea is that the business logic doesn’t depend on technical details; instead, the technical details depend on the business logic (dependency inversion principle[5] ). This concept is illustrated in Figure 1.2. 
 
@@ -124,12 +104,7 @@ Going forward, we will refer to a process running a service as a _server_ , and 
 
 > 5“Dependency inversion principle,” https://en.wikipedia.org/wiki/Depend ency_inversion_principle 
 
-
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0027-02.png)
 
-
 Figure 1.2: In this example, the business logic uses the repository interface, implemented by the PostgreSQL adapter, to access the database. In contrast, the HTTP adapter handles incoming requests by calling operations defined in the service interface. 
-
 

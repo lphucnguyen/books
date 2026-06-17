@@ -2,7 +2,6 @@
 
 **Resiliency** 
 
-
 # **Introduction** 
 
 _“Anything that can go wrong will go wrong.”_ 
@@ -17,9 +16,6 @@ To build fault-tolerant applications, we first need to have an idea of what can 
 
 > 8Also known as Murphy’s law 
 
-
-232 
-
 Chapter 25 describes how to use redundancy, the replication of functionality or state, to increase the availability of a system. As we will learn, redundancy is only helpful when the redundant nodes can’t fail for the same reason at the same time, i.e., when failures are not correlated. 
 
 Chapter 26 discusses how to isolate correlated failures by partitioning resources and then describes two very powerful forms of partitioning: shuffle sharding and cellular architectures. 
@@ -27,5 +23,4 @@ Chapter 26 discusses how to isolate correlated failures by partitioning resource
 Chapter 27 dives into more tactical resiliency patterns for tolerating failures of downstream dependencies that you can apply to existing systems with few changes, like timeouts and retries. 
 
 Chapter 28 discusses resiliency patterns, like load shedding and rate-limiting, for protecting systems against overload from upstream dependencies. 
-
 

@@ -6,12 +6,9 @@ The longer it takes to detect a bug, the more expensive it becomes to fix. A sof
 
 Unfortunately, testing is not a silver bullet because it’s impossible to predict all the states a complex distributed application can get into. It only provides best-effort guarantees that the code being tested is correct and fault-tolerant. No matter how exhaustive the test coverage is, tests can only cover failures developers can imagine, not the kind of complex emergent behavior that manifests itself in production[1] . 
 
-Although tests can’t guarantee that code is bug-free, they certainly do a good job validating expected behaviors. So, as a rule of thumb, 
+Although tests can’t guarantee that code is bug-free, they certainly do a good job validating expected behaviors. So, as a rule of thumb,if you want to be confident that your implementation behaves in a certain way, you have to add a test for it.
 
-> 1 Cindy Sridharan wrote a great blog post series on the topic, see “Testing Microservices, the sane way,” https://copyconstruct.medium.com/testingmicroservices-the-sane-way-9bb31d158c16 
-
-
-280 if you want to be confident that your implementation behaves in a certain way, you have to add a test for it. 
+> 1 Cindy Sridharan wrote a great blog post series on the topic, see “Testing Microservices, the sane way,” https://copyconstruct.medium.com/testingmicroservices-the-sane-way-9bb31d158c16
 
 # **29.1 Scope** 
 
@@ -31,9 +28,6 @@ An _integration test_ has a larger scope than a unit test, since it verifies tha
 
 > 3“IntegrationTest,” https://martinfowler.com/bliki/IntegrationTest.html 
 
-
-281 
-
 An _end-to-end test_ validates behavior that spans multiple services in the system, like a user-facing scenario. These tests usually run in shared environments, like staging or production, and therefore should not impact other tests or users sharing the same environment. Because of their scope, they are slow and more prone to intermittent failures. 
 
 End-to-end tests can also be painful and expensive to maintain. For example, when an end-to-end test fails, it’s generally not obvious which service caused the failure, and a deeper investigation is required. But these tests are a necessary evil to ensure that userfacing scenarios work as expected across the entire application. They can uncover issues that tests with smaller scope can’t, like unanticipated side effects and emergent behaviors. 
@@ -48,12 +42,7 @@ The size of a test[4] reflects how much computing resources it needs to run, lik
 
 > 4“Software Engineering at Google: Lessons Learned from Programming Over Time,” https://www.amazon.com/dp/B0859PF5HB 
 
-
-282 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0300-02.png)
-
 
 Figure 29.1: Test pyramid the scope and size of a test tend to be correlated, they are distinct concepts, and it helps to separate them. 
 
@@ -67,10 +56,7 @@ Unsurprisingly, the larger a test is, the longer it takes to run and the flakier
 
 - A _fake_ is a lightweight implementation of an interface that behaves similarly to a real one. For example, an in-memory version of a database is a fake. 
 
-- A _stub_ is a function that always returns the same value no 
-
-
-283 matter which arguments are passed to it. 
+- A _stub_ is a function that always returns the same value no matter which arguments are passed to it. 
 
 - Finally, a _mock_ has expectations on how it should be called, and it’s used to test the interactions between objects. 
 
@@ -88,25 +74,17 @@ As with everything else, testing requires making trade-offs. Suppose we want to 
 
 - and a third-party API used for billing (see Figure 29.2). 
 
-As suggested earlier, we should try to write the smallest possible 
+As suggested earlier, we should try to write the smallest possibletest for the desired scope while minimizing the use of test doubles that don’t resemble how the real implementation behaves.
 
-> 5“ContractTest,” https://martinfowler.com/bliki/ContractTest.html 
-
-
-284 test for the desired scope while minimizing the use of test doubles that don’t resemble how the real implementation behaves. 
-
+> 5“ContractTest,” https://martinfowler.com/bliki/ContractTest.html
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0302-03.png)
-
 
 Figure 29.2: How should we test the service? 
 
 Let’s assume the specific endpoint under test doesn’t communicate with the internal service, so we can safely use a mock in its place. And if the data store comes with an in-memory implementation (a fake), we can use that in the test to avoid issuing network calls. Finally, we can’t easily call the third-party billing API since that would require issuing real transactions. However, assuming a fake is not available, the billing service might still offer a testing endpoint that issues fake transactions. 
 
-Here is a more nuanced example in which it’s a lot riskier to go for a smaller test. Suppose we need to test whether purging the data belonging to a specific user across the entire application stack works as expected. In Europe, this functionality is mandated by law (GDPR), and failing to comply with it can result in fines up to 20 million euros or 4% annual turnover, whichever is greater. In this case, because the risk of the functionality silently breaking is high, we want to be as confident as possible that it’s working as 
-
-
-285 expected. This warrants the use of an end-to-end test that runs in production periodically and uses live services rather than test doubles. 
+Here is a more nuanced example in which it’s a lot riskier to go for a smaller test. Suppose we need to test whether purging the data belonging to a specific user across the entire application stack works as expected. In Europe, this functionality is mandated by law (GDPR), and failing to comply with it can result in fines up to 20 million euros or 4% annual turnover, whichever is greater. In this case, because the risk of the functionality silently breaking is high, we want to be as confident as possible that it’s working as expected. This warrants the use of an end-to-end test that runs in production periodically and uses live services rather than test doubles. 
 
 # **29.4** 
 
@@ -126,9 +104,6 @@ In TLA+, a _behavior_ of a system is represented by a sequence of states, where 
 
 > 8“Industrial Use of TLA+,” https://lamport.azurewebsites.net/tla/industrialuse.html 
 
-
-286 
-
 Thus, the specification of a system is the set of all possible behaviors. 
 
 One of the goals of writing a specification is to verify that it satisfies properties we want the system to have, like safety and liveness. A _safety_ property asserts that something is true for all states of a behavior (invariant). A _liveness_ property instead asserts that something eventually happens. TLA+ allows to describe and verify properties that should be satisfied by all possible states and behaviors of a specification. This is extremely powerful, since a system running at scale will eventually run into all possible states and behaviors, and humans are bad at imagining behaviors in which several rare events occur simultaneously. 
@@ -147,12 +122,9 @@ If we were to model this with TLA+, the model checker would be able to identify 
 
 Although modeling writes as atomic (i.e., either both writes succeed, or they both fail) fixes the liveness issue, the model isn’t cor287 rect yet. For example, if two service instances are writing to A and B simultaneously, the two data stores can end up in different states because the order of writes can differ, as shown in Fig 29.3. 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0305-03.png)
-
 
 Figure 29.3: Data stores can see writes in different orders. 
 
 If you remember the discussion about transactions in section 13.1, you know we can solve this problem by introducing a message channel between the service and data stores that serializes all writes and guarantees a single global order. Regardless of the actual solution, the point is that a formal model enables us to test architectural decisions that would be hard to verify otherwise. 
-
 

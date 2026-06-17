@@ -6,14 +6,11 @@ Using a CDN has significantly reduced the number of requests hitting _Cruder_ �
 
 # **17.1 Blob storage architecture** 
 
-Because distributed file stores are such a crucial component of modern applications, it’s useful to have an idea of how they work underneath. In this chapter, we will dive into the architecture of 
+Because distributed file stores are such a crucial component of modern applications, it’s useful to have an idea of how they work underneath. In this chapter, we will dive into the architecture ofblobs/#overview
 
 > 1“Amazon Simple Storage Service,” https://aws.amazon.com/s3/ 
 
-> 2“Azure Blob Storage,” https://azure.microsoft.com/en-us/services/storage/ blobs/#overview 
-
-
-164 
+> 2“Azure Blob Storage,” https://azure.microsoft.com/en-us/services/storage/
 
 Azure Storage[3] (AS), a scalable cloud storage system that provides strong consistency. AS supports file, queue, and table abstractions, but for simplicity, our discussion will focus exclusively on the file abstraction, also referred to as the blob store. 
 
@@ -35,12 +32,7 @@ The _stream layer_ implements a distributed append-only file system in which the
 
 > 3“Windows Azure Storage: A Highly Available Cloud Storage Service with Strong Consistency,” https://sigops.org/s/conferences/sosp/2011/current /2011-Cascais/printable/11-calder.pdf 
 
-
-165 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0183-02.png)
-
 
 Figure 17.1: A high-level view of Azure Storage’s architecture is represented as a sequence of _extents_ , where the extent is the unit of replication. Writes to extents are replicated synchronously using chain replication[4] . 
 
@@ -50,12 +42,7 @@ The _partition layer_ is where high-level file operations are translated
 
 > 4we discussed chain replication in section 10.4 
 
-
-166 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0184-02.png)
-
 
 Figure 17.2: The stream layer uses chain replication to replicate extents across storage servers. to low-level stream operations. Within this layer, the _partition manager_ (yet another control plane) manages a large index of all files stored in the cluster. Each entry in the index contains metadata such as account and file name and a pointer to the actual data in the stream service (list of extent plus offset and length). The partition manager range-partitions the index and maps each partition to a partition server. The partition manager is also responsible for load-balancing partitions across servers, splitting partitions when they become too hot, and merging cold ones (see Figure 17.3). 
 
@@ -65,12 +52,9 @@ Finally, the _front-end service_ (a reverse proxy) is a stateless service that a
 
 Although we have only coarsely described the architecture of AS, it’s a great showcase of the scalability patterns applied to a concrete system. As an interesting historical note, AS was built from the ground up to be strongly consistent, while AWS S3 started of167 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0185-02.png)
-
 
 Figure 17.3: The partition manager range-partitions files across partition servers and rebalances the partitions when necessary. fering the same guarantee in 2021[5] . 
 
 > 5“Diving Deep on S3 Consistency,” https://www.allthingsdistributed.com/2 021/04/s3-strong-consistency.html 
-
 

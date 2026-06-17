@@ -10,13 +10,7 @@
 
 Mary and her team were just starting to get comfortable with the idea of using sagas to maintain data consistency. Then they discovered that transaction management wasn’t the only distributed data-related challenge they had to worry about when migrating the FTGO application to microservices. They also had to figure out how to implement queries. 
 
-In order to support the UI, the FTGO application implements a variety of query operations. Implementing these queries in the existing monolithic application is relatively straightforward, because it has a single database. For the most part, all the FTGO developers needed to do was write SQL SELECT statements and define the necessary indexes. As Mary discovered, writing queries in a microservice architecture is challenging. Queries often need to retrieve data that’s scattered 
-
-
-_**Querying using the API composition pattern**_ 
-
-
-among the databases owned by multiple services. You can’t, however, use a traditional distributed query mechanism, because even if it were technically possible, it violates encapsulation. 
+In order to support the UI, the FTGO application implements a variety of query operations. Implementing these queries in the existing monolithic application is relatively straightforward, because it has a single database. For the most part, all the FTGO developers needed to do was write SQL SELECT statements and define the necessary indexes. As Mary discovered, writing queries in a microservice architecture is challenging. Queries often need to retrieve data that’s scattered among the databases owned by multiple services. You can’t, however, use a traditional distributed query mechanism, because even if it were technically possible, it violates encapsulation. 
 
 Consider, for example, the query operations for the FTGO application described in chapter 2. Some queries retrieve data that’s owned by just one service. The findConsumerProfile() query, for example, returns data from Consumer Service. But other FTGO query operations, such as findOrder() and findOrderHistory(), return data owned by multiple services. Implementing these query operations is not as straightforward. 
 
@@ -40,16 +34,12 @@ The findOrder() operation retrieves an order by its primary key. It takes an ord
 
 The information displayed by the _Order Status_ view includes basic information about the order, including its status, payment status, status of the order from the 
 
-
 **Data from multiple services Mobile device or web application**
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0252-03.png)
 
-
 **----- Start of picture text -----**<br>
 Order status view FTGO frontend<br>Order id: 3492-2323<br>Restaurant: Ajanta Order status<br>Status: En route<br>ETA: 6:25 pm<br>Payment: Paid<br>OrderDetails findOrder(orderId)<br>FTGO application<br>Order Service Kitchen Service Delivery Service Accounting Service<br>Order Ticket Delivery Bill<br>id:3492-2323 id:3492-2323 id:45-4545 id:343-45611<br>restaurant:Ajanta status:PREPARED orderId:3492-2323 orderId:3492-2323<br>status:ENROUTE status:PAID<br>eta:6:25 pm<br>**----- End of picture text -----**<br>
-
 
 Figure 7.1 The **findOrder()** operation is invoked by a FTGO frontend module and returns the details of an **Order** . restaurant’s perspective, and delivery status, including its location and estimated delivery time if in transit. 
 
@@ -67,25 +57,16 @@ Any client that needs the order details must ask all of these services.
 
 ### 7.1.2 Overview of the API composition pattern
 
-One way to implement query operations, such as findOrder(), that retrieve data owned by multiple services is to use the API composition pattern. This pattern implements a 
-
-
-_**Querying using the API composition pattern**_ 
-
-
-query operation by invoking the services that own the data and combining the results. Figure 7.2 shows the structure of this pattern. It has two types of participants: 
+One way to implement query operations, such as findOrder(), that retrieve data owned by multiple services is to use the API composition pattern. This pattern implements a query operation by invoking the services that own the data and combining the results. Figure 7.2 shows the structure of this pattern. It has two types of participants: 
 
 - _An API composer_ —This implements the query operation by querying the provider services. 
 
 - _A provider service_ —This is a service that owns some of the data that the query returns. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0253-05.png)
-
 
 **----- Start of picture text -----**<br>
 Implements the query operation<br>by invoking the providers and API composer<br>combining the results.<br>query()<br>Services that own data<br>queryA() queryB() queryC()<br>Provider Service A Provider Service B Provider Service C<br>Database A Database B Database C<br>**----- End of picture text -----**<br>
-
 
 Figure 7.2 The API composition pattern consists of an API composer and two or more provider services. The API composer implements a query by querying the providers and combining the results. 
 
@@ -95,32 +76,22 @@ Figure 7.2 shows three provider services. The API composer implements the query 
 
 Implement a query that retrieves data from several services by querying each service via its API and combining the results. See http://microservices.io/patterns/data/apicomposition.html. 
 
-Whether you can use this pattern to implement a particular query operation depends on several factors, including how the data is partitioned, the capabilities of the APIs exposed by the services that own the data, and the capabilities of the databases used by the services. For instance, even if the _Provider services_ have APIs for retrieving the 
-
-
-required data, the aggregator might need to perform an inefficient, in-memory join of large datasets. Later on, you’ll see examples of query operations that can’t be implemented using this pattern. Fortunately, though, there are many scenarios where this pattern is applicable. To see it in action, we’ll look at an example. 
+Whether you can use this pattern to implement a particular query operation depends on several factors, including how the data is partitioned, the capabilities of the APIs exposed by the services that own the data, and the capabilities of the databases used by the services. For instance, even if the _Provider services_ have APIs for retrieving the required data, the aggregator might need to perform an inefficient, in-memory join of large datasets. Later on, you’ll see examples of query operations that can’t be implemented using this pattern. Fortunately, though, there are many scenarios where this pattern is applicable. To see it in action, we’ll look at an example. 
 
 ### 7.1.3 Implementing the findOrder() query operation using the API composition pattern
 
 The findOrder() query operation corresponds to a simple primary key-based equijoin query. It’s reasonable to expect that each of the _Provider services_ has an API endpoint for retrieving the required data by orderId. Consequently, the findOrder() query operation is an excellent candidate to be implemented by the API composition pattern. The _API composer_ invokes the four services and combines the results together. Figure 7.3 shows the design of the Find Order Composer. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0254-05.png)
-
 
 **----- Start of picture text -----**<br>
 GET/order/{orderId}<br>Find Order<br>Composer<br>GET/orders/ GET/tickets? GET/deliveries? GET/charges?<br>{orderId} orderId= orderId= orderId=<br>{orderId} {orderId} {orderId}<br>Order Service Kitchen Service Delivery Service Accounting Service<br>«aggregate» «aggregate» «aggregate» «aggregate»<br>Order RestaurantOrder Delivery Charge<br>**----- End of picture text -----**<br>
-
 
 Figure 7.3 Implementing **findOrder()** using the API composition pattern 
 
 In this example, the _API composer_ is a service that exposes the query as a REST endpoint. The _Provider services_ also implement REST APIs. But the concept is the same if the services used some other interprocess communication protocol, such as gRPC, instead of HTTP. The Find Order Composer implements a REST endpoint GET /order/{orderId}. It invokes the four services and joins the responses using the orderId. Each _Provider service_ implements a REST endpoint that returns a response corresponding to a single aggregate. The OrderService retrieves its version of an Order by primary key and the other services use the orderId as a foreign key to retrieve their aggregates. 
 
 As you can see, the API composition pattern is quite simple. Let’s look at a couple of design issues you must address when applying this pattern. 
-
-
-_**Querying using the API composition pattern**_ 
-
 
 ### 7.1.4 API composition design issues
 
@@ -136,13 +107,10 @@ Let’s look at each issue.
 
 One decision that you must make is who plays the role of the query operation’s _API composer_ . You have three options. The first option, shown in figure 7.4, is for a client of the services to be the _API composer_ . 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0255-09.png)
-
 
 **----- Start of picture text -----**<br>
 Client, such as web application<br>API composer<br>Order Delivery<br>Service Service<br>Kitchen Accounting<br>Service Service<br>**----- End of picture text -----**<br>
-
 
 Figure 7.4 Implementing API composition in a client. The client queries the provider services to retrieve the data. 
 
@@ -154,27 +122,19 @@ This option makes sense if the query operation is part of the application’s ex
 
 The third option, shown in figure 7.6, is to implement an _API composer_ as a standalone service. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0256-02.png)
-
 
 **----- Start of picture text -----**<br>
 External client, such as<br>mobile application<br>findOrder()<br>API gateway<br>API composer<br>Order Delivery<br>Service Service<br>Kitchen Accounting<br>Service Service<br>**----- End of picture text -----**<br>
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0256-03.png)
-
 
 **----- Start of picture text -----**<br>
 Clients<br>findOrder()<br>Find Order Service<br>API composer<br>Order Delivery<br>Service Service<br>Kitchen Accounting<br>Service Service<br>**----- End of picture text -----**<br>
 
-
 Figure 7.5 Implementing API composition in the API gateway. The API queries the provider services to retrieve the data, combines the results, and returns a response to the client. 
 
 Figure 7.6 Implement a query operation used by multiple clients and services as a standalone service. 
-
-
-_**Querying using the API composition pattern**_ 
 
 You should use this option for a query operation that’s used internally by multiple services. This operation can also be used for externally accessible query operations whose aggregation logic is too complex to be part of an API gateway. 
 
@@ -204,10 +164,7 @@ One drawback of this pattern is the overhead of invoking multiple services and q
 
 Another drawback of this pattern is reduced availability. As described in chapter 3, the availability of an operation declines with the number of services that are involved. Because the implementation of a query operation involves at least three services—the _API composer_ and at least two provider services—its availability will be significantly less than that of a single service. For example, if the availability of an individual service is 99.5%, then the availability of the findOrder() endpoint, which invokes four provider services, is 99.5%[(4+1)] = 97.5%! 
 
-There are couple of strategies you can use to improve availability. The first strategy is for the _API composer_ to return previously cached data when a _Provider service_ is 
-
-
-unavailable. An _API composer_ sometimes caches the data returned by a _Provider service_ in order to improve performance. It can also use this cache to improve availability. If a provider is unavailable, the _API composer_ can return data from the cache, though it may be potentially stale. 
+There are couple of strategies you can use to improve availability. The first strategy is for the _API composer_ to return previously cached data when a _Provider service_ is unavailable. An _API composer_ sometimes caches the data returned by a _Provider service_ in order to improve performance. It can also use this cache to improve availability. If a provider is unavailable, the _API composer_ can return data from the cache, though it may be potentially stale. 
 
 Another strategy for improving availability is for the _API composer_ to return incomplete data. For example, imagine that Kitchen Service is temporarily unavailable. The _API Composer_ for the findOrder() query operation could omit that service’s data from the response, because the UI can still display useful information. You’ll see more details on API design, caching, and reliability in chapter 8. 
 
@@ -228,10 +185,6 @@ Many enterprise applications use an RDBMS as the transactional system of record 
 Pattern: Command query responsibility segregation 
 
 Implement a query that needs data from several services by using events to maintain a read-only view that replicates data from the services. See http://microservices .io/patterns/data/cqrs.html. 
-
-
-_**Using the CQRS pattern**_ 
-
 
 CQRS is a generalization of this kind of architecture. It maintains one or more view databases—not just text search databases—that implement one or more of the application’s queries. To understand why this is useful, we’ll look at some queries that can’t be efficiently implemented using the API composition pattern. I’ll explain how CQRS works and then talk about the benefits and drawbacks of CQRS. Let’s take a look at when you need to use CQRS. 
 
@@ -257,19 +210,12 @@ On the surface, this operation is similar to the findOrder() query operation. Th
 
 That’s because not all services store the attributes that are used for filtering or sorting. For example, one of the findOrderHistory() operation’s filter criteria is a keyword that matches against a menu item. Only two of the services, Order Service and Kitchen Service, store an Order’s menu items. Neither Delivery Service nor Accounting Service stores the menu items, so can’t filter their data using this keyword. Similarly, neither Kitchen Service nor Delivery Service can sort by the orderCreationDate attribute. 
 
-
-_**Implementing queries in a microservice architecture**_ 
-
-
 There are two ways an _API composer_ could solve this problem. One solution is for the _API composer_ to do an in-memory join, as shown in figure 7.7. It retrieves all orders for the consumer from Delivery Service and Accounting Service and performs a join with the orders retrieved from Order Service and Kitchen Service. 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0260-04.png)
 
-
 **----- Start of picture text -----**<br>
 GET/order?consumerId=&keyword=<br>Find orders<br>composer<br>GET/orders? GET/tickets? GET/deliveries? GET/charges?<br>consumerId= consumerId= consumerId= consumerId=<br>&keyword= &keyword=<br>Order Service Kitchen Service Delivery Service Accounting Service<br>«aggregate» «aggregate» «aggregate» «aggregate»<br>Order RestaurantOrder Delivery Charge<br>**----- End of picture text -----**<br>
-
 
 **These services don’t store the data needed for a keyword search, so will return all of a consumer’s orders.** 
 
@@ -282,10 +228,6 @@ The other solution is for the _API composer_ to retrieve matching orders from Or
 Queries such as findOrderHistory() require the _API composer_ to duplicate the functionality of an RDBMS’s query execution engine. On one hand, this potentially moves work from the less scalable database to the more scalable application. On the other hand, it’s less efficient. Also, developers should be writing business functionality, not a query execution engine. 
 
 Next I show you how to apply the CQRS pattern and use a separate datastore, which is designed to efficiently implement the findOrderHistory() query operation. 
-
-
-_**Using the CQRS pattern**_ 
-
 
 But first, let’s look at an example of a query operation that’s challenging to implement, despite being local to a single service. 
 
@@ -303,10 +245,7 @@ The challenge with using replicas is keeping them up-to-date whenever the origin
 
 **THE NEED TO SEPARATE CONCERNS**
 
-Another reason why single service queries are challenging to implement is that sometimes the service that owns the data shouldn’t be the one that implements the query. The findAvailableRestaurants() query operation retrieves data that is owned by Restaurant Service. This service enables restaurant owners to manage their restaurant’s profile and menu items. It stores various attributes of a restaurant, including its name, address, cuisines, menu, and opening hours. Given that this service owns the 
-
-
-data, it makes sense, at least on the surface, for it to implement this query operation. But data ownership isn’t the only factor to consider. 
+Another reason why single service queries are challenging to implement is that sometimes the service that owns the data shouldn’t be the one that implements the query. The findAvailableRestaurants() query operation retrieves data that is owned by Restaurant Service. This service enables restaurant owners to manage their restaurant’s profile and menu items. It stores various attributes of a restaurant, including its name, address, cuisines, menu, and opening hours. Given that this service owns the data, it makes sense, at least on the surface, for it to implement this query operation. But data ownership isn’t the only factor to consider. 
 
 You must also take into account the need to separate concerns and avoid overloading services with too many responsibilities. For example, the primary responsibility of the team that develops Restaurant Service is enabling restaurant managers to maintain their restaurants. That’s quite different from implementing a highvolume, critical query. What’s more, if they were responsible for the findAvailableRestaurants() query operation, the team would constantly live in fear of deploying a change that prevented consumers from placing orders. 
 
@@ -330,16 +269,10 @@ Command Query Responsibility Segregation, as the name suggests, is all about _se
 
 Both the non-CQRS and CQRS versions of the service have an API consisting of various CRUD operations. In a non-CQRS-based service, those operations are typically implemented by a domain model that’s mapped to a database. For performance, a few queries might bypass the domain model and access the database directly. A single persistent data model supports both commands and queries. 
 
-
-_**Using the CQRS pattern**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0263-02.png)
-
 
 **----- Start of picture text -----**<br>
 Non-CQRS CQRS<br>CRUD operations CRUD operations<br>Service Service<br>CRUD R CUD R<br>Domain model Command/domain model Events Query model<br>Aggregate Query Aggregate Event<br>bypass handler<br>Aggregate Aggregate<br>Command-side<br>Database Query database<br>database<br>Single database for all CRUD One database for creates, updates, and deletes. A<br>separate database for queries. It is kept up-to-date<br>by using events that are published whenever the<br>command-side database changes.<br>**----- End of picture text -----**<br>
-
 
 Figure 7.8 On the left is the non-CQRS version of the service, and on the right is the CQRS version. CQRS restructures a service into command-side and query-side modules, which have separate databases. 
 
@@ -349,18 +282,12 @@ A separate query model handles the nontrivial queries. It’s much simpler than 
 
 **CQRS AND QUERY-ONLY SERVICES**
 
-Not only can CQRS be applied within a service, but you can also use this pattern to define query services. A query service has an API consisting of only query operations—no command operations. It implements the query operations by querying a database that it keeps up-to-date by subscribing to events published by one or more other services. A query-side service is a good way to implement a view that’s built by 
-
-
-subscribing to events published by multiple services. This kind of view doesn’t belong to any particular service, so it makes sense to implement it as a standalone service. A good example of such a service is Order History Service, which is a query service that implements the findOrderHistory() query operation. As figure 7.9 shows, this service subscribes to events published by several services, including Order Service, Delivery Service, and so on. 
-
+Not only can CQRS be applied within a service, but you can also use this pattern to define query services. A query service has an API consisting of only query operations—no command operations. It implements the query operations by querying a database that it keeps up-to-date by subscribing to events published by one or more other services. A query-side service is a good way to implement a view that’s built by subscribing to events published by multiple services. This kind of view doesn’t belong to any particular service, so it makes sense to implement it as a standalone service. A good example of such a service is Order History Service, which is a query service that implements the findOrderHistory() query operation. As figure 7.9 shows, this service subscribes to events published by several services, including Order Service, Delivery Service, and so on. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0264-03.png)
 
-
 **----- Start of picture text -----**<br>
 Order<br>events<br>Order Service<br>findOrderHistory()<br>findOrder()<br>Ticket<br>events<br>Kitchen Service Event Order History<br>handlers Service<br>Delivery<br>events<br>Delivery Service Accounting<br>events Order history<br>view database<br>Accounting Service<br>**----- End of picture text -----**<br>
-
 
 Figure 7.9 The design of **Order History Service** , which is a query-side service. It implements the **findOrderHistory()** query operation by querying a database, which it maintains by subscribing to events published by multiple other services. 
 
@@ -368,13 +295,7 @@ Order History Service has event handlers that subscribe to events published by s
 
 A query service is also a good way to implement a view that replicates data owned by a single service yet because of the need to separate concerns isn’t part of that service. For example, the FTGO developers can define an Available Restaurants Service, which implements the findAvailableRestaurants() query operation described earlier. It subscribes to events published by Restaurant Service and updates a database designed for efficient geospatial queries. 
 
-In many ways, CQRS is an event-based generalization of the popular approach of using RDBMS as the system of record and a text search engine, such as Elasticsearch, to handle text queries. What’s different is that CQRS uses a broader range of database 
-
-
-_**Using the CQRS pattern**_ 
-
-
-types—not just a text search engine. Also, CQRS query-side views are updated in near real time by subscribing to events. 
+In many ways, CQRS is an event-based generalization of the popular approach of using RDBMS as the system of record and a text search engine, such as Elasticsearch, to handle text queries. What’s different is that CQRS uses a broader range of database types—not just a text search engine. Also, CQRS query-side views are updated in near real time by subscribing to events. 
 
 Let’s now look at the benefits and drawbacks of CQRS. 
 
@@ -406,10 +327,7 @@ IMPROVES SEPARATION OF CONCERNS
 
 Another benefit of CQRS is that it separates concerns. A domain model and its corresponding persistent data model don’t handle both commands and queries. The CQRS pattern defines separate code modules and database schemas for the command and query sides of a service. By separating concerns, the command side and query side are likely to be simpler and easier to maintain. 
 
-Moreover, CQRS enables the service that implements a query to be different than the service that owns the data. For example, earlier I described how even though Restaurant Service owns the data that’s queried by the findAvailableRestaurants query operation, it makes sense for another service to implement such a critical, 
-
-
-high-volume query. A CQRS query service maintains a view by subscribing to the events published by the service or services that own the data. 
+Moreover, CQRS enables the service that implements a query to be different than the service that owns the data. For example, earlier I described how even though Restaurant Service owns the data that’s queried by the findAvailableRestaurants query operation, it makes sense for another service to implement such a critical, high-volume query. A CQRS query service maintains a view by subscribing to the events published by the service or services that own the data. 
 
 ### 7.2.4 The drawbacks of CQRS
 
@@ -441,16 +359,10 @@ Now that you’ve seen the benefits and drawbacks of CQRS, let’s now look at h
 
 A CQRS view module has an API consisting of one more query operations. It implements these query operations by querying a database that it maintains by subscribing to events published by one or more services. As figure 7.10 shows, a view module consists of a view database and three submodules. 
 
-
-_**Designing CQRS views**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0267-02.png)
-
 
 **----- Start of picture text -----**<br>
 find...()<br>...<br>CQRS view module<br>Events<br>Event<br>Query API<br>handlers<br>update() query()<br>Implements data<br>access logic Data access<br>View database<br>**----- End of picture text -----**<br>
-
 
 Figure 7.10 The design of a CQRS view module. Event handlers update the view database, which is queried by the Query API module. 
 
@@ -474,10 +386,7 @@ A key design decision is the choice of database and the design of the schema. Th
 
 **SQL VS. NOSQL DATABASES**
 
-Not that long ago, there was one type of database to rule them all: the SQL-based RDBMS. As the Web grew in popularity, though, various companies discovered that an RDBMS couldn’t satisfy their web scale requirements. That led to the creation of 
-
-
-the so-called NoSQL databases. A _NoSQL database_ typically has a limited form of transactions and less general querying capabilities. For certain use cases, these databases have certain advantages over SQL databases, including a more flexible data model and better performance and scalability. 
+Not that long ago, there was one type of database to rule them all: the SQL-based RDBMS. As the Web grew in popularity, though, various companies discovered that an RDBMS couldn’t satisfy their web scale requirements. That led to the creation of the so-called NoSQL databases. A _NoSQL database_ typically has a limited form of transactions and less general querying capabilities. For certain use cases, these databases have certain advantages over SQL databases, including a more flexible data model and better performance and scalability. 
 
 A NoSQL database is often a good choice for a CQRS view, which can leverage its strengths and ignore its weaknesses. A CQRS view benefits from the richer data model, and performance of a NoSQL database. It’s unaffected by the limitations of a NoSQL database, because it only uses simple transactions and executes a fixed set of queries. 
 
@@ -491,18 +400,11 @@ Table 7.1 Query-side view stores
 |---|---|---|
 |PK-based lookup of JSON<br>objects<br>Query-based lookup of JSON<br>objects<br>Text queries<br>Graph queries<br>Traditional SQL reporting/BI|A document store such as MongoDB<br>or DynamoDB, or a key value store<br>such as Redis<br>A document store such as MongoDB<br>or DynamoDB<br>A text search engine such as Elastic-<br>search<br>A graph database such as Neo4j<br>An RDBMS|Implement order history by main-<br>taining a MongoDB document<br>containing the per-customer.<br>Implement customer view using<br>MongoDB or DynamoDB.<br>Implement text search for orders<br>by maintaining a per-order Elas-<br>ticsearch document.<br>Implement fraud detection by<br>maintaining a graph of custom-<br>ers, orders, and other data.<br>Standard business reports and<br>analytics.|
 
-
 Now that I’ve discussed the different kinds of databases you can use to implement a CQRS view, let’s look at the problem of how to efficiently update a view. 
 
 **SUPPORTING UPDATE OPERATIONS**
 
-Besides efficiently implementing queries, the view data model must also efficiently implement the update operations executed by the event handlers. Usually, an event 
-
-
-_**Designing CQRS views**_ 
-
-
-handler will update or delete a record in the view database using its primary key. For example, soon I’ll describe the design of a CQRS view for the findOrderHistory() query. It stores each Order as a database record using the orderId as the primary key. When this view receives an event from Order Service, it can straightforwardly update the corresponding record. 
+Besides efficiently implementing queries, the view data model must also efficiently implement the update operations executed by the event handlers. Usually, an event handler will update or delete a record in the view database using its primary key. For example, soon I’ll describe the design of a CQRS view for the findOrderHistory() query. It stores each Order as a database record using the orderId as the primary key. When this view receives an event from Order Service, it can straightforwardly update the corresponding record. 
 
 Sometimes, though, it will need to update or delete a record using the equivalent of a foreign key. Consider, for instance, the event handlers for Delivery* events. If there is a one-to-one correspondence between a Delivery and an Order, then Delivery.id might be the same as Order.id. If it is, then Delivery* event handlers can easily update the order’s database record. 
 
@@ -520,30 +422,22 @@ Let’s look at these issues, starting with how to handle concurrent updates.
 
 Sometimes a DAO must handle the possibility of multiple concurrent updates to the same database record. If a view subscribes to events published by a single aggregate type, there won’t be any concurrency issues. That’s because events published by a particular aggregate instance are processed sequentially. As a result, a record corresponding to an aggregate instance won’t be updated concurrently. But if a view subscribes to events published by multiple aggregate types, then it’s possible that multiple events handlers update the same record simultaneously. 
 
-
 For example, an event handler for an Order* event might be invoked at the same time as an event handler for a Delivery* event for the same order. Both event handlers then simultaneously invoke the DAO to update the database record for that Order. A DAO must be written in a way that ensures that this situation is handled correctly. It must not allow one update to overwrite another. If a DAO implements updates by reading a record and then writing the updated record, it must use either pessimistic or optimistic locking. In the next section you’ll see an example of a DAO that handles concurrent updates by updating database records without reading them first. 
 
 **IDEMPOTENT EVENT HANDLERS**
 
 As mentioned in chapter 3, an event handler may be invoked with the same event more than once. This is generally not a problem if a query-side event handler is idempotent. An event handler is idempotent if handling duplicate events results in the correct outcome. In the worst case, the view datastore will temporarily be out-of-date. For example, an event handler that maintains the Order History view might be invoked with the (admittedly improbable) sequence of events shown in figure 7.11: DeliveryPickedUp, DeliveryDelivered, DeliveryPickedUp, and DeliveryDelivered. After delivering the DeliveryPickedUp and DeliveryDelivered events the first time, the message broker, perhaps because of a network error, starts delivering the events from an earlier point in time, and so redelivers DeliveryPickedUp and DeliveryDelivered. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0270-05.png)
-
 
 **----- Start of picture text -----**<br>
 Time<br>Delivery picked up Delivery delivered Delivery picked up Delivery delivered<br>OrderId: 123 OrderId: 123 OrderId: 123 OrderId: 123<br>State: PICKED_UP State: DELIVERED State: PICKED_UP State: DELIVERED<br>Order History View<br>Temporarily out of date<br>**----- End of picture text -----**<br>
-
 
 Figure 7.11 The **DeliveryPickedUp** and **DeliveryDelivered** events are delivered twice, which causes the order state in view to be temporarily out-of-date. 
 
 After the event handler processes the second DeliveryPickedUp event, the Order History view temporarily contains the out-of-date state of the Order until the DeliveryDelivered is processed. If this behavior is undesirable, then the event handler should detect and discard duplicate events, like a non-idempotent event handler. 
 
 An event handler isn’t idempotent if duplicate events result in an incorrect outcome. For example, an event handler that increments the balance of a bank account isn’t idempotent. A non-idempotent event handler must, as explained in chapter 3, detect and discard duplicate events by recording the IDs of events that it has processed in the view datastore. 
-
-
-_**Designing CQRS views**_ 
-
 
 In order to be reliable, the event handler must record the event ID and update the datastore atomically. How to do this depends on the type of database. If the view database store is a SQL database, the event handler could insert processed events into a PROCESSED_EVENTS table as part of the transaction that updates the view. But if the view datastore is a NoSQL database that has a limited transaction model, the event handler must save the event in the datastore “record” (for example, a MongoDB document or DynamoDB table item) that it updates. 
 
@@ -565,13 +459,7 @@ The command and query module APIs can enable the client to detect an inconsisten
 
 CQRS views will be added and updated throughout the lifetime of an application. Sometimes you need to add a new view to support a new query. At other times you might need to re-create a view because the schema has changed or you need to fix a bug in code that updates the view. 
 
-Adding and updating views is conceptually quite simple. To create a new view, you develop the query-side module, set up the datastore, and deploy the service. The query 
-
-
-_**Implementing queries in a microservice architecture**_ 
-
-
-side module’s event handlers process all the events, and eventually the view will be up-to-date. Similarly, updating an existing view is also conceptually simple: you change the event handlers and rebuild the view from scratch. The problem, however, is that this approach is unlikely to work in practice. Let’s look at the issues. 
+Adding and updating views is conceptually quite simple. To create a new view, you develop the query-side module, set up the datastore, and deploy the service. The query side module’s event handlers process all the events, and eventually the view will be up-to-date. Similarly, updating an existing view is also conceptually simple: you change the event handlers and rebuild the view from scratch. The problem, however, is that this approach is unlikely to work in practice. Let’s look at the issues. 
 
 **BUILD CQRS VIEWS USING ARCHIVED EVENTS**
 
@@ -591,21 +479,14 @@ The CQRS view for the findOrderHistory() consumes events from multiple services,
 
 - OrderHistoryQuery API _module_ —Implements the REST endpoints described earlier 
 
-
-_**Implementing a CQRS view with AWS DynamoDB**_ 
-
-
 - OrderHistoryDataAccess—Contains the OrderHistoryDAO, which defines the methods that update and query the ftgo-order-history DynamoDB table and its helper classes 
 
 - ftgo-order-history _DynamoDB table_ —The table that stores the orders 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0273-04.png)
-
 
 **----- Start of picture text -----**<br>
 findOrderHistory()<br>findOrder<br>Order<br>delivery<br>... Order History Service<br>events<br>OrderHistory<br>OrderHistory<br>Event<br>Query<br>Handlers<br>Update Query<br>OrderHistoryDataAccess<br>OrderHistoryDAO<br><DynamoDB table><br>ftgo-order-history<br>**----- End of picture text -----**<br>
-
 
 Figure 7.12 The design of **OrderHistoryService** . **OrderHistoryEventHandlers** updates the database in response to events. The **OrderHistoryQuery** module implements the query operations by querying the database. These two modules use the **OrderHistoryDataAccess** module to access the database. 
 
@@ -614,7 +495,6 @@ Let’s look at the design of the event handlers, the DAO, and the DynamoDB tabl
 ### 7.4.1 The OrderHistoryEventHandlers module
 
 This module consists of the event handlers that consume events and update the DynamoDB table. As the following listing shows, the event handlers are simple methods. Each method is a one-liner that invokes an OrderHistoryDao method with arguments that are derived from the event. 
-
 
 Listing 7.1 Event handlers that call the **OrderHistoryDao** 
 
@@ -655,10 +535,6 @@ Like many NoSQL databases, DynamoDB has data access operations that are much les
 
 - Defining an index for the findOrderHistory query 
 
-
-_**Implementing a CQRS view with AWS DynamoDB**_ 
-
-
 - Implementing the findOrderHistory query 
 
 - Paginating the query results 
@@ -684,17 +560,13 @@ This flexibility enables the OrderHistoryDataAccess module to store each Order a
 |...|||||||
 |...|...||...|...|....|...|
 
-
 Figure 7.13 Preliminary structure of the DynamoDB **OrderHistory** table 
 
 An important part of the definition of a table is its primary key. A DynamoDB application inserts, updates, and retrieves a table’s items by primary key. It would seem to make sense for the primary key to be orderId. This enables Order History Service to insert, update, and retrieve an order by orderId. But before finalizing this decision, let’s first explore how a table’s primary key impacts the kinds of data access operations it supports. 
 
 **DEFINING AN INDEX FOR THE FINDORDERHISTORY QUERY**
 
-This table definition supports primary key-based reads and writes of Orders. But it doesn’t support a query such as findOrderHistory() that returns multiple matching orders sorted by increasing age. That’s because, as you will see later in this section, this query uses the DynamoDB query() operation, which requires a table to have a 
-
-
-composite primary key consisting of two scalar attributes. The first attribute is a partition key. The _partition key_ is so called because DynamoDB’s Z-axis scaling (described in chapter 1) uses it to select an item’s storage partition. The second attribute is the _sort_ key. A query() operation returns those items that have the specified partition key, have a sort key in the specified range, and match the optional filter expression. It returns items in the order specified by the sort key. 
+This table definition supports primary key-based reads and writes of Orders. But it doesn’t support a query such as findOrderHistory() that returns multiple matching orders sorted by increasing age. That’s because, as you will see later in this section, this query uses the DynamoDB query() operation, which requires a table to have a composite primary key consisting of two scalar attributes. The first attribute is a partition key. The _partition key_ is so called because DynamoDB’s Z-axis scaling (described in chapter 1) uses it to select an item’s storage partition. The second attribute is the _sort_ key. A query() operation returns those items that have the specified partition key, have a sort key in the specified range, and match the optional filter expression. It returns items in the order specified by the sort key. 
 
 The findOrderHistory() query operation returns a consumer’s orders sorted by increasing age. It therefore requires a primary key that has the consumerId as the partition key and the orderCreationDate as the sort key. But it doesn’t make sense for (consumerId, orderCreationDate) to be the primary key of the ftgo-order-history table, because it’s not unique. 
 
@@ -715,11 +587,8 @@ The index is part of the definition of the ftgo-order-history table and is calle
 ||cde-fgh|||||||||||
 ||...||...||...|||...||....|...|
 
-
 Figure 7.14 The design of the **OrderHistory** table and index 
 
-
-_**Implementing a CQRS view with AWS DynamoDB**_
 include the primary key attributes, consumerId and orderCreationTime, and non-key attributes, including orderId and status. 
 
 The ftgo-order-history-by-consumer-id-and-creation-time index enables the OrderHistoryDaoDynamoDb to efficiently retrieve a consumer’s orders sorted by increasing age. 
@@ -742,10 +611,7 @@ Now that I’ve described how to query DynamoDB for orders, let’s look at how 
 
 **UPDATING ORDERS**
 
-DynamoDB supports two operations for adding and updating items: PutItem() and UpdateItem(). The PutItem() operation creates or replaces an entire item by its primary key. In theory, OrderHistoryDaoDynamoDb could use this operation to insert 
-
-
-and update orders. One challenge, however, with using PutItem() is ensuring that simultaneous updates to the same item are handled correctly. 
+DynamoDB supports two operations for adding and updating items: PutItem() and UpdateItem(). The PutItem() operation creates or replaces an entire item by its primary key. In theory, OrderHistoryDaoDynamoDb could use this operation to insert and update orders. One challenge, however, with using PutItem() is ensuring that simultaneous updates to the same item are handled correctly. 
 
 Consider, for example, the scenario where two event handlers simultaneously attempt to update the same item. Each event handler calls OrderHistoryDaoDynamoDb to load the item from DynamoDB, change it in memory, and update it in DynamoDB using PutItem(). One event handler could potentially overwrite the change made by the other event handler. OrderHistoryDaoDynamoDb can prevent lost updates by using DynamoDB’s optimistic locking mechanism. But an even simpler and more efficient approach is to use the UpdateItem() operation. 
 
@@ -764,10 +630,6 @@ A conditional update is only performed if a _condition expression_ is true. A _c
 OR «aggregateType»«aggregateId» < :eventId 
 
 The _condition expression_ only allows the update if the attribute doesn’t exist or the eventId is greater than the last processed event ID. 
-
-
-_**Implementing a CQRS view with AWS DynamoDB**_ 
-
 
 For example, suppose an event handler receives a DeliveryPickup event whose ID is 123323-343434 from a Delivery aggregate whose ID is 3949384394-039434903. The name of the tracking attribute is Delivery3949384394-039434903. The event handler should consider the event to be a duplicate if the value of this attribute is greater than or equal to 123323-343434. The query() operation invoked by the event handler updates the Order item using this condition expression: attribute_not_exists(Delivery3949384394-039434903) OR Delivery3949384394-039434903 < :eventId 
 
@@ -807,7 +669,6 @@ public class OrderHistoryDaoDynamoDb ... {
 }
 ```
 
-
 The addOrder() method creates an UpdateSpec, which is part of the AWS SDK and describes the update operation. After creating the UpdateSpec, it calls idempotentUpdate(), a helper method that performs the update after adding a condition expression that guards against duplicate updates. 
 
 **THE NOTEPICKEDUP() METHOD**
@@ -826,7 +687,6 @@ public class OrderHistoryDaoDynamoDb ... {
       .withNameMap(Collections.singletonMap("#deliveryStatus", DELIVERY_STATUS_FIELD)) 
       .withValueMap(Collections.singletonMap(":deliveryStatus", DeliveryStatus.PICKED_UP.toString())) 
       .withReturnValues(ReturnValue.NONE); 
-    idempotentUpdate(spec, eventSource); 
   } 
 }
 ```
@@ -840,7 +700,6 @@ The following listing shows the idempotentUpdate() method, which updates the ite
 Listing 7.4 The **idempotentUpdate()** method ignores duplicate events 
 
 ```java
-public class OrderHistoryDaoDynamoDb ... { 
   private boolean idempotentUpdate(UpdateItemSpec spec, Optional<SourceEvent> eventSource) { 
     try { 
       table.updateItem(eventSource.map(es -> es.addDuplicateDetection(spec)) 
@@ -854,10 +713,6 @@ public class OrderHistoryDaoDynamoDb ... {
 }
 ```
 
-
-_**Implementing a CQRS view with AWS DynamoDB**_ 
-
-
 If the sourceEvent is supplied, idempotentUpdate() invokes SourceEvent.addDuplicateDetection() to add to UpdateItemSpec the condition expression that was described earlier. The idempotentUpdate() method catches and ignores the ConditionalCheckFailedException, which is thrown by updateItem() if the event was a duplicate. 
 
 Now that we’ve seen the code that updates the table, let’s look at the query method. 
@@ -869,7 +724,6 @@ The findOrderHistory() method, shown in listing 7.5, retrieves the consumer’s 
 Listing 7.5 The **findOrderHistory()** method retrieves a consumer’s matching orders 
 
 ```java
-public class OrderHistoryDaoDynamoDb ... { 
   @Override 
   public OrderHistory findOrderHistory(String consumerId, OrderHistoryFilter filter) { 
     QuerySpec spec = new QuerySpec() 
@@ -929,5 +783,4 @@ As you can see, you must address numerous issues when implementing a CQRS view, 
 - CQRS improves separation of concerns by enabling a service to implement a query that returns data owned by a different service. 
 
 - Clients must handle the eventual consistency of CQRS views. 
-
 

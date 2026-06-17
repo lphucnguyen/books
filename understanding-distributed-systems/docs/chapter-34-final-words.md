@@ -10,9 +10,6 @@ For example, you could start with “Windows Azure Storage: A Highly Available C
 
 > 1“Windows Azure Storage: A Highly Available Cloud Storage Service with Strong Consistency,” https://sigops.org/s/conferences/sosp/2011/current /2011-Cascais/printable/11-calder.pdf 
 
-
-328 
-
 Once you have digested the Azure storage paper, I suggest reading “Azure Data Explorer: a big data analytics cloud platform optimized for interactive, ad-hoc queries over structured, semi-structured and unstructured data”[2] . This paper discusses the implementation of a cloud-native event store built on top of Azure’s cloud storage — a great example of how these large-scale systems compose on top of each other. 
 
 If any concept is new to you or unclear, follow your curiosity down the rabbit hole by exploring referenced papers.[3] . As a bonus exercise, this book is sprinkled with great papers and references. Read them all to complete all the side quests! 

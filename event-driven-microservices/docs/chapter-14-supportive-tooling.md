@@ -8,10 +8,7 @@ Unfortunately, there is a dearth of freely available open source tooling for man
 
 When a company has a small number of systems, it’s easy to use tribal knowledge or informal methods to keep track of who owns which systems. In the microservice world, however, it is important to explicitly track ownership of microservice implementations and event streams. By following the single writer principle (see “Microservice Single Writer Principle” on page 28), you can attribute event stream ownership back to the microservice that owns the write permissions. 
 
-You can use a simple microservice developed in-house to track and manage all of the dependencies between people, teams, and microservices. This system is the foundation for many of the other tools within this chapter, so I strongly suggest that you look into finding or developing it. Assigning microservice ownership this way helps 
-
-
-ensure that fine-grained DevOps permissions are correctly assigned to the teams that need them. 
+You can use a simple microservice developed in-house to track and manage all of the dependencies between people, teams, and microservices. This system is the foundation for many of the other tools within this chapter, so I strongly suggest that you look into finding or developing it. Assigning microservice ownership this way helps ensure that fine-grained DevOps permissions are correctly assigned to the teams that need them. 
 
 ## Event Stream Creation and Modification
 
@@ -37,10 +34,7 @@ Anything pertaining to money, billing, or other important revenue-generating eve
 
 **Namespace** 
 
-A descriptor aligned with the nested bounded context structures of the business. A stream with a namespace assigned could be hidden from services outside of the namespace, but available for services within the namespace. This helps reduce 
-
-
-data discovery overload by concealing inaccessible event streams to a user browsing through available event streams. 
+A descriptor aligned with the nested bounded context structures of the business. A stream with a namespace assigned could be hidden from services outside of the namespace, but available for services within the namespace. This helps reduce data discovery overload by concealing inaccessible event streams to a user browsing through available event streams. 
 
 **Deprecation** 
 
@@ -58,10 +52,7 @@ You may need to set up quotas at a more granular level, preventing surge-prone s
 
 ## Schema Registry
 
-Explicit schemas provide a strong framework for modeling events. Precise definitions of data, including names, types, defaults, and documentation, provide clarity to both producers and consumers of the event. The _schema registry_ is a service that allows 
-
-
-your producers to register the schemas they have used to write the event. This provides several distinct benefits: 
+Explicit schemas provide a strong framework for modeling events. Precise definitions of data, including names, types, defaults, and documentation, provide clarity to both producers and consumers of the event. The _schema registry_ is a service that allows your producers to register the schemas they have used to write the event. This provides several distinct benefits: 
 
 - The event schema does not need to be transported with the event. A simple placeholder ID can be used, significantly reducing bandwidth usage. 
 
@@ -71,9 +62,7 @@ your producers to register the schemas they have used to write the event. This p
 
 The workflow for a schema registry is shown in Figure 14-1. 
 
-
 ![](../images/Event-Driven_Microservices-0260-05.png)
-
 
 _Figure 14-1. Schema registry workflow for producing and consuming an event_ 
 
@@ -83,9 +72,7 @@ The consumer receives the event and gets the schema (step 4) for that specific I
 
 Confluent has provided an excellent implementation of a schema registry for Apache Kafka. It supports Apache Avro, Protobuf, and JSON formats and is freely available for production use. 
 
-
 ![](../images/Event-Driven_Microservices-0261-00.png)
-
 
 Registering the schemas to a dedicated event stream frees the schema registry implementation from having to provide durable storage. This is the design choice Confluent made with its schema registry. 
 
@@ -107,7 +94,6 @@ Event-driven microservices require that you manage offsets before they proceed w
 
 Changing the logic of the microservice may require that you reprocess events from a previous point in time. Usually reprocessing requires starting at the beginning of the stream, but your selection point may vary depending on your service’s needs. 
 
-
 **Application reset: Advancing the offset** 
 
 Alternately, perhaps your microservice doesn’t need old data and should consume only the newest data. You can reset the application offset to be the latest offset, instead of the earliest. 
@@ -122,14 +108,11 @@ For production-grade DevOps, a team must own the microservice in order to modify
 
 Access control to data is important not only from a business security standpoint, but also as a means of enforcing the single writer principle. Permissions and access control lists ensure that bounded contexts can enforce their boundaries. Access permissions to a given event stream should be granted only by the team that owns the producing microservice, a restriction you can enforce by using the microservice-toteam assignment system. Permissions usually fall into these common categories (depending, of course, on the event broker implementation): READ, WRITE, CREATE, DELETE, MODIFY, and DESCRIBE. 
 
-
 ![](../images/Event-Driven_Microservices-0262-07.png)
-
 
 ACLs rely on individual identification for each consumer and producer. Ensure that you enable and enforce identification for your event broker and services as soon as possible, preferably from day one. Adding identification after the fact is extremely painful, as it requires updating and reviewing every single service that connects to the event broker. 
 
 ACLs enforce bounded contexts. For instance, a microservice should be the only owner of CREATE, WRITE, and READ permissions for its internal and changelog event streams. At no point should a microservice couple on the internal event streams of another microservice. Additionally, this microservice should be the only service assigned WRITE permissions to its output stream, according to the single writer principle. The output streams may be made publicly available such that any other system can consume the data, or it may have restricted access because it contains sensitive financial or PII data or is part of a nested bounded context. 
-
 
 A typical microservice will be individually assigned a set of permissions following the format shown in Table 14-1. 
 
@@ -141,7 +124,6 @@ _Table 14-1. Typical event stream permissions for a given microservice_
 |Output event streams|CREATE, WRITE (and maybe READ, if used internally)|
 |Internal and changelog event streams|CREATE, WRITE, READ|
 
-
 One particularly helpful feature is to provide individual teams with the means of requesting consumer access for a specific microservice, offloading the responsibilities of access control enforcement to them. Alternately, depending on business requirements and metadata tags, you could centralize this process so that teams go through a security review whenever requesting access to sensitive information. The granting and revoking of permissions can be kept as its own stream of events, providing a durable and immutable record of data access for auditing purposes. 
 
 **Discovering Orphaned Streams and Microservices** 
@@ -152,10 +134,7 @@ In the normal course of business growth, new microservices and streams will be c
 
 It is common to reset the internal state of the application when changing a stateful application’s implementation. Any changes to the data structures stored in the internal and changelog event streams, as well as any changes to the topology workflow, will require that the streams be deleted and re-created according to the new application. 
 
-Some of the stateful microservice patterns discussed in Chapter 7 use state stores external to the processing node. Depending on the capabilities supported by your company’s microservice platform organization, it may be possible (and is certainly advisable) to reset these external state stores when requested by the microservice owner. For example, if a microservice is using an external state store, such as Amazon’s DynamoDB or Google’s Bigtable, it would be best to purge the associated state 
-
-
-when resetting the application. This reduces operational overhead and ensures that any stale or erroneous data is automatically removed. Any external stateful services outside the domain of “officially supported capabilities” will likely need to be manually reset. 
+Some of the stateful microservice patterns discussed in Chapter 7 use state stores external to the processing node. Depending on the capabilities supported by your company’s microservice platform organization, it may be possible (and is certainly advisable) to reset these external state stores when requested by the microservice owner. For example, if a microservice is using an external state store, such as Amazon’s DynamoDB or Google’s Bigtable, it would be best to purge the associated state when resetting the application. This reduces operational overhead and ensures that any stale or erroneous data is automatically removed. Any external stateful services outside the domain of “officially supported capabilities” will likely need to be manually reset. 
 
 It’s important to note that while this tool should be self-serve, in no way should another team be able to delete the event streams and state owned by another team. Again, I recommend using the microservice-to-team assignment system discussed in this chapter to ensure that an application can be reset only by its owner or an admin. In summary, this tool needs to: 
 
@@ -172,7 +151,6 @@ Consumer lag is one of the best indicators that an event-driven microservice nee
 Some monitoring systems, such as Burrow for Apache Kafka, consider the history of offset lag when computing the lag state. This approach can be useful in cases where you have a large volume of events entering a stream, such that the amount of lag is only ever at 0 for a split second before the next event arrives. Since lag measurements tend to be periodic in nature, it is possible that the system will always appear to be lagging by a conventional measurement. Therefore, using deviation from historical norms can be a useful mechanism for determining if a system is falling behind or catching up. 
 
 Remember that while microservices should be free to scale up and down as required, generally some form of hysteresis—a tolerance threshold—is used to prevent a system from scaling up and down endlessly. This hysteresis loop needs to be part of the logic that evaluates the signal and can often be accommodated by modern cloud platforms such as AWS CloudWatch and Google Cloud Operations (formerly Stackdriver). 
-
 
 ## Streamlined Microservice Creation Process
 
@@ -210,7 +188,6 @@ Container management is handled by the container management service (CMS), as di
 
 - Autoscaling on CPU, memory, disk or lag metrics 
 
-
 The business will need to determine how many container management options should be exposed to developers, versus how many should be managed by a dedicated operations team. This typically depends on the culture of DevOps within the organization. 
 
 ## Cluster Creation and Management
@@ -225,10 +202,7 @@ The team responsible for managing the event broker clusters will often also prov
 
 ### Programmatic Bringup of Compute Resources
 
-You’ll often need to bring up a set of compute resources that are independent of all other resources. It is not always necessary to create an entirely new container management service, as usually the existing one can serve multiple namespaces. As with 
-
-
-event brokers, cloud computing providers commonly provide hosted services that can give you these capabilities on-demand, such as Google’s and Amazon’s hosted Kubernetes solutions. 
+You’ll often need to bring up a set of compute resources that are independent of all other resources. It is not always necessary to create an entirely new container management service, as usually the existing one can serve multiple namespaces. As with event brokers, cloud computing providers commonly provide hosted services that can give you these capabilities on-demand, such as Google’s and Amazon’s hosted Kubernetes solutions. 
 
 The same technical and legal requirements that apply to event brokers extend to compute resources. Avoid regional failures by distributing processing across data centers, process data locally if it cannot leave the country, and save money by dynamically shifting compute-heavy workloads to cheaper service providers. 
 
@@ -252,10 +226,7 @@ The specifics of how data is replicated between clusters vary with event broker 
 
 ### Programmatic Bringup of Tooling
 
-Last, but certainly not least, the same sets of tools discussed thus far should also be programmatically brought up for new clusters. This provides a common set of tools you can deploy to any cluster deployment without relying on any data stores besides the event broker itself. There are a number of benefits to using tooling in this manner. First, the tooling gets used far more often and helps reveal bugs or necessary features to be added. Second, it lowers the barrier to entry for using new clusters, as users will 
-
-
-already be familiar with the tooling interfaces. Lastly, when the cluster is terminated, the tools can be terminated alongside it with no additional cleanup required. 
+Last, but certainly not least, the same sets of tools discussed thus far should also be programmatically brought up for new clusters. This provides a common set of tools you can deploy to any cluster deployment without relying on any data stores besides the event broker itself. There are a number of benefits to using tooling in this manner. First, the tooling gets used far more often and helps reveal bugs or necessary features to be added. Second, it lowers the barrier to entry for using new clusters, as users will already be familiar with the tooling interfaces. Lastly, when the cluster is terminated, the tools can be terminated alongside it with no additional cleanup required. 
 
 ## Dependency Tracking and Topology Visualization
 
@@ -272,7 +243,6 @@ One problem that data scientists and data engineers regularly encounter is how t
 **Overlay team boundaries** 
 
 The teams owning the microservices and streams can be mapped onto the topology. When rendered with a proper visualization tool, the topology will clearly show which teams are directly responsible for which services. 
-
 
 **Discover data sources** 
 
@@ -292,9 +262,7 @@ A business owner could look at this overlay and ask themselves, “Does this imp
 
 Figure 14-2 shows a topology with 25 microservices, overlaid with the ownership of four teams. For purposes of clarity, each arrow represents the production of data to an event stream as well as consumption by the consuming process. Thus, microservice 3 is consuming a stream of data from microservice 4. 
 
-
 ![](../images/Event-Driven_Microservices-0270-00.png)
-
 
 _Figure 14-2. Topology map of service connections_ 
 
@@ -310,15 +278,9 @@ _Table 14-2. Topology graph measure of interconnectedness_
 |Team|3|3|3|2 (Teams 1,4)|1 (Team 2)|6|
 |Team|4|1|5|1 (Team 1)|2 (Teams 2,3)|8|
 
-
-Let’s see what happens if we reduce the number of interteam connections and the number of incoming and outgoing streams at the team boundary. Microservices 2 and 7 are good candidates for being reassigned simply due to their ownership island in the topology, and can be reassigned to reduce the number of cross-team dependencies. Microservice 7 can be assigned to team 1 (or to team 3), and microservice 2 can be assigned to team 4. It is also more apparent now that microservice 1 may also be 
-
-
-assigned to team 4 to further reduce the cross-boundary communication. This result is shown in Figure 14-3 and Table 14-3. 
-
+Let’s see what happens if we reduce the number of interteam connections and the number of incoming and outgoing streams at the team boundary. Microservices 2 and 7 are good candidates for being reassigned simply due to their ownership island in the topology, and can be reassigned to reduce the number of cross-team dependencies. Microservice 7 can be assigned to team 1 (or to team 3), and microservice 2 can be assigned to team 4. It is also more apparent now that microservice 1 may also be assigned to team 4 to further reduce the cross-boundary communication. This result is shown in Figure 14-3 and Table 14-3. 
 
 ![](../images/Event-Driven_Microservices-0271-01.png)
-
 
 _Figure 14-3. Topology map of service connections after reassignment of microservices_ 
 
@@ -332,13 +294,9 @@ _Table 14-3. New measure of interconnectedness; differences are shown in bracket
 |Team|3|3|3|2 (Teams 1,4)|2 (Teams 1,2) (+1)|6|
 |Team|4|1|3 (–2)|1 (Team 1)|2 (Teams 3,4)|8 (+2)|
 
-
 Computing the cross-boundary dependencies has a positive result: cross-team incoming and outgoing stream counts are reduced, with a net decrease of three connections between teams. Minimizing the number of cross-boundary connections helps optimize the assignment of microservices to teams. This is not sufficient, however, for determining the assignment of microservices to a team. You must also take into account a variety of factors, such as the team’s head count, areas of expertise, and implementation complexities. 
 
-Most importantly of all, though, you must account for the business functions that a microservice is performing. Consider a scenario where one team produces a whole host of event data, perhaps consumed from a number of external sources. It could be 
-
-
-that the business responsibility of that team is limited simply to sourcing and organizing the data into events, with business logic being performed downstream by other consumers. In this case, the team would have many stream connections and team connections. This is where it is useful to be able to view the business functions associated with the microservices owned by the team. 
+Most importantly of all, though, you must account for the business functions that a microservice is performing. Consider a scenario where one team produces a whole host of event data, perhaps consumed from a number of external sources. It could be that the business responsibility of that team is limited simply to sourcing and organizing the data into events, with business logic being performed downstream by other consumers. In this case, the team would have many stream connections and team connections. This is where it is useful to be able to view the business functions associated with the microservices owned by the team. 
 
 In the preceding example, there are a number of questions worth asking. For one, do the business function implementations of microservice 2 align closer to the goals of team 2 or team 4? What about microservice 7: is it aligned closer with team 1’s goals than team 2’s? And in general, which services align best with which team? These answers tend to be lucrative and must be carefully evaluated against the goals of the team. It is natural that team goals change as business needs evolve, and it is important to ensure that the microservices assigned to those teams align with the overarching business goals. This tooling provides insight into these allocations and helps provide clarity to business owners. 
 

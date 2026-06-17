@@ -12,12 +12,9 @@ The term _topology_ comes up frequently in discussions of event-driven microserv
 
 A microservice topology is the event-driven topology internal to a single microservice. This defines the data-driven operations to be performed on incoming events, including transformation, storage, and emission. 
 
-
 Figure 2-1 shows a single microservice topology ingesting from two input event streams. 
 
-
 ![](../images/Event-Driven_Microservices-0040-01.png)
-
 
 _Figure 2-1. A simple microservice topology_ 
 
@@ -27,17 +24,13 @@ The microservice topology ingests events from event stream A and materializes th
 
 A business topology is the set of microservices, event streams, and APIs that fulfill complex business functions. It is an arbitrary grouping of services and may represent the services owned by a single team or department or those that fulfill a superset of complex business functionality. The business communication structures detailed in Chapter 1 compose the business topology. Microservices implement the business bounded contexts, and event streams provide the data communication mechanism for sharing cross-context domain data. 
 
-
 ![](../images/Event-Driven_Microservices-0040-06.png)
-
 
 A _microservice topology_ details the inner workings of a single microservice. A _business topology_ , on the other hand, details the relationships _between_ services. 
 
 Figure 2-2 shows a business topology with three independent microservices and event streams. Note that the business topology does not detail the inner workings of a microservice. 
 
-
 ![](../images/Event-Driven_Microservices-0041-00.png)
-
 
 _Figure 2-2. A simple business topology_ 
 
@@ -53,11 +46,9 @@ An event is a _recording_ of what happened, much like how an application’s inf
 
 Events are typically represented using a key/value format. The value stores the complete details of the event, while the key is used for identification purposes, routing, and aggregation operations on events _with the same key_ . The key is not a required field for all event types. 
 
-
 |**Key**|**Value**|
 |---|---|
 |Unique ID|Details pertaining to the Unique ID|
-
 
 There are three main event types, which will be used throughout this book and which you’ll inevitably encounter in your own domains. 
 
@@ -69,7 +60,6 @@ Unkeyed events are used to describe an event as a singular statement of fact. An
 |---|---|
 |N/A|ISBN: 372719, Timestamp: 1538913600|
 
-
 ### Entity Event
 
 An entity is a _unique thing_ and is keyed on the unique ID of that thing. The entity event describes the properties and state of an entity—most commonly an object in the business context—at a given point in time. For a book publisher, an example could be a book entity, keyed on ISBN. The value field contains all the necessary information related to the unique entity. 
@@ -78,19 +68,16 @@ An entity is a _unique thing_ and is keyed on the unique ID of that thing. The e
 |---|---|---|
 |ISBN:|372719|Author: Adam Bellemare|
 
-
 Entity events are particularly important in event-driven architectures. They provide a continual history of the state of an entity and can be used to materialize state (covered in the next section). Only the latest entity event is needed to determine the current state of an entity. 
 
 ### Keyed Event
 
 A keyed event contains a key but does _not represent an entity_ . Keyed events are usually used for partitioning the stream of events to guarantee data locality within a single partition of an event stream (more on this later in the chapter). An example could be a stream of events, keyed on ISBN, indicating which user has interacted with the book. 
 
-
 |**Key**||**Value**|
 |---|---|---|
 |ISBN:|372719|UserId: A537FE|
 |ISBN:|372719|UserId: BB0012|
-
 
 Note that the events could be aggregated by key such that a list of users can be composed for each ISBN, resulting in a single _entity_ event keyed on ISBN.. 
 
@@ -98,31 +85,23 @@ Note that the events could be aggregated by key such that a list of users can be
 
 You can _materialize_ a stateful table by applying entity events, in order, from an entity event stream. Each entity event is upserted into the key/value table, such that the most recently read event for a given key is represented. Conversely, you can convert a table into a stream of entity events by publishing each update to the event stream. This is known as the _table-stream duality_ , and it is fundamental to the creation of state in an event-driven microservice. This is illustrated in Figure 2-3, where AA and CC both have the newest values in their materialized table. 
 
-
 ![](../images/Event-Driven_Microservices-0043-04.png)
-
 
 _Upserting_ means inserting a new row if it doesn’t already exist in the table, or updating it if it does. 
 
-
 ![](../images/Event-Driven_Microservices-0043-06.png)
-
 
 _Figure 2-3. Materializing an event stream into a table_ 
 
 In the same way, you can have a table record all updates and in doing so produce a stream of data representing the table’s state over time. In the following example, BB is upserted twice, while DD is upserted just once. The output stream in Figure 2-4 shows three upsert events representing these operations. 
 
-
 ![](../images/Event-Driven_Microservices-0044-00.png)
-
 
 _Figure 2-4. Generating an event stream from the changes applied to a table_ 
 
 A relational database table, for instance, is created and populated through a series of data insertion, update, and deletion commands. These commands can be produced as events to an immutable log, such as a local append-only file (like the binary log in MySQL) or an external event stream. By playing back the entire contents of the log, you can exactly reconstruct the table and all of its data contents. 
 
-
 ![](../images/Event-Driven_Microservices-0044-03.png)
-
 
 This table-stream duality is used for communicating state between event-driven microservices. Any consumer client can read an event stream of keyed events and materialize it into its own local state store. This simple yet powerful pattern allows microservices to share state through events alone, without any direct coupling between producer and consumer services. 
 
@@ -130,9 +109,7 @@ The deletion of a keyed event is handled by producing a tombstone. A tombstone i
 
 Append-only immutable logs may grow indefinitely unless they are compacted. Compaction is performed by the event broker to reduce the size of its internal logs by retaining only the most recent event for a given key. Older events of the same key will be deleted, and the remaining events compacted down into a new and smaller set of files. The event stream offsets are maintained such that no changes are required by the consumers. Figure 2-5 illustrates the logical compaction of an event stream in the event broker, including the total deletion of the tombstone record. 
 
-
 ![](../images/Event-Driven_Microservices-0045-00.png)
-
 
 _Figure 2-5. After a compaction, only the most recent record is kept for a given key—all tombstone records and their predecessors of the same key are deleted_ 
 
@@ -144,10 +121,7 @@ Maintaining state for the processing of business logic is an extremely common pa
 
 Event data serves as the means of long term and implementation agnostic data storage, as well as the communication mechanism between services. Therefore, it is important that both the producers and consumers of events have a common understanding of the meaning of the data. Ideally, the consumer must be able to interpret the contents and meaning of an event without having to consult with the owner of the producing service. This requires a common language for communication between producers and consumers and is analogous to an API definition between synchronous request-response services. 
 
-Schematization selections such as Apache Avro and Google’s Protobuf provide two features that are leveraged heavily in event-driven microservices. First, they provide an evolution framework, where certain sets of changes can be safely made to the schemas without requiring downstream consumers to make a code change. Second, they also provide the means to generate typed classes (where applicable) to convert the 
-
-
-schematized data into plain old objects in the language of your choice. This makes the creation of business logic far simpler and more transparent in the development of microservices. Chapter 3 covers these topics in greater detail. 
+Schematization selections such as Apache Avro and Google’s Protobuf provide two features that are leveraged heavily in event-driven microservices. First, they provide an evolution framework, where certain sets of changes can be safely made to the schemas without requiring downstream consumers to make a code change. Second, they also provide the means to generate typed classes (where applicable) to convert the schematized data into plain old objects in the language of your choice. This makes the creation of business logic far simpler and more transparent in the development of microservices. Chapter 3 covers these topics in greater detail. 
 
 ## Microservice Single Writer Principle
 
@@ -174,7 +148,6 @@ A cluster of event broker nodes enables clients to connect to other nodes in the
 **High-performance** 
 
 Multiple broker nodes share the production and consumption load. In addition, each broker node must be highly performant to be able to handle hundreds of thousands of writes or reads per second. 
-
 
 Though there are different ways in which event data can be stored, replicated, and accessed behind the scenes of an event broker, they all generally provide the same mechanisms of storage and access to their clients. 
 
@@ -205,7 +178,6 @@ Event streams must be able to retain events for an infinite period of time. This
 **Replayability** 
 
 Event streams must be replayable, such that any consumer can read whatever data it requires. This provides the basis for the single source of truth and is foundational for communicating state between microservices. 
-
 
 ### Additional Factors to Consider
 
@@ -247,7 +219,6 @@ There are multiple event broker implementations to select from, each of which ha
 
 - Are you using commonly used frameworks or trying to roll your own? 
 
-
 **Community support** 
 
 Community support is an extremely important aspect of selecting an event broker. An open source and freely available project, such as Apache Kafka, is a particularly good example of an event broker with large community support. 
@@ -278,14 +249,9 @@ I have found that people may be confused about what constitutes a message broker
 
 Message brokers have a long history and have been used in large-scale messageoriented middleware architectures by numerous organizations. Message brokers enable systems to communicate across a network through publish/subscribe message queues. Producers write messages to a queue, while a consumer consumes these messages and processes them accordingly. Messages are then acknowledged as consumed and deleted either immediately or shortly thereafter. Message brokers are designed to handle a different type of problem than event brokers. 
 
-Event brokers, on the other hand, are designed around providing an ordered log of facts. Event brokers meet two very specific needs that are not satisfied by the message broker. For one, the message broker provides only _queues_ of messages, where the 
-
-
-consumption of the message is handled on a per-queue basis. Applications that share consumption from a queue will each receive only a subset of the records. This makes it impossible to correctly communicate state via events, since each consumer is unable to obtain a full copy of all events. Unlike the message broker, the event broker maintains a single ledger of records and manages individual access via indices, so each independent consumer can access all required events. Additionally, a message broker deletes events after acknowledgment, whereas an event broker retains them for as long as the organization needs. The deletion of the event after consumption makes a message broker insufficient for providing the indefinitely stored, globally accessible, replayable, single source of truth for all applications. 
-
+Event brokers, on the other hand, are designed around providing an ordered log of facts. Event brokers meet two very specific needs that are not satisfied by the message broker. For one, the message broker provides only _queues_ of messages, where the consumption of the message is handled on a per-queue basis. Applications that share consumption from a queue will each receive only a subset of the records. This makes it impossible to correctly communicate state via events, since each consumer is unable to obtain a full copy of all events. Unlike the message broker, the event broker maintains a single ledger of records and manages individual access via indices, so each independent consumer can access all required events. Additionally, a message broker deletes events after acknowledgment, whereas an event broker retains them for as long as the organization needs. The deletion of the event after consumption makes a message broker insufficient for providing the indefinitely stored, globally accessible, replayable, single source of truth for all applications. 
 
 ![](../images/Event-Driven_Microservices-0050-01.png)
-
 
 Event brokers enable an immutable, append-only log of facts that preserves the state of event ordering. The consumer can pick up and reprocess from anywhere in the log at any time. This pattern is essential for enabling event-driven microservices, but it is not available with message brokers. 
 
@@ -299,9 +265,7 @@ Though not a definitive standard, commonly available event brokers use an append
 
 Each consumer is responsible for updating its own pointers to previously read indices within the event stream. This index, known as the _offset_ , is the measurement of the current event from the beginning of the event stream. Offsets permit multiple consumers to consume and track their progress independently of one another, as shown in Figure 2-6. 
 
-
 ![](../images/Event-Driven_Microservices-0051-00.png)
-
 
 _Figure 2-6. Consumer groups and their per-partition offsets_ 
 
@@ -311,17 +275,13 @@ The _consumer group_ allows for multiple consumers to be viewed as the same logi
 
 In queue-based consumption, each event is consumed by one and only one microservice instance. Upon being consumed, that event is marked as “consumed” by the event broker and is no longer provided to any other consumer. Partition counts do not matter when consuming as a queue, as any number of consumer instances can be used for consumption. 
 
-
 ![](../images/Event-Driven_Microservices-0051-05.png)
-
 
 Event order is not maintained when processing from a queue. Parallel consumers consume and process events out of order, while a single consumer may fail to process an event, return it to the queue for processing at a later date, and move on to the next event. 
 
 Queues are not supported by all event brokers. For instance, Apache Pulsar currently supports queues while Apache Kafka does not. Figure 2-7 shows the implementation of a queue using individual offset acknowledgment. 
 
-
 ![](../images/Event-Driven_Microservices-0052-00.png)
-
 
 _Figure 2-7. Consuming from an immutable log as a queue_ 
 
@@ -337,7 +297,6 @@ The adoption of event-driven microservices enables the creation of services that
 
 Managing microservices can become increasingly difficult as the number of services grows. Each microservice requires specific compute resources, data stores, configurations, environment variables, and a whole host of other microservice-specific properties. Each microservice must also be manageable and deployable by the team that owns it. Containerization and virtualization, along with their associated management systems, are common ways to achieve this. Both options allow individual teams to customize the requirements of their microservices through a single unit of deployability. 
 
-
 ### Putting Microservices into Containers
 
 Containers, as recently popularized by Docker, isolate applications from one another. Containers leverage the existing host operating system via a shared kernel model. This provides basic separation between containers, while the container itself isolates environment variables, libraries, and other dependencies. Containers provide most of the benefits of a virtual machine (covered next) at a fraction of the cost, with fast startup times and low resource overhead. 
@@ -348,9 +307,7 @@ Containers’ shared operating system approach does have some tradeoffs. Contain
 
 Virtual machines (VMs) address some of the shortcomings of containers, though their adoption has been slower. Traditional VMs provide full isolation with a selfcontained OS and virtualized hardware specified for each instance. Although this alternative provides higher security than containers, it has historically been much more expensive. Each VM has higher overhead costs compared to containers, with slower startup times and larger system footprints. 
 
-
 ![](../images/Event-Driven_Microservices-0053-05.png)
-
 
 Efforts are under way to make VMs cheaper and more efficient. Current initiatives include Google’s gVisor, Amazon’s Firecracker, and Kata Containers, to mention just a few. As these technologies improve, VMs will become a much more competitive alternative to containers for your microservice needs. It is worth keeping an eye on this domain should your needs be driven by security-first requirements. 
 
@@ -358,18 +315,13 @@ Efforts are under way to make VMs cheaper and more efficient. Current initiative
 
 Containers and VMs are managed through a variety of purpose-built software known as _container management systems_ (CMSes). These control container deployment, resource allocation, and integration with the underlying compute resources. Popular and commonly used CMSes include Kubernetes, Docker Engine, Mesos Marathon, Amazon ECS, and Nomad. 
 
-Microservices must be able to scale up and down depending on changing workloads, service-level agreements (SLAs), and performance requirements. Vertical scaling must be supported, in which compute resources such as CPU, memory, and disk are 
-
-
-increased or decreased on each microservice instance. Horizontal scaling must also be supported, with new instances added or removed. 
+Microservices must be able to scale up and down depending on changing workloads, service-level agreements (SLAs), and performance requirements. Vertical scaling must be supported, in which compute resources such as CPU, memory, and disk are increased or decreased on each microservice instance. Horizontal scaling must also be supported, with new instances added or removed. 
 
 Each microservice should be deployed as a single unit. For many microservices, a single executable is all that is needed to perform its business requirements, and it can be deployed within a single container. Other microservices may be more complex, with multiple containers and external data stores requiring coordination. This is where something like Kubernetes’s pod concept comes into play, allowing for multiple containers to be deployed and reverted as a single action. Kubernetes also allows for single-run operations; for example, database migrations can be run during the execution of the single deployable. 
 
 VM management is supported by a number of implementations, but is currently more limited than container management. Kubernetes and Docker Engine support Google’s gVisor and Kata Containers, while Amazon’s platform supports AWS Firecracker. The lines between containers and VMs will continue to blur as development continues. Make sure that the CMS you select will handle the containers and VMs that you require of it. 
 
-
 ![](../images/Event-Driven_Microservices-0054-03.png)
-
 
 There are rich sets of resources available for Kubernetes, Docker, Mesos, Amazon ECS, and Nomad. The information they provide goes far beyond what I can present here. I encourage you to look into these materials for more information. 
 
@@ -378,7 +330,6 @@ There are rich sets of resources available for Kubernetes, Docker, Mesos, Amazon
 The _microservice tax_ is the sum of costs, including financial, manpower, and opportunity, associated with implementing the tools and components of a microservice architecture. This includes the cost of managing, deploying, and operating the event broker, CMS, deployment pipelines, monitoring solutions, and logging services. These expenses are unavoidable and are paid either centrally by the organization or independently by each team implementing microservices. The former results in a scalable, simplified, and unified framework for developing microservices, while the latter results in excessive overhead, duplicate solutions, fragmented tooling, and unsustainable growth. 
 
 Paying the microservice tax is not a trivial matter, and it is one of the largest impediments to getting started with EDM. Small organizations would likely do best to stick with an architecture that better suits their business needs, such as a modular monolith. Larger organizations need to account for the total costs of both the implementation and maintenance of a microservice platform and determine if the long-term roadmap of their business can accommodate the predicted work efforts. 
-
 
 Fortunately, both open source and hosted services have become far more available and easy to use in recent years. The microservice tax is being steadily reduced with new integrations between CMSes, event brokers, and other commonly needed tools. Be sure that your organization is prepared to devote the necessary resources to pay these up-front costs. 
 

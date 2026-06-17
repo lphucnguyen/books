@@ -12,4 +12,3 @@ The first four chapters go through the fundamental ideas that apply to all data 
 
 Later, Part II will turn to the particular issues of distributed data systems. 
 
-

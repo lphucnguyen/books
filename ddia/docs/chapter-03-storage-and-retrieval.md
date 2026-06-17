@@ -12,10 +12,7 @@ Why should you, as an application developer, care how the database handles stora
 
 In particular, there is a big difference between storage engines that are optimized for transactional workloads and those that are optimized for analytics. We will explore that distinction later in “Transaction Processing or Analytics?” on page 90, and in “Column-Oriented Storage” on page 95 we’ll discuss a family of storage engines that is optimized for analytics. 
 
-However, first we’ll start this chapter by talking about storage engines that are used in the kinds of databases that you’re probably familiar with: traditional relational databases, and also most so-called NoSQL databases. We will examine two families of 
-
-
-storage engines: _log-structured_ storage engines, and _page-oriented_ storage engines such as B-trees. 
+However, first we’ll start this chapter by talking about storage engines that are used in the kinds of databases that you’re probably familiar with: traditional relational databases, and also most so-called NoSQL databases. We will examine two families of storage engines: _log-structured_ storage engines, and _page-oriented_ storage engines such as B-trees. 
 
 ## Data Structures That Power Your Database
 
@@ -56,12 +53,9 @@ $ cat database
 42,{"name":"San Francisco","attractions":["Exploratorium"]}
 ```
 
-
 Our `db_set` function actually has pretty good performance for something that is so simple, because appending to a file is generally very efficient. Similarly to what `db_set` does, many databases internally use a _log_ , which is an append-only data file. Real databases have more issues to deal with (such as concurrency control, reclaiming disk space so that the log doesn’t grow forever, and handling errors and partially written records), but the basic principle is the same. Logs are incredibly useful, and we will encounter them several times in the rest of this book. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0093-01.png)
-
 
 The word _log_ is often used to refer to application logs, where an application outputs text that describes what’s happening. In this book, _log_ is used in the more general sense: an append-only sequence of records. It doesn’t have to be human-readable; it might be binary and intended only for other programs to read. 
 
@@ -73,7 +67,6 @@ An index is an _additional_ structure that is derived from the primary data. Man
 
 This is an important trade-off in storage systems: well-chosen indexes speed up read queries, but every index slows down writes. For this reason, databases don’t usually index everything by default, but require you—the application developer or database administrator—to choose indexes manually, using your knowledge of the application’s typical query patterns. You can then choose the indexes that give your application the greatest benefit, without introducing more overhead than necessary. 
 
-
 ### Hash Indexes
 
 Let’s start with indexes for key-value data. This is not the only kind of data you can index, but it’s very common, and it’s a useful building block for more complex indexes. 
@@ -82,32 +75,23 @@ Key-value stores are quite similar to the _dictionary_ type that you can find in
 
 Let’s say our data storage consists only of appending to a file, as in the preceding example. Then the simplest possible indexing strategy is this: keep an in-memory hash map where every key is mapped to a byte offset in the data file—the location at which the value can be found, as illustrated in Figure 3-1. Whenever you append a new key-value pair to the file, you also update the hash map to reflect the offset of the data you just wrote (this works both for inserting new keys and for updating existing keys). When you want to look up a value, use the hash map to find the offset in the data file, seek to that location, and read the value. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0094-04.png)
-
 
 _Figure 3-1. Storing a log of key-value pairs in a CSV-like format, indexed with an inmemory hash map._ 
 
-This may sound simplistic, but it is a viable approach. In fact, this is essentially what Bitcask (the default storage engine in Riak) does [3]. Bitcask offers high-performance reads and writes, subject to the requirement that all the keys fit in the available RAM, since the hash map is kept completely in memory. The values can use more space than there is available memory, since they can be loaded from disk with just one disk 
-
-
-seek. If that part of the data file is already in the filesystem cache, a read doesn’t require any disk I/O at all. 
+This may sound simplistic, but it is a viable approach. In fact, this is essentially what Bitcask (the default storage engine in Riak) does [3]. Bitcask offers high-performance reads and writes, subject to the requirement that all the keys fit in the available RAM, since the hash map is kept completely in memory. The values can use more space than there is available memory, since they can be loaded from disk with just one disk seek. If that part of the data file is already in the filesystem cache, a read doesn’t require any disk I/O at all. 
 
 A storage engine like Bitcask is well suited to situations where the value for each key is updated frequently. For example, the key might be the URL of a cat video, and the value might be the number of times it has been played (incremented every time someone hits the play button). In this kind of workload, there are a lot of writes, but there are not too many distinct keys—you have a large number of writes per key, but it’s feasible to keep all keys in memory. 
 
 As described so far, we only ever append to a file—so how do we avoid eventually running out of disk space? A good solution is to break the log into segments of a certain size by closing a segment file when it reaches a certain size, and making subsequent writes to a new segment file. We can then perform _compaction_ on these segments, as illustrated in Figure 3-2. Compaction means throwing away duplicate keys in the log, and keeping only the most recent update for each key. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0095-03.png)
-
 
 _Figure 3-2. Compaction of a key-value update log (counting the number of times each cat video was played), retaining only the most recent value for each key._ 
 
 Moreover, since compaction often makes segments much smaller (assuming that a key is overwritten several times on average within one segment), we can also merge several segments together at the same time as performing the compaction, as shown in Figure 3-3. Segments are never modified after they have been written, so the merged segment is written to a new file. The merging and compaction of frozen segments can be done in a background thread, and while it is going on, we can still continue to serve read and write requests as normal, using the old segment files. After the merging process is complete, we switch read requests to using the new merged segment instead of the old segments—and then the old segment files can simply be deleted. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0096-00.png)
-
 
 _Figure 3-3. Performing compaction and segment merging simultaneously._ 
 
@@ -125,10 +109,7 @@ If you want to delete a key and its associated value, you have to append a speci
 
 **Crash recovery**
 
-If the database is restarted, the in-memory hash maps are lost. In principle, you can restore each segment’s hash map by reading the entire segment file from beginning to end and noting the offset of the most recent value for every key as you go along. However, that might take a long time if the segment files are large, which would make server restarts painful. Bitcask speeds up recovery by storing 
-
-
-a snapshot of each segment’s hash map on disk, which can be loaded into memory more quickly. 
+If the database is restarted, the in-memory hash maps are lost. In principle, you can restore each segment’s hash map by reading the entire segment file from beginning to end and noting the offset of the most recent value for every key as you go along. However, that might take a long time if the segment files are large, which would make server restarts painful. Bitcask speeds up recovery by storing a snapshot of each segment’s hash map on disk, which can be loaded into memory more quickly. 
 
 **Partially written records**
 
@@ -154,7 +135,6 @@ However, the hash table index also has limitations:
 
 In the next section we will look at an indexing structure that doesn’t have those limitations. 
 
-
 ### SSTables and LSM-Trees
 
 In Figure 3-3, each log-structured storage segment is a sequence of key-value pairs. These pairs appear in the order that they were written, and values later in the log take precedence over values for the same key earlier in the log. Apart from that, the order of key-value pairs in the file does not matter. 
@@ -165,20 +145,15 @@ We call this format _Sorted String Table_ , or _SSTable_ for short. We also requ
 
 1. Merging segments is simple and efficient, even if the files are bigger than the available memory. The approach is like the one used in the _mergesort_ algorithm and is illustrated in Figure 3-4: you start reading the input files side by side, look at the first key in each file, copy the lowest key (according to the sort order) to the output file, and repeat. This produces a new merged segment file, also sorted by key. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0098-05.png)
 
-
 _Figure 3-4. Merging several SSTable segments, retaining only the most recent value for each key._ 
-
 
 What if the same key appears in several input segments? Remember that each segment contains all the values written to the database during some period of time. This means that all the values in one input segment must be more recent than all the values in the other segment (assuming that we always merge adjacent segments). When multiple segments contain the same key, we can keep the value from the most recent segment and discard the values in older segments. 
 
 2. In order to find a particular key in the file, you no longer need to keep an index of all the keys in memory. See Figure 3-5 for an example: say you’re looking for the key `handiwork` , but you don’t know the exact offset of that key in the segment file. However, you do know the offsets for the keys _handbag_ and _handsome_ , and because of the sorting you know that _handiwork_ must appear between those two. This means you can jump to the offset for _handbag_ and scan from there until you find _handiwork_ (or not, if the key is not present in the file). 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0099-02.png)
-
 
 _Figure 3-5. An SSTable with an in-memory index._ 
 
@@ -187,7 +162,6 @@ You still need an in-memory index to tell you the offsets for some of the keys, 
 3. Since read requests need to scan over several key-value pairs in the requested range anyway, it is possible to group those records into a block and compress it before writing it to disk (indicated by the shaded area in Figure 3-5). Each entry of the sparse in-memory index then points at the start of a compressed block. Besides saving disk space, compression also reduces the I/O bandwidth use. 
 
 > i. If all keys and values had a fixed size, you could use binary search on a segment file and avoid the inmemory index entirely. However, they are usually variable-length in practice, which makes it difficult to tell where one record ends and the next one starts if you don’t have an index. 
-
 
 **Constructing and maintaining SSTables**
 
@@ -211,10 +185,7 @@ This scheme works very well. It only suffers from one problem: if the database c
 
 The algorithm described here is essentially what is used in LevelDB [6] and RocksDB [7], key-value storage engine libraries that are designed to be embedded into other applications. Among other things, LevelDB can be used in Riak as an alternative to Bitcask. Similar storage engines are used in Cassandra and HBase [8], both of which were inspired by Google’s Bigtable paper [9] (which introduced the terms _SSTable_ and _memtable_ ). 
 
-Originally this indexing structure was described by Patrick O’Neil et al. under the name _Log-Structured Merge-Tree_ (or LSM-Tree) [10], building on earlier work on 
-
-
-log-structured filesystems [11]. Storage engines that are based on this principle of merging and compacting sorted files are often called LSM storage engines. 
+Originally this indexing structure was described by Patrick O’Neil et al. under the name _Log-Structured Merge-Tree_ (or LSM-Tree) [10], building on earlier work on log-structured filesystems [11]. Storage engines that are based on this principle of merging and compacting sorted files are often called LSM storage engines. 
 
 Lucene, an indexing engine for full-text search used by Elasticsearch and Solr, uses a similar method for storing its _term dictionary_ [12, 13]. A full-text index is much more complex than a key-value index but is based on a similar idea: given a word in a search query, find all the documents (web pages, product descriptions, etc.) that mention the word. This is implemented with a key-value structure where the key is a word (a _term_ ) and the value is the list of IDs of all the documents that contain the word (the _postings list_ ). In Lucene, this mapping from term to postings list is kept in SSTable-like sorted files, which are merged in the background as needed [14]. 
 
@@ -230,7 +201,6 @@ Even though there are many subtleties, the basic idea of LSM-trees—keeping a c
 
 The log-structured indexes we have discussed so far are gaining acceptance, but they are not the most common type of index. The most widely used indexing structure is quite different: the _B-tree_ . 
 
-
 Introduced in 1970 [17] and called “ubiquitous” less than 10 years later [18], B-trees have stood the test of time very well. They remain the standard index implementation in almost all relational databases, and many nonrelational databases use them too. 
 
 Like SSTables, B-trees keep key-value pairs sorted by key, which allows efficient keyvalue lookups and range queries. But that’s where the similarity ends: B-trees have a very different design philosophy. 
@@ -239,9 +209,7 @@ The log-structured indexes we saw earlier break the database down into variable-
 
 Each page can be identified using an address or location, which allows one page to refer to another—similar to a pointer, but on disk instead of in memory. We can use these page references to construct a tree of pages, as illustrated in Figure 3-6. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0102-04.png)
-
 
 _Figure 3-6. Looking up a key using a B-tree index._ 
 
@@ -249,23 +217,19 @@ One page is designated as the _root_ of the B-tree; whenever you want to look up
 
 In the example in Figure 3-6, we are looking for the key 251, so we know that we need to follow the page reference between the boundaries 200 and 300. That takes us to a similar-looking page that further breaks down the 200–300 range into subranges. 
 
-
 Eventually we get down to a page containing individual keys (a _leaf page_ ), which either contains the value for each key inline or contains references to the pages where the values can be found. 
 
 The number of references to child pages in one page of the B-tree is called the _branching factor_ . For example, in Figure 3-6 the branching factor is six. In practice, the branching factor depends on the amount of space required to store the page references and the range boundaries, but typically it is several hundred. 
 
 If you want to update the value for an existing key in a B-tree, you search for the leaf page containing that key, change the value in that page, and write the page back to disk (any references to that page remain valid). If you want to add a new key, you need to find the page whose range encompasses the new key and add it to that page. If there isn’t enough free space in the page to accommodate the new key, it is split into two half-full pages, and the parent page is updated to account for the new subdivision of key ranges—see Figure 3-7.[ii] 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0103-03.png)
-
 
 _Figure 3-7. Growing a B-tree by splitting a page._ 
 
 This algorithm ensures that the tree remains _balanced_ : a B-tree with _n_ keys always has a depth of _O_ (log _n_ ). Most databases can fit into a B-tree that is three or four levels deep, so you don’t need to follow many page references to find the page you are looking for. (A four-level tree of 4 KB pages with a branching factor of 500 can store up to 256 TB.) 
 
 ii. Inserting a new key into a B-tree is reasonably intuitive, but deleting one (while keeping the tree balanced) is somewhat more involved [2]. 
-
 
 **Making B-trees reliable**
 
@@ -301,7 +265,6 @@ However, benchmarks are often inconclusive and sensitive to details of the workl
 
 > iii. This variant is sometimes known as a B[+] tree, although the optimization is so common that it often isn’t distinguished from other B-tree variants. 
 
-
 **Advantages of LSM-trees**
 
 A B-tree index must write every piece of data at least twice: once to the write-ahead log, and once to the tree page itself (and perhaps again as pages are split). There is also overhead from having to write an entire page at a time, even if only a few bytes in that page changed. Some storage engines even overwrite the same page twice in order to avoid ending up with a partially updated page in the event of a power failure [24, 25]. 
@@ -318,10 +281,7 @@ On many SSDs, the firmware internally uses a log-structured algorithm to turn ra
 
 **Downsides of LSM-trees**
 
-A downside of log-structured storage is that the compaction process can sometimes interfere with the performance of ongoing reads and writes. Even though storage engines try to perform compaction incrementally and without affecting concurrent 
-
-
-access, disks have limited resources, so it can easily happen that a request needs to wait while the disk finishes an expensive compaction operation. The impact on throughput and average response time is usually small, but at higher percentiles (see “Describing Performance” on page 13) the response time of queries to log-structured storage engines can sometimes be quite high, and B-trees can be more predictable [28]. 
+A downside of log-structured storage is that the compaction process can sometimes interfere with the performance of ongoing reads and writes. Even though storage engines try to perform compaction incrementally and without affecting concurrent access, disks have limited resources, so it can easily happen that a request needs to wait while the disk finishes an expensive compaction operation. The impact on throughput and average response time is usually small, but at higher percentiles (see “Describing Performance” on page 13) the response time of queries to log-structured storage engines can sometimes be quite high, and B-trees can be more predictable [28]. 
 
 Another issue with compaction arises at high write throughput: the disk’s finite write bandwidth needs to be shared between the initial write (logging and flushing a memtable to disk) and the compaction threads running in the background. When writing to an empty database, the full disk bandwidth can be used for the initial write, but the bigger the database gets, the more disk bandwidth is required for compaction. 
 
@@ -335,10 +295,7 @@ B-trees are very ingrained in the architecture of databases and provide consiste
 
 So far we have only discussed key-value indexes, which are like a _primary key_ index in the relational model. A primary key uniquely identifies one row in a relational table, or one document in a document database, or one vertex in a graph database. Other records in the database can refer to that row/document/vertex by its primary key (or ID), and the index is used to resolve such references. 
 
-It is also very common to have _secondary indexes_ . In relational databases, you can create several secondary indexes on the same table using the `CREATE INDEX` com‐ 
-
-
-mand, and they are often crucial for performing joins efficiently. For example, in Figure 2-1 in Chapter 2 you would most likely have a secondary index on the `user_id` columns so that you can find all the rows belonging to the same user in each of the tables. 
+It is also very common to have _secondary indexes_ . In relational databases, you can create several secondary indexes on the same table using the `CREATE INDEX` com‐ mand, and they are often crucial for performing joins efficiently. For example, in Figure 2-1 in Chapter 2 you would most likely have a secondary index on the `user_id` columns so that you can find all the rows belonging to the same user in each of the tables. 
 
 A secondary index can easily be constructed from a key-value index. The main difference is that keys are not unique; i.e., there might be many rows (documents, vertices) with the same key. This can be solved in two ways: either by making each value in the index a list of matching row identifiers (like a postings list in a full-text index) or by making each key unique by appending a row identifier to it. Either way, both B-trees and log-structured indexes can be used as secondary indexes. 
 
@@ -351,7 +308,6 @@ When updating a value without changing the key, the heap file approach can be qu
 In some situations, the extra hop from the index to the heap file is too much of a performance penalty for reads, so it can be desirable to store the indexed row directly within an index. This is known as a _clustered index_ . For example, in MySQL’s InnoDB storage engine, the primary key of a table is always a clustered index, and secondary indexes refer to the primary key (rather than a heap file location) [31]. In SQL Server, you can specify one clustered index per table [32]. 
 
 A compromise between a clustered index (storing all row data within the index) and a nonclustered index (storing only references to the data within the index) is known as a _covering index_ or _index with included columns_ , which stores _some_ of a table’s columns within the index [33]. This allows some queries to be answered by using the index alone (in which case, the index is said to _cover_ the query) [32]. 
-
 
 As with any kind of duplication of data, clustered and covering indexes can speed up reads, but they require additional storage and can add overhead on writes. Databases also need to go to additional effort to enforce transactional guarantees, because applications should not see inconsistencies due to the duplication. 
 
@@ -372,10 +328,7 @@ A standard B-tree or LSM-tree index is not able to answer that kind of query eff
 
 One option is to translate a two-dimensional location into a single number using a space-filling curve, and then to use a regular B-tree index [34]. More commonly, specialized spatial indexes such as R-trees are used. For example, PostGIS implements geospatial indexes as R-trees using PostgreSQL’s Generalized Search Tree indexing facility [35]. We don’t have space to describe R-trees in detail here, but there is plenty of literature on them. 
 
-An interesting idea is that multi-dimensional indexes are not just for geographic locations. For example, on an ecommerce website you could use a three-dimensional index on the dimensions ( _red_ , _green_ , _blue_ ) to search for products in a certain range of colors, or in a database of weather observations you could have a two-dimensional 
-
-
-index on ( _date_ , _temperature_ ) in order to efficiently search for all the observations during the year 2013 where the temperature was between 25 and 30 ℃ . With a onedimensional index, you would have to either scan over all the records from 2013 (regardless of temperature) and then filter them by temperature, or vice versa. A 2D index could narrow down by timestamp and temperature simultaneously. This technique is used by HyperDex [36]. 
+An interesting idea is that multi-dimensional indexes are not just for geographic locations. For example, on an ecommerce website you could use a three-dimensional index on the dimensions ( _red_ , _green_ , _blue_ ) to search for products in a certain range of colors, or in a database of weather observations you could have a two-dimensional index on ( _date_ , _temperature_ ) in order to efficiently search for all the observations during the year 2013 where the temperature was between 25 and 30 ℃ . With a onedimensional index, you would have to either scan over all the records from 2013 (regardless of temperature) and then filter them by temperature, or vice versa. A 2D index could narrow down by timestamp and temperature simultaneously. This technique is used by HyperDex [36]. 
 
 **Full-text search and fuzzy indexes**
 
@@ -403,10 +356,7 @@ Counterintuitively, the performance advantage of in-memory databases is not due 
 
 Besides performance, another interesting area for in-memory databases is providing data models that are difficult to implement with disk-based indexes. For example, Redis offers a database-like interface to various data structures such as priority queues and sets. Because it keeps all data in memory, its implementation is comparatively simple. 
 
-Recent research indicates that an in-memory database architecture could be extended to support datasets larger than the available memory, without bringing back the overheads of a disk-centric architecture [45]. The so-called _anti-caching_ approach works by evicting the least recently used data from memory to disk when there is not enough memory, and loading it back into memory when it is accessed again in the future. This is similar to what operating systems do with virtual memory and swap files, but the database can manage memory more efficiently than the OS, as it can work at the granularity of individual records rather than entire memory pages. This 
-
-
-approach still requires indexes to fit entirely in memory, though (like the Bitcask example at the beginning of the chapter). 
+Recent research indicates that an in-memory database architecture could be extended to support datasets larger than the available memory, without bringing back the overheads of a disk-centric architecture [45]. The so-called _anti-caching_ approach works by evicting the least recently used data from memory to disk when there is not enough memory, and loading it back into memory when it is accessed again in the future. This is similar to what operating systems do with virtual memory and swap files, but the database can manage memory more efficiently than the OS, as it can work at the granularity of individual records rather than entire memory pages. This approach still requires indexes to fit entirely in memory, though (like the Bitcask example at the beginning of the chapter). 
 
 Further changes to storage engine design will probably be needed if _non-volatile memory_ (NVM) technologies become more widely adopted [46]. At present, this is a new area of research, but it is worth keeping an eye on in the future. 
 
@@ -414,9 +364,7 @@ Further changes to storage engine design will probably be needed if _non-volatil
 
 In the early days of business data processing, a write to the database typically corresponded to a _commercial transaction_ taking place: making a sale, placing an order with a supplier, paying an employee’s salary, etc. As databases expanded into areas that didn’t involve money changing hands, the term _transaction_ nevertheless stuck, referring to a group of reads and writes that form a logical unit. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0112-04.png)
-
 
 A transaction needn’t necessarily have ACID (atomicity, consistency, isolation, and durability) properties. _Transaction processing_ just means allowing clients to make low-latency reads and writes— as opposed to _batch processing_ jobs, which only run periodically (for example, once per day). We discuss the ACID properties in Chapter 7 and batch processing in Chapter 10. 
 
@@ -430,7 +378,6 @@ However, databases also started being increasingly used for _data analytics_ , w
 
 - Which brand of baby food is most often purchased together with brand X diapers? 
 
-
 These queries are often written by business analysts, and feed into reports that help the management of a company make better decisions ( _business intelligence_ ). In order to differentiate this pattern of using databases from transaction processing, it has been called _online analytic processing_ (OLAP) [47].[iv] The difference between OLTP and OLAP is not always clear-cut, but some typical characteristics are listed in Table 3-1. 
 
 _Table 3-1. Comparing characteristics of transaction processing versus analytic systems_ 
@@ -442,7 +389,6 @@ _Table 3-1. Comparing characteristics of transaction processing versus analytic 
 |Primarily used by|End user/customer, via web application|Internal analyst, for decision support|
 |What data represents|Latest state of data (current point in time)|History of events that happened over time|
 |Dataset size|Gigabytes to terabytes|Terabytes to petabytes|
-
 
 At first, the same databases were used for both transaction processing and analytic queries. SQL turned out to be quite flexible in this regard: it works well for OLTPtype queries as well as OLAP-type queries. Nevertheless, in the late 1980s and early 1990s, there was a trend for companies to stop using their OLTP systems for analytics purposes, and to run the analytics on a separate database instead. This separate database was called a _data warehouse_ . 
 
@@ -456,19 +402,15 @@ These OLTP systems are usually expected to be highly available and to process tr
 
 **Transaction Processing or Analytics? | 91** 
 
-
 A _data warehouse_ , by contrast, is a separate database that analysts can query to their hearts’ content, without affecting OLTP operations [48]. The data warehouse contains a read-only copy of the data in all the various OLTP systems in the company. Data is extracted from OLTP databases (using either a periodic data dump or a continuous stream of updates), transformed into an analysis-friendly schema, cleaned up, and then loaded into the data warehouse. This process of getting data into the warehouse is known as _Extract–Transform–Load_ (ETL) and is illustrated in Figure 3-8. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0114-01.png)
-
 
 _Figure 3-8. Simplified outline of ETL into a data warehouse._ 
 
 Data warehouses now exist in almost all large enterprises, but in small companies they are almost unheard of. This is probably because most small companies don’t have so many different OLTP systems, and most small companies have a small amount of data—small enough that it can be queried in a conventional SQL database, or even analyzed in a spreadsheet. In a large company, a lot of heavy lifting is required to do something that is simple in a small company. 
 
 A big advantage of using a separate data warehouse, rather than querying OLTP systems directly for analytics, is that the data warehouse can be optimized for analytic access patterns. It turns out that the indexing algorithms discussed in the first half of this chapter work well for OLTP, but are not very good at answering analytic queries. 
-
 
 In the rest of this chapter we will look at storage engines that are optimized for analytics instead. 
 
@@ -490,9 +432,7 @@ The example schema in Figure 3-9 shows a data warehouse that might be found at a
 
 **Transaction Processing or Analytics? | 93** 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0116-00.png)
-
 
 _Figure 3-9. Example of a star schema for use in a data warehouse._ 
 
@@ -500,10 +440,7 @@ Usually, facts are captured as individual events, because this allows maximum fl
 
 Some of the columns in the fact table are attributes, such as the price at which the product was sold and the cost of buying it from the supplier (allowing the profit margin to be calculated). Other columns in the fact table are foreign key references to other tables, called _dimension tables_ . As each row in the fact table represents an event, the dimensions represent the _who_ , _what_ , _where_ , _when_ , _how_ , and _why_ of the event. 
 
-For example, in Figure 3-9, one of the dimensions is the product that was sold. Each row in the `dim_product` table represents one type of product that is for sale, including 
-
-
-its stock-keeping unit (SKU), description, brand name, category, fat content, package size, etc. Each row in the `fact_sales` table uses a foreign key to indicate which product was sold in that particular transaction. (For simplicity, if the customer buys several different products at once, they are represented as separate rows in the fact table.) 
+For example, in Figure 3-9, one of the dimensions is the product that was sold. Each row in the `dim_product` table represents one type of product that is for sale, including its stock-keeping unit (SKU), description, brand name, category, fat content, package size, etc. Each row in the `fact_sales` table uses a foreign key to indicate which product was sold in that particular transaction. (For simplicity, if the customer buys several different products at once, they are represented as separate rows in the fact table.) 
 
 Even date and time are often represented using dimension tables, because this allows additional information about dates (such as public holidays) to be encoded, allowing queries to differentiate between sales on holidays and non-holidays. 
 
@@ -520,7 +457,6 @@ If you have trillions of rows and petabytes of data in your fact tables, storing
 Although fact tables are often over 100 columns wide, a typical data warehouse query only accesses 4 or 5 of them at one time ( `"SELECT *"` queries are rarely needed for analytics) [51]. Take the query in Example 3-1: it accesses a large number of rows (every occurrence of someone buying fruit or candy during the 2013 calendar year), but it only needs to access three columns of the `fact_sales` table: `date_key` , `product_sk` , and `quantity` . The query ignores all other columns. 
 
 **Column-Oriented Storage | 95** 
-
 
 _Example 3-1. Analyzing whether people are more inclined to buy fresh fruit or candy, depending on the day of the week_ 
 
@@ -546,15 +482,11 @@ In order to process a query like Example 3-1, you may have indexes on `fact_sale
 
 The idea behind _column-oriented storage_ is simple: don’t store all the values from one row together, but store all the values from each _column_ together instead. If each column is stored in a separate file, a query only needs to read and parse those columns that are used in that query, which can save a lot of work. This principle is illustrated in Figure 3-10. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0118-06.png)
-
 
 Column storage is easiest to understand in a relational data model, but it applies equally to nonrelational data. For example, Parquet [57] is a columnar storage format that supports a document data model, based on Google’s Dremel [54]. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0119-00.png)
-
 
 _Figure 3-10. Storing relational data by column, rather than by row._ 
 
@@ -568,9 +500,7 @@ Take a look at the sequences of values for each column in Figure 3-10: they ofte
 
 **Column-Oriented Storage | 97** 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0120-00.png)
-
 
 _Figure 3-11. Compressed, bitmap-indexed storage of a single column._ 
 
@@ -586,7 +516,6 @@ WHERE product_sk IN (30, 68, 69):
 
 Load the three bitmaps for `product_sk = 30` , `product_sk = 68` , and `product_sk = 69` , and calculate the bitwise _OR_ of the three bitmaps, which can be done very efficiently. 
 
-
 ```
 WHERE product_sk = 31 AND store_sk = 3:
 ```
@@ -595,9 +524,7 @@ Load the bitmaps for `product_sk = 31` and `store_sk = 3` , and calculate the bi
 
 There are also various other compression schemes for different kinds of data, but we won’t go into them in detail—see [58] for an overview. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0121-03.png)
-
 
 **Column-oriented storage and column families**
 
@@ -615,7 +542,6 @@ In a column store, it doesn’t necessarily matter in which order the rows are s
 
 **Column-Oriented Storage | 99** 
 
-
 Note that it wouldn’t make sense to sort each column independently, because then we would no longer know which items in the columns belong to the same row. We can only reconstruct a row because we know that the _k_ th item in one column belongs to the same row as the _k_ th item in another column. 
 
 Rather, the data needs to be sorted an entire row at a time, even though it is stored by column. The administrator of the database can choose the columns by which the table should be sorted, using their knowledge of common queries. For example, if queries often target date ranges, such as the last month, it might make sense to make `date_key` the first sort key. Then the query optimizer can scan only the rows from the last month, which will be much faster than scanning all rows. 
@@ -631,7 +557,6 @@ That compression effect is strongest on the first sort key. The second and third
 A clever extension of this idea was introduced in C-Store and adopted in the commercial data warehouse Vertica [61, 62]. Different queries benefit from different sort orders, so why not store the same data sorted in _several different_ ways? Data needs to be replicated to multiple machines anyway, so that you don’t lose data if one machine fails. You might as well store that redundant data sorted in different ways so that when you’re processing a query, you can use the version that best fits the query pattern. 
 
 Having multiple sort orders in a column-oriented store is a bit similar to having multiple secondary indexes in a row-oriented store. But the big difference is that the roworiented store keeps every row in one place (in the heap file or a clustered index), and secondary indexes just contain pointers to the matching rows. In a column store, there normally aren’t any pointers to data elsewhere, only columns containing values. 
-
 
 ### Writing to Column-Oriented Storage
 
@@ -653,16 +578,11 @@ One way of creating such a cache is a _materialized view_ . In a relational data
 
 When the underlying data changes, a materialized view needs to be updated, because it is a denormalized copy of the data. The database can do that automatically, but 
 
-**Column-Oriented Storage | 101** 
-
-
-such updates make writes more expensive, which is why materialized views are not often used in OLTP databases. In read-heavy data warehouses they can make more sense (whether or not they actually improve read performance depends on the individual case). 
+**Column-Oriented Storage | 101** such updates make writes more expensive, which is why materialized views are not often used in OLTP databases. In read-heavy data warehouses they can make more sense (whether or not they actually improve read performance depends on the individual case). 
 
 A common special case of a materialized view is known as a _data cube_ or _OLAP cube_ [64]. It is a grid of aggregates grouped by different dimensions. Figure 3-12 shows an example. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0124-02.png)
-
 
 _Figure 3-12. Two dimensions of a data cube, aggregating data by summing._ 
 
@@ -670,10 +590,7 @@ Imagine for now that each fact has foreign keys to only two dimension tables—i
 
 In general, facts often have more than two dimensions. In Figure 3-9 there are five dimensions: date, product, store, promotion, and customer. It’s a lot harder to imagine what a five-dimensional hypercube would look like, but the principle remains the same: each cell contains the sales for a particular date-product-store-promotioncustomer combination. These values can then repeatedly be summarized along each of the dimensions. 
 
-The advantage of a materialized data cube is that certain queries become very fast because they have effectively been precomputed. For example, if you want to know 
-
-
-the total sales per store yesterday, you just need to look at the totals along the appropriate dimension—no need to scan millions of rows. 
+The advantage of a materialized data cube is that certain queries become very fast because they have effectively been precomputed. For example, if you want to know the total sales per store yesterday, you just need to look at the totals along the appropriate dimension—no need to scan millions of rows. 
 
 The disadvantage is that a data cube doesn’t have the same flexibility as querying the raw data. For example, there is no way of calculating which proportion of sales comes from items that cost more than $100, because the price isn’t one of the dimensions. Most data warehouses therefore try to keep as much raw data as possible, and use aggregates such as data cubes only as a performance boost for certain queries. 
 
@@ -694,7 +611,6 @@ On the OLTP side, we saw storage engines from two main schools of thought:
 - The update-in-place school, which treats the disk as a set of fixed-size pages that can be overwritten. B-trees are the biggest example of this philosophy, being used in all major relational databases and also many nonrelational ones. 
 
 Log-structured storage engines are a comparatively recent development. Their key idea is that they systematically turn random-access writes into sequential writes on disk, which enables higher write throughput due to the performance characteristics of hard drives and SSDs. 
-
 
 Finishing off the OLTP side, we did a brief tour through some more complicated indexing structures, and databases that are optimized for keeping all data in memory. 
 
@@ -721,7 +637,6 @@ Although this chapter couldn’t make you an expert in tuning any one particular
 [7] Dhruba Borthakur: “The History of RocksDB,” _rocksdb.blogspot.com_ , November 24, 2013. 
 
 [8] Matteo Bertozzi: “Apache HBase I/O – HFile,” _blog.cloudera.com_ , June, 29 2012. 
-
 
 [9] Fay Chang, Jeffrey Dean, Sanjay Ghemawat, et al.: “Bigtable: A Distributed Storage System for Structured Data,” at _7th USENIX Symposium on Operating System Design and Implementation_ (OSDI), November 2006. 
 
@@ -752,7 +667,6 @@ Although this chapter couldn’t make you an expert in tuning any one particular
 [22] Bradley C. Kuszmaul: “A Comparison of Fractal Trees to Log-Structured Merge (LSM) Trees,” _tokutek.com_ , April 22, 2014. 
 
 [23] Manos Athanassoulis, Michael S. Kester, Lukas M. Maas, et al.: “Designing Access Methods: The RUM Conjecture,” at _19th International Conference on Extending Database Technology_ (EDBT), March 2016. doi:10.5441/002/edbt.2016.42 
-
 
 [24] Peter Zaitsev: “Innodb Double Write,” _percona.com_ , August 4, 2006. 
 
@@ -788,7 +702,6 @@ Although this chapter couldn’t make you an expert in tuning any one particular
 
 [40] Christopher D. Manning, Prabhakar Raghavan, and Hinrich Schütze: _Introduction to Information Retrieval_ . Cambridge University Press, 2008. ISBN: 978-0-521-86571-5, available online at _nlp.stanford.edu/IR-book_ 
 
-
 [41] Michael Stonebraker, Samuel Madden, Daniel J. Abadi, et al.: “The End of an Architectural Era (It’s Time for a Complete Rewrite),” at _33rd International Conference on Very Large Data Bases_ (VLDB), September 2007. 
 
 [42] “VoltDB Technical Overview White Paper,” VoltDB, 2014. 
@@ -815,7 +728,6 @@ Although this chapter couldn’t make you an expert in tuning any one particular
 
 [53] Marcel Kornacker, Alexander Behm, Victor Bittorf, et al.: “Impala: A Modern, Open-Source SQL Engine for Hadoop,” at _7th Biennial Conference on Innovative Data Systems Research_ (CIDR), January 2015. 
 
-
 [54] Sergey Melnik, Andrey Gubarev, Jing Jing Long, et al.: “Dremel: Interactive Analysis of Web-Scale Datasets,” at _36th International Conference on Very Large Data Bases_ (VLDB), pages 330–339, September 2010. 
 
 [55] Ralph Kimball and Margy Ross: _The Data Warehouse Toolkit: The Definitive Guide to Dimensional Modeling_ , 3rd edition. John Wiley & Sons, July 2013. ISBN: 978-1-118-53080-1 
@@ -837,5 +749,4 @@ Although this chapter couldn’t make you an expert in tuning any one particular
 [63] Julien Le Dem and Nong Li: “Efficient Data Storage for Analytics with Apache Parquet 2.0,” at _Hadoop Summit_ , San Jose, June 2014. 
 
 [64] Jim Gray, Surajit Chaudhuri, Adam Bosworth, et al.: “Data Cube: A Relational Aggregation Operator Generalizing Group-By, Cross-Tab, and Sub-Totals,” _Data Mining and Knowledge Discovery_ , volume 1, number 1, pages 29–53, March 2007. doi:10.1023/A:1009726021843 
-
 

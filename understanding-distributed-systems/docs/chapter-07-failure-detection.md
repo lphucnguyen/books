@@ -10,12 +10,7 @@ The tricky part is deciding how long to wait for the timeout to trigger. If the 
 
 But a process doesn’t need to wait to send a message to find out that the destination is not reachable. It can also proactively try to maintain a list of available processes using pings or heartbeats. 
 
-
-62 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0080-02.png)
-
 
 Figure 7.1: The client can’t tell whether the server is slow, it crashed or a message was delayed/dropped because of a network issue. 
 
@@ -24,5 +19,4 @@ A _ping_ is a periodic request that a process sends to another to check whether 
 A _heartbeat_ is a message that a process periodically sends to another. If the destination doesn’t receive a heartbeat within a specific time frame, it triggers a timeout and considers the process unavailable. But if the process comes back to life later and starts sending out heartbeats, it will eventually be considered to be available again. 
 
 Pings and heartbeats are generally used for processes that interact with each other frequently, in situations where an action needs to be taken as soon as one of them is no longer reachable. In other circumstances, detecting failures just at communication time is good enough. 
-
 

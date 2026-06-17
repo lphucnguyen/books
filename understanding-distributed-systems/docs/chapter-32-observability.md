@@ -6,10 +6,7 @@ A distributed system is never 100% healthy since, at any given time, there is al
 
 As discussed earlier, human operators are still a fundamental part of operating a service as there are things that can’t be automated, like debugging the root cause of a failure. When debugging, the operator makes a hypothesis and tries to validate it. For example, the operator might get suspicious after noticing that the variance of their service’s response time has increased slowly but steadily over the past weeks, indicating that some requests take much longer than others. After correlating the increase in variance with an increase in traffic, the operator hypothesizes that the service is getting closer to hitting a constraint, like a resource limit. But metrics and charts alone won’t help to validate this hypothesis. 
 
-Observability is a set of tools that provide granular insights into a system in production, allowing one to understand its emergent 
-
-
-316 behaviors. A good observability platform strives to minimize the time it takes to validate hypotheses. This requires granular events with rich contexts since it’s impossible to know up front what will be useful in the future. 
+Observability is a set of tools that provide granular insights into a system in production, allowing one to understand its emergent behaviors. A good observability platform strives to minimize the time it takes to validate hypotheses. This requires granular events with rich contexts since it’s impossible to know up front what will be useful in the future. 
 
 At the core of observability, we find telemetry sources like _metrics_ , _event logs_ , and _traces_ . Metrics are stored in time-series data stores that have high throughput but struggle with high dimensionality. Conversely, event logs and traces end up in stores that can handle high-dimensional data[1] but struggle with high throughput. Metrics are mainly used for monitoring, while event logs and traces are mainly for debugging. 
 
@@ -29,14 +26,11 @@ A _log_ is an immutable list of time-stamped events that happened over time. An 
 
 # Logs can originate from our services or external dependencies, like 
 
-> 1Azure Data Explorer is one such event store, see “Azure Data Explorer: a big data analytics cloud platform optimized for interactive, adhoc queries over structured, semi-structured and unstructured data,” https://azure.microsoft.com/me diahandler/files/resourcefiles/azure-data-explorer/Azure_Data_Explorer_whi te_paper.pdf 
+> 1Azure Data Explorer is one such event store, see “Azure Data Explorer: a big data analytics cloud platform optimized for interactive, adhoc queries over structured, semi-structured and unstructured data,” https://azure.microsoft.com/me
 
-
-317 
-
+diahandler/files/resourcefiles/azure-data-explorer/Azure_Data_Explorer_whi te_paper.pdf 
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0335-02.png)
-
 
 Figure 32.1: Observability is a superset of monitoring. message brokers, proxies, data stores, etc. Most languages offer libraries that make it easy to emit structured logs. Logs are typically dumped to disk files, which are sent by an agent to an external log collector asynchronously, like an ELK stack[2] or AWS CloudWatch logs. 
 
@@ -44,10 +38,7 @@ Logs provide a wealth of information about everything that’s happening in a se
 
 Logs are simple to emit, particularly so free-form textual ones. But that’s pretty much the only advantage they have compared to metrics and other telemetry data. Logging libraries can add overhead to our services if misused, especially when they are not asynchronous and block while writing to disk. Also, if the disk fills up due to excessive logging, at best we lose logs, and at worst, 
 
-2“What is the ELK Stack?,” https://www.elastic.co/what-is/elk-stack 
-
-
-318 the service instance stops working correctly. 
+2“What is the ELK Stack?,” https://www.elastic.co/what-is/elk-stack the service instance stops working correctly. 
 
 Ingesting, processing, and storing massive troves of data is not cheap either, no matter whether we plan to do this in-house or use a third-party service. Although structured binary logs are more efficient than textual ones, they are still expensive due to their high dimensionality. 
 
@@ -75,16 +66,11 @@ Of course, we can always decide to create in-memory aggregates (e.g., metrics) f
 
 Tracing captures the entire lifespan of a request as it propagates throughout the services of a distributed system. A _trace_ is a list of causally-related spans that represent the execution flow of a request in a system. A _span_ represents an interval of time that maps to a logical operation or work unit and contains a bag of key-value pairs (see Figure 32.2). 
 
-When a request begins, it’s assigned a unique trace ID. The trace ID is propagated from one stage to another at every fork in the local execution flow from one thread to another, and from caller to callee in a network call (through HTTP headers, for example). 
+When a request begins, it’s assigned a unique trace ID. The trace ID is propagated from one stage to another at every fork in the local execution flow from one thread to another, and from caller to callee in a network call (through HTTP headers, for example).mic-sampling-by-example/
 
-> 3“Dynamic Sampling by Example,” https://www.honeycomb.io/blog/dyna mic-sampling-by-example/ 
-
-
-320 
-
+> 3“Dynamic Sampling by Example,” https://www.honeycomb.io/blog/dyna
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0338-02.png)
-
 
 Figure 32.2: An execution flow can be represented with spans. 
 
@@ -102,14 +88,11 @@ Traces allow developers to:
 
 - identify bottlenecks in the end-to-end request path; 
 
-- identify which users hit which downstream services and 
+- identify which users hit which downstream services and in what proportion (also referred to as _resource attribution_ ), which can be used for rate-limiting or billing purposes.
 
 > 4“Zipkin: a distributed tracing system,” https://zipkin.io/ 
 
-> 5“AWS X-Ray,” https://aws.amazon.com/xray/ 
-
-
-321 in what proportion (also referred to as _resource attribution_ ), which can be used for rate-limiting or billing purposes. 
+> 5“AWS X-Ray,” https://aws.amazon.com/xray/
 
 Tracing is challenging to retrofit into an existing system since it requires every component in the request path to be modified to propagate the trace context from one stage to the other. And it’s not just the components that are under our control that need to support tracing; third-party frameworks, libraries, and services need to as well.[6] . 
 
@@ -121,6 +104,5 @@ This is where metrics and traces come in. We can think of them as abstractions, 
 
 Similarly, a trace can be derived by aggregating all events belonging to the lifecycle of a specific user request into an ordered list. Just like in the previous case, we can emit individual span events and have the backend aggregate them together into traces. 
 
-6The service mesh pattern can help retrofit tracing. 
-
+> 6The service mesh pattern can help retrofit tracing. 
 

@@ -5,9 +5,7 @@ _Clearly, we must break away from the sequential and not limit the computers. We
 —Grace Murray Hopper, _Management and the Computer of the Future_ (1962) 
 In Chapter 5 we discussed replication—that is, having multiple copies of the same data on different nodes. For very large datasets, or very high query throughput, that is not sufficient: we need to break the data up into _partitions_ , also known as _sharding_ .[i] 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0221-04.png)
-
 
 **Terminological confusion**
 
@@ -18,7 +16,6 @@ Normally, partitions are defined in such a way that each piece of data (each rec
 The main reason for wanting to partition data is _scalability_ . Different partitions can be placed on different nodes in a shared-nothing cluster (see the introduction to 
 
 > i. Partitioning, as discussed in this chapter, is a way of intentionally breaking a large database down into smaller ones. It has nothing to do with _network partitions_ (netsplits), a type of fault in the network between nodes. We will discuss such faults in Chapter 8. 
-
 
 Part II for a definition of _shared nothing_ ). Thus, a large dataset can be distributed across many disks, and the query load can be distributed across many processors. 
 
@@ -36,9 +33,7 @@ A node may store more than one partition. If a leader–follower replication mod
 
 Everything we discussed in Chapter 5 about replication of databases applies equally to replication of partitions. The choice of partitioning scheme is mostly independent of the choice of replication scheme, so we will keep things simple and ignore replication in this chapter. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0223-00.png)
-
 
 _Figure 6-1. Combining replication and partitioning: each node acts as leader for some partitions and follower for other partitions._ 
 
@@ -56,14 +51,11 @@ We can do better. Let’s assume for now that you have a simple key-value data m
 
 **Partitioning of Key-Value Data | 201** 
 
-
 ### Partitioning by Key Range
 
 One way of partitioning is to assign a continuous range of keys (from some minimum to some maximum) to each partition, like the volumes of a paper encyclopedia (Figure 6-2). If you know the boundaries between the ranges, you can easily determine which partition contains a given key. If you also know which partition is assigned to which node, then you can make your request directly to the appropriate node (or, in the case of the encyclopedia, pick the correct book off the shelf). 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0224-02.png)
-
 
 _Figure 6-2. A print encyclopedia is partitioned by key range._ 
 
@@ -72,7 +64,6 @@ The ranges of keys are not necessarily evenly spaced, because your data may not 
 The partition boundaries might be chosen manually by an administrator, or the database can choose them automatically (we will discuss choices of partition boundaries in more detail in “Rebalancing Partitions” on page 209). This partitioning strategy is used by Bigtable, its open source equivalent HBase [2, 3], RethinkDB, and MongoDB before version 2.4 [4]. 
 
 Within each partition, we can keep keys in sorted order (see “SSTables and LSMTrees” on page 76). This has the advantage that range scans are easy, and you can treat the key as a concatenated index in order to fetch several related records in one query (see “Multi-column indexes” on page 87). For example, consider an application that stores data from a network of sensors, where the key is the timestamp of the measurement ( _year-month-day-hour-minute-second_ ). Range scans are very useful in this case, because they let you easily fetch, say, all the readings from a particular month. 
-
 
 However, the downside of key range partitioning is that certain access patterns can lead to hot spots. If the key is a timestamp, then the partitions correspond to ranges of time—e.g., one partition per day. Unfortunately, because we write data from the sensors to the database as the measurements happen, all the writes end up going to the same partition (the one for today), so that partition can be overloaded with writes while others sit idle [5]. 
 
@@ -90,9 +81,7 @@ Once you have a suitable hash function for keys, you can assign each partition a
 
 **Partitioning of Key-Value Data | 203** 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0226-00.png)
-
 
 _Figure 6-3. Partitioning by hash of key._ 
 
@@ -106,10 +95,7 @@ As we shall see in “Rebalancing Partitions” on page 209, this particular app
 
 Unfortunately however, by using the hash of the key for partitioning we lose a nice property of key-range partitioning: the ability to do efficient range queries. Keys that were once adjacent are now scattered across all the partitions, so their sort order is lost. In MongoDB, if you have enabled hash-based sharding mode, any range query has to be sent to all partitions [4]. Range queries on the primary key are not supported by Riak [9], Couchbase [10], or Voldemort. 
 
-Cassandra achieves a compromise between the two partitioning strategies [11, 12, 13]. A table in Cassandra can be declared with a _compound primary key_ consisting of several columns. Only the first part of that key is hashed to determine the partition, but the other columns are used as a concatenated index for sorting the data in Cassandra’s SSTables. A query therefore cannot search for a range of values within the 
-
-
-first column of a compound key, but if it specifies a fixed value for the first column, it can perform an efficient range scan over the other columns of the key. 
+Cassandra achieves a compromise between the two partitioning strategies [11, 12, 13]. A table in Cassandra can be declared with a _compound primary key_ consisting of several columns. Only the first part of that key is hashed to determine the partition, but the other columns are used as a concatenated index for sorting the data in Cassandra’s SSTables. A query therefore cannot search for a range of values within the first column of a compound key, but if it specifies a fixed value for the first column, it can perform an efficient range scan over the other columns of the key. 
 
 The concatenated index approach enables an elegant data model for one-to-many relationships. For example, on a social media site, one user may post many updates. If the primary key for updates is chosen to be `(user_id, update_timestamp)` , then you can efficiently retrieve all updates made by a particular user within some time interval, sorted by timestamp. Different users may be stored on different partitions, but within each user, the updates are stored ordered by timestamp on a single partition. 
 
@@ -126,7 +112,6 @@ However, having split the writes across different keys, any reads now have to do
 Perhaps in the future, data systems will be able to automatically detect and compensate for skewed workloads; but for now, you need to think through the trade-offs for your own application. 
 
 **Partitioning of Key-Value Data | 205** 
-
 
 ## Partitioning and Secondary Indexes
 
@@ -146,9 +131,7 @@ You want to let users search for cars, allowing them to filter by color and by m
 
 > ii. If your database only supports a key-value model, you might be tempted to implement a secondary index yourself by creating a mapping from values to document IDs in application code. If you go down this route, you need to take great care to ensure your indexes remain consistent with the underlying data. Race conditions and intermittent write failures (where some changes were saved but others weren’t) can very easily cause the data to go out of sync—see “The need for multi-object transactions” on page 231. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0229-00.png)
-
 
 _Figure 6-4. Partitioning secondary indexes by document._ 
 
@@ -158,9 +141,7 @@ However, reading from a document-partitioned index requires care: unless you hav
 
 This approach to querying a partitioned database is sometimes known as _scatter/ gather_ , and it can make read queries on secondary indexes quite expensive. Even if you query the partitions in parallel, scatter/gather is prone to tail latency amplification (see “Percentiles in Practice” on page 16). Nevertheless, it is widely used: MongoDB, Riak [15], Cassandra [16], Elasticsearch [17], SolrCloud [18], and VoltDB [19] all use document-partitioned secondary indexes. Most database vendors recommend that you structure your partitioning scheme so that secondary index queries can be served from a single partition, but that is not always possible, especially when you’re using multiple secondary indexes in a single query (such as filtering cars by color and by make at the same time). 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0230-00.png)
-
 
 _Figure 6-5. Partitioning secondary indexes by term._ 
 
@@ -174,10 +155,7 @@ We call this kind of index _term-partitioned_ , because the term we’re looking
 
 As before, we can partition the index by the term itself, or using a hash of the term. Partitioning by the term itself can be useful for range scans (e.g., on a numeric property, such as the asking price of the car), whereas partitioning on a hash of the term gives a more even distribution of load. 
 
-The advantage of a global (term-partitioned) index over a document-partitioned index is that it can make reads more efficient: rather than doing scatter/gather over all partitions, a client only needs to make a request to the partition containing the term that it wants. However, the downside of a global index is that writes are slower and more complicated, because a write to a single document may now affect multiple 
-
-
-partitions of the index (every term in the document might be on a different partition, on a different node). 
+The advantage of a global (term-partitioned) index over a document-partitioned index is that it can make reads more efficient: rather than doing scatter/gather over all partitions, a client only needs to make a request to the partition containing the term that it wants. However, the downside of a global index is that writes are slower and more complicated, because a write to a single document may now affect multiple partitions of the index (every term in the document might be on a different partition, on a different node). 
 
 In an ideal world, the index would always be up to date, and every document written to the database would immediately be reflected in the index. However, in a termpartitioned index, that would require a distributed transaction across all partitions affected by a write, which is not supported in all databases (see Chapter 7 and Chapter 9). 
 
@@ -205,7 +183,6 @@ No matter which partitioning scheme is used, rebalancing is usually expected to 
 
 - No more data than necessary should be moved between nodes, to make rebalancing fast and to minimize the network and disk I/O load. 
 
-
 ### Strategies for Rebalancing
 
 There are a few different ways of assigning partitions to nodes [23]. Let’s briefly discuss each in turn. 
@@ -228,9 +205,7 @@ Now, if a node is added to the cluster, the new node can _steal_ a few partition
 
 Only entire partitions are moved between nodes. The number of partitions does not change, nor does the assignment of keys to partitions. The only thing that changes is the assignment of partitions to nodes. This change of assignment is not immediate— it takes some time to transfer a large amount of data over the network—so the old assignment of partitions is used for any reads and writes that happen while the transfer is in progress. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0233-00.png)
-
 
 _Figure 6-6. Adding a new node to a database cluster with multiple partitions per node._ 
 
@@ -241,7 +216,6 @@ This approach to rebalancing is used in Riak [15], Elasticsearch [24], Couchbase
 In this configuration, the number of partitions is usually fixed when the database is first set up and not changed afterward. Although in principle it’s possible to split and merge partitions (see the next section), a fixed number of partitions is operationally simpler, and so many fixed-partition databases choose not to implement partition splitting. Thus, the number of partitions configured at the outset is the maximum number of nodes you can have, so you need to choose it high enough to accommodate future growth. However, each partition also has management overhead, so it’s counterproductive to choose too high a number. 
 
 Choosing the right number of partitions is difficult if the total size of the dataset is highly variable (for example, if it starts small but may grow much larger over time). Since each partition contains a fixed fraction of the total data, the size of each partition grows proportionally to the total amount of data in the cluster. If partitions are very large, rebalancing and recovery from node failures become expensive. But if partitions are too small, they incur too much overhead. The best performance is achieved when the size of partitions is “just right,” neither too big nor too small, which can be hard to achieve if the number of partitions is fixed but the dataset size varies. 
-
 
 **Dynamic partitioning**
 
@@ -275,7 +249,6 @@ There is a gradient between fully automatic rebalancing (the system decides auto
 
 Fully automated rebalancing can be convenient, because there is less operational work to do for normal maintenance. However, it can be unpredictable. Rebalancing is an expensive operation, because it requires rerouting requests and moving a large amount of data from one node to another. If it is not done carefully, this process can overload the network or the nodes and harm the performance of other requests while the rebalancing is in progress. 
 
-
 Such automation can be dangerous in combination with automatic failure detection. For example, say one node is overloaded and is temporarily slow to respond to requests. The other nodes conclude that the overloaded node is dead, and automatically rebalance the cluster to move load away from it. This puts additional load on the overloaded node, other nodes, and the network—making the situation worse and potentially causing a cascading failure. 
 
 For that reason, it can be a good thing to have a human in the loop for rebalancing. It’s slower than a fully automatic process, but it can help prevent operational surprises. 
@@ -296,9 +269,7 @@ On a high level, there are a few different approaches to this problem (illustrat
 
 In all cases, the key problem is: how does the component making the routing decision (which may be one of the nodes, or the routing tier, or the client) learn about changes in the assignment of partitions to nodes? 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0237-00.png)
-
 
 _Figure 6-7. Three different ways of routing a request to the right node._ 
 
@@ -306,12 +277,9 @@ This is a challenging problem, because it is important that all participants agr
 
 Many distributed data systems rely on a separate coordination service such as ZooKeeper to keep track of this cluster metadata, as illustrated in Figure 6-8. Each node registers itself in ZooKeeper, and ZooKeeper maintains the authoritative mapping of partitions to nodes. Other actors, such as the routing tier or the partitioning-aware client, can subscribe to this information in ZooKeeper. Whenever a partition changes ownership, or a node is added or removed, ZooKeeper notifies the routing tier so that it can keep its routing information up to date. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0237-04.png)
 
-
 _Figure 6-8. Using ZooKeeper to keep track of assignment of partitions to nodes._ 
-
 
 For example, LinkedIn’s Espresso uses Helix [31] for cluster management (which in turn relies on ZooKeeper), implementing a routing tier as shown in Figure 6-8. HBase, SolrCloud, and Kafka also use ZooKeeper to track partition assignment. MongoDB has a similar architecture, but it relies on its own _config server_ implementation and _mongos_ daemons as the routing tier. 
 
@@ -355,10 +323,7 @@ We also discussed the interaction between partitioning and secondary indexes. A 
 
 Finally, we discussed techniques for routing queries to the appropriate partition, which range from simple partition-aware load balancing to sophisticated parallel query execution engines. 
 
-By design, every partition operates mostly independently—that’s what allows a partitioned database to scale to multiple machines. However, operations that need to write 
-
-
-to several partitions can be difficult to reason about: for example, what happens if the write to one partition succeeds, but another fails? We will address that question in the following chapters. 
+By design, every partition operates mostly independently—that’s what allows a partitioned database to scale to multiple machines. However, operations that need to write to several partitions can be difficult to reason about: for example, what happens if the write to one partition succeeds, but another fails? We will address that question in the following chapters. 
 
 **References**
 
@@ -391,7 +356,6 @@ to several partitions can be difficult to reason about: for example, what happen
 [14] Samuel Axon: “3% of Twitter’s Servers Dedicated to Justin Bieber,” _mashable.com_ , September 7, 2010. 
 
 [15] “Riak 1.4.8 Docs,” Basho Technologies, Inc., 2014. 
-
 
 [16] Richard Low: “The Sweet Spot for Cassandra Secondary Indexing,” _wentnet.com_ , October 21, 2013. 
 

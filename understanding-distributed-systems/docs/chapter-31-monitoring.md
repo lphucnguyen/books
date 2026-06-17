@@ -6,14 +6,9 @@ Monitoring is primarily used to detect failures that impact users in production 
 
 In the early days, monitoring was used mostly to report whether a service was up, without much visibility of what was going on inside (black-box monitoring). In time, developers also started to instrument their applications to report whether specific features worked as expected (white-box monitoring). This was popularized with the introduction of statsd[1] by Etsy, which normalized collecting application-level measurements. While black-box monitoring is useful for detecting the symptoms of a failure, white-box monitoring can help identify the root cause. 
 
-The main use case for black-box monitoring is to monitor external dependencies, such as third-party APIs, and validate how users perceive the performance and health of a service from the outside. A common black-box approach is to periodically run scripts ( _syn-_ 
+The main use case for black-box monitoring is to monitor external dependencies, such as third-party APIs, and validate how users perceive the performance and health of a service from the outside. A common black-box approach is to periodically run scripts ( _synthetics_[2] ) that send test requests to external API endpoints and monitor how long they took and whether they were successful. Synthetics are deployed in the same regions the application’s users are and hit the same endpoints they do. Because they exercise the system’s public surface from the outside, they can catch issues that aren’t visible from within the application, like connectivity problems. Synthetics are also useful for detecting issues with APIs that aren’t exercised often by users. 
 
 > 1“Measure Anything, Measure Everything,” https://codeascraft.com/2011/0 2/15/measure-anything-measure-everything/ 
-
-
-298 
-
-_thetics_[2] ) that send test requests to external API endpoints and monitor how long they took and whether they were successful. Synthetics are deployed in the same regions the application’s users are and hit the same endpoints they do. Because they exercise the system’s public surface from the outside, they can catch issues that aren’t visible from within the application, like connectivity problems. Synthetics are also useful for detecting issues with APIs that aren’t exercised often by users. 
 
 For example, if the DNS server of a service were down, the issue would be visible to synthetics, since they wouldn’t be able to resolve its IP address. However, the service itself would think everything was fine, and it was just getting fewer requests than usual. 
 
@@ -23,12 +18,9 @@ A _metric_ is a time series of raw measurements (samples) of resource usage (e.g
 
 Commonly, a metric can also be tagged with a set of key-value pairs ( _labels_ ). For example, the label could represent the region, data center, cluster, or node where the service is running. Labels make it easy to slice and dice the data and eliminate the instrumentation cost of manually creating a metric for each label combination. However, because every distinct combination of labels is a different metric, tagging generates a large number of metrics, making them challenging to store and process. 
 
-At the very least, a service should emit metrics about its load (e.g., request throughput), its internal state (e.g., in-memory cache size), and its dependencies’ availability and performance (e.g., data store response time). Combined with the metrics emitted by downstream services, this allows operators to identify problems quickly. But this requires explicit code changes and a deliberate 
+At the very least, a service should emit metrics about its load (e.g., request throughput), its internal state (e.g., in-memory cache size), and its dependencies’ availability and performance (e.g., data store response time). Combined with the metrics emitted by downstream services, this allows operators to identify problems quickly. But this requires explicit code changes and a deliberateeffort by developers to instrument their code.
 
-> 2“Using synthetic monitoring,” https://docs.aws.amazon.com/AmazonClou dWatch/latest/monitoring/CloudWatch_Synthetics_Canaries.html 
-
-
-299 effort by developers to instrument their code. 
+> 2“Using synthetic monitoring,” https://docs.aws.amazon.com/AmazonClou dWatch/latest/monitoring/CloudWatch_Synthetics_Canaries.html
 
 For example, take a fictitious HTTP handler that returns a resource. There is a whole range of questions we will want to be able to answer once it’s running in production[3] : 
 
@@ -50,9 +42,7 @@ _# Is the id valid?_
 
 - _# Did the remote call time out?_ 
 
-- _# How long did the call take?_ 
-
-self._cache[id] = resource 
+- _# How long did the call take?_ self._cache[id] = resource 
 
 _# What's the size of the cache?_ 
 
@@ -72,9 +62,6 @@ Now, suppose we want to record the number of requests the handler failed to serv
 
 > 4We will talk more about event logs in section 32.1; for now, assume an event is just a dictionary. 
 
-
-300 
-
 # } 
 
 The agent batches these events and emits them periodically to a remote telemetry service, which persists them in a dedicated data store for event logs. For example, this is the approach taken by Azure Monitor’s log-based metrics[5] . 
@@ -89,10 +76,7 @@ Going back to our example, the telemetry service could preaggregate the failure 
 
 The ingestion service could also create multiple pre-aggregates with different periods. This way, the pre-aggregated metric with the best period that satisfies the query can be chosen at query 
 
-> 5“Log-based metrics in Application Insights,” https://docs.microsoft.com/enus/azure/azure-monitor/app/pre-aggregated-metrics-log-metrics#log-basedmetrics 
-
-
-301 time. For example, CloudWatch[6] (the telemetry service used by AWS) pre-aggregates data as it’s ingested. 
+> 5“Log-based metrics in Application Insights,” https://docs.microsoft.com/enus/azure/azure-monitor/app/pre-aggregated-metrics-log-metrics#log-basedmetrics time. For example, CloudWatch[6] (the telemetry service used by AWS) pre-aggregates data as it’s ingested. 
 
 We can take this idea one step further and also reduce ingestion costs by having the local telemetry agents pre-aggregate metrics client-side. By combining client- and server-side pre-aggregation, we can drastically reduce the bandwidth, compute, and storage requirements for metrics. However, this comes at a cost: we lose the ability to re-aggregate metrics after ingestion because we no longer have access to the original events that generated them. For example, if a metric is pre-aggregated over a period of 1 hour, it can’t later be re-aggregated over a period of 5 minutes without the original events. 
 
@@ -104,22 +88,17 @@ As noted before, one of the main use cases for metrics is alerting. But that doe
 
 In this section, we will discuss one specific metric category that lends itself well to alerting: _service-level indicators_ (SLIs). An SLI is a metric that measures one aspect of the _level of service_ provided by a service to its users, like the response time, error rate, or throughput. SLIs are typically aggregated over a rolling time window and represented with a summary statistic, like an average or percentile. 
 
-SLIs are best defined as a ratio of two metrics: the number of “good events” over the total number of events. That makes the ratio easy 
+SLIs are best defined as a ratio of two metrics: the number of “good events” over the total number of events. That makes the ratio easyto interpret: 0 means the service is completely broken and 1 that whatever is being measured is working as expected (see Figure 31.1). As we will see later in the chapter, ratios also simplify the configuration of alerts. Some commonly used SLIs for services are:
 
 > 6“Amazon CloudWatch concepts,” https://docs.aws.amazon.com/AmazonCl oudWatch/latest/monitoring/cloudwatch_concepts.html 
 
-> 7like, e.g., Druid; see “A Real-time Analytical Data Store,” http://static.druid.i o/docs/druid.pdf 
-
-
-302 to interpret: 0 means the service is completely broken and 1 that whatever is being measured is working as expected (see Figure 31.1). As we will see later in the chapter, ratios also simplify the configuration of alerts. Some commonly used SLIs for services are: 
+> 7like, e.g., Druid; see “A Real-time Analytical Data Store,” http://static.druid.i o/docs/druid.pdf
 
 - _Response time_ — The fraction of requests that are completed faster than a given threshold. 
 
 - _Availability_ — The proportion of time the service was usable, defined as the number of successful requests over the total number of requests. 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0320-05.png)
-
 
 Figure 31.1: An SLI defined as the ratio of good events over the total number of events 
 
@@ -131,16 +110,13 @@ A distribution can be summarized with a statistic. Take the average, for example
 
 A better way to represent the distribution of response times is with percentiles. A percentile is the value below which a percentage of the response times fall. For example, if the 99th percentile is 1 second, then 99% of requests have a response time below or equal to 1 second. The upper percentiles of a response time distribution, like the 99th and 99.9th percentiles, are also called _long-tail latencies_ . Even though only a small fraction of requests experience these extreme latencies, it can impact the most important users for the business. They are the ones that make the highest number of requests and thus have a higher chance of experiencing tail latencies. There are studies[9] that show that high latencies negatively affect revenues: a mere 100-millisecond delay in load time can hurt conversion rates by 7 percent. 
 
-Also, long-tail latencies can dramatically impact a service. For example, suppose a service on average uses about 2K threads to serve 10K requests per second. By Little’s Law[10] , the average response time of a thread is 200 ms. Now, if suddenly 1% of requests start taking 20 seconds to complete (e.g., because of a congested switch and relaxed timeouts), 2K additional threads are needed to deal 
+Also, long-tail latencies can dramatically impact a service. For example, suppose a service on average uses about 2K threads to serve 10K requests per second. By Little’s Law[10] , the average response time of a thread is 200 ms. Now, if suddenly 1% of requests start taking 20 seconds to complete (e.g., because of a congested switch and relaxed timeouts), 2K additional threads are needed to dealjust with the slow requests. So the number of threads used by the service has to double to sustain the load!
 
 > 8“latency: a primer,” https://igor.io/latency/ 
 
 > 9“Akamai Online Retail Performance Report: Milliseconds Are Critical,” https: //www.akamai.com/newsroom/press-release/akamai-releases-spring-2017state-of-online-retail-performance-report 
 
-> 10Little’s law says the average number of items in a system equals the average rate at which new items arrive multiplied by the average time an item spends in the system; see “Back of the envelope estimation hacks,” https://robertovitillo.c om/back-of-the-envelope-estimation-hacks/ 
-
-
-304 just with the slow requests. So the number of threads used by the service has to double to sustain the load! 
+> 10Little’s law says the average number of items in a system equals the average rate at which new items arrive multiplied by the average time an item spends in the system; see “Back of the envelope estimation hacks,” https://robertovitillo.c om/back-of-the-envelope-estimation-hacks/
 
 Measuring long-tail latencies and keeping them in check doesn’t just make our users happy but also drastically improves the resiliency of our systems while reducing their operational costs. Intuitively, by reducing the long-tail latency (worst-case scenario), we also happen to improve the average-case scenario. 
 
@@ -154,12 +130,7 @@ SLOs are helpful for alerting purposes and also help the team prioritize repair 
 
 Smaller time windows force the team to act quicker and prioritize bug fixes and repair items, while longer windows are better suited to make long-term decisions about which projects to invest 
 
-
-305 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0323-02.png)
-
 
 Figure 31.2: An SLO defines the range of acceptable values for an SLI. in. Consequently, it makes sense to have multiple SLOs with different window sizes. 
 
@@ -177,23 +148,19 @@ It’s worth mentioning that users can become over-reliant on the actual behavio
 
 Alerting is the part of a monitoring system that triggers an action when a specific condition happens, like a metric crossing a threshold. Depending on the severity and the type of the alert, the action can range from running some automation, like restarting a service instance, to ringing the phone of a human operator who is on call. In the rest of this section, we will mostly focus on the latter case. 
 
-For an alert to be useful, it has to be actionable. The operator shouldn’t spend time exploring dashboards to assess the alert’s impact and urgency. For example, an alert signaling a spike in CPU usage is not useful as it’s not clear whether it has any impact 
+For an alert to be useful, it has to be actionable. The operator shouldn’t spend time exploring dashboards to assess the alert’s impact and urgency. For example, an alert signaling a spike in CPU usage is not useful as it’s not clear whether it has any impactives/
 
-> 11“Service Level Objectives,” https://sre.google/sre-book/service-level-object ives/ 
+> 11“Service Level Objectives,” https://sre.google/sre-book/service-level-object
 
-> 12“Chaos engineering,” https://en.wikipedia.org/wiki/Chaos_engineering 
+ives/ 
 
-
-307 on the system without further investigation. On the other hand, an SLO is a good candidate for an alert because it quantifies the impact on the users. The SLO’s error budget can be monitored to trigger an alert whenever a large fraction of it has been consumed. 
+> 12“Chaos engineering,” https://en.wikipedia.org/wiki/Chaos_engineering on the system without further investigation. On the other hand, an SLO is a good candidate for an alert because it quantifies the impact on the users. The SLO’s error budget can be monitored to trigger an alert whenever a large fraction of it has been consumed. 
 
 Before discussing how to define an alert, it’s important to understand that there is a trade-off between its precision and recall. Formally, _precision_ is the fraction of significant events (i.e., actual issues) over the total number of alerts, while _recall_ is the ratio of significant events that triggered an alert. Alerts with low precision are noisy and often not actionable, while alerts with low recall don’t always trigger during an outage. Although it would be nice to have 100% precision and recall, improving one typically lowers the other, and so a compromise needs to be made. 
 
 Suppose we have an availability SLO of 99% over 30 days, and we would like to configure an alert for it. A naive way would be to trigger an alert whenever the availability goes below 99% within a relatively short time window, like an hour. But how much of the error budget has actually been burned by the time the alert triggers? Because the time window of the alert is one hour, and the SLO error budget is defined over 30 days, the percentage of error budget that has been spent when the alert triggers is 30 days1 hour[=][0.14%][.][A] system is never 100% healthy, since there is always something failing at any given time. So being notified that 0.14% of the SLO’s error budget has been burned is not useful. In this case, we have a high recall but a low precision. 
 
 We can improve the alert’s precision by increasing the amount of time the condition needs to be true. The problem is that now the alert will take longer to trigger, even during an actual outage. The alternative is to alert based on how fast the error budget is burning, also known as the _burn rate_ , which lowers the detection time. The burn rate is defined as the percentage of the error budget consumed over the percentage of the SLO time window that has elapsed — it’s the rate of exhaustion of the error budget. So using our previous example, a burn rate of 1 means the error budget will be exhausted precisely in 30 days; if the rate is 2, then it will be 15 days; if the rate is 3, it will be 10 days, and so on. 
-
-
-308 
 
 To improve recall, we can have multiple alerts with different thresholds. For example, a burn rate below 2 could be classified as a low-severity alert to be investigated during working hours, while a burn rate over 10 could trigger an automated call to an engineer. The SRE workbook has some great examples[13] of how to configure alerts based on burn rates. While the majority of alerts should be based on SLOs, some should trigger for known failure modes that we haven’t had the time to design or debug away. For example, suppose we know a service suffers from a memory leak that has led to an incident in the past, but we haven’t yet managed to track down the root cause. In this case, as a temporary mitigation, we could define an alert that triggers an automated restart when a service instance is running out of memory. 
 
@@ -209,14 +176,11 @@ The categories of dashboards presented here (see Figure 31.3) are by no means st
 
 > 13“Alerting on SLOs,” https://sre.google/workbook/alerting-on-slos/ 
 
-> 14“Building dashboards for operational visibility,” https://aws.amazon.com/b uilders-library/building-dashboards-for-operational-visibility 
+> 14“Building dashboards for operational visibility,” https://aws.amazon.com/b
 
-
-309 
-
+uilders-library/building-dashboards-for-operational-visibility 
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0327-02.png)
-
 
 Figure 31.3: Dashboards should be tailored to their audience. 
 
@@ -226,9 +190,7 @@ The SLO summary dashboard is designed to be used by various stakeholders from ac
 
 This dashboard displays metrics about the system’s public API endpoints, which helps operators identify problematic paths during an incident. For each endpoint, the dashboard exposes several metrics related to request messages, request handling, and response messages, like: 
 
-- Number of requests received or messages pulled from a mes310 
-
-saging broker, request size statistics, authentication issues, etc. 
+- Number of requests received or messages pulled from a mes310 saging broker, request size statistics, authentication issues, etc. 
 
 - Request handling duration, availability and response time of external dependencies, etc. 
 
@@ -246,9 +208,6 @@ As new metrics are added and old ones removed, charts and dashboards need to be 
 
 As dashboards render top to bottom, the most important charts should always be located at the very top. Also, charts should be rendered with a default timezone, like UTC, to ease the communication between people located in different parts of the world when looking at the same data. 
 
-
-311 
-
 All charts in the same dashboard should use the same time resolution (e.g., 1 minute, 5 minutes, 1 hour, etc.) and range (24 hours, 7 days, etc.). This makes it easy to visually correlate anomalies across charts in the same dashboard. We can pick the default time range and resolution based on the dashboard’s most common use case. For example, a 1-hour range with a 1-minute resolution is best for monitoring an ongoing incident, while a 1-year range with a 1-day resolution is best for capacity planning. 
 
 We should keep the number of data points and metrics on the same chart to a minimum. Rendering too many points doesn’t just make charts slow to download/render but also makes it hard to interpret them and spot anomalies. 
@@ -265,9 +224,6 @@ A chart should also contain useful annotations, like:
 
 Metrics that are only emitted when an error condition occurs can be hard to interpret as charts will show wide gaps between the data points, leaving the operator wondering whether the service stopped emitting that metric due to a bug. To avoid this, it’s best practice to emit a metric using a value of zero in the absence of an error and a value of 1 in the presence of it. 
 
-
-312 
-
 # **31.6 Being on call** 
 
 A healthy on-call rotation is only possible when services are built from the ground up with reliability and operability in mind. By making the developers responsible for operating what they build, they are incentivized to reduce the operational toll to a minimum. They are also in the best position to be on call since they are intimately familiar with the system’s architecture, brick walls, and trade-offs. 
@@ -278,15 +234,11 @@ Achieving a healthy on-call rotation is only possible when alerts are actionable
 
 The first step to address an alert is to mitigate it, not fix the underlying root cause that created it. A new artifact has been rolled out that degrades the service? Roll it back. The service can’t cope with the load even though it hasn’t increased? Scale it out. 
 
-Once the incident has been mitigated, the next step is to understand the root cause and come up with ways to prevent it from happening again. The greater the impact was, as measured by 
+Once the incident has been mitigated, the next step is to understand the root cause and come up with ways to prevent it from happening again. The greater the impact was, as measured bythe SLOs, the more time we should spend on this. Incidents that burned a significant fraction of an SLO’s error budget require a formal _postmortem_ . The goal of the postmortem is to understand the incident’s root cause and come up with a set of repair items that will prevent it from happening again. Ideally, there should also be an agreement in the team that if an SLO’s error budget is burned or the number of alerts spirals out of control, the whole team stops working on new features to focus exclusively on reliability until a healthy on-call rotation has been restored.
 
 > 15Ideally, we should automate what we can to minimize manual actions that operators need to perform. As it turns out, machines are good at following instructions. 
-
-
-313 the SLOs, the more time we should spend on this. Incidents that burned a significant fraction of an SLO’s error budget require a formal _postmortem_ . The goal of the postmortem is to understand the incident’s root cause and come up with a set of repair items that will prevent it from happening again. Ideally, there should also be an agreement in the team that if an SLO’s error budget is burned or the number of alerts spirals out of control, the whole team stops working on new features to focus exclusively on reliability until a healthy on-call rotation has been restored. 
 
 The SRE books[16] provide a wealth of information and best practices regarding setting up a healthy on-call rotation. 
 
 16“SRE Books,” https://sre.google/books/ 
-
 

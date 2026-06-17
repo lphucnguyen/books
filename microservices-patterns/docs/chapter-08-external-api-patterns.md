@@ -14,7 +14,6 @@
 
 The FTGO application, like many other applications, has a REST API. Its clients include the FTGO mobile applications, JavaScript running in the browser, and applications developed by partners. In such a monolithic architecture, the API that’s exposed to clients is the monolith’s API. But when once the FTGO team starts deploying microservices, there’s no longer one API, because each service has its own API. Mary and her team must decide what kind of API the FTGO application should now expose to its clients. For example, should clients be aware of the existence of services and make requests to them directly? 
 
-
 The task of designing an application’s external API is made even more challenging by the diversity of its clients. Different clients typically require different data. A desktop browser-based UI usually displays far more information than a mobile application. Also, different clients access the services over different kinds of networks. The clients within the firewall use a high-performance LAN, and the clients outside of the firewall use the internet or mobile network, which will have lower performance. Consequently, as you’ll learn, it often doesn’t make sense to have a single, one-size-fits-all API. 
 
 This chapter begins by describing various external API design issues. I then describe the external API patterns. I cover the API gateway pattern and then the Backends for frontends pattern. After that, I discuss how to design and implement an API gateway. I review the various options that are available, which include off-the-shelf API gateway products and frameworks for developing your own. I describe the design and implementation of an API gateway that’s built using the Spring Cloud Gateway framework. I also describe how to build an API gateway using GraphQL, a framework that provides graph-based query language. 
@@ -41,16 +40,10 @@ One approach to API design is for clients to invoke the services directly. On th
 
 - Services might use IPC mechanisms that aren’t convenient or practical for clients to use, especially those clients outside the firewall. 
 
-
-_**External API design issues**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0285-02.png)
-
 
 **----- Start of picture text -----**<br>
 Lower-performance Firewall<br>internet<br>Web<br>Higher-performance<br>application<br>LAN<br>Web page<br>requests<br>Browser<br>HTML<br>API<br>JavaScript requests Backend services<br>application<br>Order Service<br>API<br>iPhone/<br>Android requests Consumer<br>application Service<br>API Delivery<br>requests Service<br>3rd-party<br>application Kitchen<br>Service<br>**----- End of picture text -----**<br>
-
 
 Figure 8.1 The FTGO application’s services and their clients. There are several different types of clients. Some are inside the firewall, and others are outside. Those outside the firewall access the services over the lower-performance internet/mobile network. Those clients inside the firewall use a higherperformance LAN. 
 
@@ -62,7 +55,6 @@ Consumers use the FTGO mobile client to place and manage their orders. Imagine y
 
 The monolithic version of the FTGO application has an API endpoint that returns the order details. The mobile client retrieves the information it needs by making a single request. In contrast, in the microservices version of the FTGO application, the order details are, as described previously, scattered across several services, including the following: 
 
-
 - Order Service—Basic order information, including the details and status 
 
 - Kitchen Service—The status of the order from the restaurant’s perspective and the estimated time it will be ready for pickup 
@@ -73,18 +65,12 @@ The monolithic version of the FTGO application has an API endpoint that returns 
 
 If the mobile client invokes the services directly, then it must, as figure 8.2 shows, make multiple calls to retrieve this data. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0286-07.png)
-
 
 **----- Start of picture text -----**<br>
 One API required<br>Firewall<br>iPhone/<br>Android Internet getOrderDetails() Monolithic FTGO<br>consumer application<br>application<br>Firewall FTGO backend services<br>Order Service<br>getOrder()<br>Internet<br>getDelivery() Delivery<br>iPhone/ Service<br>Android<br>consumer getBill()<br>application Accounting<br>Service<br>getTicket()<br>Kitchen<br>Service<br>Many API calls required<br>**----- End of picture text -----**<br>
 
-
 Figure 8.2 A client can retrieve the order details from the monolithic FTGO application with a single request. But the client must make multiple requests to retrieve the same information in a microservice architecture. 
-
-
-_**External API design issues**_ 
 
 In this design, the mobile application is playing the role of API composer. It invokes multiple services and combines the results. Although this approach seems reasonable, it has several serious problems. 
 
@@ -104,10 +90,7 @@ Unlike when updating a server-side application, it takes hours or perhaps even d
 
 **SERVICES MIGHT USE CLIENT-UNFRIENDLY IPC MECHANISMS**
 
-Another challenge with a mobile application directly calling services is that some services could use protocols that aren’t easily consumed by a client. Client applications that run outside the firewall typically use protocols such as HTTP and WebSockets. But as described in chapter 3, service developers have many protocols to choose from—not just HTTP. Some of an application’s services might use gRPC, whereas others could use the AMQP messaging protocol. These kinds of protocols work well 
-
-
-internally, but might not be easily consumed by a mobile client. Some aren’t even firewall friendly. 
+Another challenge with a mobile application directly calling services is that some services could use protocols that aren’t easily consumed by a client. Client applications that run outside the firewall typically use protocols such as HTTP and WebSockets. But as described in chapter 3, service developers have many protocols to choose from—not just HTTP. Some of an application’s services might use gRPC, whereas others could use the AMQP messaging protocol. These kinds of protocols work well internally, but might not be easily consumed by a mobile client. Some aren’t even firewall friendly. 
 
 ### 8.1.2 API design issues for other kinds of clients
 
@@ -127,8 +110,6 @@ On one hand, browser-based JavaScript applications are easy to update when servi
 
 FTGO, like many other organizations, exposes an API to third-party developers. The developers can use the FTGO API to write applications that place and manage orders. These third-party applications access the APIs over the internet, so API composition is likely to be inefficient. But the inefficiency of API composition is a relatively minor problem compared to the much larger challenge of designing an API 
 
-
-_**The API gateway pattern**_
 that’s used by third-party applications. That’s because third-party developers need an API that’s stable. 
 
 Very few organizations can force third-party developers to upgrade to a new API. Organizations that have an unstable API risk losing developers to a competitor. Consequently, you must carefully manage the evolution of an API that’s used by thirdparty developers. You typically have to maintain older versions for a long time—possibly forever. 
@@ -147,18 +128,12 @@ An _API gateway_ is a service that’s the entry point into the application from
 
 ### 8.2.1 Overview of the API gateway pattern
 
-Section 8.1.1 described the drawbacks of clients, such as the FTGO mobile application, making multiple requests in order to display information to the user. A much better approach is for a client to make a single request to an API gateway, a service that serves as the single entry point for API requests into an application from outside the firewall. It’s similar to the Facade pattern from object-oriented design. Like a facade, an API gateway encapsulates the application’s internal architecture and provides an API to its clients. It may also have other responsibilities, such as authentication, monitoring, 
-
-
-and rate limiting. Figure 8.3 shows the relationship between the clients, the API gateway, and the services. 
-
+Section 8.1.1 described the drawbacks of clients, such as the FTGO mobile application, making multiple requests in order to display information to the user. A much better approach is for a client to make a single request to an API gateway, a service that serves as the single entry point for API requests into an application from outside the firewall. It’s similar to the Facade pattern from object-oriented design. Like a facade, an API gateway encapsulates the application’s internal architecture and provides an API to its clients. It may also have other responsibilities, such as authentication, monitoring, and rate limiting. Figure 8.3 shows the relationship between the clients, the API gateway, and the services. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0290-03.png)
 
-
 **----- Start of picture text -----**<br>
 Lower-performance Firewall<br>internet<br>Web<br>Higher-performance<br>application<br>LAN<br>Web page<br>Browser requests<br>HTML<br>API<br>JavaScript requests Backend services<br>application<br>Order Service<br>API<br>iPhone/<br>requests API<br>Android Consumer<br>gateway<br>application Service<br>API<br>requests Delivery<br>Service<br>3rd-party<br>application<br>**----- End of picture text -----**<br>
-
 
 Figure 8.3 The API gateway is the single entry point into the application for API calls from outside the firewall. 
 
@@ -168,9 +143,6 @@ The API gateway is responsible for request routing, API composition, and protoco
 
 One of the key functions of an API gateway is _request routing_ . An API gateway implements some API operations by routing requests to the corresponding service. When it receives a request, the API gateway consults a routing map that specifies which service to route the request to. A routing map might, for example, map an HTTP method and path to the HTTP URL of a service. This function is identical to the reverse proxying features provided by web servers such as NGINX. 
 
-
-_**The API gateway pattern**_ 
-
 **API COMPOSITION**
 
 An API gateway typically does more than simply reverse proxying. It might also implement some API operations using API composition. The FTGO API gateway, for example, implements the Get Order Details API operation using API composition. As figure 8.4 shows, the mobile application makes one request to the API gateway, which fetches the order details from multiple services. 
@@ -179,16 +151,12 @@ The FTGO API gateway provides a coarse-grained API that enables mobile clients t
 
 **Many API calls required**
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0291-06.png)
-
 
 **----- Start of picture text -----**<br>
 Firewall FTGO backend services<br>Internet Order Service<br>getOrder()<br>Delivery<br>iPhone/ getDelivery() Service<br>Android<br>consumer<br>application getBill() Accounting<br>Service<br>getTicket()<br>Kitchen<br>Service<br>Firewall FTGO backend services<br>LAN<br>Order Service<br>getOrder()<br>Internet<br>iPhone/ getDelivery() Delivery<br>Android getOrderDetails() API Service<br>consumer gateway getBill()<br>application Accounting<br>Service<br>getTicket() Kitchen<br>Service<br>Lower-performance One API call required Higher-performance<br>network network<br>**----- End of picture text -----**<br>
 
-
 Figure 8.4 An API gateway often does API composition, which enables a client such as a mobile device to efficiently retrieve data using a single API request. 
-
 
 **PROTOCOL TRANSLATION**
 
@@ -218,9 +186,6 @@ Although an API gateway’s primary responsibilities are API routing and composi
 
 There are three different places in your application where you could implement these edge functions. First, you can implement them in the backend services. This might make sense for some functions, such as caching, metrics collection, and possibly authorization. But it’s generally more secure if the application authenticates requests on the edge before they reach the services. 
 
-
-_**The API gateway pattern**_ 
-
 The second option is to implement these edge functions in an edge service that’s upstream from the API gateway. The edge service is the first point of contact for an external client. It authenticates the request and performs other edge processing before passing it to the API gateway. 
 
 An important benefit of using a dedicated edge service is that it separates concerns. The API gateway focuses on API routing and composition. Another benefit is that it centralizes responsibility for critical edge functions such as authentication. That’s particularly valuable when an application has multiple API gateways that are possibly written using a variety of languages and frameworks. I’ll talk more about that later. The drawback of this approach is that it increases network latency because of the extra hop. It also adds to the complexity of the application. 
@@ -231,16 +196,12 @@ As a result, it’s often convenient to use the third option and implement these
 
 An API gateway has a layered, modular architecture. Its architecture, shown in figure 8.5, consists of two layers: the API layer and a common layer. The API layer consists of one or more independent API modules. Each API module implements an API for a 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0293-07.png)
-
 
 **----- Start of picture text -----**<br>
 Browser JavaScript<br>Mobile client 3rd-party application<br>application<br>API gateway<br>API layer<br>Mobile API Browser API Public API<br>Common layer<br>**----- End of picture text -----**<br>
 
-
 Figure 8.5 An API gateway has a layered modular architecture. The API for each client is implemented by a separate module. The common layer implements functionality common to all APIs, such as authentication. 
-
 
 particular client. The common layer implements shared functionality, including edge functions such as authentication. 
 
@@ -268,16 +229,10 @@ When a team needs to change their API, they check in the changes to the source r
 
 One concern with an API gateway is that responsibility for it is blurred. Multiple teams contribute to the same code base. An API gateway team is responsible for its operation. Though not as bad as a SOA ESB, this blurring of responsibilities is counter to the microservice architecture philosophy of “if you build it, you own it.” 
 
-
-_**The API gateway pattern**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0295-02.png)
-
 
 **----- Start of picture text -----**<br>
 Mobile client team Browser client team Public API team<br>Browser JavaScript<br>Mobile client 3rd-party application<br>application<br>Owns Owns Owns<br>API gateway<br>API layer<br>Mobile API Browser API Public API<br>Common layer<br>Owns<br>API gateway team<br>**----- End of picture text -----**<br>
-
 
 Figure 8.6 A client team owns their API module. As they change the client, they can change the API module and not ask the API gateway team to make the changes. 
 
@@ -287,22 +242,16 @@ The solution is to have an API gateway for each client, the so-called Backends f
 
 Implement a separate API gateway for each type of client. See http://microservices .io/patterns/apigateway.html. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0296-02.png)
-
 
 **----- Start of picture text -----**<br>
 Mobile client team Browser client team Public API team<br>Browser JavaScript<br>Mobile client 3rd-party application<br>application<br>Owns Owns Owns<br>Mobile API Browser API Public API<br>gateway gateway gateway<br>API layer API layer API layer<br>Mobile API Browser API Public API<br>Common layer Common layer Common layer<br>**----- End of picture text -----**<br>
-
 
 Figure 8.7 The Backends for frontends pattern defines a separate API gateway for each client. Each client team owns their API gateway. An API gateway team owns the common layer. 
 
 The public API team owns and operates their API gateway, the mobile team owns and operates theirs, and so on. In theory, different API gateways could be developed using different technology stacks. But that risks duplicating code for common functionality, such as the code that implements edge functions. Ideally, all API gateways use the same technology stack. The common functionality is a shared library implemented by the API gateway team. 
 
 Besides clearly defining responsibilities, the BFF pattern has other benefits. The API modules are isolated from one another, which improves reliability. One misbehaving API can’t easily impact other APIs. It also improves observability, because different API modules are different processes. Another benefit of the BFF pattern is that each API is independently scalable. The BFF pattern also reduces startup time because each API gateway is a smaller, simpler application. 
-
-
-_**The API gateway pattern**_ 
 
 ### 8.2.2 Benefits and drawbacks of an API gateway
 
@@ -322,10 +271,7 @@ A great example of an API gateway is the Netflix API. The Netflix streaming serv
 
 In the first version of the API gateway, each client team implemented their API using Groovy scripts that perform routing and API composition. Each script invoked one or more service APIs using Java client libraries provided by the service teams. On one hand, this works well, and client developers have written thousands of scripts. The Netflix API gateway handles billions of requests per day, and on average each API call fans out to six or seven backend services. On the other hand, Netflix has found this monolithic architecture to be somewhat cumbersome. 
 
-As a result, Netflix is now moving to an API gateway architecture similar to the Backends for frontends pattern. In this new architecture, client teams write API modules using NodeJS. Each API module runs its own Docker container, but the scripts don’t invoke the services directly. Rather, they invoke a second “API gateway,” which exposes the service APIs using Netflix Falcor. _Netflix Falcor_ is an API technology that does declarative, dynamic API composition and enables a client to invoke multiple 
-
-
-services using a single request. This new architecture has a number of benefits. The API modules are isolated from one another, which improves reliability and observability, and the client API module is independently scalable. 
+As a result, Netflix is now moving to an API gateway architecture similar to the Backends for frontends pattern. In this new architecture, client teams write API modules using NodeJS. Each API module runs its own Docker container, but the scripts don’t invoke the services directly. Rather, they invoke a second “API gateway,” which exposes the service APIs using Netflix Falcor. _Netflix Falcor_ is an API technology that does declarative, dynamic API composition and enables a client to invoke multiple services using a single request. This new architecture has a number of benefits. The API modules are isolated from one another, which improves reliability and observability, and the client API module is independently scalable. 
 
 ### 8.2.4 API gateway design issues
 
@@ -352,9 +298,6 @@ The other approach is to use the _asynchronous_ (nonblocking) I/O model . In thi
 Nonblocking I/O is much more scalable because it doesn’t have the overhead of using multiple threads. The drawback, though, is that the asynchronous, callbackbased programming model is much more complex. The code is more difficult to write, understand, and debug. Event handlers must return quickly to avoid blocking the event loop thread. 
 
 Also, whether using nonblocking I/O has a meaningful overall benefit depends on the characteristics of the API gateway’s request-processing logic. Netflix had mixed results when it rewrote Zuul, its edge server, to use NIO (see https://medium.com/netflixtechblog/zuul-2-the-netflix-journey-to-asynchronous-non-blocking-systems-45947377fb5c). 
-
-
-_**The API gateway pattern**_ 
 
 On one hand, as you would expect, using NIO reduced the cost of each network connection, due to the fact that there’s no longer a dedicated thread for each one. Also, a Zuul cluster that ran I/O-intensive logic—such as request routing—had a 25% increase in throughput and a 25% reduction in CPU utilization. On the other hand, a Zuul cluster that ran CPU-intensive logic—such as decryption and compression—showed no improvement. 
 
@@ -384,7 +327,6 @@ The drawback of calling the services sequentially is that the response time is t
 
 This is because the traditional way to write scalable, concurrent code is to use callbacks. Asynchronous, event-driven I/O is inherently callback-based. Even a Servlet 
 
-
 API-based API composer that invokes services concurrently typically uses callbacks. It could execute requests concurrently by calling ExecutorService.submitCallable(). The problem there is that this method returns a Future, which has a blocking API. A more scalable approach is for an API composer to call ExecutorService.submit (Runnable) and for each Runnable to invoke a callback with the outcome of the request. The callback accumulates results, and once all of them have been received it sends back the response to the client. 
 
 Writing API composition code using the traditional asynchronous callback approach quickly leads you to callback hell. The code will be tangled, difficult to understand, and error prone, especially when composition requires a mixture of parallel and sequential requests. A much better approach is to write API composition code in a declarative style using a reactive approach. Examples of reactive abstractions for the JVM include the following: 
@@ -409,8 +351,6 @@ Another way to ensure that an API gateway is reliable is to properly handle fail
 
 In chapter 3 I described patterns for service discovery, and in chapter 11, I cover patterns for observability. The service discovery patterns enable a service client, such as an API gateway, to determine the network location of a service instance so that it can invoke it. The observability patterns enable developers to monitor the 
 
-
-_**Implementing an API gateway**_
 behavior of an application and troubleshoot problems. An API gateway, like other services in the architecture, must implement the patterns that have been selected for the architecture. 
 
 ## 8.3 Implementing an API gateway
@@ -441,10 +381,7 @@ Several off-the-self services and products implement API gateway features. Let�
 
 **AWS API GATEWAY**
 
-The AWS API gateway, one of the many services provided by Amazon Web Services, is a service for deploying and managing APIs. An AWS API gateway API is a set of REST resources, each of which supports one or more HTTP methods. You configure the API gateway to route each (Method, Resource) to a backend service. A backend service is either an AWS Lambda Function, described later in chapter 12, an applicationdefined HTTP service, or an AWS service. If necessary, you can configure the API 
-
-
-gateway to transform request and response using a template-based mechanism. The AWS API gateway can also authenticate requests. 
+The AWS API gateway, one of the many services provided by Amazon Web Services, is a service for deploying and managing APIs. An AWS API gateway API is a set of REST resources, each of which supports one or more HTTP methods. You configure the API gateway to route each (Method, Resource) to a backend service. A backend service is either an AWS Lambda Function, described later in chapter 12, an applicationdefined HTTP service, or an AWS service. If necessary, you can configure the API gateway to transform request and response using a template-based mechanism. The AWS API gateway can also authenticate requests. 
 
 The AWS API gateway fulfills some of the requirements for an API gateway that I listed earlier. The API gateway is provided by AWS, so you’re not responsible for installation and operations. You configure the API gateway, and AWS handles everything else, including scaling. 
 
@@ -461,9 +398,6 @@ Like the AWS API gateway, the AWS Application Load Balancer meets some of the re
 Another option is to use an API gateway product such as Kong or Traefik . These are open source packages that you install and operate yourself. Kong is based on the NGINX HTTP server, and Traefik is written in GoLang. Both products let you configure flexible routing rules that use the HTTP method, headers, and path to select the backend service. Kong lets you configure plugins that implement edge functions such as authentication. Traefik can even integrate with some service registries, described in chapter 3. 
 
 Although these products implement edge functions and powerful routing capabilities, they have some drawbacks. You must install, configure, and operate them yourself. They don’t support API composition. And if you want the API gateway to perform API composition, you must develop your own API gateway. 
-
-
-_**Implementing an API gateway**_ 
 
 ### 8.3.2 Developing your own API gateway
 
@@ -487,7 +421,6 @@ ABOUT SPRING CLOUD GATEWAY
 
 None of the options I’ve described so far meet all the requirements. In fact, I had given up in my search for an API gateway framework and had started developing an API gateway based on Spring MVC. But then I discovered the Spring Cloud Gateway project (https://cloud.spring.io/spring-cloud-gateway/). It’s an API gateway framework built on top of several frameworks, including Spring Framework 5, Spring Boot 2, and Spring Webflux, which is a reactive web framework that's part of Spring Framework 5 and built on Project Reactor. Project Reactor is an NIO-based reactive framework for the JVM that provides the Mono abstraction used a little later in this chapter. 
 
-
 Spring Cloud Gateway provides a simple yet comprehensive way to do the following: 
 
 - Route requests to backend services. 
@@ -498,13 +431,10 @@ Spring Cloud Gateway provides a simple yet comprehensive way to do the following
 
 Figure 8.8 shows the key parts of an API gateway built using this framework. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0304-07.png)
-
 
 **----- Start of picture text -----**<br>
 static void main(String[]args){<br>«@SpringBootApplication»ApiGatewayApplication ...<br>}<br>Orders«API package»<br>«Spring Configuration»OrderConfiguration<br>orders* «@Bean» «@Bean» GET/orders/{orderId}<br>http://orderservice=> orderProxyRouting orderHandlerRouting OrderHandlers::getOrderDetails=><br>Order handlers<br>mono<ServerResponse><br>getOrderDetails(ServerRequest){<br>getOrderDetails() ...<br>}<br>«proxy» «proxy» «proxy»<br>.... DeliveryService OrderService<br>findDeliveryByOrder() findOrderById() mono<OrderInfo><br>findOrderById()(orderId){<br>Remote proxies«package» ...WebClient<br>.get()<br>.url("http://order-service/..."}<br>}<br>Spring Cloud Gateway<br>Spring 5 Spring webFlux<br>Project reactor<br>**----- End of picture text -----**<br>
-
 
 Figure 8.8 The architecture of an API gateway built using Spring Cloud Gateway 
 
@@ -515,9 +445,6 @@ The API gateway consists of the following packages:
 - _One or more API packages_ —An API package implements a set of API endpoints. For example, the Orders package implements the Order-related API endpoints. 
 
 - _Proxy package_ —Consists of proxy classes that are used by the API packages to invoke the services. 
-
-
-_**Implementing an API gateway**_ 
 
 The OrderConfiguration class defines the Spring beans responsible for routing Order-related requests. A routing rule can match against some combination of the HTTP method, the headers, and the path. The orderProxyRoutes @Bean defines rules that map API operations to backend service URLs. For example, it routes paths beginning with /orders to the Order Service. 
 
@@ -648,10 +575,7 @@ Mono<OrderDetails> orderDetails = combined.map(OrderDetails::makeOrderDetails);
 
 **Transform the OrderDetails into a ServerResponse.** 
 
-The getOrderDetails() method implements API composition to fetch the order details. It’s written in a scalable, reactive style using the Mono abstraction , which is provided by Project Reactor. A Mono, which is a richer kind of Java 8 CompletableFuture, contains the outcome of an asynchronous operation that’s either a value or an exception. It has a rich API for transforming and combining the values returned by asynchronous operations. You can use Monos to write concurrent code in a style that’s 
-
-
-simple and easy to understand. In this example, the getOrderDetails() method invokes the four services in parallel and combines the results to create an OrderDetails object. 
+The getOrderDetails() method implements API composition to fetch the order details. It’s written in a scalable, reactive style using the Mono abstraction , which is provided by Project Reactor. A Mono, which is a richer kind of Java 8 CompletableFuture, contains the outcome of an asynchronous operation that’s either a value or an exception. It has a rich API for transforming and combining the values returned by asynchronous operations. You can use Monos to write concurrent code in a style that’s simple and easy to understand. In this example, the getOrderDetails() method invokes the four services in parallel and combines the results to create an OrderDetails object. 
 
 The getOrderDetails() method takes a ServerRequest, which is the Spring WebFlux representation of an HTTP request, as a parameter and does the following: 
 
@@ -722,30 +646,20 @@ Spring Cloud Gateway is an excellent framework for implementing an API gateway. 
 
 Imagine that you’re responsible for implementing the FTGO’s API Gateway’s GET /orders/{orderId} endpoint, which returns the order details. On the surface, implementing this endpoint might appear to be simple. But as described in section 8.1, this endpoint retrieves data from multiple services. Consequently, you need to use the 
 
-
 API composition pattern and write code that invokes the services and combines the results. 
 
 Another challenge, mentioned earlier, is that different clients need slightly different data. For example, unlike the mobile application, the desktop SPA application displays your rating for the order. One way to tailor the data returned by the endpoint, as described in chapter 3, is to give the client the ability to specify the data they need. An endpoint can, for example, support query parameters such as the expand parameter, which specifies the related resources to return, and the field parameter, which specifies the fields of each resource to return. The other option is to define multiple versions of this endpoint as part of applying the Backends for frontends pattern. This is a lot of work for just one of the many API endpoints that the FTGO’s API Gateway needs to implement. 
 
 Implementing an API gateway with a REST API that supports a diverse set of clients well is time consuming. Consequently, you may want to consider using a graphbased API framework, such as GraphQL, that’s designed to support efficient data fetching. The key idea with graph-based API frameworks is that, as figure 8.9 shows, the server’s API consists of a graph-based schema. The graph-based schema defines a set of _nodes_ (types), which have _properties_ (fields) and relationships with other nodes. The client retrieves data by executing a query that specifies the required data in terms of the graph’s nodes and their properties and relationships. As a result, a client can retrieve the data it needs in a single round-trip to the API gateway. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0310-05.png)
-
 
 **----- Start of picture text -----**<br>
 API gateway<br>Consumer Service<br>Graph-based API framework<br>Consumer<br>Query<br>Graph schema<br>Consumer Order Service<br>Query<br>Order<br>Schema<br>Query =><br>Client<br>Order Service<br>Query Restaurant Service<br>mapping<br>Restaurant<br>Query<br>Restaurant Delivery<br>Delivery Service<br>Delivery<br>**----- End of picture text -----**<br>
 
-
 Figure 8.9 The API gateway’s API consists of a graph-based schema that’s mapped to the services. A client issues a query that retrieves multiple graph nodes. The graph-based API framework executes the query by retrieving data from one or more services. 
 
-Graph-based API technology has a couple of important benefits. It gives clients control over what data is returned. Consequently, developing a single API that’s flexible 
-
-
-_**Implementing an API gateway**_ 
-
-
-enough to support diverse clients becomes feasible. Another benefit is that even though the API is much more flexible, this approach significantly reduces the development effort. That’s because you write the server-side code using a query execution framework that’s designed to support API composition and projections. It’s as if, rather than force clients to retrieve data via stored procedures that you need to write and maintain, you let them execute queries against the underlying database. 
+Graph-based API technology has a couple of important benefits. It gives clients control over what data is returned. Consequently, developing a single API that’s flexible enough to support diverse clients becomes feasible. Another benefit is that even though the API is much more flexible, this approach significantly reduces the development effort. That’s because you write the server-side code using a query execution framework that’s designed to support API composition and projections. It’s as if, rather than force clients to retrieve data via stored procedures that you need to write and maintain, you let them execute queries against the underlying database. 
 
 **Schema-driven API technologies**
 
@@ -767,28 +681,16 @@ The GraphQL-based API gateway, shown in figure 8.10, is written in JavaScript us
 
 There’s also a small amount of glue code that integrates the GraphQL server with the Express web framework. Let’s look at each part, starting with the GraphQL schema. 
 
-
-_**External API patterns**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0312-03.png)
-
 
 **----- Start of picture text -----**<br>
 Apollo<br>graphQL<br>client<br>http://.../graphql?query={orders(consumerId:1){orde rId,restaurant{id}}}<br>FTGO API gateway<br>Express web framework<br>function resolveOrder(_. {orderId}, context){<br>Apollo graphQL engine return context.orderServiceProxy.findOrder(orderI d);<br>}<br>type Query{ const resolvers = {<br>orders(consumerId:Int!): [Order] Query:{<br>order(orderId : int!): Order orders: resolveOrders,<br>consumer(consumerId : int!): Consumer order: resolveOrder,<br>} ...<br>},<br>type Order { Order:{<br>orderId: ID, consumer: resolveOrderConsumer,<br>consumerId: Int, restaurant: resolveOrderRestaurant,<br>consumer: Consumer deliveryInfo: resolveOrderDeliveryInfo<br>restaurant: Restaurant },<br>deliveryInfo : DeliveryInfo ...<br>...<br>function resolveOrderDeliveryInfo({orderId}, args, context) {<br>return context.deliveryServiceProxy.findDeliveryF orOrder(orderId);<br>}<br>ConsumerServiceProxy OrderServiceProxy RestaurantServiceProxy DeliveryServiceProxy<br>invokes invokes invokes invokes<br>Consumer Service Order Service Restaurant Service Delivery Service<br>**----- End of picture text -----**<br>
-
 
 Figure 8.10 The design of the GraphQL-based FTGO API Gateway 
 
 **DEFINING A GRAPHQL SCHEMA**
 
-A GraphQL API is centered around a _schema_ , which consists of a collection of types that define the structure of the server-side data model and the operations, such as queries, that a client can perform. GraphQL has several different kinds of types. The example code in this section uses just two kinds of types: _object_ types, which are the 
-
-
-_**Implementing an API gateway**_ 
-
-
-primary way of defining the data model, and _enums_ , which are similar to Java enums. An object type has a name and a collection of typed, named fields. A _field_ can be a scalar type, such as a number, string, or enum; a list of scalar types; a reference to another object type; or a collection of references to another object type. Despite resembling a field of a traditional object-oriented class, a GraphQL field is conceptually a function that returns a value. It can have arguments, which enable a GraphQL client to tailor the data the function returns. 
+A GraphQL API is centered around a _schema_ , which consists of a collection of types that define the structure of the server-side data model and the operations, such as queries, that a client can perform. GraphQL has several different kinds of types. The example code in this section uses just two kinds of types: _object_ types, which are the primary way of defining the data model, and _enums_ , which are similar to Java enums. An object type has a name and a collection of typed, named fields. A _field_ can be a scalar type, such as a number, string, or enum; a list of scalar types; a reference to another object type; or a collection of references to another object type. Despite resembling a field of a traditional object-oriented class, a GraphQL field is conceptually a function that returns a value. It can have arguments, which enable a GraphQL client to tailor the data the function returns. 
 
 GraphQL also uses fields to define the queries supported by the schema. You define the schema’s queries by declaring an object type, which by convention is called Query. Each field of the Query object is a named query, which has an optional set of parameters, and a return type. I found this way of defining queries a little confusing when I first encountered it, but it helps to keep in mind that a GraphQL field is a function. It will become even clearer when we look at how fields are connected to the backend data sources. 
 
@@ -812,7 +714,6 @@ type Consumer {
 
 type Order { 
   orderId: ID 
-  consumerId : Int 
   consumer: Consumer 
   restaurant: Restaurant 
   deliveryInfo : DeliveryInfo 
@@ -855,13 +756,7 @@ The principal benefit of using GraphQL is that its query language gives the clie
 
 This query returns those fields of the specified Consumer. 
 
-Here’s a more elaborate query that returns a consumer, their orders, and the ID and name of each order’s restaurant: query { consumer(consumerId:1) { id firstName lastName 
-
-
-_**Implementing an API gateway**_ 
-
-
-orders { orderId restaurant { id name } deliveryInfo { estimatedDeliveryTime name } 
+Here’s a more elaborate query that returns a consumer, their orders, and the ID and name of each order’s restaurant: query { consumer(consumerId:1) { id firstName lastName orders { orderId restaurant { id name } deliveryInfo { estimatedDeliveryTime name } 
 
 } 
 
@@ -873,9 +768,7 @@ This query tells the server to return more than just the fields of the Consumer.
 
 The query language is more flexible than it might first appear. That’s because a query is a field of the Query object, and a query document specifies which of those fields the server should return. These simple examples retrieve a single field, but a query document can execute multiple queries by specifying multiple fields. For each field, the query document supplies the field’s arguments and specifies what fields of the result object it’s interested in. Here’s a query that retrieves two different consumers: 
 
-**query {**
-
-c1: consumer (consumerId:1) { id, firstName, lastName} c2: consumer (consumerId:2) { id, firstName, lastName} } 
+**query {** c1: consumer (consumerId:1) { id, firstName, lastName} c2: consumer (consumerId:2) { id, firstName, lastName} } 
 
 In this query document, c1 and c2 are what GraphQL calls _aliases_ . They’re used to distinguish between the two Consumers in the result, which would otherwise both be called consumer. This example retrieves two objects of the same type, but a client could retrieve several objects of different types. 
 
@@ -885,10 +778,7 @@ CONNECTING THE SCHEMA TO THE DATA
 
 When the GraphQL server executes a query, it must retrieve the requested data from one or more data stores. In the case of the FTGO application, the GraphQL server must invoke the APIs of the services that own the data. You associate a GraphQL schema with the data sources by attaching resolver functions to the fields of the object types defined by the schema. The GraphQL server implements the API composition pattern by invoking resolver functions to retrieve the data, first for the top-level query, and then recursively for the fields of the result object or objects. 
 
-The details of how resolver functions are associated with the schema depend on which GraphQL server you are using. Listing 8.8 shows how to define the resolvers 
-
-
-when using the Apollo GraphQL server. You create a doubly nested JavaScript object. Each top-level property corresponds to an object type, such as Query and Order. Each second-level property, such as Order.consumer, defines a field’s resolver function. 
+The details of how resolver functions are associated with the schema depend on which GraphQL server you are using. Listing 8.8 shows how to define the resolvers when using the Apollo GraphQL server. You create a doubly nested JavaScript object. Each top-level property corresponds to an object type, such as Query and Order. Each second-level property, such as Order.consumer, defines a field’s resolver function. 
 
 Listing 8.8 Attaching the resolver functions to fields of the GraphQL schema 
 
@@ -927,9 +817,6 @@ function resolveOrders(_, { consumerId }, context) {
 
 This function obtains the OrderServiceProxy from the context and invokes it to fetch a consumer’s orders. It ignores its first parameter. It passes the consumerId argument, provided by the query document, to OrderServiceProxy.findOrders(). The findOrders() method retrieves the consumer’s orders from OrderHistoryService. 
 
-
-_**Implementing an API gateway**_ 
-
 Here’s the resolveOrderRestaurant() function, which is the resolver for the Order.restaurant field that retrieves an order’s restaurant: 
 
 ```javascript
@@ -944,20 +831,16 @@ GraphQL uses a recursive algorithm to execute the resolver functions. First, it 
 
 Figure 8.11 shows how this algorithm executes the query that retrieves a consumer’s orders and each order’s delivery information and restaurant. First, the GraphQL engine invokes resolveConsumer(), which retrieves Consumer. Next, it invokes resolveConsumerOrders(), which is the resolver for the Consumer.orders field that returns the consumer’s orders. The GraphQL engine then iterates through Orders, invoking the resolvers for the Order.restaurant and Order.deliveryInfo fields. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0317-07.png)
-
 
 **----- Start of picture text -----**<br>
 Schema Query document<br>Query arguments passed to resolver<br>query{<br>type Query{ consumer(consumerId:1){ consumer = resolveConsumer(..., 1)<br>consumer(consumerId:int!): Consumer id<br>} firstName<br>lastName<br>type Order { orders{ orders = resolveConsumerOrders(consumer)<br>... orderId<br>restaurant: Restaurant restaurant{<br>deliveryInfo : DeliveryInfo id resolveOrderRestaurant(order, ...)<br>... name<br>}<br>deliveryInfo{<br>estimatedDeliveryTime resolveOrderDeliveryInfo(order)<br>name<br>}<br>}<br>}<br>Resolver functions<br>}<br>**----- End of picture text -----**<br>
-
 
 Figure 8.11 GraphQL executes a query by recursively invoking the resolver functions for the fields specified in the Query document. First, it executes the resolver for the query, and then it recursively invokes the resolvers for the fields in the result object hierarchy. 
 
 The result of executing the resolvers is a Consumer object populated with data retrieved from multiple services. 
 
 Let’s now look at how to optimize the executing of resolvers by using batching and caching. 
-
 
 **OPTIMIZING LOADING USING BATCHING AND CACHING**
 
@@ -970,9 +853,7 @@ A NodeJS-based GraphQL server can use the DataLoader module to implement batchin
 Listing 8.9 Using a **DataLoader** to optimize calls to **Restaurant Service** 
 
 ```javascript
-const DataLoader = require('dataloader'); 
-
-class RestaurantServiceProxy { 
+const DataLoader = require('dataloader'); class RestaurantServiceProxy { 
   constructor() { 
     this.dataLoader = new DataLoader(restaurantIds => this.batchFindRestaurants(restaurantIds)); 
   } 
@@ -991,10 +872,6 @@ RestaurantServiceProxy and, hence, DataLoader are created for each request, so t
 
 Let’s now look at how to integrate the GraphQL engine with a web framework so that it can be invoked by clients. 
 
-
-_**Implementing an API gateway**_ 
-
-
 **INTEGRATING THE APOLLO GRAPHQL SERVER WITH EXPRESS**
 
 The Apollo GraphQL server executes GraphQL queries. In order for clients to invoke it, you need to integrate it with a web framework. Apollo GraphQL server supports several web frameworks, including Express, a popular NodeJS web framework. 
@@ -1004,13 +881,7 @@ Listing 8.10 shows how to use the Apollo GraphQL server in an Express applicatio
 Listing 8.10 Integrating the GraphQL server with the Express web framework 
 
 ```javascript
-const {graphqlExpress} = require("apollo-server-express"); 
-
-const schema = makeExecutableSchema({ typeDefs, resolvers }); 
-
-const app = express(); 
-
-function makeContextWithDependencies(req) { 
+const {graphqlExpress} = require("apollo-server-express"); const schema = makeExecutableSchema({ typeDefs, resolvers }); const app = express(); function makeContextWithDependencies(req) { 
   const orderServiceProxy = new OrderServiceProxy(); 
   const consumerServiceProxy = new ConsumerServiceProxy(); 
   const restaurantServiceProxy = new RestaurantServiceProxy(); 
@@ -1024,13 +895,10 @@ function makeGraphQLHandler() {
 } 
 
 app.post('/graphql', bodyParser.json(), makeGraphQLHandler()); 
-app.get('/graphql', makeGraphQLHandler()); 
-
-app.listen(PORT); 
+app.get('/graphql', makeGraphQLHandler()); app.listen(PORT); 
 ```
 
 **Route POST /graphql and GET /graphql endpoints to the GraphQL server.** 
-
 
 This example doesn’t handle concerns such as security, but those would be straightforward to implement. The API gateway could, for example, authenticate users using Passport, a NodeJS security framework described in chapter 11. The makeContextWithDependencies() function would pass the user information to each repository’s constructor so that they can propagate the user information to the services. 
 
@@ -1041,7 +909,6 @@ Let’s now look at how a client can invoke this server to execute GraphQL queri
 There are a couple of different ways a client application can invoke the GraphQL server. Because the GraphQL server has an HTTP-based API, a client application could use an HTTP library to make requests, such as GET http://localhost:3000/ graphql?query={orders(consumerId:1){orderId,restaurant{id}}}'. It’s easier, though, to use a GraphQL client library, which takes care of properly formatting requests and typically provides features such as client-side caching. 
 
 The following listing shows the FtgoGraphQLClient class, which is a simple GraphQL-based client for the FTGO application. Its constructor instantiates ApolloClient, which is provided by the Apollo GraphQL client library. The FtgoGraphQLClient class defines a findConsumer() method that uses the client to retrieve the name of a consumer. 
-
 
 Listing 8.11 Using the Apollo GraphQL client to execute queries 
 
@@ -1070,7 +937,6 @@ class FtgoGraphQLClient {
 
 The FtgoGraphQLClient class can define a variety of query methods, such as findConsumer(). Each one executes a query that retrieves exactly the data needed by the client. 
 
-
 ## Summary
 
 This section has barely scratched the surface of GraphQL’s capabilities. I hope I’ve demonstrated that GraphQL is a very appealing alternative to a more traditional, REST-based API gateway. It lets you implement an API that’s flexible enough to support a diverse set of clients. Consequently, you should consider using GraphQL to implement your API gateway. 
@@ -1086,5 +952,4 @@ This section has barely scratched the surface of GraphQL’s capabilities. I hop
 - Spring Cloud Gateway is a good, easy-to-use framework for developing an API gateway. It routes requests using any request attribute, including the method and the path. Spring Cloud Gateway can route a request either directly to a backend service or to a custom handler method. It’s built using the scalable, reactive Spring Framework 5 and Project Reactor frameworks. You can write your custom request handlers in a reactive style using, for example, Project Reactor’s Mono abstraction. 
 
 - GraphQL, a framework that provides graph-based query language, is another excellent foundation for developing an API Gateway. You write a graph-oriented schema to describe the server-side data model and its supported queries. You then map that schema to your services by writing resolvers, which retrieve data. GraphQL-based clients execute queries against the schema that specify exactly the data that the server should return. As a result, a GraphQL-based API gateway can support diverse clients. 
-
 

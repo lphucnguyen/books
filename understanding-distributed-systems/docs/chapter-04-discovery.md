@@ -6,14 +6,11 @@ So far, we have explored how to create a reliable and secure channel between two
 
 In this chapter, we will look at how DNS resolution[2] works in a browser, but the process is similar for other types of clients. When you enter a URL in your browser, the first step is to resolve the hostname’s IP address, which is then used to open a new TLS connection. For example, let’s take a look at how the DNS resolution works when you type _www.example.com_ into your browser (see Figure 4.1). 
 
-1. The browser checks its local cache to see whether it has resolved the hostname before. If so, it returns the cached IP address; otherwise, it routes the request to a DNS resolver, 
+1. The browser checks its local cache to see whether it has resolved the hostname before. If so, it returns the cached IP address; otherwise, it routes the request to a DNS resolver,tatracker.ietf.org/doc/html/rfc1035
 
-> 1“RFC 1035: Domain Names - Implementation and Specification,” https://da tatracker.ietf.org/doc/html/rfc1035 
+> 1“RFC 1035: Domain Names - Implementation and Specification,” https://da
 
-2“A deep dive into DNS,” https://www.youtube.com/watch?v=drWd9HIhJ dU 
-
-
-32 a server typically hosted by your Internet Service Provider (ISP). 
+2“A deep dive into DNS,” https://www.youtube.com/watch?v=drWd9HIhJ dU a server typically hosted by your Internet Service Provider (ISP). 
 
 2. The resolver is responsible for iteratively resolving the hostname for its clients. The reason why it’s iterative will become obvious in a moment. The resolver first checks its local cache for a cached entry, and if one is found, it’s returned to the client. If not, the query is sent to a root name server (root NS). 
 
@@ -33,12 +30,7 @@ The resolution process involves several round trips in the worst case, but its b
 
 > 3“RFC 7858: Specification for DNS over Transport Layer Security (TLS),” https: //en.wikipedia.org/wiki/DNS_over_TLS 
 
-
-33 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0051-02.png)
-
 
 Figure 4.1: DNS resolution process server lookups. Not only that, but think of the scale required for the name servers to handle the global resolution load. So caching is used to speed up the resolution process since the mapping of domain names to IP addresses doesn’t change often — the browser, operating system, and DNS resolver all use caches internally. 
 
@@ -46,13 +38,9 @@ How do these caches know when to expire a record? Every DNS record has a _time t
 
 Setting a TTL requires making a tradeoff. If you use a long TTL, many clients won’t see a change for a long time. But if you set it too short, you increase the load on the name servers and the average response time of requests because clients will have to resolve the hostname more often. 
 
-If your name server becomes unavailable for any reason, then the 
-
-
-34 smaller the record’s TTL is, the higher the number of clients impacted will be. DNS can easily become a single point of failure — if your DNS name server is down and clients can’t find the IP address of your application, they won’t be able to connect it. This can lead to massive outages[4] . 
+If your name server becomes unavailable for any reason, then the smaller the record’s TTL is, the higher the number of clients impacted will be. DNS can easily become a single point of failure — if your DNS name server is down and clients can’t find the IP address of your application, they won’t be able to connect it. This can lead to massive outages[4] . 
 
 This brings us to an interesting observation. DNS could be a lot more robust to failures if DNS caches would serve stale entries when they can’t reach a name server, rather than treating TTLs as time bombs. Since entries rarely change, serving a stale entry is arguably a lot more robust than not serving any entry at all. The principle that a system should continue to function even when a dependency is impaired is also referred to as “static stability”; we will talk more about it in the resiliency part of the book. 
 
 4“DDoS attack on Dyn,” https://en.wikipedia.org/wiki/2016_Dyn_cyberatta ck 
-
 

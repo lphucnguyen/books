@@ -12,8 +12,6 @@ The heart of an enterprise application is the business logic, which implements t
 
 Developing complex business logic is even more challenging in a microservice architecture where the business logic is spread over multiple services. You need to 
 
-
-_**Business logic organization patterns**_
 address two key challenges. First, a typical domain model is a tangled web of interconnected classes. Although this isn’t a problem in a monolithic application, in a microservice architecture, where classes are scattered around different services, you need to eliminate object references that would otherwise span service boundaries. The second challenge is designing business logic that works within the transaction management constraints of a microservice architecture. Your business logic can use ACID transactions within services, but as described in chapter 4, it must use the Saga pattern to maintain data consistency across services. 
 
 Fortunately, we can address these issues by using the Aggregate pattern from DDD. The Aggregate pattern structures a service’s business logic as a collection of aggregates. An _aggregate_ is a cluster of objects that can be treated as a unit. There are two reasons why aggregates are useful when developing business logic in a microservice architecture: 
@@ -42,38 +40,23 @@ This service consists of the business logic and the following adapters:
 
 - Domain Event Publishing Adapter—An outbound adapter that publishes events to a message broker 
 
-
-_**Designing business logic in a microservice architecture**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0178-03.png)
-
 
 **----- Start of picture text -----**<br>
 POST/orders<br>Inbound adapters GET/order/Id<br>REST API<br>Order<br>Service requests Order<br>command<br>handlers<br>Order Service<br>business logic<br>Order events<br>Domain event<br>publisher adapter<br>Database<br>adapter<br>Outbound adapters<br>Order database<br>**----- End of picture text -----**<br>
 
-
 Figure 5.1 The **Order Service** has a hexagonal architecture. It consists of the business logic and one or more adapters that interface with external applications and other services. 
 
-The business logic is typically the most complex part of the service. When developing business logic, you should consciously organize your business logic in the way that’s most appropriate for your application. After all, I’m sure you’ve experienced the frustration of having to maintain someone else’s badly structured code. Most enterprise applications are written in an object-oriented language such as Java, so they consist of classes and methods. But using an object-oriented language doesn’t guarantee that the business logic has an object-oriented design. The key decision you must make when developing business logic is whether to use an object-oriented approach or a procedural approach. There are two main patterns for organizing 
-
-
-_**Business logic organization patterns**_ 
-
-
-business logic: the procedural Transaction script pattern, and the object-oriented Domain model pattern. 
+The business logic is typically the most complex part of the service. When developing business logic, you should consciously organize your business logic in the way that’s most appropriate for your application. After all, I’m sure you’ve experienced the frustration of having to maintain someone else’s badly structured code. Most enterprise applications are written in an object-oriented language such as Java, so they consist of classes and methods. But using an object-oriented language doesn’t guarantee that the business logic has an object-oriented design. The key decision you must make when developing business logic is whether to use an object-oriented approach or a procedural approach. There are two main patterns for organizing business logic: the procedural Transaction script pattern, and the object-oriented Domain model pattern. 
 
 ### 5.1.1 Designing business logic using the Transaction script pattern
 
 Although I’m a strong advocate of the object-oriented approach, there are some situations where it is overkill, such as when you are developing simple business logic. In such a situation, a better approach is to write procedural code and use what the book _Patterns of Enterprise Application Architecture_ by Martin Fowler (Addison-Wesley Professional, 2002) calls the Transaction script pattern. Rather than doing any object-oriented design, you write a method called a _transaction script_ to handle each request from the presentation tier. As figure 5.2 shows, an important characteristic of this approach is that the classes that implement behavior are separate from those that store state. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0179-05.png)
-
 
 **----- Start of picture text -----**<br>
 Classes with<br>OrderService behavior<br>createOrder()<br>reviseOrder()<br>cancelOrder()<br>...<br>OrderDao Order<br>save(Order) orderId<br>findOrderById() orderLineItems<br>... ...<br>Classes<br>with state<br>**----- End of picture text -----**<br>
-
 
 Figure 5.2 Organizing business logic as transaction scripts. In a typical transaction script–based design, one set of classes implements behavior and another set stores state. The transaction scripts are organized into classes that typically have no state. The scripts use data classes, which typically have no behavior. 
 
@@ -83,13 +66,7 @@ When using the Transaction script pattern, the scripts are usually located in se
 
 Organize the business logic as a collection of procedural transaction scripts, one for each type of request. 
 
-This style of design is highly procedural and relies on few of the capabilities of objectoriented programming (OOP) languages. This what you would create if you were writing the application in C or another non-OOP language. Nevertheless, you shouldn’t be 
-
-
-_**Designing business logic in a microservice architecture**_ 
-
-
-ashamed to use a procedural design when it’s appropriate. This approach works well for simple business logic. The drawback is that this tends not to be a good way to implement complex business logic. 
+This style of design is highly procedural and relies on few of the capabilities of objectoriented programming (OOP) languages. This what you would create if you were writing the application in C or another non-OOP language. Nevertheless, you shouldn’t be ashamed to use a procedural design when it’s appropriate. This approach works well for simple business logic. The drawback is that this tends not to be a good way to implement complex business logic. 
 
 ### 5.1.2 Designing business logic using the Domain model pattern
 
@@ -101,19 +78,12 @@ Organize the business logic as an object model consisting of classes that have s
 
 In an object-oriented design, the business logic consists of an object model, a network of relatively small classes. These classes typically correspond directly to concepts from the problem domain. In such a design some classes have only either state or behavior, but many contain both, which is the hallmark of a well-designed class. Figure 5.3 shows an example of the Domain model pattern. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0180-09.png)
-
 
 **----- Start of picture text -----**<br>
 Some classes have only behavior. Some classes have only state.<br>OrderService DeliveryInformation<br>createOrder() deliveryTime<br>reviseOrder() deliveryAddress<br>cancelOrder()<br>...<br>Uses<br>Order<br>OrderRepository «private»<br>orderId<br>findOrderById() orderLineItems<br>...<br>...<br>revise()<br>cancel()<br>Many classes have «static»<br>state and behavior.<br>create()<br>**----- End of picture text -----**<br>
 
-
 Figure 5.3 Organizing business logic as a domain model. The majority of the business logic consists of classes that have state and behavior. 
-
-
-_**Business logic organization patterns**_ 
-
 
 As with the Transaction script pattern, an OrderService class has a method for each request/system operation. But when using the Domain model pattern, the service methods are usually simple. That’s because a service method almost always delegates to persistent domain objects, which contain the bulk of the business logic. A service method might, for example, load a domain object from the database and invoke one of its methods. In this example, the Order class has both state and behavior. Moreover, its state is private and can only be accessed indirectly via its methods. 
 
@@ -131,10 +101,7 @@ DDD also has some tactical patterns that are building blocks for domain models. 
 
 - _Value object_ —An object that is a collection of values. Two value objects whose attributes have the same values can be used interchangeably. An example of a value object is a Money class, which consists of a currency and an amount. 
 
-- _Factory_ —An object or method that implements object creation logic that’s too complex to be done directly by a constructor. It can also hide the concrete 
-
-
-classes that are instantiated. A factory might be implemented as a static method of a class. 
+- _Factory_ —An object or method that implements object creation logic that’s too complex to be done directly by a constructor. It can also hide the concrete classes that are instantiated. A factory might be implemented as a static method of a class. 
 
 - _Repository_ —An object that provides access to persistent entities and encapsulates the mechanism for accessing the database. 
 
@@ -146,23 +113,14 @@ These building blocks are used by many developers. Some are supported by framewo
 
 In traditional object-oriented design, a domain model is a collection of classes and relationships between classes. The classes are usually organized into packages. For example, figure 5.4 shows part of a domain model for the FTGO application. It’s a typical domain model consisting of a web of interconnected classes. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0182-08.png)
-
 
 **----- Start of picture text -----**<br>
 Assigned to<br>Placed by For Restaurant Courier Location<br>Consumer Order<br>name available lat<br>state ... ... lon<br>...<br>Pays using Paid using<br>PaymentInfo DeliveryInfo OrderLineItem MenuItem Address<br>creditcardId deliveryTime quantity name street1<br>... price street2<br>city<br>state<br>zip<br>**----- End of picture text -----**<br>
 
-
 Figure 5.4 A traditional domain model is a web of interconnected classes. It doesn’t explicitly specify the boundaries of business objects, such as **Consumer** and **Order** . 
 
-This example has several classes corresponding to business objects: Consumer, Order, Restaurant, and Courier. But interestingly, the explicit boundaries of each business object are missing from this kind of traditional domain model. It doesn’t specify, for 
-
-
-_**Designing a domain model using the DDD aggregate pattern**_ 
-
-
-example, which classes are part of the Order business object. This lack of boundaries can sometimes cause problems, especially in microservice architecture. 
+This example has several classes corresponding to business objects: Consumer, Order, Restaurant, and Courier. But interestingly, the explicit boundaries of each business object are missing from this kind of traditional domain model. It doesn’t specify, for example, which classes are part of the Order business object. This lack of boundaries can sometimes cause problems, especially in microservice architecture. 
 
 I begin this section with an example problem caused by the lack of explicit boundaries. Next I describe the concept of an aggregate and how it has explicit boundaries. After that, I describe the rules that aggregates must obey and how they make aggregates a good fit for the microservice architecture. I then describe how to carefully choose the boundaries of your aggregates and why it matters. Finally, I discuss how to design business logic using aggregates. Let’s first take a look at the problems caused by fuzzy boundaries. 
 
@@ -176,10 +134,6 @@ For example, let’s look at how to ensure the order minimum is met when multipl
 
 |Consumer - Mary<br>BEGIN TXN<br>SELECT ORDER_TOTAL FROM ORDER<br>WHERE ORDER ID = X<br>SELECT * FROM ORDER_LINE_ITEM<br>WHERE ORDER_ID = X<br>...<br>END TXN<br>Verify minimum is met|Consumer - Sam<br>BEGIN TXN<br>SELECT ORDER_TOTAL FROM ORDER<br>WHERE ORDER ID = X<br>SELECT * FROM ORDER_LINE_ITEM<br>WHERE ORDER_ID = X<br>...<br>END TXN|
 |---|---|
-
-
-_**Designing business logic in a microservice architecture**_ 
-
 
 BEGIN TXN UPDATE ORDER_LINE_ITEM SET VERSION=..., QUANTITY=... WHERE VERSION = <loaded version> AND ID = ... END TXN 
 
@@ -199,16 +153,10 @@ Organize a domain model as a collection of aggregates, each of which is a graph 
 
 Figure 5.5 shows the Order aggregate and its boundary. An Order aggregate consists of an Order entity, one or more OrderLineItem value objects, and other value objects such as a delivery Address and PaymentInformation. 
 
-
-_**Designing a domain model using the DDD aggregate pattern**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0185-02.png)
-
 
 **----- Start of picture text -----**<br>
 «value object» «aggregate root» «aggregate root» «value object»<br>DeliveryInfo Order Consumer DeliveryInfo<br>«value object» «value object»<br>PaymentInfo PaymentInfo<br>Consumer aggregate<br>«value object» «aggregate root»<br>OrderLineItem Restaurant<br>quantity ...<br>Order aggregate Restaurant aggregate<br>**----- End of picture text -----**<br>
-
 
 Figure 5.5 Structuring a domain model as a set of aggregates makes the boundaries explicit. 
 
@@ -226,7 +174,6 @@ In DDD, a key part of designing a domain model is identifying aggregates, their 
 
 DDD requires aggregates to obey a set of rules. These rules ensure that an aggregate is a self-contained unit that can enforce its invariants. Let’s look at each of the rules. 
 
-
 **RULE #1: REFERENCE ONLY THE AGGREGATE ROOT**
 
 The previous example illustrated the perils of updating OrderLineItems directly. The goal of the first aggregate rule is to eliminate this problem. It requires that the root entity be the only part of an aggregate that can be referenced by classes outside of the aggregate. A client can only update an aggregate by invoking a method on the aggregate root. 
@@ -237,13 +184,10 @@ A service, for example, uses a repository to load an aggregate from the database
 
 Another rule is that aggregates reference each other by identity (for example, primary key) instead of object references. For example, as figure 5.6 shows, an Order references its Consumer using a consumerId rather than a reference to the Consumer object. Similarly, an Order references a Restaurant using a restaurantId. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0186-07.png)
-
 
 **----- Start of picture text -----**<br>
 DeliveryInfo «aggregate root» «aggregate root» DeliveryInfo<br>Order Consumer<br>consumerId<br>PaymentInfo restaurantId ... PaymentInfo<br>...<br>Consumer aggregate<br>«aggregate root»<br>OrderLineItem<br>Restaurant<br>quantity ...<br>Order aggregate Restaurant aggregate<br>**----- End of picture text -----**<br>
-
 
 Figure 5.6 References between aggregates are by primary key rather than by object reference. The **Order** aggregate has the IDs of the **Consumer** and **Restaurant** aggregates. Within an aggregate, objects have references to one another. 
 
@@ -251,8 +195,6 @@ This approach is quite different from traditional object modeling, which conside
 
 This approach also simplifies persistence since the aggregate is the unit of storage. It makes it easier to store aggregates in a NoSQL database such as MongoDB. It also 
 
-
-_**Designing a domain model using the DDD aggregate pattern**_
 eliminates the need for transparent lazy loading and its associated problems. Scaling the database by sharding aggregates is relatively straightforward. 
 
 **RULE #3: ONE TRANSACTION CREATES OR UPDATES ONE AGGREGATE**
@@ -261,13 +203,10 @@ Another rule that aggregates must obey is that a transaction can only create or 
 
 This rule makes it more complicated to implement operations that need to create or update multiple aggregates. But this is exactly the problem that sagas (described in chapter 4) are designed to solve. Each step of the saga creates or updates exactly one aggregate. Figure 5.7 shows how this works. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0187-06.png)
-
 
 **----- Start of picture text -----**<br>
 Saga<br>Service A Service B<br>Local transaction 1 Local transaction 2 Local transaction 3<br>Create/update Create/update Create/update<br>Aggregate X Aggregate Y Aggregate Z<br>**----- End of picture text -----**<br>
-
 
 Figure 5.7 A transaction can only create or update a single aggregate, so an application uses a saga to update multiple aggregates. Each step of the saga creates or updates one aggregate. 
 
@@ -277,20 +216,16 @@ An alternative approach to maintaining consistency across multiple aggregates wi
 
 Or is there? It turns out that aggregate boundaries are not set in stone. When developing a domain model, you get to choose where the boundaries lie. But like a 20th century colonial power drawing national boundaries, you need to be careful. 
 
-
 ### 5.2.4 Aggregate granularity
 
 When developing a domain model, a key decision you must make is how large to make each aggregate. On one hand, aggregates should ideally be small. Because updates to each aggregate are serialized, more fine-grained aggregates will increase the number of simultaneous requests that the application can handle, improving scalability. It will also improve the user experience because it reduces the chance of two users attempting conflicting updates of the same aggregate. On the other hand, because an aggregate is the scope of transaction, you may need to define a larger aggregate in order to make a particular update atomic. 
 
 For example, earlier I mentioned how in the FTGO application’s domain model Order and Consumer are separate aggregates. An alternative design is to make Order part of the Consumer aggregate. Figure 5.8 shows this alternative design. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0188-05.png)
-
 
 **----- Start of picture text -----**<br>
 <<aggregate root>><br>DeliveryInfo Order DeliveryInfo<br>Consumer<br>restaurantId<br>PaymentInfo ... ... PaymentInfo<br><<aggregate root>><br>OrderLineItem<br>Restaurant<br>quantity ...<br>Consumer aggregate Restaurant aggregate<br>**----- End of picture text -----**<br>
-
 
 Figure 5.8 An alternative design defines a **Customer** aggregate that contains the **Customer** and **Order** classes. This design enables an application to atomically update a **Consumer** and one or more of its **Orders** . 
 
@@ -298,28 +233,18 @@ A benefit of this larger Consumer aggregate is that the application can atomical
 
 Another drawback of this approach in a microservice architecture is that it is an obstacle to decomposition. The business logic for Orders and Consumers, for example, must be collocated in the same service, which makes the service larger. Because of these issues, making aggregates as fine-grained as possible is best. 
 
-
-_**Designing a domain model using the DDD aggregate pattern**_ 
-
-
 ### 5.2.5 Designing business logic with aggregates
 
 In a typical (micro)service, the bulk of the business logic consists of aggregates. The rest of the business logic resides in the domain services and the sagas. The sagas orchestrate sequences of local transactions in order to enforce data consistency. The services are the entry points into the business logic and are invoked by inbound adapters. A service uses a repository to retrieve aggregates from the database or save aggregates to the database. Each repository is implemented by an outbound adapter that accesses the database. Figure 5.9 shows the aggregate-based design of the business logic for the Order Service. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0189-04.png)
-
 
 **----- Start of picture text -----**<br>
 REST API<br>Order<br>command<br>handlers<br>«service»<br>OrderService<br>createOrder()<br>reviseOrder()<br>Domain cancelOrder()<br>event<br>publisher<br>«saga»<br>CreateOrder<br>«aggregate» Saga<br>Order<br>id «saga»<br>... ReviseOrder<br>Saga<br>«value object»<br>OrderLineItem «repository»<br>OrderRepository<br>quantity<br>menuItem voidSave(Order)<br>name Orer findOne(id)<br>...<br>Database<br>adapter<br>**----- End of picture text -----**<br>
 
-
 Figure 5.9 An aggregate-based design for the **Order Service** business logic 
 
-The business logic consists of the Order aggregate, the OrderService service class, the OrderRepository, and one or more sagas. The OrderService invokes the OrderRepository to save and load Orders. For simple requests that are local to the service, 
-
-
-the service updates an Order aggregate. If an update request spans multiple services, the OrderService will also create a saga, as described in chapter 4. 
+The business logic consists of the Order aggregate, the OrderService service class, the OrderRepository, and one or more sagas. The OrderService invokes the OrderRepository to save and load Orders. For simple requests that are local to the service, the service updates an Order aggregate. If an update request spans multiple services, the OrderService will also create a saga, as described in chapter 4. 
 
 We’ll take a look at the code—but first, let’s examine a concept that’s closely related to aggregates: domain events. 
 
@@ -356,10 +281,6 @@ Domain events are useful because other parties—users, other applications, or o
 - Notifying a different component of the same application in order, for example, to send a WebSocket message to a user’s browser or update a text database such as ElasticSearch. 
 
 - Sending notifications—text messages or emails—to users informing them that their order has shipped, their Rx prescription is ready for pick up, or their flight is delayed. 
-
-
-_**Publishing domain events**_ 
-
 
 - Monitoring domain events to verify that the application is behaving correctly. 
 
@@ -398,7 +319,6 @@ The DomainEvent interface is a marker interface that identifies a class as a dom
 
 Let’s imagine, for example, that you’re writing an event consumer that processes Order events. The OrderCreated event class shown previously captures the essence of what has happened. But your event consumer may need the order details when processing an 
 
-
 OrderCreated event. One option is for it to retrieve that information from the OrderService. The drawback of an event consumer querying the service for the aggregate is that it incurs the overhead of a service request. 
 
 An alternative approach known as _event enrichment_ is for events to contain information that consumers need. It simplifies event consumers because they no longer need to request that data from the service that published the event. In the OrderCreated event, the Order aggregate can enrich the event by including the order details. The following listing shows the enriched event. 
@@ -428,10 +348,6 @@ There are a few different strategies for identifying domain events. Often the re
 
 Another approach, which is increasing in popularity, is to use event storming. _Event storming_ is an event-centric workshop format for understanding a complex domain. It involves gathering domain experts in a room, lots of sticky notes, and a very large surface—a whiteboard or paper roll—to stick the notes on. The result of event storming is an event-centric domain model consisting of aggregates and events. 
 
-
-_**Publishing domain events**_ 
-
-
 Event storming consist of three main steps: 
 
 - 1 _Brainstorm events_ —Ask the domain experts to brainstorm the domain events. Domain events are represented by orange sticky notes that are laid out in a rough timeline on the modeling surface. 
@@ -450,20 +366,16 @@ Event storming consist of three main steps:
 
 Figure 5.10 shows the result of an event-storming workshop. In just a couple of hours, the participants identified numerous domain events, commands, and aggregates. It was a good first step in the process of creating a domain model. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0193-11.png)
-
 
 **----- Start of picture text -----**<br>
 Event Command Aggregate Policy<br>**----- End of picture text -----**<br>
-
 
 Figure 5.10 The result of an event-storming workshop that lasted a couple of hours. The sticky notes are events, which are laid out along a timeline; commands, which represent user actions; and aggregates, which emit events in response to a command. 
 
 Event storming is a useful technique for quickly creating a domain model. 
 
 Now that we’ve covered the basics of domain events, let’s look at the mechanics of generating and publishing them. 
-
 
 ### 5.3.5 Generating and publishing domain events
 
@@ -531,7 +443,6 @@ public class Ticket extends AbstractAggregateRoot {
 Ticket extends AbstractAggregateRoot, which defines a registerDomainEvent() method that records the event. A service would call AbstractAggregateRoot.getDomainEvents() to retrieve those events. 
 
 My preference is for the first option: the method returning events to the service. But accumulating events in the aggregate root is also a viable option. In fact, the Spring Data Ingalls release train (https://spring.io/blog/2017/01/30/what-s-new-inspring-data-release-ingalls) implements a mechanism that automatically publishes events to the Spring ApplicationContext. The main drawback is that to reduce code duplication, aggregate roots should extend a superclass such as AbstractAggregateRoot, which might conflict with a requirement to extend some other superclass. Another issue is that although it’s easy for the aggregate root’s methods to call registerDomainEvent(), methods in other classes in the aggregate would find it challenging. They would mostly likely need to somehow pass the events to the aggregate root. 
-
 
 **HOW TO RELIABLY PUBLISH DOMAIN EVENTS?**
 
@@ -642,16 +553,10 @@ The service also has two outbound adapters:
 
 - DomainEventPublishingAdapter—Implements the DomainEventPublisher interface and publishes Ticket domain events. 
 
-
-_**Kitchen Service business logic**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0199-02.png)
-
 
 **----- Start of picture text -----**<br>
 Restaurant<br>accept<br>reject<br>preparing<br>readyForPickup<br>pickedUp<br>REST API<br>Create ticket Restaurant created<br>Confirm create ticket Restaurant menu revised<br>KitchenService KitchenService<br>CommandHandler EventConsumer<br>Kitchen Service Restaurant Events<br>command channel Kitchen channel<br>Service<br>«aggregate»<br>Ticket<br>«repository»<br>Ticket<br>Domain event<br>Repository<br>publisher<br>«aggregate»<br>restaurant<br>Domain event Database<br>publishing adapter «repository» adapter<br>Ticket events Restaurant Kitchen Service<br>channel Repository database<br>**----- End of picture text -----**<br>
-
 
 Figure 5.11 The design of **Kitchen Service** 
 
@@ -662,7 +567,6 @@ Let’s take a closer look at the design of KitchenService, starting with the Ti
 Ticket is one of the aggregates of Kitchen Service. As described in chapter 2, when talking about the concept of a Bounded Context, this aggregate represents the restaurant kitchen’s view of an order. It doesn’t contain information about the consumer, such as their identity, the delivery information, or payment details. It’s focused on enabling a restaurant’s kitchen to prepare the Order for pickup. Moreover, KitchenService doesn’t generate a unique ID for this aggregate. Instead, it uses the ID supplied by OrderService. 
 
 Let’s first look at the structure of this class and then we’ll examine its methods. 
-
 
 **STRUCTURE OF THE TICKET CLASS**
 
@@ -705,9 +609,6 @@ The Ticket aggregate defines several methods. As you saw earlier, it has a stati
 
 The following listing shows some of its methods. 
 
-
-_**Kitchen Service business logic**_ 
-
 **Listing 5.11 Some of the Ticket 's methods**
 
 ```java
@@ -728,7 +629,6 @@ public class Ticket {
   } 
 
   public List<TicketDomainEvent> cancel() { 
-    switch (state) { 
       case CREATED: 
       case ACCEPTED: 
         this.state = TicketState.CANCELLED; 
@@ -736,7 +636,6 @@ public class Ticket {
       case READY_FOR_PICKUP: 
         throw new TicketCannotBeCancelledException(); 
       default: 
-        throw new UnsupportedStateTransitionException(state); 
     } 
   } 
 }
@@ -747,7 +646,6 @@ The create() method creates a Ticket. The preparing() method is called when the 
 **THE KITCHENSERVICE DOMAIN SERVICE**
 
 KitchenService is invoked by the service’s inbound adapters. It defines various methods for changing the state of an order, including accept(), reject(), preparing(), and others. Each method loads the specifies aggregate, calls the corresponding method on the aggregate root, and publishes any domain events. The following listing shows its accept() method. 
-
 
 Listing 5.12 The service’s **accept()** method updates **Ticket** 
 
@@ -832,23 +730,14 @@ As mentioned in earlier chapters, Order Service provides an API for creating, up
 
 In addition to the Order and Restaurant aggregates, the business logic consists of OrderService, OrderRepository, RestaurantRepository, and various sagas such as the CreateOrderSaga described in chapter 4. OrderService is the primary entry point into the business logic and defines methods for creating and updated Orders 
 
-
-_**Designing business logic in a microservice architecture**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0204-03.png)
-
 
 **----- Start of picture text -----**<br>
 Consumer<br>createOrder()<br>cancelOrder() Restaurant Events<br>reviseOrder() channel<br>Ticket events<br>channel<br>REST API<br>Order Service<br>command channel<br>OrderEvent<br>consumer<br>Consumer Service<br>Domain event<br>Order command channel<br>publishing command<br>adapter handlers<br>OrderService<br>Kitchen Service<br>Outbound command channel<br>Domain event «saga» Command command<br>publisher *OrderSaga producer message<br>adapter<br>Accounting Service<br>command channel<br>«aggregate»<br>Restaurant<br>«aggregate» Create order saga<br>«repository» Order reply channel<br>Restaurant<br>Repository<br>Cancel order saga<br>«repository»<br>OrderRepository SagaReply reply channel<br>message<br>adapter<br>Revise order saga<br>Database reply channel<br>adapter<br>Order Service<br>database<br>**----- End of picture text -----**<br>
 
-
 Figure 5.12 The design of the **Order Service** . It has a REST API for managing orders. It exchanges messages and events with other services via several message channels. and Restaurants. OrderRepository defines methods for persisting Orders, and RestaurantRepository has methods for persisting Restaurants. Order Service has several inbound adapters: 
 
 - REST API—The REST API invoked by the user interface used by consumers. It invokes OrderService to create and update Orders. 
-
-
-_**Order Service business logic**_ 
 
 - OrderEventConsumer—Subscribes to events published by Restaurant Service. It invokes OrderService to create and update its replica of Restaurants. 
 
@@ -874,16 +763,12 @@ The Order aggregate represents an order placed by a consumer. We’ll first look
 
 Figure 5.13 shows the structure of the Order aggregate. The Order class is the root of the Order aggregate. The Order aggregate also consists of value objects such as OrderLineItem, DeliveryInfo, and PaymentInfo. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0205-14.png)
-
 
 **----- Start of picture text -----**<br>
 «value object»<br>Address<br>«value object» street1<br>DeliveryInfo street2<br>deliveryTime city<br>state<br>zip<br>«aggregate»<br>Order<br>state «value object»<br>consumerId PaymentInfo<br>restaurantId<br>... paymentMethodId<br>Order minimum<br>«value object»<br>OrderLineItem Price «value object»<br>quantity Money<br>menuItem amount<br>name<br>**----- End of picture text -----**<br>
 
-
 Figure 5.13 The design of the **Order** aggregate, which consists of the **Order** aggregate root and various value objects. 
-
 
 The Order class has a collection of OrderLineItems. Because the Order’s Consumer and Restaurant are other aggregates, it references them by primary key value. The Order class has a DeliveryInfo class, which stores the delivery address and the desired delivery time, and a PaymentInfo, which stores the payment info. The following listing shows the code. 
 
@@ -926,17 +811,12 @@ This class is persisted with JPA and is mapped to the ORDERS table. The id field
 
 In order to create or update an order, Order Service must collaborate with other services using sagas. Either OrderService or the first step of the saga invokes an Order method that verifies that the operation can be performed and changes the state of the Order to a pending state. A _pending_ state, as explained in chapter 4, is an example of 
 
-
-_**Order Service business logic**_
 a semantic lock countermeasure, which helps ensure that sagas are isolated from one another. Eventually, once the saga has invoked the participating services, it then updates the Order to reflect the outcome. For example, as described in chapter 4, the Create Order Saga has multiple participant services, including Consumer Service, Accounting Service, and Kitchen Service. OrderService first creates an Order in an APPROVAL_PENDING state, and then later changes its state to either APPROVED or REJECTED. The behavior of an Order can be modeled as the state machine shown in figure 5.14. 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0207-03.png)
 
-
 **----- Start of picture text -----**<br>
 Initial state cancelConfirmed<br>CANCEL_PENDING CANCELLED<br>cancelRejected cancel<br>authorized<br>APPROVAL_PENDING APPROVED ...<br>reviseConfirmed<br>revise<br>rejected reviseRejected<br>REJECTED REVISION_PENDING<br>**----- End of picture text -----**<br>
-
 
 Figure 5.14 Part of the state machine model of the **Order** aggregate 
 
@@ -947,7 +827,6 @@ Let’s now look at the how the Order aggregate implements this state machine.
 **THE ORDER AGGREGATE’S METHODS**
 
 The Order class has several groups of methods, each of which corresponds to a saga. In each group, one method is invoked at the start of the saga, and the other methods are invoked at the end. I’ll first discuss the business logic that creates an Order. After that we’ll look at how an Order is updated. The following listing shows the Order’s methods that are invoked during the process of creating an Order. 
-
 
 Listing 5.15 The methods that are invoked during order creation 
 
@@ -979,12 +858,9 @@ public class Order {
   } 
 
   public List<DomainEvent> noteRejected() { 
-    switch (state) { 
-      case APPROVAL_PENDING: 
         this.state = REJECTED; 
         return singletonList(new OrderRejected()); 
       default: 
-        throw new UnsupportedStateTransitionException(state); 
     } 
   } 
   ... 
@@ -992,9 +868,6 @@ public class Order {
 ```
 
 The createOrder() method is a static factory method that creates an Order and publishes an OrderCreatedEvent. The OrderCreatedEvent is enriched with the details of the Order, including the line items, the total amount, the restaurant ID, and the restaurant name. Chapter 7 discusses how Order History Service uses Order events, including OrderCreatedEvent, to maintain an easily queried replica of Orders. 
-
-
-_**Order Service business logic**_ 
 
 The initial state of the Order is APPROVAL_PENDING. When the CreateOrderSaga completes, it will invoke either noteApproved() or noteRejected(). The noteApproved() method is invoked when the consumer’s credit card has been successfully authorized. The noteRejected() method is called when one of the services rejects the order or authorization fails. As you can see, the state of the Order aggregate determines the behavior of most of its methods. Like the Ticket aggregate, it also emits events. 
 
@@ -1005,7 +878,6 @@ Listing 5.16 The **Order** method for revising an **Order**
 ```java
 public class Order { 
   public List<OrderDomainEvent> revise(OrderRevision orderRevision) { 
-    switch (state) { 
       case APPROVED: 
         LineItemQuantityChange change = orderLineItems.lineItemQuantityChange(orderRevision); 
         if (change.newOrderTotal.isGreaterThanOrEqual(orderMinimum)) { 
@@ -1014,12 +886,10 @@ public class Order {
         this.state = OrderState.REVISION_PENDING; 
         return singletonList(new OrderRevisionProposed(orderRevision, change.currentOrderTotal, change.newOrderTotal)); 
       default: 
-        throw new UnsupportedStateTransitionException(state); 
     } 
   } 
 
   public List<OrderDomainEvent> confirmRevision(OrderRevision orderRevision) { 
-    switch (state) { 
       case REVISION_PENDING: 
         LineItemQuantityChange licd = orderLineItems.lineItemQuantityChange(orderRevision); 
         orderRevision.getDeliveryInformation().ifPresent(newDi -> this.deliveryInformation = newDi); 
@@ -1029,7 +899,6 @@ public class Order {
         this.state = OrderState.APPROVED; 
         return singletonList(new OrderRevised(orderRevision, licd.currentOrderTotal, licd.newOrderTotal)); 
       default: 
-        throw new UnsupportedStateTransitionException(state); 
     } 
   } 
 }
@@ -1094,13 +963,7 @@ The createOrder() method first creates and persists an Order aggregate. It then 
 
 In many ways, the business logic for a microservices-based application is not that different from that of a monolithic application. It’s comprised of classes such as services, JPA-backed entities, and repositories. There are some differences, though. A domain model is organized as a set of DDD aggregates that impose various design constraints. Unlike in a traditional object model, references between classes in different aggregates are in terms of primary key value rather than object references. Also, a transaction can only create or update a single aggregate. It’s also useful for aggregates to publish domain events when their state changes. 
 
-Another major difference is that services often use sagas to maintain data consistency across multiple services. For example, Kitchen Service merely participates in sagas, it doesn’t initiate them. In contrast, Order Service relies heavily on sagas when 
-
-
-_**Designing business logic in a microservice architecture**_ 
-
-
-creating and updating orders. That’s because Orders must be transactionally consistent with data owned by other services. As a result, most OrderService methods create a saga rather than update an Order directly. 
+Another major difference is that services often use sagas to maintain data consistency across multiple services. For example, Kitchen Service merely participates in sagas, it doesn’t initiate them. In contrast, Order Service relies heavily on sagas when creating and updating orders. That’s because Orders must be transactionally consistent with data owned by other services. As a result, most OrderService methods create a saga rather than update an Order directly. 
 
 This chapter has covered how to implement business logic using a traditional approach to persistence. That has involved integrating messaging and event publishing with database transaction management. The event publishing code is intertwined with the business logic. The next chapter looks at event sourcing, an event-centric approach to writing business logic where event generation is integral to the business logic rather than being bolted on. 
 
@@ -1111,5 +974,4 @@ This chapter has covered how to implement business logic using a traditional app
 - A good way to organize a service’s business logic is as a collection of DDD aggregates. DDD aggregates are useful because they modularize the domain model, eliminate the possibility of object reference between services, and ensure that each ACID transaction is within a service. 
 
 - An aggregate should publish domain events when it’s created or updated. Domain events have a wide variety of uses. Chapter 4 discusses how they can implement choreography-based sagas. And, in chapter 7, I talk about how to use domain events to update replicated data. Domain event subscribers can also notify users and other applications, and publish WebSocket messages to a user’s browser. 
-
 

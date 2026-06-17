@@ -12,36 +12,23 @@ The server uses specific HTTP response headers[2] to let clients know that a res
 
 > 1This is an example of the replication pattern in action. 
 
-> 2“HTTP caching,” https://developer.mozilla.org/en-US/docs/Web/HTTP /Caching 
-
-
-146 with the resource, it adds a _Cache-Control_ header that defines for how long to cache the resource (TTL) and an _ETag_ header with a version identifier. Finally, when the cache receives the response, it stores the resource locally and returns it to the client (see Figure 14.1). 
-
+> 2“HTTP caching,” https://developer.mozilla.org/en-US/docs/Web/HTTP /Caching with the resource, it adds a _Cache-Control_ header that defines for how long to cache the resource (TTL) and an _ETag_ header with a version identifier. Finally, when the cache receives the response, it stores the resource locally and returns it to the client (see Figure 14.1). 
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0164-03.png)
-
 
 Figure 14.1: A client accessing a resource for the first time (the Age header contains the time in seconds the object was in the cache) 
 
 Now, suppose some time passes and the client tries to access the resource again. The cache first checks whether the resource hasn’t expired yet, i.e., whether it’s _fresh_ . If so, the cache immediately returns it. However, even if the resource hasn’t expired from the client’s point of view, the server may have updated it in the meantime. That means reads are not strongly consistent, but we will safely assume that this is an acceptable tradeoff for our application. 
 
-If the resource has expired, it’s considered _stale_ . In this case, the 
-
-
-147 cache sends a GET request to the server with a conditional header (like _If-None-Match_ ) containing the version identifier of the stale resource to check whether a newer version is available. If there is, the server returns the updated resource; if not, the server replies with a _304 Not Modified_ status code (see Figure 14.2). 
-
+If the resource has expired, it’s considered _stale_ . In this case, the cache sends a GET request to the server with a conditional header (like _If-None-Match_ ) containing the version identifier of the stale resource to check whether a newer version is available. If there is, the server returns the updated resource; if not, the server replies with a _304 Not Modified_ status code (see Figure 14.2). 
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0165-03.png)
-
 
 Figure 14.2: A client accessing a stale resource 
 
 Ideally, a static resource should be immutable so that clients can cache it “forever,” which corresponds to a maximum length of a year according to the HTTP specification. We can still modify a static resource if needed by creating a new one with a different URL so that clients will be forced to fetch it from the server. 
 
-Another advantage of treating static resources as immutable is that we can update multiple related resources atomically. For example, if we publish a new version of the application’s website, the updated HTML index file is going to reference the new URLs for the JavaScript and CSS bundles. Thus, a client will see either the old 
-
-
-148 version of the website or the new one depending on which index file it has read, but never a mix of the two that uses, e.g., the old JavaScript bundle with the new CSS one. 
+Another advantage of treating static resources as immutable is that we can update multiple related resources atomically. For example, if we publish a new version of the application’s website, the updated HTML index file is going to reference the new URLs for the JavaScript and CSS bundles. Thus, a client will see either the old version of the website or the new one depending on which index file it has read, but never a mix of the two that uses, e.g., the old JavaScript bundle with the new CSS one. 
 
 Another way of thinking about HTTP caching is that we treat the read path ( _GET_ ) differently from the write path ( _POST, PUT, DELETE_ ) because we expect the number of reads to be several orders of magnitude higher than the number of writes. This is a common pattern referred to as the _Command Query Responsibility Segregation_[3] (CQRS) pattern.[4] 
 
@@ -51,9 +38,7 @@ To summarize, allowing clients to cache static resources has reduced the load on
 
 A _reverse proxy_ is a server-side proxy that intercepts all communications with clients. Since the proxy is indistinguishable from the actual server, clients are unaware that they are communicating through an intermediary (see Figure 14.3). 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0166-07.png)
-
 
 Figure 14.3: A reverse proxy acts as an intermediary between the clients and the servers. 
 
@@ -62,9 +47,6 @@ A common use case for a reverse proxy is to cache static resources returned by t
 > 3“CQRS,” https://martinfowler.com/bliki/CQRS.html 
 
 > 4This is another instance of functional decomposition. 
-
-
-149 
 
 Because a reverse proxy is a middleman, it can be used for much more than just caching. For example, it can: 
 
@@ -81,5 +63,4 @@ We will explore some of these use cases in the next chapters. NGINX[5] and HAPro
 > 6“HAProxy,” https://www.haproxy.com/ 
 
 5“NGINX,” https://www.nginx.com/ 
-
 

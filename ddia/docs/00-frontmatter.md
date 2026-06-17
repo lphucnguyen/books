@@ -1,13 +1,11 @@
 
 ![](../images/Designing_Data_Intensive_Applications-0001-00.png)
 
-
 **Designing Data-Intensive A lications pp**
 
 THE BIG IDEAS BEHIND RELIABLE, SCALABLE, AND MAINTAINABLE SYSTEMS 
 
 Martin Kleppmann 
-
 
 **Designing Data-Intensive Applications** _**The Big Ideas Behind Reliable, Scalable, and Maintainable Systems**_ 
 
@@ -15,10 +13,7 @@ Martin Kleppmann
 
 **Beijing Boston Farnham Sebastopol Tokyo** 
 
-
-**Designing Data-Intensive Applications**
-
-by Martin Kleppmann 
+**Designing Data-Intensive Applications** by Martin Kleppmann 
 
 Copyright © 2017 Martin Kleppmann. All rights reserved. 
 
@@ -46,14 +41,11 @@ While the publisher and the author have used good faith efforts to ensure that t
 
 978-1-449-37332-0 [LSI] 
 
-
 _Technology is a powerful force in our society. Data, software, and communication can be used for bad: to entrench unfair power structures, to undermine human rights, and to protect vested interests. But they can also be used for good: to make underrepresented people’s voices heard, to create opportunities for everyone, and to avert disasters. This book is dedicated to everyone working toward the good._ 
-
 
 _Computing is pop culture. […] Pop culture holds a disdain for history. Pop culture is all about identity and feeling like you’re participating. It has nothing to do with cooperation, the past or the future—it’s living in the present. I think the same is true of most people who write code for money. They have no idea where [their culture came from]._ 
 
 - —Alan Kay, in interview with _Dr Dobb’s Journal_ (2012) 
-
 
 **Table of Contents**
 
@@ -84,22 +76,13 @@ _Computing is pop culture. […] Pop culture holds a disdain for history. Pop cu
 |||Many-to-One and Many-to-Many Relationships                                                 33|
 |||Are Document Databases Repeating History?                                                       36|
 
-
-
-
 Relational Versus Document Databases Today                                                     38 Query Languages for Data                                                                                            42 Declarative Queries on the Web                                                                              44 MapReduce Querying                                                                                                46 Graph-Like Data Models                                                                                              49 Property Graphs                                                                                                         50 The Cypher Query Language                                                                                   52 Graph Queries in SQL                                                                                               53 Triple-Stores and SPARQL                                                                                       55 The Foundation: Datalog                                                                                          60 Summary                                                                                                                         63 **3. Storage and Retrieval. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  69** Data Structures That Power Your Database                                                              70 Hash Indexes                                                                                                               72 SSTables and LSM-Trees                                                                                           76 B-Trees                                                                                                                         79 Comparing B-Trees and LSM-Trees                                                                       83 Other Indexing Structures                                                                                        85 Transaction Processing or Analytics?                                                                         90 Data Warehousing                                                                                                     91 Stars and Snowflakes: Schemas for Analytics                                                        93 Column-Oriented Storage                                                                                            95 Column Compression                                                                                               97 Sort Order in Column Storage                                                                                 99 Writing to Column-Oriented Storage                                                                  101 Aggregation: Data Cubes and Materialized Views                                             101 Summary                                                                                                                       103 **4. Encoding and Evolution. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  111** Formats for Encoding Data                                                                                        112 Language-Specific Formats                                                                                    113 JSON, XML, and Binary Variants                                                                          114 Thrift and Protocol Buffers                                                                                    117 Avro                                                                                                                           122 The Merits of Schemas                                                                                            127 Modes of Dataflow                                                                                                      128 Dataflow Through Databases                                                                                 129 Dataflow Through Services: REST and RPC                                                        131 Message-Passing Dataflow                                                                                      136 Summary                                                                                                                       139 
-
-
 
 **Part II. Distributed Data**
 
 **5. Replication. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  151** Leaders and Followers                                                                                                 152 Synchronous Versus Asynchronous Replication                                                153 Setting Up New Followers                                                                                      155 Handling Node Outages                                                                                         156 Implementation of Replication Logs                                                                     158 Problems with Replication Lag                                                                                  161 Reading Your Own Writes                                                                                     162 Monotonic Reads                                                                                                     164 Consistent Prefix Reads                                                                                          165 Solutions for Replication Lag                                                                                 167 Multi-Leader Replication                                                                                           168 Use Cases for Multi-Leader Replication                                                               168 Handling Write Conflicts                                                                                       171 Multi-Leader Replication Topologies                                                                   175 Leaderless Replication                                                                                                 177 Writing to the Database When a Node Is Down                                                177 Limitations of Quorum Consistency                                                                    181 Sloppy Quorums and Hinted Handoff                                                                 183 Detecting Concurrent Writes                                                                                 184 Summary                                                                                                                       192 **6. Partitioning. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  199** Partitioning and Replication                                                                                      200 Partitioning of Key-Value Data                                                                                 201 Partitioning by Key Range                                                                                      202 Partitioning by Hash of Key                                                                                   203 Skewed Workloads and Relieving Hot Spots                                                       205 Partitioning and Secondary Indexes                                                                         206 Partitioning Secondary Indexes by Document                                                    206 Partitioning Secondary Indexes by Term                                                             208 Rebalancing Partitions                                                                                                209 Strategies for Rebalancing                                                                                       210 Operations: Automatic or Manual Rebalancing                                                 213 Request Routing                                                                                                           214 Parallel Query Execution                                                                                        216 Summary                                                                                                                       216 **7. Transactions. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  221** The Slippery Concept of a Transaction                                                                    222 
 
-
-
 The Meaning of ACID                                                                                            223 Single-Object and Multi-Object Operations                                                        228 Weak Isolation Levels                                                                                                 233 Read Committed                                                                                                      234 Snapshot Isolation and Repeatable Read                                                              237 Preventing Lost Updates                                                                                         242 Write Skew and Phantoms                                                                                     246 Serializability                                                                                                                251 Actual Serial Execution                                                                                           252 Two-Phase Locking (2PL)                                                                                      257 Serializable Snapshot Isolation (SSI)                                                                     261 Summary                                                                                                                       266 **8. The Trouble with Distributed Systems. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  273** Faults and Partial Failures                                                                                          274 Cloud Computing and Supercomputing                                                              275 Unreliable Networks                                                                                                   277 Network Faults in Practice                                                                                     279 Detecting Faults                                                                                                        280 Timeouts and Unbounded Delays                                                                         281 Synchronous Versus Asynchronous Networks                                                   284 Unreliable Clocks                                                                                                        287 Monotonic Versus Time-of-Day Clocks                                                              288 Clock Synchronization and Accuracy                                                                   289 Relying on Synchronized Clocks                                                                           291 Process Pauses                                                                                                          295 Knowledge, Truth, and Lies                                                                                       300 The Truth Is Defined by the Majority                                                                   300 Byzantine Faults                                                                                                       304 System Model and Reality                                                                                       306 Summary                                                                                                                       310 **9. Consistency and Consensus. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  321** Consistency Guarantees                                                                                             322 Linearizability                                                                                                               324 What Makes a System Linearizable?                                                                     325 Relying on Linearizability                                                                                       330 Implementing Linearizable Systems                                                                     332 The Cost of Linearizability                                                                                     335 Ordering Guarantees                                                                                                   339 Ordering and Causality                                                                                           339 Sequence Number Ordering                                                                                  343 
-
-
 
 ||Total Order Broadcast                                                                                             348|
 |---|---|
@@ -141,12 +124,7 @@ The Meaning of ACID                                                             
 ||Fault Tolerance                                                                                                         476|
 ||Summary                                                                                                                       479|
 
-
-
-
 **12. The Future of Data Systems. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  489** Data Integration                                                                                                           490 Combining Specialized Tools by Deriving Data                                                 490 Batch and Stream Processing                                                                                 494 Unbundling Databases                                                                                                499 Composing Data Storage Technologies                                                                499 Designing Applications Around Dataflow                                                           504 Observing Derived State                                                                                         509 Aiming for Correctness                                                                                              515 The End-to-End Argument for Databases                                                           516 Enforcing Constraints                                                                                             521 Timeliness and Integrity                                                                                         524 Trust, but Verify                                                                                                       528 Doing the Right Thing                                                                                                533 Predictive Analytics                                                                                                 533 Privacy and Tracking                                                                                               536 Summary                                                                                                                       543 **Glossary. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  553 Index. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  559** 
-
-
 
 **Preface**
 
@@ -166,11 +144,7 @@ In the last decade we have seen many interesting developments in databases, in d
 
 - Many services are now expected to be highly available; extended downtime due to outages or maintenance is becoming increasingly unacceptable. 
 
-_Data-intensive applications_ are pushing the boundaries of what is possible by making use of these technological developments. We call an application _data-intensive_ if data is its primary challenge—the quantity of data, the complexity of data, or the speed at 
-
-
-
-which it is changing—as opposed to _compute-intensive_ , where CPU cycles are the bottleneck. 
+_Data-intensive applications_ are pushing the boundaries of what is possible by making use of these technological developments. We call an application _data-intensive_ if data is its primary challenge—the quantity of data, the complexity of data, or the speed at which it is changing—as opposed to _compute-intensive_ , where CPU cycles are the bottleneck. 
 
 The tools and technologies that help data-intensive applications store and process data have been rapidly adapting to these changes. New types of database systems (“NoSQL”) have been getting lots of attention, but message queues, caches, search indexes, frameworks for batch and stream processing, and related technologies are very important too. Many applications use some combination of these. 
 
@@ -187,8 +161,6 @@ After reading this book, you will be in a great position to decide which kind of
 **Who Should Read This Book?**
 
 If you develop applications that have some kind of server/backend for storing or processing data, and your applications use the internet (e.g., web applications, mobile apps, or internet-connected sensors), then this book is for you. 
-
-
 
 This book is for software engineers, software architects, and technical managers who love to code. It is especially relevant if you need to make decisions about the architecture of the systems you work on—for example, if you need to choose tools for solving a given problem and figure out how best to apply them. But even if you have no choice over your tools, this book will help you better understand their strengths and weaknesses. 
 
@@ -210,8 +182,6 @@ Sometimes, when discussing scalable data systems, people make comments along the
 
 This book does not attempt to give detailed instructions on how to install or use specific software packages or APIs, since there is already plenty of documentation for those things. Instead we discuss the various principles and trade-offs that are fundamental to data systems, and we explore the different design decisions taken by different products. 
 
-
-
 In the ebook editions we have included links to the full text of online resources. All links were verified at the time of publication, but unfortunately links tend to break frequently due to the nature of the web. If you come across a broken link, or if you are reading a print copy of this book, you can look up references using a search engine. For academic papers, you can search for the title in Google Scholar to find open-access PDF files. Alternatively, you can find all of the references at _https:// github.com/ept/ddia-references_ , where we maintain up-to-date links. 
 
 We look primarily at the _architecture_ of data systems and the ways they are integrated into data-intensive applications. This book doesn’t have space to cover deployment, operations, security, management, and other areas—those are complex and important topics, and we wouldn’t do them justice by making them superficial side notes in this book. They deserve books of their own. 
@@ -226,11 +196,7 @@ This book is arranged into three parts:
 
 1. In Part I, we discuss the fundamental ideas that underpin the design of dataintensive applications. We start in Chapter 1 by discussing what we’re actually trying to achieve: reliability, scalability, and maintainability; how we need to think about them; and how we can achieve them. In Chapter 2 we compare several different data models and query languages, and see how they are appropriate to different situations. In Chapter 3 we talk about storage engines: how databases arrange data on disk so that we can find it again efficiently. Chapter 4 turns to formats for data encoding (serialization) and evolution of schemas over time. 
 
-2. In Part II, we move from data stored on one machine to data that is distributed across multiple machines. This is often necessary for scalability, but brings with it a variety of unique challenges. We first discuss replication (Chapter 5), partitioning/sharding (Chapter 6), and transactions (Chapter 7). We then go into 
-
-
-
-more detail on the problems with distributed systems (Chapter 8) and what it means to achieve consistency and consensus in a distributed system (Chapter 9). 
+2. In Part II, we move from data stored on one machine to data that is distributed across multiple machines. This is often necessary for scalability, but brings with it a variety of unique challenges. We first discuss replication (Chapter 5), partitioning/sharding (Chapter 6), and transactions (Chapter 7). We then go into more detail on the problems with distributed systems (Chapter 8) and what it means to achieve consistency and consensus in a distributed system (Chapter 9). 
 
 3. In Part III, we discuss systems that derive some datasets from other datasets. Derived data often occurs in heterogeneous systems: when there is no one database that can do everything well, applications need to integrate several different databases, caches, indexes, and so on. In Chapter 10 we start with a batch processing approach to derived data, and we build upon it with stream processing in Chapter 11. Finally, in Chapter 12 we put everything together and discuss approaches for building reliable, scalable, and maintainable applications in the future. 
 
@@ -240,17 +206,13 @@ Most of what we discuss in this book has already been said elsewhere in some for
 
 **O’Reilly Safari**
 
-
 ![](../images/Designing_Data_Intensive_Applications-0019-05.png)
-
 
 _Safari_ (formerly Safari Books Online) is a membership-based training and reference platform for enterprise, government, educators, and individuals. 
 
 Members have access to thousands of books, training videos, Learning Paths, interactive tutorials, and curated playlists from over 250 publishers, including O’Reilly Media, Harvard Business Review, Prentice Hall Professional, Addison-Wesley Professional, Microsoft Press, Sams, Que, Peachpit Press, Adobe, Focal Press, Cisco Press, John Wiley & Sons, Syngress, Morgan Kaufmann, IBM Redbooks, Packt, Adobe Press, FT Press, Apress, Manning, New Riders, McGraw-Hill, Jones & Bartlett, and Course Technology, among others. 
 
 For more information, please visit _http://oreilly.com/safari_ . 
-
-
 
 **How to Contact Us**
 
@@ -276,8 +238,6 @@ This book is an amalgamation and systematization of a large number of other peop
 
 I have also learned a lot from personal conversations, thanks to a large number of people who have taken the time to discuss ideas or patiently explain things to me. In particular, I would like to thank Joe Adler, Ross Anderson, Peter Bailis, Márton Balassi, Alastair Beresford, Mark Callaghan, Mat Clayton, Patrick Collison, Sean Cribbs, Shirshanka Das, Niklas Ekström, Stephan Ewen, Alan Fekete, Gyula Fóra, Camille Fournier, Andres Freund, John Garbutt, Seth Gilbert, Tom Haggett, Pat Helland, Joe Hellerstein, Jakob Homan, Heidi Howard, John Hugg, Julian Hyde, Conrad Irwin, Evan Jones, Flavio Junqueira, Jessica Kerr, Kyle Kingsbury, Jay Kreps, Carl Lerche, Nicolas Liochon, Steve Loughran, Lee Mallabone, Nathan Marz, Caitie 
 
-
-
 McCaffrey, Josie McLellan, Christopher Meiklejohn, Ian Meyers, Neha Narkhede, Neha Narula, Cathy O’Neil, Onora O’Neill, Ludovic Orban, Zoran Perkov, Julia Powles, Chris Riccomini, Henry Robinson, David Rosenthal, Jennifer Rullmann, Matthew Sackman, Martin Scholl, Amit Sela, Gwen Shapira, Greg Spurrier, Sam Stokes, Ben Stopford, Tom Stuart, Diana Vasile, Rahul Vohra, Pete Warden, and Brett Wooldridge. 
 
 Several more people have been invaluable to the writing of this book by reviewing drafts and providing feedback. For these contributions I am particularly indebted to Raul Agepati, Tyler Akidau, Mattias Andersson, Sasha Baranov, Veena Basavaraj, David Beyer, Jim Brikman, Paul Carey, Raul Castro Fernandez, Joseph Chow, Derek Elkins, Sam Elliott, Alexander Gallego, Mark Grover, Stu Halloway, Heidi Howard, Nicola Kleppmann, Stefan Kruppa, Bjorn Madsen, Sander Mak, Stefan Podkowinski, Phil Potter, Hamid Ramazani, Sam Stokes, and Ben Summers. Of course, I take all responsibility for any remaining errors or unpalatable opinions in this book. 
@@ -287,6 +247,4 @@ For helping this book become real, and for their patience with my slow writing a
 Very special thanks are due to Shabbir Diwan and Edie Freedman, who illustrated with great care the maps that accompany the chapters. It’s wonderful that they took on the unconventional idea of creating maps, and made them so beautiful and compelling. 
 
 Finally, my love goes to my family and friends, without whom I would not have been able to get through this writing process that has taken almost four years. You’re the best. 
-
-
 

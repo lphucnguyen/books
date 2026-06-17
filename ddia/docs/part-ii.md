@@ -20,7 +20,6 @@ If your application needs to continue working even if one machine (or several ma
 
 If you have users around the world, you might want to have servers at various locations worldwide so that each user can be served from a datacenter that is geographically close to them. That avoids the users having to wait for network packets to travel halfway around the world. 
 
-
 **Scaling to Higher Load**
 
 If all you need is to scale to higher load, the simplest approach is to buy a more powerful machine (sometimes called _vertical scaling_ or _scaling up_ ). Many CPUs, many RAM chips, and many disks can be joined together under one operating system, and a fast interconnect allows any CPU to access any part of the memory or disk. In this kind of _shared-memory architecture_ , all the components can be treated as a single machine [1].[i] 
@@ -40,7 +39,6 @@ No special hardware is required by a shared-nothing system, so you can use whate
 > i. In a large machine, although any CPU can access any part of memory, some banks of memory are closer to one CPU than to others (this is called _nonuniform memory access_ , or NUMA [1]). To make efficient use of this architecture, the processing needs to be broken down so that each CPU mostly accesses memory that is nearby—which means that partitioning is still required, even when ostensibly running on one machine. 
 
 ii. _Network Attached Storage_ (NAS) or _Storage Area Network_ (SAN). 
-
 
 machines, you don’t need to be operating at Google scale: even for small companies, a multi-region distributed architecture is now feasible. 
 
@@ -62,9 +60,7 @@ Splitting a big database into smaller subsets called _partitions_ so that differ
 
 These are separate mechanisms, but they often go hand in hand, as illustrated in Figure II-1. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0170-00.png)
-
 
 _Figure II-1. A database split into two partitions, with two replicas per partition._ 
 
@@ -81,5 +77,4 @@ Later, in Part III of this book, we will discuss how you can take several (poten
 [3] Michael Stonebraker: “The Case for Shared Nothing,” _IEEE Database Engineering Bulletin_ , volume 9, number 1, pages 4–9, March 1986. 
 
 [4] Frank McSherry, Michael Isard, and Derek G. Murray: “Scalability! But at What COST?,” at _15th USENIX Workshop on Hot Topics in Operating Systems_ (HotOS), May 2015. 
-
 

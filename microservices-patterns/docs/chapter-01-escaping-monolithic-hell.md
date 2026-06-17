@@ -12,10 +12,6 @@
 
 It was only Monday lunchtime, but Mary, the CTO of Food to Go, Inc. (FTGO), was already feeling frustrated. Her day had started off really well. She had spent the previous week with other software architects and developers at an excellent conference learning about the latest software development techniques, including continuous deployment and the microservice architecture. Mary had also met up with her former computer science classmates from North Carolina A&T State and shared technology leadership war stories. The conference had left her feeling empowered and eager to improve how FTGO develops software. 
 
-
-_**Escaping monolithic hell**_ 
-
-
 Unfortunately, that feeling had quickly evaporated. She had just spent the first morning back in the office in yet another painful meeting with senior engineering and business people. They had spent two hours discussing why the development team was going to miss another critical release date. Sadly, this kind of meeting had become increasingly common over the past few years. Despite adopting agile, the pace of development was slowing down, making it next to impossible to meet the business’s goals. And, to make matters worse, there didn’t seem to be a simple solution. 
 
 The conference had made Mary realize that FTGO was suffering from a case of _monolithic hell_ and that the cure was to adopt the microservice architecture. But the microservice architecture and the associated state-of-the-art software development practices described at the conference felt like an elusive dream. It was unclear to Mary how she could fight today’s fires while simultaneously improving the way software was developed at FTGO. 
@@ -32,32 +28,22 @@ Like many other aging enterprise applications, the FTGO application is a monolit
 
 The next section describes the architecture of the FTGO application. Then it talks about why the monolithic architecture worked well initially. We’ll get into how the FTGO application has outgrown its architecture and how that has resulted in monolithic hell. 
 
-
-_**The slow march toward monolithic hell**_ 
-
-
 ### 1.1.1 The architecture of the FTGO application
 
 FTGO is a typical enterprise Java application. Figure 1.1 shows its architecture. The FTGO application has a hexagonal architecture, which is an architectural style described in more detail in chapter 2. In a hexagonal architecture, the core of the application consists of the business logic. Surrounding the business logic are various adapters that implement UIs and integrate with external systems. 
 
 **Invoked by mobile applications**
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0033-05.png)
-
 
 **----- Start of picture text -----**<br>
 Cloud services<br>FTGO application<br>Twilio<br>Courier RESTAPI Restaurant adapterTwilio messagingservice<br>management<br>Order Delivery<br>management management<br>Consumer Payments<br>Amazon AWS SES<br>Notification SE S email<br>adapter service<br>Web Billing<br>UI<br>Stripe<br>adapter<br>MySQL Stripe<br>Restaurant adapter payment<br>service<br>Adapters invoke<br>MySQL cloud services.<br>**----- End of picture text -----**<br>
-
 
 Figure 1.1 The FTGO application has a hexagonal architecture. It consists of business logic surrounded by adapters that implement UIs and interface with external systems, such as mobile applications and cloud services for payments, messaging, and email. 
 
 The business logic consists of modules, each of which is a collection of domain objects. Examples of the modules include Order Management, Delivery Management, Billing, and Payments. There are several adapters that interface with the external systems. Some are _inbound_ adapters, which handle requests by invoking the business logic, including the REST API and Web UI adapters. Others are _outbound_ adapters, which enable the business logic to access the MySQL database and invoke cloud services such as Twilio and Stripe. 
 
-Despite having a logically modular architecture, the FTGO application is packaged as a single WAR file. The application is an example of the widely used _monolithic_ style 
-
-
-of software architecture, which structures a system as a single executable or deployable component. If the FTGO application were written in the Go language (GoLang), it would be a single executable. A Ruby or NodeJS version of the application would be a single directory hierarchy of source code. The monolithic architecture isn’t inherently bad. The FTGO developers made a good decision when they picked monolithic architecture for their application. 
+Despite having a logically modular architecture, the FTGO application is packaged as a single WAR file. The application is an example of the widely used _monolithic_ style of software architecture, which structures a system as a single executable or deployable component. If the FTGO application were written in the Go language (GoLang), it would be a single executable. A Ruby or NodeJS version of the application would be a single directory hierarchy of source code. The monolithic architecture isn’t inherently bad. The FTGO developers made a good decision when they picked monolithic architecture for their application. 
 
 ### 1.1.2 The benefits of the monolithic architecture
 
@@ -85,16 +71,10 @@ As figure 1.2 shows, the once small, simple FTGO application has grown over the 
 
 A major problem with the FTGO application is that it’s too complex. It’s too large for any developer to fully understand. As a result, fixing bugs and correctly implementing new features have become difficult and time consuming. Deadlines are missed. 
 
-
-_**The slow march toward monolithic hell**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0035-02.png)
-
 
 **----- Start of picture text -----**<br>
 FTGO development Large Single code base creates Large, complex<br>development communication and unreliable, difficult<br>Order management team organization coordination overhead. to maintain<br>Restaurant management team<br>Deployment pipeline<br>Jenkins Manual FTGO<br>Cl Backlog testing application<br>Source<br>Delivery management team code<br>repository<br>Production<br>The path from code commit to<br>production is arduous.<br>Changes sit in a queue until<br>they can be manually tested.<br>**----- End of picture text -----**<br>
-
 
 Figure 1.2 A case of monolithic hell. The large FTGO developer team commits their changes to a single source code repository. The path from code commit to production is long and arduous and involves manual testing. The FTGO application is large, complex, unreliable, and difficult to maintain. 
 
@@ -109,10 +89,6 @@ As well as having to fight overwhelming complexity, FTGO developers find day-to-
 **PATH FROM COMMIT TO DEPLOYMENT IS LONG AND ARDUOUS**
 
 Another problem with the FTGO application is that deploying changes into production is a long and painful process. The team typically deploys updates to production once a month, usually late on a Friday or Saturday night. Mary keeps reading that the state-of-the-art for Software-as-a-Service (SaaS) applications is _continuous deployment_ : 
-
-
-_**Escaping monolithic hell**_ 
-
 
 deploying changes to production many times a day during business hours. Apparently, as of 2011, Amazon.com deployed a change into production every 11.6 seconds without ever impacting the user! For the FTGO developers, updating production more than once a month seems like a distant dream. And adopting continuous deployment seems next to impossible. 
 
@@ -132,8 +108,6 @@ Another problem with the FTGO application is the lack of reliability. As a resul
 
 The final aspect of monolithic hell experienced by the FTGO team is that the architecture forces them to use a technology stack that’s becoming increasingly obsolete. The monolithic architecture makes it difficult to adopt new frameworks and languages. It would be extremely expensive and risky to rewrite the entire monolithic application so that it would use a new and presumably better technology. Consequently, developers 
 
-
-_**What you’ll learn in this book**_
 are stuck with the technology choices they made at the start of the project. Quite often, they must maintain an application written using an increasingly obsolete technology stack. 
 
 The Spring framework has continued to evolve while being backward compatible, so in theory FTGO might have been able to upgrade. Unfortunately, the FTGO application uses versions of frameworks that are incompatible with newer versions of Spring. The development team has never found the time to upgrade those frameworks. As a result, major parts of the application are written using increasingly out-of-date frameworks. What’s more, the FTGO developers would like to experiment with non-JVM languages such as GoLang and NodeJS. Sadly, that’s not possible with a monolithic application. 
@@ -172,7 +146,6 @@ By the time you finish reading this book you’ll understand the following:
 
 - Strategies for refactoring a monolithic application into a microservice architecture 
 
-
 You’ll also be able to do the following: 
 
 - Architect an application using the microservice architecture pattern 
@@ -203,21 +176,12 @@ Today, the growing consensus is that if you’re building a large, complex appli
 
 ### 1.4.1 Scale cube and microservices
 
-My definition of the microservice architecture is inspired by Martin Abbott and Michael Fisher’s excellent book, _The Art of Scalability_ (Addison-Wesley, 2015). This 
-
-
-_**Microservice architecture to the rescue**_ 
-
-
-book describes a useful, three-dimensional scalability model: the _scale cube_ , shown in figure 1.3. 
-
+My definition of the microservice architecture is inspired by Martin Abbott and Michael Fisher’s excellent book, _The Art of Scalability_ (Addison-Wesley, 2015). This book describes a useful, three-dimensional scalability model: the _scale cube_ , shown in figure 1.3. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0039-03.png)
 
-
 **----- Start of picture text -----**<br>
 Microservices<br>Y-axis scaling,<br>a.k.a. functional<br>decomposition<br>Scale by splitting<br>things that are<br>Many<br>different, such as<br>partitions<br>by function.<br>Z-axis scaling,<br>a.k.a. data partitioning<br>Monolith One Scale by splitting<br>One Many partition similar things, such as<br>instance instances by customer ID.<br>X-axis scaling,<br>a.k.a. horizontal duplication<br>Scale by cloning.<br>**----- End of picture text -----**<br>
-
 
 Figure 1.3 The scale cube defines three separate ways to scale an application: X-axis scaling load balances requests across multiple, identical instances; Z-axis scaling routes requests based on an attribute of the request; Y-axis functionally decomposes an application into services. 
 
@@ -233,23 +197,17 @@ _Z-axis_ scaling also runs multiple instances of the monolith application, but u
 
 In this example, each application instance is responsible for a subset of users. The router uses the userId specified by the request Authorization header to select one of 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0040-02.png)
-
 
 **----- Start of picture text -----**<br>
 Route requests using a N  identical application<br>load balancing algorithm. instances<br>Application<br>instance 1<br>Request Load Application<br>Client<br>balancer instance 2<br>Application<br>instance 3<br>**----- End of picture text -----**<br>
 
-
 Figure 1.4 X-axis scaling runs multiple, identical instances of the monolithic application behind a load balancer. 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0040-04.png)
 
-
 **----- Start of picture text -----**<br>
 Uses the userId to decide N  identical application<br>where to route requests instances<br>Application<br>instance 1<br>Users: a–h<br>Request:<br>GET /...<br>Authorization: userId:password Application<br>Client Router<br>instance 2<br>Users: i-p<br>Application<br>instance 3<br>Each instance is responsible Users: r–z<br>for a subset of the users.<br>**----- End of picture text -----**<br>
-
 
 Figure 1.5 Z-axis scaling runs multiple identical instances of the monolithic application behind a router, which routes based on a **request** attribute . Each instance is responsible for a subset of the data. the _N_ identical instances of the application. Z-axis scaling is a great way to scale an application to handle increasing transaction and data volumes. 
 
@@ -257,16 +215,10 @@ Y-AXIS SCALING FUNCTIONALLY DECOMPOSES AN APPLICATION INTO SERVICES
 
 X- and Z-axis scaling improve the application’s capacity and availability. But neither approach solves the problem of increasing development and application complexity. To solve those, you need to apply _Y-axis_ scaling, or _functional decomposition_ . Figure 1.6 shows how Y-axis scaling works: by splitting a monolithic application into a set of services. 
 
-
-_**Microservice architecture to the rescue**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0041-02.png)
-
 
 **----- Start of picture text -----**<br>
 Y-axis scaling functionality decomposes<br>an application into services.<br>Order service<br>Order<br>Service<br>Application instance 1<br>Order<br>Order Request Load<br>Service<br>Order Service balancer<br>instance 2<br>requests<br>Order<br>Service<br>Customer Customer<br>Client instance 3<br>requests Service<br>Review<br>requests Review<br>Service<br>Each service is typically scaled using<br>X-axis and possibly Z-axis scaling.<br>**----- End of picture text -----**<br>
-
 
 Figure 1.6 Y-axis scaling splits the application into a set of services. Each service is responsible for a particular function. A service is scaled using X-axis scaling and, possibly, Z-axis scaling. 
 
@@ -280,13 +232,7 @@ Now let’s look at how the microservice architecture is a form of modularity.
 
 _Modularity_ is essential when developing large, complex applications. A modern application like FTGO is too large to be developed by an individual. It’s also too complex to be understood by a single person. Applications must be decomposed into modules that are developed and understood by different people. In a monolithic application, modules are defined using a combination of programming language constructs (such as Java packages) and build artifacts (such as Java JAR files). However, as the FTGO developers have discovered, this approach tends not to work well in practice. Longlived, monolithic applications usually degenerate into big balls of mud. 
 
-The microservice architecture uses services as the unit of modularity. A service has an API, which is an impermeable boundary that is difficult to violate. You can’t bypass 
-
-
-_**Escaping monolithic hell**_ 
-
-
-the API and access an internal class as you can with a Java package. As a result, it’s much easier to preserve the modularity of the application over time. There are other benefits of using services as building blocks, including the ability to deploy and scale them independently. 
+The microservice architecture uses services as the unit of modularity. A service has an API, which is an impermeable boundary that is difficult to violate. You can’t bypass the API and access an internal class as you can with a Java package. As a result, it’s much easier to preserve the modularity of the application over time. There are other benefits of using services as building blocks, including the ability to deploy and scale them independently. 
 
 ### 1.4.3 Each service has its own database
 
@@ -310,23 +256,16 @@ The FTGO application’s business logic consists of numerous backend services. E
 
 - Delivery Service—Manages delivery of orders from restaurants to consumers 
 
-
-_**Microservice architecture to the rescue**_ 
-
-
 - Restaurant Service—Maintains information about restaurants 
 
 - Kitchen Service—Manages the preparation of orders 
 
 - Accounting Service—Handles billing and payments 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0043-05.png)
-
 
 **----- Start of picture text -----**<br>
 The API Gateway routes Services corresponding<br>requests from the mobile to business capabilities/<br>applications to services. REST domain-driven design<br>API (DDD) subdomains<br>Order<br>Service<br>Stripe<br>REST REST Adapter<br>API API<br>Courier GatewayAPI RESTAPI Restaurant AccountingService<br>REST Service<br>API<br>Twilio<br>REST Adapter<br>Consumer REST API<br>API Notification<br>Kitchen Service<br>Restaurant Service Amazon<br>Web UI SES<br>Adapter<br>Restaurant<br>REST<br>API<br>Delivery<br>Service<br>Services have APIs. A service’s data is private.<br>**----- End of picture text -----**<br>
-
 
 Figure 1.7 Some of the services of the microservice architecture-based version of the FTGO application. An API Gateway routes requests from the mobile applications to services. The services collaborate via APIs. 
 
@@ -336,13 +275,11 @@ Many services correspond to the modules described earlier in this chapter. What�
 
 Some critics of the microservice architecture claim it’s nothing new—it’s serviceoriented architecture (SOA). At a very high level, there are some similarities. SOA and the microservice architecture are architectural styles that structure a system as a set of services. But as table 1.1 shows, once you dig deep, you encounter significant differences. 
 
-
 Table 1.1 Comparing SOA with microservices 
 
 ||SOA|Microservices|
 |---|---|---|
 |Inter-service<br>communication<br>Data<br>Typical service|Smart pipes, such as Enterprise Ser-<br>vice Bus, using heavyweight protocols,<br>such as SOAP and the other WS*<br>standards.<br>Global data model and shared data-<br>bases<br>Larger monolithic application|Dumb pipes, such as a message<br>broker, or direct service-to-service<br>communication, using lightweight<br>protocols such as REST or gRPC<br>Data model and database per service<br>Smaller service|
-
 
 SOA and the microservice architecture usually use different technology stacks. SOA applications typically use heavyweight technologies such as SOAP and other WS* standards. They often use an ESB, a _smart pipe_ that contains business and message-processing logic to integrate the services. Applications built using the microservice architecture tend to use lightweight, open source technologies. The services communicate via _dumb pipes_ , such as message brokers or lightweight protocols like REST or gRPC. 
 
@@ -372,10 +309,6 @@ The microservice architecture has the following benefits:
 
 - It has better fault isolation. 
 
-
-_**Benefits and drawbacks of the microservice architecture**_ 
-
-
 Let’s look at each benefit. 
 
 **ENABLES THE CONTINUOUS DELIVERY AND DEPLOYMENT OF LARGE, COMPLEX APPLICATIONS**
@@ -404,13 +337,10 @@ EACH SERVICE IS SMALL AND EASILY MAINTAINED
 
 Another benefit of the microservice architecture is that each service is relatively small. The code is easier for a developer to understand. The small code base doesn’t slow down the IDE, making developers more productive. And each service typically starts a lot faster than a large monolith does, which also makes developers more productive and speeds up deployments. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0046-02.png)
-
 
 **----- Start of picture text -----**<br>
 Small, autonomous, Each service has Each service has Small, simple,<br>loosely coupled teams its own source its own automated reliable, easy to<br>code repository. deployment pipeline. maintain services<br>FTGO development<br>Order management team<br>Deployment pipeline<br>Jenkins Cl Order Service<br>Order Service<br>source code<br>Restaurant management team repository<br>Deployment pipeline<br>Jenkins Cl Restaurant Service<br>Restaurant Service<br>source code<br>Delivery management team<br>repository<br>Deployment pipeline<br>Jenkins Cl Delivery Service<br>Delivery Service Production<br>source code<br>repository<br>**----- End of picture text -----**<br>
-
 
 Figure 1.8 The microservices-based FTGO application consists of a set of loosely coupled services. Each team develops, tests, and deploys their services independently. 
 
@@ -425,9 +355,6 @@ The microservice architecture has better fault isolation. For example, a memory 
 **EASILY EXPERIMENT WITH AND ADOPT NEW TECHNOLOGIES**
 
 Last but not least, the microservice architecture eliminates any long-term commitment to a technology stack. In principle, when developing a new service, the developers are free to pick whatever language and frameworks are best suited for that service. 
-
-
-_**Benefits and drawbacks of the microservice architecture**_ 
 
 In many organizations, it makes sense to restrict the choices, but the key point is that you aren’t constrained by past decisions. 
 
@@ -459,10 +386,6 @@ Another issue with using the microservice architecture is that developers must d
 
 Implementing use cases that span multiple services requires the use of unfamiliar techniques. Each service has its own database, which makes it a challenge to implement transactions and queries that span services. As described in chapter 4, a microservicesbased application must use what are known as _sagas_ to maintain data consistency across services. Chapter 7 explains that a microservices-based application can’t retrieve data from multiple services using simple queries. Instead, it must implement queries using either API composition or CQRS views. 
 
-
-_**Escaping monolithic hell**_ 
-
-
 IDEs and other development tools are focused on building monolithic applications and don’t provide explicit support for developing distributed applications. Writing automated tests that involve multiple services is challenging. These are all issues that are specific to the microservice architecture. Consequently, your organization’s developers must have sophisticated software development and delivery skills in order to successfully use microservices. 
 
 The microservice architecture also introduces significant operational complexity. Many more moving parts—multiple instances of different types of service—must be managed in production. To successfully deploy microservices, you need a high level of automation. You must use technologies such as the following: 
@@ -487,10 +410,6 @@ Later on, though, when the problem is how to handle complexity, that’s when it
 
 As you can see, the microservice architecture offer many benefits, but also has some significant drawbacks. Because of these issues, adopting a microservice architecture should not be undertaken lightly. But for complex applications, such as a consumerfacing web application or SaaS application, it’s usually the right choice. Well-known sites like eBay (www.slideshare.net/RandyShoup/the-ebay-architecture-striking-abalance-between-site-stability-feature-velocity-performance-and-cost), Amazon.com, Groupon, and Gilt have all evolved from a monolithic architecture to a microservice architecture. 
 
-
-_**The Microservice architecture pattern language**_ 
-
-
 You must address numerous design and architectural issues when using the microservice architecture. What’s more, many of these issues have multiple solutions, each with a different set of trade-offs. There is no one single perfect solution. To help guide your decision making, I’ve created the Microservice architecture pattern language. I reference this pattern language throughout the rest of the book as I teach you about the microservice architecture. Let’s look at what a pattern language is and why it’s helpful. 
 
 ## 1.6 The Microservice architecture pattern language
@@ -507,10 +426,7 @@ A lot of arguments follow the _suck/rock dichotomy_ (http://nealford.com/memeago
 
 Microservices are not immune to the silver bullet phenomenon. Whether this architecture is appropriate for your application depends on many factors. Consequently, it’s bad advice to advise always using the microservice architecture, but it’s equally bad advice to advise never using it. As with many things, it depends. 
 
-The underlying reason for these polarized and hyped arguments about technology is that humans are primarily driven by their emotions. Jonathan Haidt, in his excellent 
-
-
-book _The Righteous Mind: Why Good People Are Divided by Politics and Religion_ (Vintage, 2013), uses the metaphor of an elephant and its rider to describe how the human mind works. The elephant represents the emotion part of the human brain. It makes most of the decisions. The rider represents the rational part of the brain. It can sometimes influence the elephant, but it mostly provides justifications for the elephant’s decisions. 
+The underlying reason for these polarized and hyped arguments about technology is that humans are primarily driven by their emotions. Jonathan Haidt, in his excellent book _The Righteous Mind: Why Good People Are Divided by Politics and Religion_ (Vintage, 2013), uses the metaphor of an elephant and its rider to describe how the human mind works. The elephant represents the emotion part of the human brain. It makes most of the decisions. The rider represents the rational part of the brain. It can sometimes influence the elephant, but it mostly provides justifications for the elephant’s decisions. 
 
 We—the software development community—need to overcome our emotional nature and find a better way of discussing and applying technology. A great way to discuss and describe technology is to use the _pattern_ format, because it’s objective. When describing a technology in the pattern format, you must, for example, describe the drawbacks. Let’s take a look at the pattern format. 
 
@@ -529,10 +445,6 @@ Let’s imagine, for example, that you’re building a banking application that 
 - The Account class that uses the algorithm 
 
 The Strategy pattern is an _object-oriented_ design pattern, so the elements of the solution are classes. Later in this section, I describe _high-level_ design patterns, where the solution consists of collaborating services. 
-
-
-_**The Microservice architecture pattern language**_ 
-
 
 One reason why patterns are valuable is because a pattern must describe the context within which it applies. The idea that a solution is specific to a particular context and might not work well in other contexts is an improvement over how technology used to typically be discussed. For example, a solution that solves the problem at the scale of Netflix might not be the best approach for an application with fewer users. 
 
@@ -568,10 +480,7 @@ The _related patterns_ section of a pattern describes the relationship between t
 
 - _Predecessor_ —A predecessor pattern is a pattern that motivates the need for this pattern. For example, the Microservice architecture pattern is the predecessor to the rest of the patterns in the pattern language, except the monolithic architecture pattern. 
 
-- _Successor_ —A pattern that solves an issue that has been introduced by this pattern. For example, if you apply the Microservice architecture pattern, you must 
-
-
-then apply numerous successor patterns, including service discovery patterns and the Circuit breaker pattern. 
+- _Successor_ —A pattern that solves an issue that has been introduced by this pattern. For example, if you apply the Microservice architecture pattern, you must then apply numerous successor patterns, including service discovery patterns and the Circuit breaker pattern. 
 
 - _Alternative_ —A pattern that provides an alternative solution to this pattern. For example, the Monolithic architecture pattern and the Microservice architecture pattern are alternative ways of architecting an application. You pick one or the other. 
 
@@ -581,13 +490,10 @@ then apply numerous successor patterns, including service discovery patterns and
 
 In addition, you can organize patterns that tackle issues in a particular problem area into groups. The explicit description of related patterns provides valuable guidance on how to effectively solve a particular problem. Figure 1.9 shows how the relationships between patterns is visually represented. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0052-07.png)
-
 
 **----- Start of picture text -----**<br>
 Monolithic Key<br>architecture Predecessor Successor<br>Alternative A Alternative B<br>General Specific<br>Microservice Single service<br>architecture per host<br>Pattern Service-per-container<br>Deployment<br>Problem area<br>**----- End of picture text -----**<br>
-
 
 Figure 1.9 The visual representation of different types of relationships between the patterns: a _successor_ pattern solves a problem created by applying the _predecessor_ pattern; two or more patterns can be _alternative_ solutions to the same problem; one pattern can be a _specialization_ of another pattern; and patterns that solve problems in the same area can be grouped, or _generalized_ . 
 
@@ -601,10 +507,6 @@ The different kinds of relationships between patterns shown in figure 1.9 are re
 
 - Patterns that apply to a particular problem area 
 
-
-_**The Microservice architecture pattern language**_ 
-
-
 A collection of patterns related through these relationships sometimes form what is known as a pattern language. The patterns in a pattern language work together to solve problems in a particular domain. In particular, I’ve created the Microservice architecture pattern language. It’s a collection of interrelated software architecture and design patterns for microservices. Let’s take a look at this pattern language. 
 
 ### 1.6.3 Overview of the Microservice architecture pattern language
@@ -613,16 +515,12 @@ The Microservice architecture pattern language is a collection of patterns that 
 
 The pattern language consists of several groups of patterns. On the left in figure 1.10 is the application architecture patterns group, the Monolithic architecture pattern and the Microservice architecture pattern. Those are the patterns we’ve been discussing 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0053-06.png)
-
 
 **----- Start of picture text -----**<br>
 Key Application patterns<br>Predecessor Successor<br>Database<br>Alternative AGeneral Alternative BSpecific Decomposition architecture Maintaining Testing<br>data consistency<br>Problem area<br>Querying<br>Application infrastructure patterns<br>Monolithic Observability<br>Transactional messaging<br>architecture<br>Cross-cutting<br>Security<br>concerns Communication style Reliability<br>Microservice Infrastructure patterns<br>architecture<br>Discovery<br>Application<br>architecture External<br>Deployment API<br>Communication patterns<br>Microservice patterns<br>**----- End of picture text -----**<br>
 
-
 Figure 1.10 A high-level view of the Microservice architecture pattern language showing the different problem areas that the patterns solve. On the left are the application architecture patterns: Monolithic architecture and Microservice architecture. All the other groups of patterns solve problems that result from choosing the Microservice architecture pattern. 
-
 
 in this chapter. The rest of the pattern language consists of groups of patterns that are solutions to issues that are introduced by using the Microservice architecture pattern. The patterns are also divided into three layers: 
 
@@ -638,13 +536,10 @@ These patterns are grouped together based on the kind of problem they solve. Let
 
 Deciding how to decompose a system into a set of services is very much an art, but there are a number of strategies that can help. The two decomposition patterns shown in figure 1.11 are different strategies you can use to define your application’s architecture. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0054-09.png)
-
 
 **----- Start of picture text -----**<br>
 Key<br>Predecessor Successor Decompose by<br>business capability<br>Alternative A Alternative B<br>General Specific<br>Problem area Decompose by<br>subdomain<br>**----- End of picture text -----**<br>
-
 
 Figure 1.11 There are two decomposition patterns: Decompose by business capability, which organizes services around business capabilities, and Decompose by subdomain, which organizes services around domaindriven design (DDD) subdomains. 
 
@@ -664,16 +559,10 @@ An application built using the microservice architecture is a distributed system
 
 - _External API_ —How do clients of your application communicate with the services? 
 
-
-_**The Microservice architecture pattern language**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0055-02.png)
-
 
 **----- Start of picture text -----**<br>
 Key<br>Polling Transaction<br>Predecessor Successor publisher log tailing<br>Alternative A Alternative B<br>General Specific<br>Transactional<br>outbox<br>Problem area<br>Transactional messaging<br>Remote procedure<br>Messaging<br>invocation<br>Circuit<br>breaker<br>Domain-specific<br>Reliability<br>Communication style<br>Client-side<br>Self registration<br>discovery<br>API gateway<br>Service registry<br>Backend for<br>Server-side 3rd-party frontend<br>discovery registration<br>Discovery External API<br>**----- End of picture text -----**<br>
-
 
 Figure 1.12 The five groups of communication patterns 
 
@@ -689,23 +578,17 @@ PATTERNS FOR QUERYING DATA IN A MICROSERVICE ARCHITECTURE
 
 The other issue with using a database per service is that some queries need to join data that’s owned by multiple services. A service’s data is only accessible via its API, so you can’t use distributed queries against its database. Figure 1.14 shows a couple of patterns you can use to implement queries. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0056-02.png)
-
 
 **----- Start of picture text -----**<br>
 Domain<br>Key<br>event<br>Predecessor Successor<br>Alternative A Alternative B<br>General Specific Database perservice Saga sourcingEvent<br>Problem area<br>Aggregate<br>**----- End of picture text -----**<br>
 
-
 Figure 1.13 Because each service has its own database, you must use the Saga pattern to maintain data consistency across services. 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0056-04.png)
 
-
 **----- Start of picture text -----**<br>
 Key Database<br>Predecessor Successor per service<br>Alternative A Alternative B<br>General Specific<br>Problem area API<br>CQRS<br>composition<br>**----- End of picture text -----**<br>
-
 
 Figure 1.14 Because each service has its own database, you must use one of the querying patterns to retrieve data scattered across multiple services. 
 
@@ -719,16 +602,10 @@ In comparison, deploying a microservices-based application is much more complex.
 
 The traditional, and often manual, way of deploying applications in a languagespecific packaging format, for example WAR files, doesn’t scale to support a microservice architecture. You need a highly automated deployment infrastructure. Ideally, you should use a deployment platform that provides the developer with a simple UI (command-line or GUI) for deploying and managing their services. The deployment platform will typically be based on virtual machines (VMs), containers, or serverless technology. Chapter 12 looks at the different deployment options. 
 
-
-_**The Microservice architecture pattern language**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0057-02.png)
-
 
 **----- Start of picture text -----**<br>
 Key<br>Predecessor Successor<br>Traditional approach of deploying A modern approach, which<br>Alternative A Alternative B services using their language-specific encapsulates a service’s<br>General Specific packaging, such as WAR files technology stack<br>Problem area<br>Multiple services Single service<br>A modern approach, per host per host<br>which runs your code<br>without you having to<br>worry about managing<br>the infrastructure Serverless<br>deployment<br>Service-per-container<br>Automated, self-service<br>platform for deploying<br>and managing services<br>Service deployment<br>Service-per-VM<br>platform<br>**----- End of picture text -----**<br>
-
 
 Figure 1.15 Several patterns for deploying microservices. The traditional approach is to deploy services in a language-specific packaging format. There are two modern approaches to deploying services. The first deploys services as VM or containers. The second is the serverless approach. You simply upload the service’s code and the serverless platform runs it. You should use a service deployment platform, which is an automated, self-service platform for deploying and managing services. 
 
@@ -743,7 +620,6 @@ You can use the following patterns to design observable services:
 - _Health check API_ —Expose an endpoint that returns the health of the service. 
 
 - _Log aggregation_ —Log service activity and write logs into a centralized logging server, which provides searching and alerting. 
-
 
 - _Distributed tracing_ —Assign each external request a unique ID and trace requests as they flow between services. 
 
@@ -775,25 +651,16 @@ In a microservice architecture, there are numerous concerns that every service m
 
 In a microservice architecture, users are typically authenticated by the API gateway. It must then pass information about the user, such as identity and roles, to the services it invokes. A common solution is to apply the Access token pattern. The API gateway passes an access token, such as JWT (JSON Web Token), to the services, which can validate the token and obtain information about the user. Chapter 11 discusses the Access token pattern in more detail. 
 
-Not surprisingly, the patterns in the Microservice architecture pattern language are focused on solving architect and design problems. You certainly need the right 
-
-
-_**Beyond microservices: Process and organization**_ 
-
-
-architecture in order to successfully develop software, but it’s not the only concern. You must also consider process and organization. 
+Not surprisingly, the patterns in the Microservice architecture pattern language are focused on solving architect and design problems. You certainly need the right architecture in order to successfully develop software, but it’s not the only concern. You must also consider process and organization. 
 
 ## 1.7 Beyond microservices: Process and organization
 
 For a large, complex application, the microservice architecture is usually the best choice. But in addition to having the right architecture, successful software development requires you to also have organization, and development and delivery processes. Figure 1.16 shows the relationships between process, organization, and architecture. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0059-05.png)
-
 
 **----- Start of picture text -----**<br>
 Process:<br>DevOps/continuous delivery/deployment<br>Enables Enables<br>Rapid, frequent,<br>and reliable delivery<br>of software<br>Organization: Architecture:<br>Small, autonomous, Microservice<br>Enables<br>cross-functional teams architecture<br>**----- End of picture text -----**<br>
-
 
 Figure 1.16 The rapid, frequent, and reliable delivery of large, complex applications requires a combination of DevOps, which includes continuous delivery/deployment, small, autonomous teams, and the microservice architecture. 
 
@@ -804,7 +671,6 @@ I’ve already described the microservice architecture. Let’s look at organiza
 Success inevitably means that the engineering team will grow. On the one hand, that’s a good thing because more developers can get more done. The trouble with large teams is, as Fred Brooks wrote in _The Mythical Man-Month_ , the communication overhead of a team of size _N_ is _O_ ( _N_[2] ). If the team gets too large, it will become inefficient, due to the communication overhead. Imagine, for example, trying to do a daily standup with 20 people. 
 
 The solution is to refactor a large single team into a team of teams. Each team is small, consisting of no more than 8–12 people. It has a clearly defined business-oriented mission: developing and possibly operating one or more services that implement a feature or a business capability. The team is cross-functional and can develop, test, and deploy its services without having to frequently communicate or coordinate with other teams. 
-
 
 **The reverse Conway maneuver**
 
@@ -828,13 +694,7 @@ Jez Humble (https://continuousdelivery.com/) defines continuous delivery as foll
 
 _Continuous Delivery is the ability to get changes of all types—including new features, configuration changes, bug fixes and experiments—into production, or into the hands of users, safely and quickly in a sustainable way._ 
 
-A key characteristic of continuous delivery is that software is always releasable. It relies on a high level of automation, including automated testing. Continuous deployment takes continuous delivery one step further in the practice of automatically deploying releasable code into production. High-performing organizations 
-
-
-_**Beyond microservices: Process and organization**_ 
-
-
-that practice continuous deployment deploy multiple times per day into production, have far fewer production outages, and recover quickly from any that do occur (https://puppet.com/ resources/whitepaper/state-of-devops-report). As described earlier in section 1.5.1, the microservice architecture directly supports continuous delivery/deployment. 
+A key characteristic of continuous delivery is that software is always releasable. It relies on a high level of automation, including automated testing. Continuous deployment takes continuous delivery one step further in the practice of automatically deploying releasable code into production. High-performing organizations that practice continuous deployment deploy multiple times per day into production, have far fewer production outages, and recover quickly from any that do occur (https://puppet.com/ resources/whitepaper/state-of-devops-report). As described earlier in section 1.5.1, the microservice architecture directly supports continuous delivery/deployment. 
 
 **Move fast without breaking things**
 
@@ -857,7 +717,6 @@ Adopting the microservice architecture changes your architecture, your organizat
 The best-selling book _Managing Transitions_ (Da Capo Lifelong Books, 2017, https://wmbridges.com/books) by William and Susan Bridges introduces the concept of a _transition_ , which refers to the process of how people respond emotionally to a change. It describes a three-stage Transition Model: 
 
 - 1 _Ending, Losing, and Letting Go_ —The period of emotional upheaval and resistance when people are presented with a change that forces them out of their comfort zone. They often mourn the loss of the old way of doing things. For example, when people reorganize into cross-functional teams, they miss their former teammates. Similarly, a data modeling group that owns the global data model will be threatened by the idea of each service having its own data model. 
-
 
 - 2 _The Neutral Zone_ —The intermediate stage between the old and new ways of doing things, where people are often confused. They are often struggling to learn the new way of doing things. 
 
@@ -884,5 +743,4 @@ In the next chapter, you’ll learn about the goal of software architecture and 
 - You need more than just the microservice architecture to accelerate software delivery. Successful software development also requires DevOps and small, autonomous teams. 
 
 - Don’t forget about the human side of adopting microservices. You need to consider employees’ emotions in order to successfully transition to a microservice architecture. 
-
 

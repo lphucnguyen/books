@@ -12,10 +12,7 @@ FaaS solutions may comprise many different functions, with the sum of their oper
 
 ### Ensure Strict Membership to a Bounded Context
 
-The functions and internal event streams composing a solution must strictly belong to a bounded context, such that the owner of the function and data is clearly identified. It is common for an organization to have ownership questions around functions, services, and event streams when implementing microservice solutions in large 
-
-
-numbers. While many microservice solutions map 1:1 to a bounded context, an _n_ :1 mapping is not uncommon, as multiple functions may be used for a single bounded context. It’s important to identify _which_ function belongs to _which_ bounded context, because the high granularity of functions can blur those lines. 
+The functions and internal event streams composing a solution must strictly belong to a bounded context, such that the owner of the function and data is clearly identified. It is common for an organization to have ownership questions around functions, services, and event streams when implementing microservice solutions in large numbers. While many microservice solutions map 1:1 to a bounded context, an _n_ :1 mapping is not uncommon, as multiple functions may be used for a single bounded context. It’s important to identify _which_ function belongs to _which_ bounded context, because the high granularity of functions can blur those lines. 
 
 Some practical ways of maintaining bounded contexts with functions include: 
 
@@ -41,7 +38,6 @@ Offsets may be committed once the batch of events to process has been passed off
 
 Committing offsets before processing has completed can be problematic, however. If the function is unable to successfully process an event, and numerous retries fail, then data loss is likely. The event will typically be shunted into a dead-letter queue or simply discarded. While many function-based microservices are not sensitive to data loss, those that are should not use this strategy. 
 
-
 ### Less Is More
 
 An often-cited feature of FaaS frameworks is that they make it easy to write a single function and reuse it in multiple services. Following this approach, however, can lead to a highly fragmented solution that makes it difficult to discern exactly what is going on within the bounded context. Additionally, ownership of a given function becomes ambiguous, and it may not be clear if changes to a function could negatively affect other services. While versioning of functions can help with this issue, it can also lead to conflicts when multiple products need to maintain and improve different versions of a function. 
@@ -57,7 +53,6 @@ Third-party service providers such as Amazon Web Services (AWS), Google Cloud Pl
 ## Building Microservices Out of Functions
 
 There are four main components you must consider when working with functionbased solutions, regardless of your FaaS framework or event broker: 
-
 
 - The function 
 
@@ -84,7 +79,6 @@ Next, you need to wire up some triggering logic for the function. This will be c
 |---|---|---|---|
 |`myFunction`|`myInputStream`|`onNewEvent`|< … >|
 
-
 You can see that `myFunction` is set to trigger when a new event is delivered to `myInput Stream` . You’ll also notice that there is a column named Policies and Metadata, which is a bit of a catch all that includes configurations such as the following: 
 
 - Consumer group 
@@ -97,9 +91,7 @@ You can see that `myFunction` is set to trigger when a new event is delivered to
 
 Once the triggers, metadata, and policies are established, the function is ready to process incoming events. When a new event arrives in its input event stream, the function will be started by the FaaS framework, get passed a batch of events, and begin processing. Upon completion, the function will terminate and wait for more events to come in. This is a typical implementation of the event-stream listener pattern, which is discussed more in the next section. 
 
-
 ![](../images/Event-Driven_Microservices-0173-00.png)
-
 
 Each function-based microservice implementation must have its own independent consumer group, just as with other non-FaaS microservices. 
 
@@ -119,33 +111,23 @@ Triggers are used to tell a function to start up and begin processing. The suppo
 
 ### Triggering Based on New Events: The Event-Stream Listener
 
-Functions can be triggered when an event is produced into an event stream. The _event-stream listener trigger_ isolates event consumption behind a predefined consumer, reducing the amount of overhead code that a developer must write. Events are 
-
-
-injected directly into the function in a form of an array of events, in sequential order from an event stream, or as a cluster of unordered events if consuming from a queue. You can create multiple mappings from event streams to functions, such that a function can consume events from many different streams. 
+Functions can be triggered when an event is produced into an event stream. The _event-stream listener trigger_ isolates event consumption behind a predefined consumer, reducing the amount of overhead code that a developer must write. Events are injected directly into the function in a form of an array of events, in sequential order from an event stream, or as a cluster of unordered events if consuming from a queue. You can create multiple mappings from event streams to functions, such that a function can consume events from many different streams. 
 
 FaaS solutions from Google, Microsoft, and Amazon provide this trigger for usage with their proprietary event brokers, but currently do not support triggering directly from open source brokers. The generalized structure of this approach is shown in Figure 9-1. 
 
-
 ![](../images/Event-Driven_Microservices-0174-02.png)
-
 
 _Figure 9-1. Integrated event-stream listener with FaaS framework_ 
 
 Conversely, open source solutions such as OpenFaaS, Kubeless, Nuclio, and others provide a variety of triggering plug-ins with various event brokers, such as Kafka, Pulsar, and NATS, to name a few. For instance, Apache Kafka Connect allows you to trigger the functions of third-party FaaS frameworks. Since Kafka Connect runs outside of the FaaS framework, you would end up with an event-stream listener as per Figure 9-2. 
 
-
 ![](../images/Event-Driven_Microservices-0174-05.png)
-
 
 _Figure 9-2. External event-stream listener application provided by Kafka Connect_ 
 
 Though not shown in the previous examples, function results can be output to their own event streams, not just for the purpose of outputting data but also for tracking the function’s success. 
 
-_Synchronous_ triggers require the function to complete before they issue the next events. This is particularly important for maintaining the processing order and is limited by the parallelism of the event stream being processed. Conversely, _asynchronous_ triggering can issue multiple events to multiple functions, each one reporting 
-
-
-back as it is completed. This will _not_ maintain the processing order, however, and should be used only when processing order is not important to the business logic. 
+_Synchronous_ triggers require the function to complete before they issue the next events. This is particularly important for maintaining the processing order and is limited by the parallelism of the event stream being processed. Conversely, _asynchronous_ triggering can issue multiple events to multiple functions, each one reporting back as it is completed. This will _not_ maintain the processing order, however, and should be used only when processing order is not important to the business logic. 
 
 _Batch size_ and _batch window_ are two important properties to consider in streamlistener triggers. The batch size dictates the maximum number of events to dispatch for processing, while the batch window indicates the maximum amount of time to wait for additional events, instead of triggering the function immediately. Both of these parameters are used to ensure that the overhead of starting the function is spread among the batch of records to reduce costs. 
 
@@ -168,9 +150,7 @@ return0;
 }
 ```
 
-
 ![](../images/Event-Driven_Microservices-0175-05.png)
-
 
 Much like a containerized microservice, triggers for the eventstream listener pattern can be configured to start processing events from a stream’s latest offsets, earliest offsets, or anywhere in between. 
 
@@ -179,7 +159,6 @@ Much like a containerized microservice, triggers for the eventstream listener pa
 A consumer group’s lag metric is another way to trigger functions. You can detect lag by periodically polling the offsets of an individual application’s consumer groups and computing the delta between the current consumer offset and the head offset of the stream (see “Consumer Offset Lag Monitoring” on page 246 for more on lag monitoring). While similar to the stream listener trigger, lag monitoring can also be used for scaling non-FaaS microservices. 
 
 Lag monitoring typically involves computing and reporting lag metrics to your monitoring framework of choice. The monitoring framework can then call the FaaS framework to tell it to start up the functions registered on the event stream. A high lag value can indicate that multiple function instances can be started to more quickly process the load, while a low lag value may require only a single function instance to process the backlog. You can tailor the relationship between lag quantity and function startup on a microservice-by-microservice basis, ensuring compliance with SLAs. 
-
 
 One of the major differences between the previously mentioned event-stream listener trigger and this one is that with lag triggering, the function does _not_ consume the events until _after_ it is started. Functions started by the lag trigger have a wider domain of responsibilities, including establishing a client connection with the event broker, consuming the events, and committing back any offset updates. This makes functions triggered by lag much more similar to basic producer/consumer clients, albeit with a limited lifespan. The following example function illustrates this workflow: 
 
@@ -223,10 +202,7 @@ If the function is frequently triggered by the lag monitor, there is a good chan
 
 ### Triggering on a Schedule
 
-Functions can also be scheduled to start up periodically and at specific datetimes. The scheduled functions start up at the specified interval, poll the source event-streams for new events, and process them or shut down as necessary. The polling period 
-
-
-should be kept low so that SLAs are maintained, but polling too frequently may put undue load on both the FaaS framework and event broker. 
+Functions can also be scheduled to start up periodically and at specific datetimes. The scheduled functions start up at the specified interval, poll the source event-streams for new events, and process them or shut down as necessary. The polling period should be kept low so that SLAs are maintained, but polling too frequently may put undue load on both the FaaS framework and event broker. 
 
 Client code for a time-based trigger looks identical to that of the consumer group lag trigger example. 
 
@@ -244,16 +220,13 @@ FaaS approaches work particularly well for solutions that can leverage the ondem
 
 FaaS solutions can perform extremely well when concurrency and determinism are not concerns. However, once determinism comes into play, you must take great care to ensure correctness and consistency in the event stream processing. Much like the basic consumer solutions in the next chapter, FaaS solutions require that you provide an event scheduler to ensure consistent processing results. Copartitioned data can only be successfully and consistently processed by a single function at a time, similar to how the full-featured lightweight and heavyweight frameworks must use only a single thread. 
 
-
 ## Maintaining State
 
 Given the short lifespan of functions, most stateful FaaS-based solutions require the use of an external stateful service. Part of the reason is the goal of many FaaS providers to supply quick, highly scalable units of processing power independent of the data’s location. Having functions that require local state from previous executions limits current execution to the nodes that have that state co-located. This greatly reduces the flexibility of FaaS providers, so they often enforce a “no local state” policy and require that everything stateful be stored external to the executors. 
 
 Although previous local state may be available if a function starts in a warm state, there is no guarantee that this will always be the case. Functions connect to external state stores exactly as any other client would—by creating a connection to the state store and using the corresponding API. Any state must be persisted and retrieved explicitly by the function. 
 
-
 ![](../images/Event-Driven_Microservices-0178-03.png)
-
 
 Be sure to use strict access permissions for your function’s state, such that nothing outside of its bounded context is allowed access. 
 
@@ -265,9 +238,7 @@ FaaS frameworks will continue to grow and include new features. Simple managemen
 
 Functions are often used to execute other functions and may also be used for both choreographed and orchestrated workflows. Communication between functions can be facilitated asynchronously through events, via request-response calls, or with a combination of both. These choices depend highly on the FaaS framework and the problem space of the bounded context. It’s common to use choreography and orchestration design patterns when implementing a multifunction solution. 
 
-
 ![](../images/Event-Driven_Microservices-0179-00.png)
-
 
 To avoid out-of-order processing issues, ensure that all processing is completed for one event before processing the next event. 
 
@@ -275,16 +246,13 @@ To avoid out-of-order processing issues, ensure that all processing is completed
 
 The output of one function can be produced into an event stream for another consuming function. A bounded context may be made up of many functions and many internal event streams, with varying triggering and scaling logic for each function definition. Each function processes incoming events at its own rate, with events being consumed, work being performed, and outputs produced accordingly. An example of this design is shown in Figure 9-3. 
 
-
 ![](../images/Event-Driven_Microservices-0179-04.png)
-
 
 _Figure 9-3. Multifunction event-driven FaaS topology representing a single microservice_ 
 
 In this example, function A is triggered independently of the triggers for functions B and C. Event streams 2 and 3 are considered internal event streams, with access to their contents completely restricted to any functions outside of the bounded context. Each function consumes events from its source stream using the same consumer group, as the functions are all colocated within the same bounded context. This ensures that the functions are effectively operating in the same way as a non-FaaSbased microservice. 
 
 There are several benefits of using an event-based communication pattern. Each function within the topology can manage its own consumer offsets, committing each offset once its work is done. No coordination between functions needs to occur outside of the event stream processing. The preceding figure shows a choreographybased design pattern, though orchestration can also be used. Additionally, any failures in the event processing will not result in any data loss, as the events are durably stored in the event broker and will simply be reprocessed by the next function instance. 
-
 
 ### Direct-Call Pattern
 
@@ -294,9 +262,7 @@ In the direct-call pattern, a function can call other functions directly from it
 
 Asychronous direct calls lead to a choreography-based FaaS solution. One function simply invokes the next one based on its business logic, leaving it up to that function and the FaaS framework to handle the next steps, including any failures or errors. An asynchronous direct-call function topology is a simple way to chain function calls together. Figure 9-4 illustrates an example. 
 
-
 ![](../images/Event-Driven_Microservices-0180-04.png)
-
 
 _Figure 9-4. Choreographed asynchronous function calls within a bounded context_ 
 
@@ -319,14 +285,11 @@ return0;
 }
 ```
 
-
 Function B is called inline with the work from function A. Depending on your FaaS framework, this may result in multiple instances of function B being created, each of which runs independently of the others. This will create a race condition where some executions of function B will finish before others, potentially leading to out-of-order processing of events. 
 
 Similarly, writing your code as follows will not solve ordering problems either. Processing will still happen out of order, as function A’s processing work will be executed for all events in the batch prior to function B’s execution. 
 
 ```
-publicintfunctionA(Event[]events,Contextcontext){
-for(Eventevent:events){
 //Do function A's processing work
 }
 //Invoke function B asynchronously with entire batch of events
@@ -334,7 +297,6 @@ asyncFunctionB(events);
 ```
 
 ```
-context.success()
 return0;
 }
 ```
@@ -349,9 +311,7 @@ Synchronous function calls allow you to invoke other functions and await the res
 
 **Event stream—triggered processing.** In the following example, a single orchestration function is triggered when new events arrive in a partitioned event stream. The function starts up and begins processing the input batch of events, dispatching event sequentially for each function. Figure 9-5 shows an example of function-based orchestration within a single bounded context. 
 
-
 ![](../images/Event-Driven_Microservices-0182-00.png)
-
 
 _Figure 9-5. Orchestrated synchronous function calls within a bounded context_ 
 
@@ -377,7 +337,6 @@ The orchestration function invokes functions A and B in order and awaits the res
 
 **Queue-triggered event processing.** If you use a queue with individual commit capabilities, the triggering mechanism can simply trigger an individual orchestration function for each event. The orchestrator will need to commit the processing confirmation back to the queue after it has completed its work. In the case that the orchestrator fails to process the work, it will simply be picked up by the next orchestrator instance created. 
 
-
 ## Termination and Shutdown
 
 A function is terminated once it has completed its work or it reaches the end of its allocated lifespan, generally in the range of 5–10 minutes. The function instance is suspended and enters a state of hibernation, where it may be immediately revived. The suspended function may also eventually be evicted from the hibernation cache due to resource or time constraints. 
@@ -394,7 +353,6 @@ Each function has specific needs based on its workload. Optimizing the resources
 
 Each function can be allocated a specific amount of CPU and memory. It is important to tune these parameters to the needs of your function; overallocation can be expensive, while underallocation may result in your functions crashing or taking too long to complete. 
 
-
 Maximum execution time is another factor, as it limits how long a function may run. This parameter is closely related to the batch size, as the time a function needs to process events is very often linearly related, on average, with the number of events to process. Set the maximum execution time higher than the maximum expected time to process a specific batch size of events to avoid unnecessary function timeout errors. 
 
 Lastly, you must consider any external I/O to state stores belonging within the bounded context of the function-based solution. The workload of a function varies with the flow of input events, with some workloads requiring consistent I/O to external state, and other workloads requiring only sporadic I/O. A failure to provide sufficient I/O resources can result in degraded throughput and performance. 
@@ -407,9 +365,7 @@ If a function is unable to process its assigned batch of events during its execu
 
 - Decrease the maximum batch size of events processed by the function. 
 
-
 ![](../images/Event-Driven_Microservices-0184-06.png)
-
 
 Functions that establish their own connections to the event broker and manage the consumption of events can also periodically commit offsets during execution, ensuring partial completion of the batch. This does not work when the function is passed the batch of consumed events, as it has no way to update the consumer offsets during processing. 
 
@@ -417,10 +373,7 @@ Additionally, some event-listener triggering systems, such as those provided by 
 
 ## Scaling Your FaaS Solutions
 
-FaaS solutions provide exceptional capabilities for the parallelization of work, especially for queues and event streams where the order in which data is processed is not important. For partitioned event streams, if the order of events is indeed important, 
-
-
-the maximum level of parallelization is limited by the number of partitions in your event streams, just as it is for all microservice implementations. 
+FaaS solutions provide exceptional capabilities for the parallelization of work, especially for queues and event streams where the order in which data is processed is not important. For partitioned event streams, if the order of events is indeed important, the maximum level of parallelization is limited by the number of partitions in your event streams, just as it is for all microservice implementations. 
 
 Scaling policies are typically the domain of the FaaS framework, so check your framework documentation to see what options are offered. Typical options involve scaling based on consumer input lag, time of day, processing throughput, and performance characteristics. 
 
@@ -428,9 +381,7 @@ For functions that instantiate and manage their own event broker connections, be
 
 Static partition assignments eliminate the rebalancing overhead of dynamically assigned consumer groups and can also be used to copartition event streams. Functions will start with the foreknowledge of which partitions they will consume from; there will be no rebalancing, and events can simply be consumed whenever the function is triggered. This approach does require a more careful consideration of the work that your function is performing, as you need to ensure that each partition is being consumed. 
 
-
 ![](../images/Event-Driven_Microservices-0185-04.png)
-
 
 Be careful about thrashing triggers and scaling policy. Frequent rebalancing of partition assignments can be expensive for event brokers. Try to scale your function count up or down at most once every few minutes. 
 
@@ -438,7 +389,4 @@ Be careful about thrashing triggers and scaling policy. Frequent rebalancing of 
 
 Function-as-a-Service is an area of cloud computing that is growing rapidly. Many FaaS frameworks offer a variety of function development, management, deployment, triggering, testing, and scalability tools that allow you to build your microservices using functions. Functions can be triggered by new events in an event stream, consumer group lag status, wall-clock time, or custom logic. 
 
-Function-based solutions are particularly useful in handling stateless and simple stateful business problems that do not require event scheduling. The orchestration pattern allows multiple functions to be called in strict sequential order, while also 
-
-
-respecting the order of events from the event stream. Since the FaaS framework space is growing and evolving rapidly, it’s important to keep up with the newest features of the platforms of interest to you and your organization. 
+Function-based solutions are particularly useful in handling stateless and simple stateful business problems that do not require event scheduling. The orchestration pattern allows multiple functions to be called in strict sequential order, while also respecting the order of events from the event stream. Since the FaaS framework space is growing and evolving rapidly, it’s important to keep up with the newest features of the platforms of interest to you and your organization. 

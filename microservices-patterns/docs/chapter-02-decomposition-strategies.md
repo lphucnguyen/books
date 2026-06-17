@@ -8,10 +8,7 @@
 
 - Using the bounded context concept from domaindriven design (DDD) to untangle data and make decomposition easier 
 
-Sometimes you have to be careful what you wish for. After an intense lobbying effort, Mary had finally convinced the business that migrating to a microservice architecture was the right thing to do. Feeling a mixture of excitement and some trepidation, Mary had a morning-long meeting with her architects to discuss where to begin. During the discussion, it became apparent that some aspects of the Microservice architecture pattern language, such as deployment and service discovery, were new and unfamiliar, yet straightforward. The key challenge, which is the essence of the microservice architecture, is the functional decomposition of the application into services. The first and most important aspect of the architecture is, 
-
-
-therefore, the definition of the services. As they stood around the whiteboard, the FTGO team wondered exactly how to do that! 
+Sometimes you have to be careful what you wish for. After an intense lobbying effort, Mary had finally convinced the business that migrating to a microservice architecture was the right thing to do. Feeling a mixture of excitement and some trepidation, Mary had a morning-long meeting with her architects to discuss where to begin. During the discussion, it became apparent that some aspects of the Microservice architecture pattern language, such as deployment and service discovery, were new and unfamiliar, yet straightforward. The key challenge, which is the essence of the microservice architecture, is the functional decomposition of the application into services. The first and most important aspect of the architecture is, therefore, the definition of the services. As they stood around the whiteboard, the FTGO team wondered exactly how to do that! 
 
 In this chapter, you’ll learn how to define a microservice architecture for an application. I describe strategies for decomposing an application into services. You’ll learn that services are organized around business concerns rather than technical concerns. I also show how to use ideas from domain-driven design (DDD) to eliminate god classes, which are classes that are used throughout an application and cause tangled dependencies that prevent decomposition. 
 
@@ -28,10 +25,6 @@ I begin this section by describing the concept of _software architecture_ and wh
 ### 2.1.1 What is software architecture and why does it matter?
 
 Architecture is clearly important. There are at least two conferences dedicated to the topic: O’Reilly Software Architecture Conference (https://conferences.oreilly.com/ software-architecture) and the SATURN conference (https://resources.sei.cmu.edu/ news-events/events/saturn/). Many developers have the goal of becoming an architect. But what is architecture and why does it matter? 
-
-
-_**What is the microservice architecture exactly?**_ 
-
 
 To answer that question, I first define what is meant by the term _software architecture_ . After that, I discuss how an application’s architecture is multidimensional and is best described using a collection of views or blueprints. I then describe that software architecture matters because of its impact on the application’s software quality attributes. 
 
@@ -61,13 +54,10 @@ The purpose of each view is as follows:
 
 - _Implementation view_ —The output of the build system. This view consists of modules, which represent packaged code, and components, which are executable 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0066-02.png)
-
 
 **----- Start of picture text -----**<br>
 What developers create What is produced by the build system<br>Elements: Classes and packages Elements: Modules, (JAR files) and<br>Relations: The relationships components (WAR files<br>between them or executables)<br>Relations: Their dependencies<br>Logical Implementation<br>view view<br>Animate the views.<br>Scenarios<br>Process Deployment<br>view view<br>Running components Processes running on “machines”<br>Elements: Processes Elements: Machines and processes<br>Relations: Inter-process Relations: Networking<br>communication<br>**----- End of picture text -----**<br>
-
 
 Figure 2.1 The 4+1 view model describes an application’s architecture using four views, along with scenarios that show how the elements within each view collaborate to handle requests. or deployable units consisting of one or more modules. In Java, a module is a JAR file, and a component is typically a WAR file or an executable JAR file. The relations between them include dependency relationships between modules and composition relationships between components and modules. 
 
@@ -79,8 +69,6 @@ In addition to these four views, there are the scenarios—the +1 in the 4+1 mod
 
 The 4+1 view model is an excellent way to describe an applications’s architecture. Each view describes an important aspect of the architecture, and the scenarios 
 
-
-_**What is the microservice architecture exactly?**_
 illustrate how the elements of a view collaborate. Let’s now look at why architecture is important. 
 
 **WHY ARCHITECTURE MATTERS**
@@ -100,7 +88,6 @@ A particular architectural style provides a limited palette of elements (compone
 **THE LAYERED ARCHITECTURAL STYLE**
 
 The classic example of an architectural style is the layered architecture. A _layered architecture_ organizes software elements into layers. Each layer has a well-defined set of responsibilities. A layered architecture also constraints the dependencies between the layers. A layer can only depend on either the layer immediately below it (if strict layering) or any of the layers below it. 
-
 
 You can apply the layered architecture to any of the four views discussed earlier. The popular three-tier architecture is the layered architecture applied to the logical view. It organizes the application’s classes into the following tiers or layers: 
 
@@ -128,16 +115,10 @@ _Hexagonal architecture_ is an alternative to the layered architectural style. A
 
 The business logic has one or more ports. A _port_ defines a set of operations and is how the business logic interacts with what’s outside of it. In Java, for example, a port is often a Java interface. There are two kinds of ports: inbound and outbound ports. An inbound port is an API exposed by the business logic, which enables it to be invoked by external applications. An example of an inbound port is a service interface, which defines a service’s public methods. An outbound port is how the business logic invokes external systems. An example of an output port is a repository interface, which defines a collection of data access operations. 
 
-
-_**What is the microservice architecture exactly?**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0069-02.png)
-
 
 **----- Start of picture text -----**<br>
 Inbound adapter Inbound adapter<br>Some<br>Message<br>Browser controller<br>consumer<br>class<br>Foo<br>service<br>Business logic Message broker<br>Messaging<br>interface<br>Inbound port<br>Repository<br>interface Message<br>producer<br>DAO<br>Outbound adapter<br>Outbound adapter<br>Outbound port<br>Database<br>**----- End of picture text -----**<br>
-
 
 Figure 2.2 An example of a hexagonal architecture, which consists of the business logic and one or more adapters that communicate with external systems. The business logic has one or more ports. Inbound adapters, which handled requests from external systems, invoke an inbound port. An outbound adapter implements an outbound port, and invokes an external system. 
 
@@ -146,7 +127,6 @@ Surrounding the business logic are adapters. As with ports, there are two types 
 An outbound adapter implements an outbound port and handles requests from the business logic by invoking an external application or service. An example of an outbound adapter is a _data access object_ (DAO) class that implements operations for accessing a database. Another example would be a proxy class that invokes a remote service. Outbound adapters can also publish events. 
 
 An important benefit of the hexagonal architectural style is that it decouples the business logic from the presentation and data access logic in the adapters. The business logic doesn’t depend on either the presentation logic or the data access logic. 
-
 
 Because of this decoupling, it’s much easier to test the business logic in isolation. Another benefit is that it more accurately reflects the architecture of a modern application. The business logic can be invoked via multiple adapters, each of which implements a particular API or UI. The business logic can also invoke multiple adapters, each one of which invokes a different external system. Hexagonal architecture is a great way to describe the architecture of each service in a microservice architecture. 
 
@@ -168,16 +148,10 @@ Structure the application as a collection of loosely coupled, independently depl
 
 Later in this chapter, I describe what is meant by _business capability_ . The connectors between services are implemented using interprocess communication mechanisms such as REST APIs and asynchronous messaging. Chapter 3 discusses interprocess communication in more detail. 
 
-
-_**What is the microservice architecture exactly?**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0071-02.png)
-
 
 **----- Start of picture text -----**<br>
 The API Gateway routes<br>requests from the mobile Services corresponding<br>applications to services. REST to business capabilities/<br>API DDD subdomains<br>Order<br>Service<br>Stripe<br>REST REST Adapter<br>API API<br>Courier GatewayAPI RESTAPI Restaurant AccountingService<br>REST Service<br>API<br>Twilio<br>REST Adapter<br>Consumer REST API<br>API Notification<br>Kitchen Service<br>Restaurant Service Amazon<br>Web UI SES<br>Adapter<br>Restaurant<br>REST<br>API<br>Delivery<br>Service<br>Services have APIs. A service’s data is private.<br>**----- End of picture text -----**<br>
-
 
 Figure 2.3 A possible microservice architecture for the FTGO application. It consists of numerous services. 
 
@@ -191,16 +165,12 @@ A service’s API encapsulates its internal implementation. Unlike in a monolith
 
 Each service in a microservice architecture has its own architecture and, potentially, technology stack. But a typical service has a hexagonal architecture. Its API is implemented by adapters that interact with the service’s business logic. The operations 
 
-
 **Defines operations** 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0072-03.png)
 
-
 **----- Start of picture text -----**<br>
 Service API<br>Commands:<br>createOrder()<br>Invokes<br>...<br>Queries:<br>findOrderbyId()<br>...<br>Order<br>Service Order Service<br>client<br>Subscribes to events Order<br>event<br>publisher<br>Order created<br>Order cancelled<br>Publishes events when data changes<br>**----- End of picture text -----**<br>
-
 
 Figure 2.4 A service has an API that encapsulates the implementation. The API defines operations, which are invoked by clients. There are two types of operations: commands update data, and queries retrieve data. When its data changes, a service publishes events that clients can subscribe to. adapter invokes the business logic, and the events adapter publishes events emitted by the business logic. 
 
@@ -210,13 +180,7 @@ Later in chapter 12, when I discuss deployment technologies, you’ll see that t
 
 An important characteristic of the microservice architecture is that the services are loosely coupled (https://en.wikipedia.org/wiki/Loose_coupling). All interaction with a service happens via its API, which encapsulates its implementation details. This enables the implementation of the service to change without impacting its clients. Loosely coupled services are key to improving an application’s development time attributes, including its maintainability and testability. They are much easier to understand, change, and test. 
 
-The requirement for services to be loosely coupled and to collaborate only via APIs prohibits services from communicating via a database. You must treat a service’s persistent data like the fields of a class and keep them private. Keeping the data private enables a developer to change their service’s database schema without having to 
-
-
-_**What is the microservice architecture exactly?**_ 
-
-
-spend time coordinating with developers working on other services. Not sharing database tables also improves runtime isolation. It ensures, for example, that one service can’t hold database locks that block another service. Later on, though, you’ll learn that one downside of not sharing databases is that maintaining data consistency and querying across services are more complex. 
+The requirement for services to be loosely coupled and to collaborate only via APIs prohibits services from communicating via a database. You must treat a service’s persistent data like the fields of a class and keep them private. Keeping the data private enables a developer to change their service’s database schema without having to spend time coordinating with developers working on other services. Not sharing database tables also improves runtime isolation. It ensures, for example, that one service can’t hold database locks that block another service. Later on, though, you’ll learn that one downside of not sharing databases is that maintaining data consistency and querying across services are more complex. 
 
 **THE ROLE OF SHARED LIBRARIES**
 
@@ -234,42 +198,28 @@ A much better goal is to define a well-designed service to be a service capable 
 
 The microservice architecture structures an application as a set of small, loosely coupled services. As a result, it improves the development time attributes—maintainability, testability, deployability, and so on—and enables an organization to develop better software faster. It also improves an application’s scalability, although that’s not the main goal. To develop a microservice architecture for your application, you need to identify the services and determine how they collaborate. Let’s look at how to do that. 
 
-
 ## 2.2 Defining an application?s microservice architecture
 
 How should we define a microservice architecture? As with any software development effort, the starting points are the written requirements, hopefully domain experts, and perhaps an existing application. Like much of software development, defining an architecture is more art than science. This section describes a simple, three-step process, shown in figure 2.5, for defining an application’s architecture. It’s important to remember, though, that it’s not a process you can follow mechanically. It’s likely to be iterative and involve a lot of creativity. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0074-04.png)
-
 
 **----- Start of picture text -----**<br>
 The starting point are the requirements,<br>such as the user stories.<br>**----- End of picture text -----**<br>
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0074-05.png)
-
 
 **----- Start of picture text -----**<br>
 A system operation represents<br>an external request.<br>**----- End of picture text -----**<br>
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0074-06.png)
-
 
 **----- Start of picture text -----**<br>
 Step 1: Identify system operations<br>Functional requirements<br>createOrder()<br>As a consumer<br>I want to place an order<br>so that I can ...<br>FTGO<br>As a restaurant<br>I want to accept an order<br>acceptOrder()<br>so that I can ...<br>Step 2: Identify services Step 3: Define service APIs and collaborations<br>FTGO FTGO<br>createOrder()<br>createOrder()<br>Order<br>Order verifyOrder()<br>Service<br>Service<br>Restaurant<br>Iterate Restaurant<br>Service<br>createTicket() Service<br>Kitchen<br>Service<br>acceptOrder() acceptOrder() Kitchen<br>... Service<br>**----- End of picture text -----**<br>
 
-
 Figure 2.5 A three-step process for defining an application’s microservice architecture 
 
-An application exists to handle requests, so the first step in defining its architecture is to distill the application’s requirements into the key requests. But instead of describing the requests in terms of specific IPC technologies such as REST or messaging, I use 
-
-
-_**Defining an application’s microservice architecture**_ 
-
-
-the more abstract notion of system operation. A _system operation_ is an abstraction of a request that the application must handle. It’s either a command, which updates data, or a query, which retrieves data. The behavior of each command is defined in terms of an abstract domain model, which is also derived from the requirements. The system operations become the architectural scenarios that illustrate how the services collaborate. 
+An application exists to handle requests, so the first step in defining its architecture is to distill the application’s requirements into the key requests. But instead of describing the requests in terms of specific IPC technologies such as REST or messaging, I use the more abstract notion of system operation. A _system operation_ is an abstraction of a request that the application must handle. It’s either a command, which updates data, or a query, which retrieves data. The behavior of each command is defined in terms of an abstract domain model, which is also derived from the requirements. The system operations become the architectural scenarios that illustrate how the services collaborate. 
 
 The second step in the process is to determine the decomposition into services. There are several strategies to choose from. One strategy, which has its origins in the discipline of business architecture, is to define services corresponding to business capabilities. Another strategy is to organize services around domain-driven design subdomains. The end result is services that are organized around business concepts rather than technical concepts. 
 
@@ -281,21 +231,12 @@ This section first describes how to identity an application’s operations. Afte
 
 ### 2.2.1 Identifying the system operations
 
-The first step in defining an application’s architecture is to define the system operations. The starting point is the application’s requirements, including user stories and their associated user scenarios (note that these are different from the architectural scenarios). The system operations are identified and defined using the two-step process shown in figure 2.6. This process is inspired by the object-oriented design process covered in Craig Larman’s book _Applying UML and Patterns_ (Prentice Hall, 2004) (see www.craiglarman.com/wiki/index.php?title=Book_Applying_UML_and_Patterns for details). The first step creates the high-level domain model consisting of the key classes 
-
-
-_**Decomposition strategies**_ 
-
-
-that provide a vocabulary with which to describe the system operations. The second step identifies the system operations and describes each one’s behavior in terms of the domain model. 
-
+The first step in defining an application’s architecture is to define the system operations. The starting point is the application’s requirements, including user stories and their associated user scenarios (note that these are different from the architectural scenarios). The system operations are identified and defined using the two-step process shown in figure 2.6. This process is inspired by the object-oriented design process covered in Craig Larman’s book _Applying UML and Patterns_ (Prentice Hall, 2004) (see www.craiglarman.com/wiki/index.php?title=Book_Applying_UML_and_Patterns for details). The first step creates the high-level domain model consisting of the key classes that provide a vocabulary with which to describe the system operations. The second step identifies the system operations and describes each one’s behavior in terms of the domain model. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0076-04.png)
 
-
 **----- Start of picture text -----**<br>
 Step 1 Step 2<br>High-level domain model Functional requirements<br>createOrder()<br>As a consumer<br>Order<br>Domain model I want to place an order<br>derived from so that I can ...<br>requirements<br>FTGO<br>Restaurant As a restaurant<br>I want to accept an order<br>acceptOrder()<br>so that I can ...<br>Delivery<br>Maps to<br>System operations are defined<br>in terms of domain model.<br>**----- End of picture text -----**<br>
-
 
 Figure 2.6 System operations are derived from the application’s requirements using a two-step process. The first step is to create a high-level domain model. The second step is to define the system operations, which are defined in terms of the domain model. 
 
@@ -309,8 +250,6 @@ The first step in the process of defining the system operations is to sketch a h
 
 A domain model is created using standard techniques such as analyzing the nouns in the stories and scenarios and talking to the domain experts. Consider, for example, 
 
-
-_**Defining an application’s microservice architecture**_
 the Place Order story. We can expand that story into numerous user scenarios including this one: 
 
 - Given a consumer 
@@ -339,16 +278,12 @@ Given an order that is in the PENDING_ACCEPTANCE state and a courier that is ava
 
 This scenario suggests the existence of Courier and Delivery classes. The end result after a few iterations of analysis will be a domain model that consists, unsurprisingly, of those classes and others, such as MenuItem and Address. Figure 2.7 is a class diagram that shows the key classes. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0077-17.png)
-
 
 **----- Start of picture text -----**<br>
 Assigned to<br>Placed by For Restaurant Courier Location<br>Consumer Order<br>name available lat<br>state ... ... lon<br>...<br>Pays using Paid using<br>PaymentInfo DeliveryInfo OrderLineItem MenuItem Address<br>creditcardId deliveryTime quantity name street1<br>... price street2<br>city<br>state<br>zip<br>**----- End of picture text -----**<br>
 
-
 Figure 2.7 The key classes in the FTGO domain model 
-
 
 The responsibilities of each class are as follows: 
 
@@ -392,22 +327,16 @@ Table 2.1 Key system commands for the FTGO application
 |---|---|---|---|
 |Consumer<br>Restaurant|Create Order<br>Accept Order|createOrder()<br>acceptOrder()|Creates an order<br>Indicates that the restaurant has<br>accepted the order and is committed<br>to preparing it by the indicated time|
 
-
-_**Defining an application’s microservice architecture**_ 
-
-
 Table 2.1 Key system commands for the FTGO application _(continued)_ 
 
 |Actor|Story|Command|Description|
 |---|---|---|---|
 |Restaurant<br>Courier<br>Courier<br>Courier|Order Ready<br>for Pickup<br>Update<br>Location<br>Delivery<br>picked up<br>Delivery<br>delivered|noteOrderReadyForPickup()<br>noteUpdatedLocation()<br>noteDeliveryPickedUp()<br>noteDeliveryDelivered()|Indicates that the order is ready for<br>pickup<br>Updates the current location of the<br>courier<br>Indicates that the courier has<br>picked up the order<br>Indicates that the courier has deliv-<br>ered the order|
 
-
 A command has a specification that defines its parameters, return value, and behavior in terms of the domain model classes. The behavior specification consists of preconditions that must be true when the operation is invoked, and post-conditions that are true after the operation is invoked. Here, for example, is the specification of the createOrder() system operation: 
 
 |Operation<br>Returns<br>Preconditions<br>Post-conditions|createOrder(consumer id, payment method, delivery address, delivery time,<br>restaurant id, order line items)<br>orderId, …<br>The consumer exists and can place orders.<br>The line items correspond to the restaurant’s menu items.<br>The delivery address and time can be serviced by the restaurant.<br>The consumer’s credit card was authorized for the order total.<br>An order was created in thePENDING_ACCEPTANCEstate.|
 |---|---|
-
 
 The preconditions mirror the _givens_ in the Place Order user scenario described earlier. The post-conditions mirror the _thens_ from the scenario. When a system operation is invoked it will verify the preconditions and perform the actions required to make the post-conditions true. 
 
@@ -415,7 +344,6 @@ Here’s the specification of the acceptOrder() system operation:
 
 |Operation<br>Returns<br>Preconditions<br>Post-conditions|acceptOrder(restaurantId, orderId, readyByTime)<br>—<br>Theorder.statusisPENDING_ACCEPTANCE.<br>A courier is available to deliver the order.<br>Theorder.statuswas changed toACCEPTED.<br>Theorder.readyByTimewas changed to thereadyByTime.<br>The courier was assigned to deliver the order.|
 |---|---|
-
 
 Its pre- and post-conditions mirror the user scenario from earlier. 
 
@@ -449,10 +377,6 @@ Once the system operations have been defined, the next step is to identify the a
 
 Let’s look at the first strategy, which defines services corresponding to business capabilities. 
 
-
-_**Defining an application’s microservice architecture**_ 
-
-
 ### 2.2.2 Defining services by applying the Decompose by business capability pattern
 
 One strategy for creating a microservice architecture is to decompose by business capability. A concept from business architecture modeling, a _business capability_ is something that a business does in order to generate value. The set of capabilities for a given business depends on the kind of business. For example, the capabilities of an insurance company typically include Underwriting, Claims management, Billing, Compliance, and so on. The capabilities of an online store include Order management, Inventory management, Shipping, and so on. 
@@ -478,7 +402,6 @@ It is not difficult to imagine that the business capabilities for FTGO include t
    - _Courier management_ —Managing courier information 
 
    - _Restaurant information management_ —Managing restaurant menus and other information, including location and open hours 
-
 
 - Consumer management—Managing information about consumers 
 
@@ -522,16 +445,10 @@ The decision of which level of the capability hierarchy to map to services, beca
 
 - I mapped the Accounting capability to its own service, because the different types of accounting seem similar. 
 
-
-_**Defining an application’s microservice architecture**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0083-02.png)
-
 
 **----- Start of picture text -----**<br>
 Capability hierarchy Services<br>Couriers and restaurants<br>Supplier management are very different<br>Courier management Courier Service kinds of suppliers<br>=> different services.<br>Restaurant information<br>Restaurant Service<br>management<br>Consumer management Consumer Service<br>Order taking and fulfillment<br>Three different services<br>Order management Order Service<br>handling different<br>Restaurant order phases of the order<br>ticket management Kitchen Service taking and fulfillment<br>Logistics<br>Courier availability<br>Delivery Service<br>management<br>Delivery management<br>Accounting<br>Consumer accounting Treat payments and<br>billing the same for now.<br>Restaurant accounting Accounting Service<br>Courier accounting<br>**----- End of picture text -----**<br>
-
 
 Figure 2.8 Mapping FTGO business capabilities to services. Capabilities at various levels of the capability hierarchy are mapped to services. 
 
@@ -539,13 +456,7 @@ Later on, it may make sense to separate payments (of Restaurants and Couriers) a
 
 A key benefit of organizing services around capabilities is that because they’re stable, the resulting architecture will also be relatively stable. The individual components of the architecture may evolve as the _how_ aspect of the business changes, but the architecture remains unchanged. 
 
-Having said that, it’s important to remember that the services shown in figure 2.8 are merely the first attempt at defining the architecture. They may evolve over time as we learn more about the application domain. In particular, an important step in the architecture definition process is investigating how the services collaborate in each of the key architectural services. You might, for example, discover that a particular decomposition is inefficient due to excessive interprocess communication and that you must combine services. Conversely, a service might grow in complexity to the 
-
-
-_**Decomposition strategies**_ 
-
-
-point where it becomes worthwhile to split it into multiple services. What’s more, in section 2.2.5, I describe several obstacles to decomposition that might cause you to revisit your decision. 
+Having said that, it’s important to remember that the services shown in figure 2.8 are merely the first attempt at defining the architecture. They may evolve over time as we learn more about the application domain. In particular, an important step in the architecture definition process is investigating how the services collaborate in each of the key architectural services. You might, for example, discover that a particular decomposition is inefficient due to excessive interprocess communication and that you must combine services. Conversely, a service might grow in complexity to the point where it becomes worthwhile to split it into multiple services. What’s more, in section 2.2.5, I describe several obstacles to decomposition that might cause you to revisit your decision. 
 
 Let’s take a look at another way to decompose an application that is based on domain-driven design. 
 
@@ -561,26 +472,18 @@ DDD is quite different than the traditional approach to enterprise modeling, whi
 
 DDD defines a separate domain model for each subdomain. A subdomain is a part of the _domain_ , DDD’s term for the application’s problem space. Subdomains are identified using the same approach as identifying business capabilities: analyze the business and identify the different areas of expertise. The end result is very likely to be subdomains that are similar to the business capabilities. The examples of subdomains in FTGO include Order taking, Order management, Kitchen management, Delivery, and Financials. As you can see, these subdomains are very similar to the business capabilities described earlier. 
 
-
-_**Defining an application’s microservice architecture**_ 
-
-
 DDD calls the scope of a domain model a _bounded context_ . A bounded context includes the code artifacts that implement the model. When using the microservice architecture, each bounded context is a service or possibly a set of services. We can create a microservice architecture by applying DDD and defining a service for each subdomain. Figure 2.9 shows how the subdomains map to services, each with its own domain model. 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0085-03.png)
 
-
 **----- Start of picture text -----**<br>
 FTGO domain<br>Order Service<br>Maps to Order<br>Order taking domain model<br>subdomain<br>Delivery Service<br>Maps to<br>Delivery<br>Delivery domain model<br>subdomain<br>Kitchen<br>subdomain<br>Kitchen Service<br>Maps to<br>Kitchen<br>domain model<br>....<br>subdomain Maps to<br>.... Service<br>Accounting<br>subdomain<br>Accounting Service<br>Maps to<br>Accounting<br>domain model<br>**----- End of picture text -----**<br>
-
 
 Figure 2.9 From subdomains to services: each subdomain of the FTGO application domain is mapped to a service, which has its own domain model. 
 
 DDD and the microservice architecture are in almost perfect alignment. The DDD concept of subdomains and bounded contexts maps nicely to services within a microservice architecture. Also, the microservice architecture’s concept of autonomous teams owning services is completely aligned with the DDD’s concept of each domain model being owned and developed by a single team. Even better, as I describe later in this section, the concept of a subdomain with its own domain model is a great way to eliminate god classes and thereby make decomposition easier. 
 
 Decompose by subdomain and Decompose by business capability are the two main patterns for defining an application’s microservice architecture. There are, however, some useful guidelines for decomposition that have their roots in object-oriented design. Let’s take a look at them. 
-
 
 ### 2.2.4 Decomposition guidelines
 
@@ -610,8 +513,6 @@ The idea is that if two classes change in lockstep because of the same underlyin
 
 We can apply CCP when creating a microservice architecture and package components that change for the same reason into the same service. Doing this will minimize 
 
-
-_**Defining an application’s microservice architecture**_
 the number of services that need to be changed and deployed when some requirement changes. Ideally, a change will only affect a single team and a single service. CCP is the antidote to the distributed monolith anti-pattern. 
 
 SRP and CCP are 2 of the 11 principles developed by Bob Martin. They’re particularly useful when developing a microservice architecture. The remaining nine principles are used when designing classes and packages. For more information about SRP, CCP, and the other OOD principles, see the article “The Principles of Object Oriented Design” on Bob Martin’s website (http://butunclebob.com/ArticleS.UncleBob .PrinciplesOfOod). 
@@ -642,7 +543,6 @@ _Network latency_ is an ever-present concern in a distributed system. You might 
 
 Another problem is how to implement interservice communication in a way that doesn’t reduce availability. For example, the most straightforward way to implement the createOrder() operation is for the Order Service to synchronously invoke the other services using REST. The drawback of using a protocol like REST is that it reduces the availability of the Order Service. It won’t be able to create an order if any of those other services are unavailable. Sometimes this is a worthwhile trade-off, but in chapter 3 you’ll learn that using asynchronous messaging, which eliminates tight coupling and improves availability, is often a better choice. 
 
-
 **MAINTAINING DATA CONSISTENCY ACROSS SERVICES**
 
 Another challenge is maintaining data consistency across services. Some system operations need to update data in multiple services. For example, when a restaurant accepts an order, updates must occur in both the Kitchen Service and the Delivery Service. The Kitchen Service changes the status of the Ticket. The Delivery Service schedules delivery of the order. Both of these updates must be done atomically. 
@@ -661,16 +561,10 @@ The Order class is a great example of a god class in the FTGO application. That�
 
 As you can see, the Order class has fields and methods corresponding to order processing, restaurant order management, delivery, and payments. This class also has a complex state model, due to the fact that one model has to describe state transitions 
 
-
-_**Defining an application’s microservice architecture**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0089-02.png)
-
 
 **----- Start of picture text -----**<br>
 Order<br>OrderTotal<br>deliveryTime<br>status<br><<delivery>><br>pickupTime<br><<billing>><br>transactionid<br><<orderTaking>><br>create() Address Courier Consumer Restaurant PaymentInfo<br>cancel()<br><<restaurant>><br>accept()<br>reject()<br>noteReadyForPickup()<br><<delivery>><br>assignCourier()<br>notePickedUp()<br>noteDelivered()<br>OrderLineItem<br>**----- End of picture text -----**<br>
-
 
 Figure 2.10 The **Order** god class is bloated with numerous responsibilities. from disparate parts of the application. In its current form, this class makes it extremely difficult to split code into services. 
 
@@ -680,13 +574,10 @@ Another solution is to encapsulate the Order database in an Order Service, which
 
 A much better approach is to apply DDD and treat each service as a separate subdomain with its own domain model. This means that each of the services in the FTGO application that has anything to do with orders has its own domain model with its version of the Order class. A great example of the benefit of multiple domain models is the Delivery Service. Its view of an Order, shown in figure 2.11, is extremely simple: pickup address, pickup time, delivery address, and delivery time. Moreover, rather than call it an Order, the Delivery Service uses the more appropriate name of Delivery. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0090-02.png)
-
 
 **----- Start of picture text -----**<br>
 Pickup location<br>Delivery Delivery location Address<br>status<br>scheduledPickupTime Assigned to<br>ScheduledDeliveryTime<br>Courier<br>**----- End of picture text -----**<br>
-
 
 Figure 2.11 The **Delivery Service** domain model 
 
@@ -694,35 +585,23 @@ The Delivery Service isn’t interested in any of the other attributes of an ord
 
 The Kitchen Service also has a much simpler view of an order. Its version of an Order is called a Ticket. As figure 2.12 shows, a Ticket simply consist of a status, the requestedDeliveryTime, a prepareByTime, and a list of line items that tell the restaurant what to prepare. It’s unconcerned with the consumer, payment, delivery, and so on. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0090-06.png)
-
 
 **----- Start of picture text -----**<br>
 Ticket TicketLineItem<br>status quantity<br>requestedDeliveryTime item<br>preparedByTime<br>**----- End of picture text -----**<br>
-
 
 Figure 2.12 The **Kitchen Service** domain model 
 
 The Order service has the most complex view of an order, shown in figure 2.13. Even though it has quite a few fields and methods, it’s still much simpler than the original version. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0090-09.png)
-
 
 **----- Start of picture text -----**<br>
 Order<br>status<br>orderTotal<br>Address PaymentInfo Consumer Restaurant<br>deliveryTime<br>...<br>OrderLineItem<br>**----- End of picture text -----**<br>
 
-
 Figure 2.13 The **Order Service** domain model 
 
-The Order class in each domain model represents different aspects of the same Order business entity. The FTGO application must maintain consistency between these different objects in different services. For example, once the Order Service has authorized 
-
-
-_**Defining an application’s microservice architecture**_ 
-
-
-the consumer’s credit card, it must trigger the creation of the Ticket in the Kitchen Service. Similarly, if the restaurant rejects the order via the Kitchen Service, it must be cancelled in the Order Service service, and the customer credited in the billing service. In chapter 4, you’ll learn how to maintain consistency between services, using the previously mentioned event-driven mechanism sagas. 
+The Order class in each domain model represents different aspects of the same Order business entity. The FTGO application must maintain consistency between these different objects in different services. For example, once the Order Service has authorized the consumer’s credit card, it must trigger the creation of the Ticket in the Kitchen Service. Similarly, if the restaurant rejects the order via the Kitchen Service, it must be cancelled in the Order Service service, and the customer credited in the billing service. In chapter 4, you’ll learn how to maintain consistency between services, using the previously mentioned event-driven mechanism sagas. 
 
 As well as creating technical challenges, having multiple domain models also impacts the implementation of the user experience. An application must translate between the user experience, which is its own domain model, and the domain models of each of the services. In the FTGO application, for example, the Order status displayed to a consumer is derived from Order information stored in multiple services. This translation is often handled by the API gateway, discussed in chapter 8. Despite these challenges, it’s essential that you identify and eliminate god classes when defining a microservice architecture. 
 
@@ -738,10 +617,7 @@ The starting point for defining the service APIs is to map each system operation
 
 **ASSIGNING SYSTEM OPERATIONS TO SERVICES**
 
-The first step is to decide which service is the initial entry point for a request. Many system operations neatly map to a service, but sometimes the mapping is less obvious. Consider, for example, the noteUpdatedLocation() operation, which updates the courier location. On one hand, because it’s related to couriers, this operation should be assigned to the Courier service. On the other hand, it’s the Delivery Service that needs the courier location. In this case, assigning an operation to a service that needs the information provided by the operation is a better choice. In other situations, 
-
-
-it might make sense to assign an operation to the service that has the information necessary to handle it. 
+The first step is to decide which service is the initial entry point for a request. Many system operations neatly map to a service, but sometimes the mapping is less obvious. Consider, for example, the noteUpdatedLocation() operation, which updates the courier location. On one hand, because it’s related to couriers, this operation should be assigned to the Courier service. On the other hand, it’s the Delivery Service that needs the courier location. In this case, assigning an operation to a service that needs the information provided by the operation is a better choice. In other situations, it might make sense to assign an operation to the service that has the information necessary to handle it. 
 
 Table 2.2 shows which services in the FTGO application are responsible for which operations. 
 
@@ -750,7 +626,6 @@ Table 2.2 Mapping system operations to services in the FTGO application
 |Service|Operations|
 |---|---|
 |Consumer Service<br>Order Service<br>Restaurant Service<br>Kitchen Service<br>Delivery Service|createConsumer()<br>createOrder()<br>findAvailableRestaurants()<br>acceptOrder()<br>noteOrderReadyForPickup()<br>noteUpdatedLocation()<br>noteDeliveryPickedUp()<br>noteDeliveryDelivered()|
-
 
 After having assigned operations to services, the next step is to decide how the services collaborate in order to handle each system operation. 
 
@@ -768,28 +643,17 @@ Some system operations are handled entirely by a single service. For example, in
 
 Similarly, in order to implement the acceptOrder() system operation, the Kitchen Service must invoke the Delivery Service to schedule a courier to deliver the order. Table 2.3 shows the services, their revised APIs, and their collaborators. In order to fully define the service APIs, you need to analyze each system operation and determine what collaboration is required. 
 
-
-_**Defining an application’s microservice architecture**_ 
-
-
 Table 2.3 The services, their revised APIs, and their collaborators 
 
 |Service|Operations|Collaborators|
 |---|---|---|
 |Consumer Service<br>Order Service<br>Restaurant<br>Service<br>Kitchen Service<br>Delivery Service<br>Accounting<br>Service|verifyConsumerDetails()<br>createOrder()<br>findAvailableRestaurants()<br>verifyOrderDetails()<br>createTicket()<br>acceptOrder()<br>noteOrderReadyForPickup()<br>scheduleDelivery()<br>noteUpdatedLocation()<br>noteDeliveryPickedUp()<br>noteDeliveryDelivered()<br>authorizeCard()|—<br>Consumer Service<br>verifyConsumerDetails()<br>Restaurant Service<br>verifyOrderDetails()<br>Kitchen Service<br>createTicket()<br>Accounting Service<br>authorizeCard()<br>—<br>Delivery Service<br>scheduleDelivery()<br>—<br>—|
 
-
 So far, we’ve identified the services and the operations that each service implements. But it’s important to remember that the architecture we’ve sketched out is very abstract. We’ve not selected any specific IPC technology. Moreover, even though the term _operation_ suggests some kind of synchronous request/response-based IPC mechanism, you’ll see that asynchronous messaging plays a significant role. Throughout this book I describe architecture and design concepts that influence how these services collaborate. 
 
 Chapter 3 describes specific IPC technologies, including synchronous communication mechanisms such as REST, and asynchronous messaging using a message broker. I discuss how synchronous communication can impact availability and introduce the concept of a self-contained service, which doesn’t invoke other services synchronously. One way to implement a self-contained service is to use the CQRS pattern, covered in chapter 7. The Order Service could, for example, maintain a replica of the data owned by the Restaurant Service in order to eliminate the need for it to synchronously invoke the Restaurant Service to validate an order. It keeps the replica up-to-date by subscribing to events published by the Restaurant Service whenever it updates its data. 
 
-Chapter 4 introduces the saga concept and how it uses asynchronous messaging for coordinating the services that participate in the saga. As well as reliably updating 
-
-
-_**Decomposition strategies**_ 
-
-
-data scattered across multiple services, a saga is also a way to implement a self-contained service. For example, I describe how the createOrder() operation is implemented using a saga, which invokes services such as the Consumer Service, Kitchen Service, and Accounting Service using asynchronous messaging. 
+Chapter 4 introduces the saga concept and how it uses asynchronous messaging for coordinating the services that participate in the saga. As well as reliably updating data scattered across multiple services, a saga is also a way to implement a self-contained service. For example, I describe how the createOrder() operation is implemented using a saga, which invokes services such as the Consumer Service, Kitchen Service, and Accounting Service using asynchronous messaging. 
 
 Chapter 8 describes the concept of an API gateway, which exposes an API to external clients. An API gateway might implement a query operation using the API composition pattern, described in chapter 7, rather than simply route it to the service. Logic in the API gateway gathers the data needed by the query by calling multiple services and combining the results. In this situation, the system operation is assigned to the API gateway rather than a service. The services need to implement the query operations needed by the API gateway. 
 
@@ -808,5 +672,4 @@ Chapter 8 describes the concept of an API gateway, which exposes an API to exter
    - Decompose by subdomain, based on concepts from domain-driven design 
 
 - You can eliminate god classes, which cause tangled dependencies that prevent decomposition, by applying DDD and defining a separate domain model for each service. 
-
 

@@ -10,16 +10,13 @@ Another way of looking at state machine replication is as a system that requires
 
 Unsurprisingly, implementing a fault-tolerant total order broadcast protocol is what makes state machine replication hard to solve since it requires consensus[1] . More importantly, the need for a total order creates a scalability bottleneck since updates need to be processed sequentially by a single process (e.g., the leader in Raft). Also, total order broadcast isn’t available during network partitions as the CAP theorem applies[2] to it as well[3] . 
 
-In this chapter, we will explore a form of replication that doesn’t 
+In this chapter, we will explore a form of replication that doesn’tregister, which is what the CAP theorem uses to define consistency. require a total order but still comes with useful guarantees. But first, we need to talk about broadcast protocols.
 
 > 1Total order broadcast is equivalent to consensus, see “Unreliable Failure Detectors for Reliable Distributed Systems,” https://www.cs.utexas.edu/~lorenzo/cor si/cs380d/papers/p225-chandra.pdf 
 
 > 2“Perspectives on the CAP Theorem,” https://groups.csail.mit.edu/tds/paper s/Gilbert/Brewer2.pdf 
 
-> 3Consensus is harder to solve than implementing a linearizable read/write register, which is what the CAP theorem uses to define consistency. 
-
-
-96 require a total order but still comes with useful guarantees. But first, we need to talk about broadcast protocols. 
+> 3Consensus is harder to solve than implementing a linearizable read/write
 
 # **11.1 Broadcast protocols** 
 
@@ -27,20 +24,13 @@ Network communication over wide area networks, like the internet, only offers po
 
 A broadcast protocol is characterized by the guarantees it provides. _Best-effort broadcast_ guarantees that if the sender doesn’t crash, the message is delivered to all non-faulty processes in a group. A simple way to implement it is to send the message to all processes in a group one by one over reliable links (see Fig 11.1). However, if, for example, the sender fails mid-way, some processes will never receive the message. 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0114-06.png)
-
 
 Figure 11.1: Best-effort broadcast 
 
-Unlike best-effort broadcast, _reliable broadcast_ guarantees that the message is eventually delivered to all non-faulty processes in the group, even if the sender crashes before the message has been fully 
-
-
-97 delivered. One way to implement reliable broadcast is to have each process retransmit the message to the rest of the group the first time it is delivered (see Fig 11.2). This approach is also known as _eager reliable broadcast_ . Although it guarantees that all non-faulty processes eventually receive the message, it’s costly as it requires sending the message 𝑁[2] times for a group of 𝑁 processes. 
-
+Unlike best-effort broadcast, _reliable broadcast_ guarantees that the message is eventually delivered to all non-faulty processes in the group, even if the sender crashes before the message has been fully delivered. One way to implement reliable broadcast is to have each process retransmit the message to the rest of the group the first time it is delivered (see Fig 11.2). This approach is also known as _eager reliable broadcast_ . Although it guarantees that all non-faulty processes eventually receive the message, it’s costly as it requires sending the message 𝑁[2] times for a group of 𝑁 processes. 
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0115-03.png)
-
 
 Figure 11.2: Eager reliable broadcast 
 
@@ -50,12 +40,7 @@ Although reliable broadcast protocols guarantee that messages are delivered to a
 
 4“Gossip protocol,” https://en.wikipedia.org/wiki/Gossip_protocol 
 
-
-98 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0116-02.png)
-
 
 Figure 11.3: Gossip broadcast ensures that messages are delivered in the same order to all processes. As discussed earlier, a fault-tolerant implementation requires consensus. 
 
@@ -71,14 +56,9 @@ More formally, eventual consistency requires:
 
 Using a broadcast protocol that doesn’t deliver messages in the same order across all replicas will inevitably lead to divergence 
 
-
-99 
-
 (see Fig 11.4). One way to reconcile conflicting writes is to use consensus to make a decision that all replicas need to agree with. 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0117-03.png)
-
 
 Figure 11.4: The same object is updated simultaneously by different clients at different replicas, leading to conflicts. 
 
@@ -90,12 +70,7 @@ Well, if we can define a deterministic outcome for any potential conflict (e.g.,
 
 - and _strong convergence_ — the guarantee that replicas that have executed the same updates _have_ the same state (i.e., every update is immediately persisted). 
 
-This variation of eventual consistency is also called _strong even-_ 
-
-
-100 
-
-_tual consistency_[5] . With it, we can build systems that are available, (strongly eventual) consistent, and also partition tolerant. 
+This variation of eventual consistency is also called _strong eventual consistency_[5] . With it, we can build systems that are available, (strongly eventual) consistent, and also partition tolerant. 
 
 Which conditions are required to guarantee that replicas strongly converge? For example, suppose we replicate an object across N replicas, where the object is an instance of some data type that supports _query_ and _update_ operations (e.g., integer, string, set, etc.). 
 
@@ -121,9 +96,6 @@ For example, suppose we are working with integer objects (which can be partially
 
 > 6“Conflict-free Replicated Data Types,” https://hal.inria.fr/inria-00609399v1 /document 
 
-
-101 
-
 Although we have assumed the use of a reliable broadcast protocol so far, replicas could even use an unreliable protocol to implement broadcast as long as they periodically exchange and merge their states to ensure that they eventually converge (aka an _anti-entropy mechanism_ , we will see some examples in section 11.3). Of course, periodic state exchanges can be expensive if done naively. 
 
 There are many data types that are designed to converge when replicated, like registers, counters, sets, dictionaries, and graphs. For example, a register is a memory cell storing some opaque sequence of bytes that supports an assignment operation to overwrite its state. To make a register convergent, we need to define a partial order over its values and a merge operation. There are two common register implementations that meet these requirements: last-writer-wins (LWW) and multi-value (MV). 
@@ -134,25 +106,15 @@ The main issue with LWW registers is that conflicting updates that happen concur
 
 > 7In practice, _version vectors_ are used to compare the state of different replicas that only keep track of events that change the state of replicas, see “Detection of Mutual Inconsistency in Distributed Systems,” https://pages.cs.wisc.edu/~remzi/Class es/739/Fall2017/Papers/parker83detection.pdf. 
 
-
-102 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0120-02.png)
-
 
 Figure 11.5: Last-writer wins register operation returns the union of all concurrent updates (see Fig 11.6). 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0120-05.png)
-
 
 Figure 11.6: Multi-value register 
 
 The beauty of CRDTs is that they compose. So, for example, you can build a convergent key-value store by using a dictionary of LWW or MV registers. This is the approach followed by _Dynamostyle_ data stores. 
-
-
-103 
 
 # **11.3 Dynamo-style data stores** 
 
@@ -162,20 +124,17 @@ In Dynamo-style data stores, every replica can accept write and read requests. W
 
 When W + R > N, the write quorum and the read quorum must intersect with each other, so at least one read will return the latest version (see Fig 11.7). This doesn’t guarantee linearizability on its own, though. For example, if a write succeeds on less than W replicas and fails on the others, replicas are left in an inconsistent state, and some clients might read the latest version while others don’t. To avoid this inconsistency, the writes need to be bundled into an atomic transaction. We will talk more about transactions in chapter 12. 
 
-Typically W and R are configured to be majority quorums, i.e., quorums that contain more than half the number of replicas. That said, other combinations are possible, and the data store’s read and write throughput depend on how large or small R and W are. For example, a read-heavy workload benefits from a smaller R; however, this makes writes slower and less available (assuming W + R > N). Alternatively, both W and R can be configured to be very small (e.g., W = R = 1) for maximum performance at the expense of consistency (W + R < N). 
+Typically W and R are configured to be majority quorums, i.e., quorums that contain more than half the number of replicas. That said, other combinations are possible, and the data store’s read and write throughput depend on how large or small R and W are. For example, a read-heavy workload benefits from a smaller R; however, this makes writes slower and less available (assuming W + R > N). Alternatively, both W and R can be configured to be very small (e.g., W = R = 1) for maximum performance at the expense of consistency (W + R < N).ducts/riak-kv/
 
 > 8“Dynamo: Amazon’s Highly Available Key-value Store,” https://www.allthi ngsdistributed.com/files/amazon-dynamo-sosp2007.pdf 
 
 > 9“Cassandra: Open Source NoSQL Database,” https://cassandra.apache.org/ 
 
-> 10“Riak KV: A distributed NoSQL key-value database,” https://riak.com/pro ducts/riak-kv/ 
+> 10“Riak KV: A distributed NoSQL key-value database,” https://riak.com/pro
 
-
-104 
-
+ducts/riak-kv/ 
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0122-02.png)
-
 
 Figure 11.7: Intersecting write and read quorums 
 
@@ -193,14 +152,11 @@ Intuitively, a program is monotonic if new inputs further refine the output and 
 
 In contrast, in a non-monotonic program, a new input can retract a prior output. For example, variable assignment is a non-monotonic operation since it overwrites the variable’s prior value. 
 
-A monotonic program can be consistent, available, and partition tolerant all at once. However, consistency in CALM doesn’t refer to linearizability, the _C_ in CAP. Linearizability is narrowly focused on the consistency of reads and writes. Instead, CALM focuses on 
+A monotonic program can be consistent, available, and partition tolerant all at once. However, consistency in CALM doesn’t refer to linearizability, the _C_ in CAP. Linearizability is narrowly focused on the consistency of reads and writes. Instead, CALM focuses onpdf/1901.01930.pdf the consistency of the program’s output[13] . In CALM, a consistent program is one that produces the same output no matter in which order the inputs are processed and despite any conflicts; it doesn’t say anything about the consistency of reads and writes.
 
 > 11“Merkle tree,” https://en.wikipedia.org/wiki/Merkle_tree 
 
-> 12“Keeping CALM: When Distributed Consistency is Easy,” https://arxiv.org/ pdf/1901.01930.pdf 
-
-
-106 the consistency of the program’s output[13] . In CALM, a consistent program is one that produces the same output no matter in which order the inputs are processed and despite any conflicts; it doesn’t say anything about the consistency of reads and writes. 
+> 12“Keeping CALM: When Distributed Consistency is Easy,” https://arxiv.org/
 
 For example, say you want to implement a counter. If all you have at your disposal are write and read operations, then the order of the operations matters: write(1), write(2), write(3) => 3 but: 
 
@@ -214,14 +170,11 @@ CALM also identifies programs that can’t be consistent because they are not mo
 
 # **11.5 Causal consistency** 
 
-So we understand now how eventual consistency can be used to implement monotonic applications that are consistent, available, 
+So we understand now how eventual consistency can be used to implement monotonic applications that are consistent, available,and partition-tolerant. Unfortunately, there are many applications for which its guarantees are not sufficient. For example, eventual consistency doesn’t guarantee that an operation that _happenedbefore_ another is observed in the correct order by replicas. Suppose you upload a picture to a social network and then add it to a gallery. With eventual consistency, the gallery may reference the image before it becomes available, causing a missing image placeholder to appear in its stead.
 
 > 13Consistency can have different meanings depending on the context; make sure you know precisely what it refers to when you encounter it. 
 
-> 14“Building on Quicksand,” https://dsf.berkeley.edu/cs286/papers/quicksan d-cidr2009.pdf 
-
-
-107 and partition-tolerant. Unfortunately, there are many applications for which its guarantees are not sufficient. For example, eventual consistency doesn’t guarantee that an operation that _happenedbefore_ another is observed in the correct order by replicas. Suppose you upload a picture to a social network and then add it to a gallery. With eventual consistency, the gallery may reference the image before it becomes available, causing a missing image placeholder to appear in its stead. 
+> 14“Building on Quicksand,” https://dsf.berkeley.edu/cs286/papers/quicksan d-cidr2009.pdf
 
 One of the main benefits of strong consistency is that it preserves the _happened-before_ order among operations, which guarantees that the cause happens before the effect. So, in the previous example, the reference to the newly added picture in the gallery is guaranteed to become visible only after the picture becomes available. 
 
@@ -233,14 +186,11 @@ Surprisingly, to preserve the _happened-before_ order (causal order) among opera
 
 Causal consistency imposes a partial order on the operations. The simplest definition requires that processes agree on the order of causally related operations but can _disagree_ on the order of unrelated ones. You can take any two operations, and either one _happened-before_ the other, or they are concurrent and therefore can’t be ordered. This is the main difference from strong consistency, which imposes a _global_ order that all processes agree with. 
 
-For example, suppose a process updates an entry in a key-value 
+For example, suppose a process updates an entry in a key-valuestore (operation A), which is later read by another process (operation B) that consequently updates another entry (operation C). In that case, all processes in the system have to agree that A _happenedbefore_ C. In contrast, if two operations, X and Y, happen concurrently and neither _happened-before_ the other, some processes may observe X before Y and others Y before X.
 
 > 15“Causal Consistency,” https://jepsen.io/consistency/models/causal 
 
-> 16“Consistency, Availability, and Convergence,” https://apps.cs.utexas.edu/tec h_reports/reports/tr/TR-2036.pdf 
-
-
-108 store (operation A), which is later read by another process (operation B) that consequently updates another entry (operation C). In that case, all processes in the system have to agree that A _happenedbefore_ C. In contrast, if two operations, X and Y, happen concurrently and neither _happened-before_ the other, some processes may observe X before Y and others Y before X. 
+> 16“Consistency, Availability, and Convergence,” https://apps.cs.utexas.edu/tec h_reports/reports/tr/TR-2036.pdf
 
 Let’s see how we can use causal consistency to build a replicated data store that is available under network partitions. We will base our discussion on “Clusters of Order-Preserving Servers” (COPS[17] ), a key-value store that delivers causal consistency across geographically distributed clusters. In COPS, a cluster is set up as a strongly consistent partitioned data store, but for simplicity, we will treat it as a single logical node without partitions.[18] Later, in chapter 16, we will discuss partitioning at length. 
 
@@ -248,25 +198,17 @@ First, let’s define a variant of causal consistency called _causal+_ in which 
 
 In COPS, any replica can accept read and write requests, and clients send requests to their closest replica (local replica). When a client sends a read request for a key to its local replica, the latter replies with the most recent value available locally. When the client receives the response, it adds the version (logical timestamp) of the value it received to a local key-version dictionary used to keep track of _dependencies_ . 
 
-When a client sends a write to its local replica, it adds a copy of 
+When a client sends a write to its local replica, it adds a copy ofthe dependency dictionary to the request. The replica assigns a version to the write, applies the change locally, and sends an acknowledgment back to the client with the version assigned to it. It can apply the change locally, even if other clients updated the key in the meantime, because values are represented with LWW registers. Finally, the update is broadcast asynchronously to the other replicas.
 
 > 17“Don’t Settle for Eventual: Scalable Causal Consistency for Wide-Area Storage with COPS,” https://www.cs.princeton.edu/~mfreed/docs/cops-sosp11.pdf 18COPS can track causal relationships between partitions (and therefore nodes), unlike simpler approaches using version vectors, which limit causality tracking to the set of keys that a single node can store (see “Session Guarantees for Weakly Consistent Replicated Data,” https://www.cs.utexas.edu/users/dahlin/Classes /GradOS/papers/SessionGuaranteesPDIS.pdf). 
 
-
-109 the dependency dictionary to the request. The replica assigns a version to the write, applies the change locally, and sends an acknowledgment back to the client with the version assigned to it. It can apply the change locally, even if other clients updated the key in the meantime, because values are represented with LWW registers. Finally, the update is broadcast asynchronously to the other replicas. 
-
 When a replica receives a replication message for a write, it doesn’t apply it locally immediately. Instead, it first checks whether the write’s dependencies have been committed locally. If not, it waits until the required versions appear. Finally, once all dependencies have been committed, the replication message is applied locally. This behavior guarantees causal consistency (see Fig 11.8). 
-
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0127-04.png)
 
-
 Figure 11.8: A causally consistent implementation of a key-value store 
 
-If a replica fails, the data store continues to be available as any replica can accept writes. There is a possibility that a replica could 
-
-
-110 fail after committing an update locally but before broadcasting it, resulting in data loss. In COPS’ case, this tradeoff is considered acceptable to avoid paying the price of waiting for one or more long-distance requests to remote replicas before acknowledging a client write. 
+If a replica fails, the data store continues to be available as any replica can accept writes. There is a possibility that a replica could fail after committing an update locally but before broadcasting it, resulting in data loss. In COPS’ case, this tradeoff is considered acceptable to avoid paying the price of waiting for one or more long-distance requests to remote replicas before acknowledging a client write. 
 
 # **11.6 Practical considerations** 
 
@@ -275,5 +217,4 @@ To summarize, in the previous chapters we explored different ways to implement r
 This tradeoff is present in any large-scale system, and some even have knobs that allow you to control it. For example, Azure Cosmos DB is a fully managed scalable NoSQL database that enables developers to choose among 5 different consistency models, ranging from eventual consistency to strong consistency[19] , where weaker consistency models have higher throughputs than stronger ones. 
 
 > 19“Azure Cosmos DB: Pushing the frontier of globally distributed databases,” https://azure.microsoft.com/en-gb/blog/azure-cosmos-db-pushing-thefrontier-of-globally-distributed-databases/ 
-
 

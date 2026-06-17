@@ -12,10 +12,7 @@ For example, these are some common models for communication links:
 
 - The _authenticated reliable link_ model makes the same assumptions as the reliable link but additionally assumes that the receiver can authenticate the sender. 
 
-Even though these models are just abstractions of real communication links, they are useful to verify the correctness of algorithms. And, as we have seen in the previous chapters, it’s possible to build 
-
-
-58 a reliable and authenticated communication link on top of a fairloss one. For example, TCP implements reliable transmission (and more), while TLS implements authentication (and more). 
+Even though these models are just abstractions of real communication links, they are useful to verify the correctness of algorithms. And, as we have seen in the previous chapters, it’s possible to build a reliable and authenticated communication link on top of a fairloss one. For example, TCP implements reliable transmission (and more), while TLS implements authentication (and more). 
 
 Similarly, we can model the behavior of processes based on the type of failures we expect to happen: 
 
@@ -31,10 +28,9 @@ Finally, we can also model timing assumptions:
 
 - The _synchronous_ model assumes that sending a message or executing an operation never takes more than a certain amount of time. This is not very realistic for the type of systems we care about, where we know that sending messages over the network can potentially take a very long 
 
-> 1“The Byzantine Generals Problem,” https://lamport.azurewebsites.net/pubs /byz.pdf 
+> 1“The Byzantine Generals Problem,” https://lamport.azurewebsites.net/pubs /byz.pdf
 
-
-59 time, and processes can be slowed down by, e.g., garbage collection cycles or page faults. 
+time, and processes can be slowed down by, e.g., garbage collection cycles or page faults. 
 
 - The _asynchronous_ model assumes that sending a message or executing an operation on a process can take an unbounded amount of time. Unfortunately, many problems can’t be solved under this assumption; if sending messages can take an infinite amount of time, algorithms can get stuck and not make any progress at all. Nevertheless, this model is useful because it’s simpler than models that make timing assumptions, and therefore algorithms based on it are also easier to implement[2] . 
 
@@ -49,5 +45,4 @@ But remember, models are just an abstraction of reality[4] since they don’t re
 > 3“Introduction to Reliable and Secure Distributed Programming,” https://ww w.distributedprogramming.net/ 
 
 > 4“All models are wrong,” https://en.wikipedia.org/wiki/All_models_are_w rong 
-
 

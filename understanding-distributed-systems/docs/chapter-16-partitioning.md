@@ -12,12 +12,7 @@ Partitioning is not a free lunch since it introduces a fair amount of complexity
 
 - To roll up data across partitions, it needs to be pulled from multiple partitions and aggregated (e.g., think of the complexity of implementing a “group by” operation across partitions). 
 
-
-156 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0174-02.png)
-
 
 Figure 16.1: A partitioned application with a gateway that routes requests to partitions 
 
@@ -29,18 +24,13 @@ Figure 16.1: A partitioned application with a gateway that routes requests to pa
 
 It’s no coincidence we are talking about partitioning right after discussing CDNs. A cache lends itself well to partitioning as it avoids most of this complexity. For example, it generally doesn’t need to atomically update data across partitions or perform aggregations spanning multiple partitions. 
 
-Now that we have an idea of what partitioning is and why it’s useful, let’s discuss how data, in the form of key-value pairs, can be mapped to partitions. At a high level, there are two main ways of doing that, referred to as _range partitioning_ and _hash partitioning_ . An important prerequisite for both is that the number of possible keys is very large; for example, a boolean key with only two possible values is not suited for partitioning since it allows for at most two 
-
-
-157 partitions. 
+Now that we have an idea of what partitioning is and why it’s useful, let’s discuss how data, in the form of key-value pairs, can be mapped to partitions. At a high level, there are two main ways of doing that, referred to as _range partitioning_ and _hash partitioning_ . An important prerequisite for both is that the number of possible keys is very large; for example, a boolean key with only two possible values is not suited for partitioning since it allows for at most two partitions. 
 
 # **16.1 Range partitioning** 
 
 Range partitioning splits the data by key range into lexicographically sorted partitions, as shown in Figure 16.2. To make range scans fast, each partition is generally stored in sorted order on disk. 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0175-05.png)
-
 
 Figure 16.2: A range-partitioned dataset 
 
@@ -48,10 +38,7 @@ The first challenge with range partitioning is picking the partition boundaries.
 
 Another issue is that some access patterns can lead to _hotspots_ , which affect performance. For example, if the data is range partitioned by date, all requests for the current day will be served by a single node. There are ways around that, like adding a random prefix to the partition keys, but there is a price to pay in terms of increased complexity. 
 
-When the size of the data or the number of requests becomes too large, the number of nodes needs to be increased to sustain the increase in load. Similarly, if the data shrinks and/or the number of requests drops, the number of nodes should be reduced to decrease costs. The process of adding and removing nodes to balance 
-
-
-158 the system’s load is called _rebalancing_ . Rebalancing has to be implemented in a way that minimizes disruption to the system, which needs to continue to serve requests. Hence, the amount of data transferred when rebalancing partitions should be minimized. 
+When the size of the data or the number of requests becomes too large, the number of nodes needs to be increased to sustain the increase in load. Similarly, if the data shrinks and/or the number of requests drops, the number of nodes should be reduced to decrease costs. The process of adding and removing nodes to balance the system’s load is called _rebalancing_ . Rebalancing has to be implemented in a way that minimizes disruption to the system, which needs to continue to serve requests. Hence, the amount of data transferred when rebalancing partitions should be minimized. 
 
 One solution is to create a lot more partitions than necessary when the system is first initialized and assign multiple partitions to each node. This approach is also called _static partitioning_ since the number of partitions doesn’t change over time. When a new node joins, some partitions move from the existing nodes to the new one so that the store is always in a balanced state. The drawback of this approach is that the number of partitions is fixed and can’t be easily changed. Getting the number of partitions right is hard — too many partitions add overhead and decrease performance, while too few partitions limit scalability. Also, some partitions might end up being accessed much more than others, creating hotspots. 
 
@@ -65,12 +52,7 @@ Next, we assign a subset of the hashes to each partition, as shown in Figure 16.
 
 Although this approach ensures that the partitions contain more 
 
-
-159 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0177-02.png)
-
 
 Figure 16.3: A hash-partitioned dataset or less the same number of entries, it doesn’t eliminate hotspots if the _access pattern_ is not uniform. For example, if a single key is accessed significantly more often than others, the node hosting the partition it belongs to could become overloaded. In this case, the partition needs to be split further by increasing the total number of partitions. Alternatively, the key needs to be split into sub-keys by, e.g., prepending a random prefix. 
 
@@ -82,24 +64,13 @@ Now, when a new partition is added, only the keys that now map
 
 > 1“Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web,” https://www.cs.princeton.edu/cours es/archive/fall09/cos518/papers/chash.pdf 
 
-
-160 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0178-02.png)
-
 
 Figure 16.4: With consistent hashing, partition identifiers and keys are randomly distributed around a circle, and each key is assigned to the next partition that appears on the circle in clockwise order. to it on the circle need to be reassigned, as shown in Figure 16.5. 
 
 The main drawback of hash partitioning compared to range partitioning is that the sort order over the partitions is lost, which is required to efficiently scan all the data in order. However, the data within an individual partition can still be sorted based on a secondary key. 
 
-
-161 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0179-02.png)
 
-
 Figure 16.5: After partition P4 is added, the key ’for’ is reassigned to P4, but the assignment of the other keys doesn’t change. 
-
 

@@ -16,10 +16,7 @@ Redundancy is the main reason why distributed applications can achieve better av
 
 Let’s see how these prerequisites apply to a concrete example. Hardware faults such as disk, memory, and network failures can cause a node to crash, degrade or become otherwise unavailable. In a stateless service, a load balancer can mask these faults using 
 
-> 1“When Redundancy Actually Helps,” https://brooker.co.za/blog/2019/06 /20/redundancy.html 
-
-
-244 a pool of redundant nodes. Although the load balancer increases the system’s complexity and, therefore, the number of ways the system can fail, the benefits in terms of scalability and availability almost always outweigh the risks it introduces (e.g., the load balancer failing). 
+> 1“When Redundancy Actually Helps,” https://brooker.co.za/blog/2019/06 /20/redundancy.html a pool of redundant nodes. Although the load balancer increases the system’s complexity and, therefore, the number of ways the system can fail, the benefits in terms of scalability and availability almost always outweigh the risks it introduces (e.g., the load balancer failing). 
 
 The load balancer needs to detect which nodes are healthy and which aren’t to take the faulty ones out of the pool. It does that with health checks, as we learned in chapter 18. Health checks are critical to achieving high availability; if there are ten servers in the pool and one is unresponsive for some reason, then 10% of requests will fail, causing the availability to drop. Therefore, the longer it takes for the load balancer to detect the unresponsive server, the longer the failures will be visible to the clients. 
 
@@ -37,19 +34,13 @@ With AZs, we can create applications that are resilient to data center outages. 
 
 Taking it to the extreme, a catastrophic event could destroy an entire region with all of its AZs. To tolerate that, we can duplicate the entire application stack in multiple regions. To distribute the traffic to different data centers located in different regions, we can use _global DNS load balancing_ . Unlike earlier, the application’s state needs to be replicated asynchronously across regions[2] given the high network latency between regions (see Figure 25.1). 
 
-That said, the chance of an entire region being destroyed is extremely low. Before embarking on the effort of making your application resilient against region failures, you should have very good 
+That said, the chance of an entire region being destroyed is extremely low. Before embarking on the effort of making your application resilient against region failures, you should have very goodactive-active-for-multi-regional-resiliency-c47719f6685b
 
-> 2“Active-Active for Multi-Regional Resiliency,” https://netflixtechblog.com/ active-active-for-multi-regional-resiliency-c47719f6685b 
-
-
-246 
-
+> 2“Active-Active for Multi-Regional Resiliency,” https://netflixtechblog.com/
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0264-02.png)
-
 
 Figure 25.1: A simplistic multi-region architecture reasons for it. It’s more likely your application will be forced to have a presence in multiple regions for legal compliance reasons. For example, there are laws mandating that the data of European customers has to be processed and stored within Europe[3] . 
 
 > 3“The CJEU judgment in the Schrems II case,” https://www.europarl.europa. eu/RegData/etudes/ATAG/2020/652073/EPRS_ATA(2020)652073_EN.pdf 
-
 

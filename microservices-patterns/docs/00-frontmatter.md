@@ -1,24 +1,17 @@
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-00.png)
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-01.png)
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-02.png)
 
-
 Chris Richardson 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-04.png)
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0001-05.png)
 
-
 **M A N N I N G** 
-
 
 **List of Patterns**
 
@@ -76,16 +69,13 @@ _Querying patterns_
 
 API composition (223) Command query responsibility segregation (228) 
 
-
 _Microservices Patterns_ 
-
 
 _Microservices Patterns_ **WITH EXAMPLES IN JAVA** 
 
 CHRIS RICHARDSON 
 
 M A N N I N G SHELTER ISLAND 
-
 
 For online information and ordering of this and other Manning books, please visit www.manning.com. The publisher offers discounts on this book when ordered in quantity. For more information, please contact 
 
@@ -105,11 +95,9 @@ Development editor: Marina Michaels Technical development editor: Christian Menn
 
 ISBN: 9781617294549 Printed in the United States of America 1 2 3 4 5 6 7 8 9 10 – DP – 23 22 21 20 19 18 
 
-
 _Where you see wrong or inequality or injustice, speak out, because this is your country. This is your democracy. Make it. Protect it. Pass it on._ 
 
 — Thurgood Marshall, Justice of the Supreme Court 
-
 
 **brie contents f**
 
@@ -130,9 +118,6 @@ _Where you see wrong or inequality or injustice, speak out, because this is your
 |_12_|■|Deploying microservices<br>383||||||
 |_13_|■|Refactoring to microservices|428|||||
 
-
-
-
 **contents**
 
 _preface xvii acknowledgments xx about this book xxii about the cover illustration xxvi_ 
@@ -151,16 +136,11 @@ _The architecture of the FTGO application 3_ ■ _The benefits of the monolithic
 
 _Scale cube and microservices 8_ ■ _Microservices as a form of modularity 11_ ■ _Each service has its own database 12 The FTGO microservice architecture 12_ ■ _Comparing the microservice architecture and SOA 13_ 
 
-- 1.5 Benefits and drawbacks of the microservice 
-
-architecture 14 
+- 1.5 Benefits and drawbacks of the microservice architecture 14 
 
 _Benefits of the microservice architecture 14_ ■ _Drawbacks of the microservice architecture 17_ 
 
-
-
 CONTENTS 
-
 
 1.6 The Microservice architecture pattern language 19 _Microservice architecture is not a silver bullet 19_ ■ _Patterns and pattern languages 20_ ■ _Overview of the Microservice architecture pattern language 23_ 
 
@@ -186,9 +166,7 @@ _3_ _**Interprocess communication in a microservice architecture 65**_
 
 _Overview of messaging 86_ ■ _Implementing the interaction styles using messaging 87_ ■ _Creating an API specification for a messaging-based service API 89_ ■ _Using a message broker 90 Competing receivers and message ordering 94_ ■ _Handling duplicate messages 95_ ■ _Transactional messaging 97 Libraries and frameworks for messaging 100_ 
 
-
 CONTENTS 
-
 
 3.4 Using asynchronous messaging to improve availability 103 _Synchronous communication reduces availability 103 Eliminating synchronous interaction 104_ 
 
@@ -206,9 +184,7 @@ _Designing business logic using the Transaction script pattern 149 Designing bus
 
 5.2 Designing a domain model using the DDD aggregate pattern 152 _The problem with fuzzy boundaries 153_ ■ _Aggregates have explicit boundaries 154_ ■ _Aggregate rules 155_ ■ _Aggregate granularity 158_ ■ _Designing business logic with aggregates 159_ 5.3 Publishing domain events 160 _Why publish change events? 160_ ■ _What is a domain event? 161_ ■ _Event enrichment 161_ ■ _Identifying domain events 162_ ■ _Generating and publishing domain events 164 Consuming domain events 167_ 
 
-
 CONTENTS 
-
 
 5.4 Kitchen Service business logic 168 
 
@@ -250,9 +226,7 @@ _Choosing a view datastore 237_ ■ _Data access module design 239 Adding and up
 
 _The OrderHistoryEventHandlers module 243 Data modeling and query design with DynamoDB 244 The OrderHistoryDaoDynamoDb class 249_ 
 
-
 CONTENTS 
-
 
 **8 External API patterns 253**
 
@@ -280,9 +254,7 @@ _Defining acceptance tests 336_ ■ _Writing acceptance tests using Gherkin 337_
 
 _Designing end-to-end tests 345_ ■ _Writing end-to-end tests 346 Running end-to-end tests 346_ 
 
-
 CONTENTS 
-
 
 **11 Developing production-ready services 348**
 
@@ -318,9 +290,7 @@ _Deploying services using Docker 395_ ■ _Benefits of deploying services as con
 
 _Overview of Kubernetes 399_ ■ _Deploying the Restaurant service on Kubernetes 402_ ■ _Deploying the API gateway 405 Zero-downtime deployments 406_ ■ _Using a service mesh to separate deployment from release 407_ 
 
-
 CONTENTS 
-
 
 12.5 Deploying services using the Serverless deployment pattern 415 _Overview of serverless deployment with AWS Lambda 416 Developing a lambda function 417_ ■ _Invoking lambda functions 417_ ■ _Benefits of using lambda functions 418 Drawbacks of using lambda functions 419_ 
 
@@ -346,7 +316,6 @@ _The design of Delayed Delivery Service 456_ ■ _Designing the integration glue
 
 _index 473_ 
 
-
 **re ace p f**
 
 One of my favorite quotes is 
@@ -359,10 +328,7 @@ The essence of that quote is that new ideas and technology take a while to diffu
 
 Bundling a diverse and complex set of functions such as provisioning, configuration, monitoring, and management into a monolith created both development and operations challenges. You couldn’t, for example, change the UI without testing and redeploying the entire application. And because the monitoring and management component relied on a Complex Event Processing (CEP) engine which maintained in-memory state we couldn’t run multiple instances of the application! That’s embarrassing to admit, but all I can say is that I am a software developer, and, “let he who is without sin cast the first stone.” 
 
-
-
 PREFACE 
-
 
 Clearly, the application had quickly outgrown its monolith architecture, but what was the alternative? The answer had been out in the software community for some time at companies such as eBay and Amazon. Amazon had, for example, started to migrate away from the monolith around 2002 (https://plus.google.com/110981030061712822816/ posts/AaygmbzVeRq). The new architecture replaced the monolith with a collection of loosely coupled services. Services are owned by what Amazon calls two-pizza teams— teams small enough to be fed by two pizzas. 
 
@@ -378,12 +344,9 @@ In January 2014, I created the https://microservices.io website to document arch
 
 The idea of small, loosely coupled teams, rapidly and reliably developing and delivering microservices is slowly diffusing through the software community. But it’s likely that this vision of the future is quite different from your daily reality. Today, businesscritical enterprise applications are typically large monoliths developed by large teams. Software releases occur infrequently and are often painful for everyone involved. IT often struggles to keep up with the needs of the business. You’re wondering how on earth you can adopt the microservice architecture. 
 
-
 PREFACE 
 
-
 The goal of this book is to answer that question. It will give you a good understanding of the microservice architecture, its benefits and drawbacks, and when to use it. The book describes how to solve the numerous design challenges you’ll face, including how to manage distributed data. It also covers how to refactor a monolithic application to a microservice architecture. But this book is not a microservices manifesto. Instead, it’s organized around a collection of patterns. A pattern is a reusable solution to a problem that occurs in a particular context. The beauty of a pattern is that besides describing the benefits of the solution, it also describes the drawbacks and the issues you must address in order to successfully implement a solution. In my experience, this kind of objectivity when thinking about solutions leads to much better decision making. I hope you’ll enjoy reading this book and that it teaches you how to successfully develop microservices. 
-
 
 **acknowled ments g**
 
@@ -397,13 +360,9 @@ I also want to thank everyone who purchased the MEAP and provided feedback in th
 
 I want to thank the organizers and attendees of all of the conferences and meetups at which I’ve spoken for the chance to present and revise my ideas. And I want to thank my consulting and training clients around the world for giving me the opportunity to help them put my ideas into practice. 
 
-
-
 ACKNOWLEDGMENTS 
 
-
 I want to thank my colleagues Andrew, Valentin, Artem, and Stanislav at Eventuate, Inc., for their contributions to the Eventuate product and open source projects. Finally, I’d like to thank my wife, Laura, and my children, Ellie, Thomas, and Janet for their support and understanding over the last 18 months. While I’ve been glued to my laptop, I’ve missed out on going to Ellie’s soccer games, watching Thomas learning to fly on his flight simulator, and trying new restaurants with Janet. Thank you all! 
-
 
 **about this book**
 
@@ -417,10 +376,7 @@ The focus of this book is on architecture and development. It’s meant for anyo
 
 The book focuses on explaining the microservice architecture patterns and other concepts. My goal is for you to find this material accessible, regardless of the technology stack you use. You only need to be familiar with the basics of enterprise application architecture and design. In particular, you need to understand concepts like three-tier architecture, web application design, relational databases, interprocess communication using messaging and REST, and the basics of application security. The code examples, though, use Java and the Spring framework. In order to get the most out of them, you should be familiar with the Spring framework. 
 
-
-
 ABOUT THIS BOOK 
-
 
 **Roadmap**
 
@@ -450,10 +406,7 @@ This book consists of 13 chapters:
 
 - Chapter 12 describes the various deployment patterns that you can use to deploy services, including virtual machines, containers, and serverless. It also 
 
-
-ABOUT THIS BOOK 
-
-discusses the benefits of using a service mesh, a layer of networking software that mediates communication in a microservice architecture. 
+ABOUT THIS BOOK discusses the benefits of using a service mesh, a layer of networking software that mediates communication in a microservice architecture. 
 
 - Chapter 13 explains how to incrementally refactor a monolithic architecture to a microservice architecture by applying the Strangler application pattern: implementing new features as services and extracting modules out of the monolith and converting them to services. 
 
@@ -471,9 +424,7 @@ The purchase of Microservices Patterns includes free access to a private web for
 
 Manning’s commitment to our readers is to provide a venue where a meaningful dialogue between individual readers and between readers and the author can take place. It’s not a commitment to any specific amount of participation on the part of the author, whose contribution to the forum remains voluntary (and unpaid). We suggest you try asking the author some challenging questions lest his interest stray! The forum and the archives of previous discussions will be accessible from the publisher’s website as long as the book is in print. 
 
-
 ABOUT THIS BOOK 
-
 
 **Other online resources**
 
@@ -489,7 +440,6 @@ Chris was also the founder of the original CloudFoundry.com, an early Java PaaS 
 
 Today, he is a recognized thought leader in microservices and speaks regularly at international conferences. Chris is the creator of Microservices.io, a pattern language for microservices. He provides microservices consulting and training to organizations around the world that are adopting the microservice architecture. Chris is working on his third startup: Eventuate.io, an application platform for developing transactional microservices. 
 
-
 **about the cover illustration**
 
 **Jefferys**
@@ -500,11 +450,7 @@ Thomas Jefferys (1719–1771) was called “Geographer to King George III.” He
 
 The diversity of the drawings in Jefferys’ volumes speaks vividly of the uniqueness and individuality of the world’s nations some 200 years ago. Dress codes have changed since then, and the diversity by region and country, so rich at the time, has faded away. It’s now often hard to tell the inhabitants of one continent from another. Perhaps, trying to view it optimistically, we’ve traded a cultural and visual diversity for a more varied personal life—or a more varied and interesting intellectual and technical life. 
 
-
-
 ABOUT THE COVER ILLUSTRATION 
 
-
 At a time when it’s difficult to tell one computer book from another, Manning celebrates the inventiveness and initiative of the computer business with book covers based on the rich diversity of regional life of two centuries ago, brought back to life by Jeffreys’ pictures. 
-
 

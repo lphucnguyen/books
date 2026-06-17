@@ -6,9 +6,6 @@ There are times when a single process in the system needs to have special powers
 
 A leader election algorithm needs to guarantee that there is at most one leader at any given time and that an election eventually completes even in the presence of failures. These two properties are also referred to as _safety_ and _liveness_ , respectively, and they are general properties of distributed algorithms. Informally, safety guarantees that nothing bad happens and liveness that something good eventually does happen. In this chapter, we will explore how a specific algorithm, the _Raft_ leader election algorithm, guarantees these properties. 
 
-
-72 
-
 # **9.1 Raft leader election** 
 
 Raft[1] ’s leader election algorithm is implemented as a state machine in which any process is in one of three states (see Figure 9.1): 
@@ -25,12 +22,9 @@ When the system starts up, all processes begin their journey as followers. A fol
 
 The process remains in the candidate state until one of three things happens: it wins the election, another process wins the election, or some time goes by with no winner: 
 
-- **The candidate wins the election** — The candidate wins the election if the majority of processes in the system vote for it. Each process can vote for at most one candidate in a term on a first-come-first-served basis. This majority rule enforces that at most one candidate can win a term. If the candidate wins the election, it transitions to the leader state and starts 
+- **The candidate wins the election** — The candidate wins the election if the majority of processes in the system vote for it. Each process can vote for at most one candidate in a term on a first-come-first-served basis. This majority rule enforces that at most one candidate can win a term. If the candidate wins the election, it transitions to the leader state and starts sending heartbeats to the other processes.
 
-> 1“In Search of an Understandable Consensus Algorithm,” https://raft.github. io/raft.pdf 
-
-
-73 sending heartbeats to the other processes. 
+> 1“In Search of an Understandable Consensus Algorithm,” https://raft.github. io/raft.pdf
 
 - **Another process wins the election** — If the candidate receives a heartbeat from a process that claims to be the leader with a term greater than or equal to the candidate’s term, it accepts the new leader and returns to the follower state.[2] If not, it continues in the candidate state. You might be wondering how that could happen; for example, if the candidate process was to stop for any reason, like for a long garbage collection pause, by the time it resumes another process could have won the election. 
 
@@ -52,21 +46,13 @@ The compare-and-swap operation atomically updates the value of a key if and only
 
 > 5“Compare-and-swap,” https://en.wikipedia.org/wiki/Compare-and-swap 
 
-
-74 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0092-02.png)
-
 
 Figure 9.1: Raft’s leader election algorithm represented as a state machine. rameters: 𝐾, 𝑉𝑜, and 𝑉𝑛, where 𝐾 is a key, and 𝑉𝑜 and 𝑉𝑛 are values referred to as the old and new value, respectively. The operation atomically compares the current value of 𝐾 with 𝑉𝑜, and if they match, it updates the value of 𝐾 to 𝑉𝑛. If the values don’t match, then 𝐾 is not modified, and the operation fails. 
 
 The expiration time defines the time to live for a key, after which the key expires and is removed from the store unless the expiration time is extended. The idea is that each competing process tries to acquire a _lease_ by creating a new key with compare-and-swap. The first process to succeed becomes the leader and remains such until it stops renewing the lease, after which another process can become the leader. 
 
-The expiration logic can also be implemented on the client side, 
-
-
-75 like this locking library[6] for DynamoDB does, but the implementation is more complex, and it still requires the data store to offer a compare-and-swap operation. 
+The expiration logic can also be implemented on the client side, like this locking library[6] for DynamoDB does, but the implementation is more complex, and it still requires the data store to offer a compare-and-swap operation. 
 
 You might think that’s enough to guarantee there can’t be more than one leader at any given time. But, unfortunately, that’s not the case. To see why suppose multiple processes need to update a file on a shared file store, and we want to guarantee that only one at a time can access it to avoid race conditions. Now, suppose we use a lease to lock the critical section. Each process tries to acquire the lease, and the one that does so successfully reads the file, updates it in memory, and writes it back to the store: 
 
@@ -82,12 +68,9 @@ The issue is that by the time the process gets to write to the file, it might no
 
 However, clock synchronization isn’t perfectly accurate. On top of that, the lease could expire while the request to the store is in-flight because of a network delay. To account for these problems, the process could check that the lease expiration is far enough in the future before writing to the file. Unfortunately, this workaround isn’t foolproof, and the lease can’t guarantee mutual exclusion by itself. 
 
-To solve this problem, we can assign a version number to each file 
+To solve this problem, we can assign a version number to each filethat is incremented every time the file is updated. The process holding the lease can then read the file and its version number from the file store, do some local computation, and finally update the file (and increment the version number) conditional on the version number not having changed. The process can perform this validation atomically using a compare-and-swap operation, which many file stores support.
 
-> 6“Building Distributed Locks with the DynamoDB Lock Client,” https://aws. amazon.com/blogs/database/building-distributed-locks-with-the-dynamodblock-client/ 
-
-
-76 that is incremented every time the file is updated. The process holding the lease can then read the file and its version number from the file store, do some local computation, and finally update the file (and increment the version number) conditional on the version number not having changed. The process can perform this validation atomically using a compare-and-swap operation, which many file stores support. 
+> 6“Building Distributed Locks with the DynamoDB Lock Client,” https://aws. amazon.com/blogs/database/building-distributed-locks-with-the-dynamodblock-client/
 
 If the file store doesn’t support conditional writes, we have to design around the fact that occasionally there will be a race condition. Sometimes, that’s acceptable; for example, if there are momentarily two leaders and they both perform the same idempotent update, no harm is done. 
 
@@ -96,5 +79,4 @@ Although having a leader can simplify the design of a system as it eliminates co
 As a rule of thumb, if we must have a leader, we have to minimize the work it performs and be prepared to occasionally have more than one. 
 
 Taking a step back, a crucial assumption we made earlier is that the data store that holds leases is fault-tolerant, i.e., it can tolerate the loss of a node. Otherwise, if the data store ran on a single node and that node were to fail, we wouldn’t be able to acquire leases. For the data store to withstand a node failing, it needs to replicate its state over multiple nodes. In the next chapter, we will take a closer look at how this can be accomplished. 
-
 

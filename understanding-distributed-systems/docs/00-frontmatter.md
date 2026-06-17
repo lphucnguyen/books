@@ -4,13 +4,11 @@ What every developer should know about large distributed applications
 
 **ROBERTO VITILLO** 
 
-
 Understanding Distributed Systems Version 2.0.0 
 
 Roberto Vitillo 
 
 March 2022 
-
 
 # **Contents** 
 
@@ -38,7 +36,6 @@ March 2022
 ||3.2|Authentication||. . . . . . . . . . . . . . . . . . . .|26|
 ||3.3|Integrity . .|.|. . . . . . . . . . . . . . . . . . . . .|28|
 ||3.4|Handshake|.|. . . . . . . . . . . . . . . . . . . . .|29|
-
 
 |CONTENTS|CONTENTS|CONTENTS||iv|
 |---|---|---|---|---|
@@ -77,7 +74,6 @@ March 2022
 ||12.1|ACID<br>. . . . . . .|. . . . . . . . . . . . . . . . . .|112|
 ||12.2|Isolation . . . . . .|. . . . . . . . . . . . . . . . . .|113|
 
-
 |CONTENTS|CONTENTS|||v|
 |---|---|---|---|---|
 ||12.3 Atomicity . . .|.|.|. . . . . . . . . . . . . . . . . . 119|
@@ -112,7 +108,6 @@ March 2022
 |**21 **|**Microservices**|||**197**|
 ||21.1 Caveats<br>. . . .|.|.|. . . . . . . . . . . . . . . . . . 199|
 ||21.2 API gateway . .|.|.|. . . . . . . . . . . . . . . . . . 202|
-
 
 |CONTENTS|CONTENTS||vi|
 |---|---|---|---|
@@ -151,7 +146,6 @@ March 2022
 ||28.3 Rate-limiting<br>.|. .|. . . . . . . . . . . . . . . . . . 263|
 ||28.4 Constant work|. .|. . . . . . . . . . . . . . . . . . 269|
 
-
 |CONTENTS|CONTENTS|vii|
 |---|---|---|
 |**V**|**Maintainability**|**275**|
@@ -179,7 +173,6 @@ March 2022
 |**33 **|**Manageability**|**323**|
 |**34 **|**Final words**|**327**|
 
-
 # **Copyright** 
 
 **Understanding Distributed Systems** by Roberto Vitillo Copyright © Roberto Vitillo. All rights reserved. 
@@ -187,7 +180,6 @@ March 2022
 The book’s diagrams have been created with Excalidraw. 
 
 While the author has used good faith efforts to ensure that the information and instructions in this work are accurate, the author disclaims all responsibility for errors or omissions, including without limitation responsibility for damages resulting from the use of or reliance on this work. The use of the information and instructions contained in this work is at your own risk. If any code samples or other technology this work contains or describes is subject to open source licenses or the intellectual property rights of others, it is your responsibility to ensure that your use thereof complies with such licenses and/or rights. 
-
 
 # **About the author** 
 
@@ -201,7 +193,6 @@ Next, I worked at Mozilla, where I set the direction of the data platform from i
 
 In 2017, I joined Microsoft to work on an internal SaaS for telemetry. Since then, I have helped launch multiple public SaaS products, like Playfab and Customer Insights. The data ingestion platform I am responsible for is one of the largest in the world, ingesting millions of events per second from billions of devices worldwide. 
 
-
 # **Acknowledgements** 
 
 I am very thankful for the colleagues and mentors who inspired me and believed in me over the years. Thanks to Chiara Roda, Andrea Dotti, Paolo Calafiura, Vladan Djeric, Mark Reid, Pawel Chodarcewicz, and Nuno Cerqueira. 
@@ -214,7 +205,6 @@ I am also very thankful for all the readers who left reviews or reached out to m
 
 Finally, and above all, thanks to my family: Rachell and Leonardo. Without your unwavering support, this book wouldn’t exist. 
 
-
 # **Preface** 
 
 Learning to build distributed systems is hard, especially if they are large scale. It’s not that there is a lack of information out there. You can find academic papers, engineering blogs, and even books on the subject. The problem is that the available information is spread out all over the place, and if you were to put it on a spectrum from theory to practice, you would find a lot of material at the two ends but not much in the middle. 
@@ -224,7 +214,6 @@ That is why I decided to write a book that brings together the core theoretical 
 If you are a developer working on the backend of web or mobile applications (or would like to be!), this book is for you. When building distributed applications, you need to be familiar with the network stack, data consistency models, scalability and reliability patterns, observability best practices, and much more. Although you can build applications without knowing much of that, you will end up spending hours debugging and re-architecting them, learning hard lessons that you could have acquired in a much faster and less painful way. 
 
 However, if you have several years of experience designing and building highly available and fault-tolerant applications that scale to millions of users, this book might not be for you. As an expert, 
-
 
 CONTENTS xvi you are likely looking for depth rather than breadth, and this book focuses more on the latter since it would be impossible to cover the 
 
@@ -237,5 +226,4 @@ As no book is ever perfect, I’m always happy to receive feedback. So if you fi
 > 1https://understandingdistributed.systems/ 
 
 > 2roberto@understandingdistributed.systems 
-
 

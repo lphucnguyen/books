@@ -2,7 +2,6 @@
 
 **Communication** 
 
-
 # **Introduction** 
 
 _“The network is reliable.”_ 
@@ -21,12 +20,7 @@ The protocols are arranged in a stack[6] , where each layer builds on the abstra
 
 > 7“MAC address,” https://en.wikipedia.org/wiki/MAC_address 
 
-
-14 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0032-01.png)
-
 
 Figure 1.3: Internet protocol suite 
 
@@ -40,9 +34,6 @@ Even though each protocol builds on top of another, sometimes the abstractions l
 
 Chapter 2 describes how to build a reliable communication channel (TCP) on top of an unreliable one (IP), which can drop or duplicate data or deliver it out of order. Building reliable abstractions on top of unreliable ones is a common pattern we will encounter again in the rest of the book. 
 
-
-15 
-
 Chapter 3 describes how to build a secure channel (TLS) on top of a reliable one (TCP). Security is a core concern of any system, and in this chapter, we will get a taste of what it takes to secure a network connection from prying eyes and malicious agents. 
 
 Chapter 4 dives into how the phone book of the internet (DNS) works, which allows nodes to discover others using names. At its heart, DNS is a distributed, hierarchical, and eventually consistent key-value store. By studying it, we will get the first taste of eventual consistency[8] and the challenges it introduces. 
@@ -50,5 +41,4 @@ Chapter 4 dives into how the phone book of the internet (DNS) works, which allow
 Chapter 5 concludes this part by discussing how loosely coupled services communicate with each other through APIs by describing the implementation of a RESTful HTTP API built upon the protocols introduced earlier. 
 
 8 We will learn more about consistency models in chapter 10. 
-
 

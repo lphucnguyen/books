@@ -10,9 +10,7 @@ We can increase the read capacity of the database by creating replicas. The most
 
 By creating read-only followers and putting them behind a load balancer, we can increase the read capacity of the database. Repli182 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0200-02.png)
-
 
 Figure 19.1: Single leader replication cation also increases the availability of the database. For example, the load balancer can automatically take a faulty replica out of the pool when it detects that it’s no longer healthy or available. And when the leader fails, a replica can be reconfigured to take its place. Additionally, individual followers can be used to isolate specific workloads, like expensive analytics queries that are run periodically, so that they don’t impact the leader and other replicas. 
 
@@ -34,9 +32,6 @@ One caveat of replication is that it only helps to scale out reads, not writes. 
 
 > 3“Multi-AZ deployments for high availability,” https://docs.aws.amazon.co m/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html 
 
-
-184 
-
 # **19.2 Partitioning** 
 
 Partitioning allows us to scale out a database for both reads and writes. Even though traditional (centralized) relational databases generally don’t support it out of the box, we can implement it at the application layer in principle. However, implementing partitioning at the application layer is challenging and adds a lot of complexity to the system. For starters, we need to decide how to partition the data among the database instances and rebalance it when a partition becomes too hot or too big. Once the data is partitioned, queries that span multiple partitions need to be split into sub-queries and their responses have to be combined (think of aggregations or joins). Also, to support atomic transactions across partitions, we need to implement a distributed transaction protocol, like 2PC. Add to all that the requirement to combine partitioning with replication, and you can see how partitioning at the application layer becomes daunting. 
@@ -46,9 +41,6 @@ Taking a step back, the fundamental problem with traditional relational database
 Times have changed, and storage is cheap nowadays, while CPU time isn’t. This is why, in the early 2000s, large tech companies began to build bespoke solutions for storing data designed from the ground up with high availability and scalability in mind. 
 
 > 4That said, reducing storage costs isn’t the only benefit of normalization: it also helps maintain data integrity. If a piece of data is duplicated in multiple places, then to update it, we have to make sure it gets updated everywhere. In contrast, if the data is normalized, we only need to update it in one place. 
-
-
-185 
 
 # **19.3 NoSQL** 
 
@@ -65,9 +57,6 @@ Finally, since NoSQL stores natively support partitioning for scalability purpos
 > 5“Bigtable: A Distributed Storage System for Structured Data,” https://static .googleusercontent.com/media/research.google.com/en//archive/bigtableosdi06.pdf 
 
 > 6we talked about Dynamo in section 11.3 
-
-
-186 
 
 Although the data models used by NoSQL stores are generally not relational, we can still use them to model relational data. But if we take a NoSQL store and try to use it as a relational database, we will end up with the worst of both worlds. If used correctly, NoSQL can handle many of the use cases that a traditional relational database can[7] , while being essentially scalable from day 1.[8] 
 
@@ -89,9 +78,6 @@ At a high level, DynamoDB’s API supports:
 
 > 10“AWS re:Invent 2018: Amazon DynamoDB Under the Hood: How We Built a Hyper-Scale Database (DAT321),” https://www.youtube.com/watch?v=yvBR7 1D0nAQ 
 
-
-187 
-
 - querying multiple items that have the same partition key (optionally specifying conditions on the sort key), 
 
 - and scanning the entire table. 
@@ -106,7 +92,6 @@ The partition and sort key attributes are used to model the table’s access pat
 |aryastark|2021-07-20|OrderID: 5252|Status: Placed|
 |branstark|2021-07-22|OrderID: 5260|Status: Placed|
 
-
 Now suppose that we also want the full name of the customer in the list of orders. While, in a relational database, a table contains only entities of a certain type (e.g., customer), in NoSQL, a table can contain entities of multiple types. Thus, we could store both customers and orders within the same table: 
 
 |Partition Key|Sort Key|Attribute|Attribute|
@@ -116,11 +101,7 @@ Now suppose that we also want the full name of the customer in the list of order
 |aryastark|2021-07-20|OrderID: 5252|Status: Placed|
 |aryastark|aryastark|FullName: Arya Stark|Address: …|
 
-
 Because a customer and its orders have the same partition key, we can now issue a single query that retrieves all entities for the desired customer. 
-
-
-188 
 
 See what we just did? We have structured the table based on the access patterns so that queries won’t require any joins. Now think for a moment about how you would model the same data in normalized form in a relational database. You would probably have one table for orders and another for customers. And, to perform the same query, a join would be required at query time, which would be slower and harder to scale. 
 
@@ -134,15 +115,11 @@ As scalable data stores keep evolving, the latest trend is to combine the scalab
 
 > 11“The DynamoDB Book,” https://www.dynamodbbook.com/ 
 
-> 12“Andy Pavlo — The official ten-year retrospective of NewSQL databases,” ht tps://www.youtube.com/watch?v=LwkS82zs65g 
-
-
-189 sistency is hardly noticeable[13] for many applications. That, combined with the fact that perfect 100% availability is not possible anyway (availability is defined in 9s), has spurred the drive to build storage systems that can scale but favor consistency over availability in the presence of network partitions. CockroachDB[14] and Spanner[15] are well-known examples of NewSQL data stores. 
+> 12“Andy Pavlo — The official ten-year retrospective of NewSQL databases,” ht tps://www.youtube.com/watch?v=LwkS82zs65g sistency is hardly noticeable[13] for many applications. That, combined with the fact that perfect 100% availability is not possible anyway (availability is defined in 9s), has spurred the drive to build storage systems that can scale but favor consistency over availability in the presence of network partitions. CockroachDB[14] and Spanner[15] are well-known examples of NewSQL data stores. 
 
 > 13“NewSQL database systems are failing to guarantee consistency, and I blame Spanner,” https://dbmsmusings.blogspot.com/2018/09/newsql-databasesystems-are-failing-to.html 
 
 > 14“CockroachDB,” https://github.com/cockroachdb/cockroach 
 
 > 15we talked about Spanner in section 12.4 
-
 

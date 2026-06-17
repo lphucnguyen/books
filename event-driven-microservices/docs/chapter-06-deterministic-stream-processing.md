@@ -12,9 +12,7 @@ Here are the three main questions addressed in this chapter:
 
 We can answer these questions by examining timestamps, event scheduling, watermarks, and stream times, and how they contribute to deterministic processing. Bugs, errors, and changes in business logic will also necessitate reprocessing, making deterministic results important. This chapter also explores how out-of-order and latearriving events can occur, strategies for handling them, and mitigating their impact on our workflows. 
 
-
 ![](../images/Event-Driven_Microservices-0108-00.png)
-
 
 This chapter is fairly information-dense despite my best efforts to find a simple and concise way to explain the key concepts. There are a number of sections where I will refer you to further resources to explore on your own, as the details often go beyond the scope of this book. 
 
@@ -32,10 +30,7 @@ Fully deterministic processing is the ideal case, where every event arrives on t
 
 Events can happen anywhere and at any time and often need to be reconciled with events from other producers. Synchronized and consistent timestamps are a hard requirement for comparing events across distributed systems. 
 
-An event stored in an event stream has both an offset and a timestamp. The offset is used by the consumer to determine which events it has already read, while the timestamp, which indicates when that event was created, is used to determine when an 
-
-
-event occurred relative to other events and to ensure that events are processed in the correct order. 
+An event stored in an event stream has both an offset and a timestamp. The offset is used by the consumer to determine which events it has already read, while the timestamp, which indicates when that event was created, is used to determine when an event occurred relative to other events and to ensure that events are processed in the correct order. 
 
 The following timestamp-related concepts are illustrated in Figure 6-1, which shows their temporal positions in the event-driven workflow: 
 
@@ -55,14 +50,11 @@ The time in which the event is ingested by the consumer. This can be set to the 
 
 The wall-clock time at which the event has been processed by the consumer. 
 
-
 ![](../images/Event-Driven_Microservices-0109-10.png)
-
 
 _Figure 6-1. Event scheduler ordering the input events by timestamp_ 
 
 You can see that it’s possible to propagate the event time through the event broker to the consumer, enabling the consumer logic to make decisions based on _when_ an event happened. This will help answer the three questions posed at the start of the chapter. Now that we’ve mapped out the types of timestamps, let’s take a look at how they’re generated. 
-
 
 ### Synchronizing Distributed Timestamps
 
@@ -80,14 +72,11 @@ For the vast majority of business cases, frequent synchronization to NTP servers
 
 Timestamps provide a way to process events distributed across multiple event streams and partitions in a consistent temporal order. Many use cases require you to maintain order between events based on time, and need consistent, reproducible results regardless of when the event stream is processed. Using offsets as a means of comparison works only for events within a single event stream partition, while events quite commonly need to be processed from multiple different event streams. 
 
-
 **Example: Selecting order of events when processing multiple partitions** 
 
 A bank must ensure that both deposit and withdrawal event streams are processed in the correct temporal order. It keeps a stateful running tally of withdrawals and deposits, applying an overdraft penalty when a client’s account balance drops below $0. For this example, the bank has its deposits in one event stream and its withdrawals in another stream, as shown in Figure 6-2. 
 
-
 ![](../images/Event-Driven_Microservices-0111-02.png)
-
 
 _Figure 6-2. In which order should events be processed?_ 
 
@@ -97,18 +86,13 @@ A naive approach to consuming and processing records, perhaps a round-robin proc
 
 Deterministic processing requires that events be processed consistently, such that the results can be reproduced at a later date. Event scheduling is the process of selecting the next events to process when consuming from multiple input partitions. For an immutable log-based event stream, records are consumed in an offset-based order. However, as Figure 6-2 demonstrates, the processing order of events must be interleaved based on the _event time_ provided in the record, regardless of which input partition it comes from, to ensure correct results. 
 
-
 ![](../images/Event-Driven_Microservices-0111-07.png)
-
 
 The most common event-scheduling implementation selects and dispatches the event with the oldest timestamp from all assigned input partitions to the downstream processing topology. 
 
-
 Event scheduling is a feature of many stream-processing frameworks, but is typically absent from basic consumer implementations. You will need to determine if it is required for your microservice implementation. 
 
-
 ![](../images/Event-Driven_Microservices-0112-01.png)
-
 
 Your microservice will need event scheduling if the order in which events are consumed and processed matters to the business logic. 
 
@@ -123,7 +107,6 @@ A time-based order of event processing requires you to select _which_ point in t
 In most scenarios, particularly when all consumers and all producers are healthy and there is no event backlog for any consumer group, all four points in time will be within a few seconds of each other. Contrarily, for a microservice processing historic events, event time and consumer ingestion time will differ significantly. 
 
 For the most accurate depiction events in the real world, it is best to use the locally assigned event time _provided you can rely on its accuracy_ . If the producer has unreliable timestamps (and you can’t fix it), your next best bet is to set the timestamps based on when the events are ingested into the event broker. It is only in rare cases where the event broker and the producer cannot communicate that there may be a substantial delay between the true event time and the one assigned by the broker. 
-
 
 ### Timestamp Extraction by the Consumer
 
@@ -141,18 +124,13 @@ Watermarking is used to track the progress of event time through a processing to
 
 A watermark is a declaration to downstream nodes _within the same processing topology_ that all events of time _t_ and prior have been processed. The node receiving the watermark can then update its own internal event time and propagate its own watermark downstream to its dependent topology nodes. This process is shown in Figure 6-3. 
 
-
 ![](../images/Event-Driven_Microservices-0113-08.png)
-
 
 _Figure 6-3. Watermark propagation between nodes in a single topology_ 
 
-
 In this figure, the consumer node has the highest watermark time because it’s consuming from the source event stream. New watermarks are generated periodically, such as after a period of wall-clock or event time has elapsed or after some minimum number of events has been processed. These watermarks propagate downstream to the other processing nodes in the topology, which update their own event time accordingly. 
 
-
 ![](../images/Event-Driven_Microservices-0114-01.png)
-
 
 This chapter only touches on watermarks to give you an understanding of how they’re used for deterministic processing. If you would like to dig deeper into watermarks, consider Chapters 2 and 3 of the excellent book _Streaming Systems_ , by Tyler Akidau, Slava Chernyak, and Reuven Lax (O’Reilly, 2018). 
 
@@ -160,12 +138,9 @@ This chapter only touches on watermarks to give you an understanding of how they
 
 Watermarks are particularly useful for coordinating event time between multiple independent consumer instances. Figure 6-4 shows a simple processing topology of two consumer instances. Each consumer instance consumes events from its own assigned partition, applies a `groupByKey` function, followed by an `aggregate` function. This requires a _shuffle_ , where all events with the same key are sent to a single downstream aggregate instance. In this case, events from instance 0 and instance 1 are sent to each other based on the key to ensure all events of the same key are in the same partition. 
 
-
 ![](../images/Event-Driven_Microservices-0114-05.png)
 
-
 _Figure 6-4. Watermark propagation between nodes in a single topology with multiple processors_ 
-
 
 There is a fair bit to unpack in this diagram, so let’s take a look at it from the start. 
 
@@ -183,9 +158,7 @@ A second option for maintaining time in a stream processor, known simply as _str
 
 Figure 6-5 shows an example of stream time. The consumer node maintains a single stream time based on the highest event-time value it has received. The stream time is currently set to 20 since that was the event time of the most recently processed event. The next event to be processed is the smallest value of the two input buffers—in this case, it’s the event with event time 30. The event is dispatched down to the processing topology, and the stream time will be updated to 30. 
 
-
 ![](../images/Event-Driven_Microservices-0116-00.png)
-
 
 _Figure 6-5. Stream time when consuming from multiple input streams_ 
 
@@ -195,9 +168,7 @@ Stream time is maintained by processing each event completely through the topolo
 
 Consider again the same two-instance consumer example from Figure 6-4, but this time with the stream time approach championed by Kafka Streams (see Figure 6-6). A notable difference is that the Kafka Streams approach sends the repartitioned events _back_ to the event broker using what’s known as an _internal event stream_ . This stream is then reconsumed by the instances, with all repartitioned data colocated by key within single partitions. This is functionally the same as the shuffle mechanism within the heavyweight cluster, but does not require a dedicated cluster (note: Kafka Streams is very microservice friendly). 
 
-
 ![](../images/Event-Driven_Microservices-0117-00.png)
-
 
 _Figure 6-6. Shuffling events via a repartition event stream_ 
 
@@ -205,9 +176,7 @@ In this example, events from the input stream are repartitioned according to the
 
 Notice the subtopologies shown in the figure. Because of the repartition event stream, the processing topology is effectively cut in half, meaning that work on each subtopology can be done in parallel. Subtopologies `1` and `3` consume from the repartition stream and group events together, while subtopologies `0` and `2` produce the repartitioned events. Each subtopology maintains its own stream time, since both are consuming from independent event streams. 
 
-
 ![](../images/Event-Driven_Microservices-0117-04.png)
-
 
 Watermarking strategies can also use repartition event streams. Apache Samza offers a standalone mode that is similar to Kafka Streams, but uses watermarking instead of stream time. 
 
@@ -215,10 +184,7 @@ Watermarking strategies can also use repartition event streams. Apache Samza off
 
 In an ideal world, all events are produced without issue and available to the consumer with zero latency. Unfortunately for all of us living in the real world, this is never the case, so we must plan to accommodate out-of-order events. An event is said to be out of order if its timestamp isn’t equal to or greater than the events ahead of it in the 
 
-**Out-of-Order and Late-Arriving Events | 99** 
-
-
-event stream. In Figure 6-7, event `F` is out of order because its timestamp is lower than `G` ’s, just as event `H` is out of order as its timestamp is lower than `I` ’s. 
+**Out-of-Order and Late-Arriving Events | 99** event stream. In Figure 6-7, event `F` is out of order because its timestamp is lower than `G` ’s, just as event `H` is out of order as its timestamp is lower than `I` ’s. 
 
 Bounded data sets, such as historical data processed in batch, are typically fairly resilient to out-of-order data. The entire batch can be thought of as one large window, and an event arriving out of order by many minutes or even hours is not really relevant provided that the processing for that batch has not yet started. In this way, a bounded data set processed in batch can produce results with high determinism. This comes at the expense of high latency, especially for the traditional sorts of nightly batch bigdata processing jobs where the results are available only after the 24-hour period, plus batch processing time. 
 
@@ -226,18 +192,13 @@ For unbounded data sets, such as those in ever-updating event streams, the devel
 
 Consider the previous example of the bank account. A deposit followed by an immediate withdrawal must be processed in the correct order lest an overdraft charge be incorrectly applied, regardless of the ordering of events or how late they may be. To mitigate this, the application logic may need to maintain state to handle out-of-order data for a time period specified by the business, such as a one-hour grace window.  
 
-
 ![](../images/Event-Driven_Microservices-0118-04.png)
-
 
 _Figure 6-7. Out-of-order events in an event stream partition_ 
 
-
 ![](../images/Event-Driven_Microservices-0118-06.png)
 
-
 Events from a single partition should always be processed according to their offset order, regardless of their timestamp. This can lead to out-of-order events. 
-
 
 An event can be considered _late_ only when viewed from the perspective of the consuming microservice. One microservice may consider _any_ out-of-order events as late, whereas another may be fairly tolerant and require many hours of wall-clock or event time to pass before considering an event to be late. 
 
@@ -253,9 +214,7 @@ The event _t_ ′ is considered late when it arrives _after_ the watermark _W(t)
 
 The event _t_ ′ is considered late when it arrives the stream time has been _after_ incremented past _t_ ′ . It is up to each operator in the subtopology how to handle this event. 
 
-
 ![](../images/Event-Driven_Microservices-0119-07.png)
-
 
 An event is late only when it has missed a deadline specific to the consumer. 
 
@@ -273,28 +232,21 @@ Multiple producers writing to multiple output partitions can introduce out-of-or
 
 **Out-of-Order and Late-Arriving Events | 101** 
 
-
 ![](../images/Event-Driven_Microservices-0120-00.png)
-
 
 _Figure 6-8. Shuffling events via a repartition event stream_ 
 
 Note that each instance maintains its own internal stream time and that there is no synchronization between the two instances. This can cause a time skew that produces out-of-order events, as shown in Figure 6-9. 
 
-
 ![](../images/Event-Driven_Microservices-0120-03.png)
-
 
 _Figure 6-9. Shuffling events via a repartition event stream_ 
 
 Instance 0 was only slightly ahead of instance 1 in stream time, but because of their independent stream times, the events of time _t_ = 90 and _t_ = 95 are considered out of order in the repartitioned event stream. This issue is exacerbated by unbalanced partition sizes, unequal processing rates, and large backlogs of events. The impact here is that the previously _in-order_ event data is now _out of order_ , and thus as a consumer you cannot depend on having consistently incrementing time in each of your event streams. 
 
-
 ![](../images/Event-Driven_Microservices-0120-06.png)
 
-
 A single-threaded producer will not create out-of-order events in normal operation unless it is sourcing its data from an out-of-order source. 
-
 
 Since the stream time is incremented whenever an event with a higher timestamp is detected, it is possible to end up in a scenario where a large number of events are considered late due to reordering. This may have an effect on processing depending on how the consumers choose to handle out-of-order events. 
 
@@ -304,9 +256,7 @@ Late events are predominantly the concern of time-based business logic, such as 
 
 _Windowing_ means grouping events together by time. This is particularly useful for events with the same key, where you want to see _what happened_ with events of that key in that period of time. There are three main types of event windows, but again, be sure to check your stream-processing framework for more information. 
 
-
 ![](../images/Event-Driven_Microservices-0121-04.png)
-
 
 Windowing can be done using either event time or processing time, though event-time windowing typically has more business applications. 
 
@@ -314,22 +264,17 @@ Windowing can be done using either event time or processing time, though event-t
 
 A tumbling window is a window of a fixed size. Previous and subsequent windows do not overlap. Figure 6-10 shows three tumbling windows, each aligned on _t_ , _t_ + 1, and so on. This sort of windowing can help answer questions such as “When is the peak hour for product usage?” 
 
-
 ![](../images/Event-Driven_Microservices-0121-08.png)
-
 
 _Figure 6-10. Tumbling windows_ 
 
 **Out-of-Order and Late-Arriving Events | 103** 
 
-
 **Sliding windows** 
 
 A sliding window has a fixed window size and incremental step known as the _window slide_ . It must reflect only the aggregation of events currently in the window. A sliding window can help answer questions such as “How many users clicked on my product in the past hour?” Figure 6-11 shows an example of the sliding window, including the size of the window and the amount that it slides forward. 
 
-
 ![](../images/Event-Driven_Microservices-0122-02.png)
-
 
 _Figure 6-11. Sliding windows_ 
 
@@ -337,9 +282,7 @@ _Figure 6-11. Sliding windows_
 
 A session window is a dynamically sized window. It is terminated based on a timeout due to inactivity, with a new session started for any activity happening after the timeout. Figure 6-12 shows an example of session windows, with a session gap due to inactivity for user C. This sort of window can help answer questions such as “What does a user look at in a given browsing session?” 
 
-
 ![](../images/Event-Driven_Microservices-0123-00.png)
-
 
 _Figure 6-12. Session windows_ 
 
@@ -356,7 +299,6 @@ There are several ways in which a late-arriving event can be handled, regardless
 **Drop event** 
 
 Simply drop the event. The window is closed, and any time-based aggregations are already complete. 
-
 
 **Wait** 
 
@@ -386,10 +328,7 @@ Here are a few questions to help you determine good guidelines for handling late
 
 Immutable event streams provide the ability to rewind consumer group offsets and replay processing from an arbitrary point in time. This is known as _reprocessing_ , and it’s something that every event-driven microservice needs to consider in its design. Reprocessing is typically performed only on event-driven microservices that use event time for processing events, and not those that rely on wall-clock time aggregations and windowing. 
 
-Event scheduling is an important part of being able to correctly reprocess historical data from event streams. It ensures that microservices process events in the same order that they did during near–real time. Handling out-of-order events is also an important part of this process, as repartitioning an event stream through the event 
-
-
-broker (instead of using a heavyweight framework like Spark, Flink, or Beam) can cause out-of-order events. 
+Event scheduling is an important part of being able to correctly reprocess historical data from event streams. It ensures that microservices process events in the same order that they did during near–real time. Handling out-of-order events is also an important part of this process, as repartitioning an event stream through the event broker (instead of using a heavyweight framework like Spark, Flink, or Beam) can cause out-of-order events. 
 
 Here are the steps to follow when you want to reprocess your event streams: 
 
@@ -405,35 +344,25 @@ Here are the steps to follow when you want to reprocess your event streams:
 
 ## Intermittent Failures and Late Events
 
-An event may be late during near-real-time processing (watermark or stream time is incremented) but may be available as expected within the event stream during eventstream reprocessing. This issue can be hard to detect, but it really illustrates the con‐ 
-
-
-nected nature of event-driven microservices and how upstream problems can affect downstream consumers. Let’s take a quick look at how this can occur. 
+An event may be late during near-real-time processing (watermark or stream time is incremented) but may be available as expected within the event stream during eventstream reprocessing. This issue can be hard to detect, but it really illustrates the con‐ nected nature of event-driven microservices and how upstream problems can affect downstream consumers. Let’s take a quick look at how this can occur. 
 
 ## Producer/Event Broker Connectivity Issues
 
 In this scenario, records are _created_ in timestamp order but can’t be _published_ until a later time (see Figure 6-13). During normal operation, producers send their events as they occur, and consumers consume them in near-real-time. This scenario is tricky to identify when it’s happening and can go unnoticed even in retrospect. 
 
-
 ![](../images/Event-Driven_Microservices-0126-03.png)
-
 
 _Figure 6-13. Normal operation prior to producer/broker connection outage_ 
 
 Say a producer has a number of records ready to send, but it is unable to connect to the event broker. The records are timestamped with the _local_ time that the event occurred. The producer will retry a number of times and either eventually succeed or give up and fail (ideally a noisy failure so that the faulty connection can be identified and rectified). This scenario is shown in Figure 6-14. Events from stream A are still consumed, with the watermark/stream time incremented accordingly. However, upon consuming from stream B, the consumer ends up with no new events, so it can simply assume that no new data is available. 
 
-
 ![](../images/Event-Driven_Microservices-0126-06.png)
-
 
 _Figure 6-14. Temporary producer/broker connection outage_ 
 
-
 Eventually the producer will be able to write records to the event stream. These events are published in the correct event-time order that they actually occurred, but because of the wall-clock delay, near-real-time consumers will have marked them as late and treat them as such. This is shown in Figure 6-15. 
 
-
 ![](../images/Event-Driven_Microservices-0127-01.png)
-
 
 _Figure 6-15. The producer is able to reconnect and publish its temporarily delayed events, while the consumer has already incremented its event time_ 
 

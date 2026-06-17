@@ -8,14 +8,11 @@ When using a CDN, clients hit URLs that resolve to caching servers that belong t
 
 # **15.1 Overlay network** 
 
-You would think that the main benefit of a CDN is caching, but it’s actually the underlying network substrate. The public internet is composed of thousands of networks, and its core routing protocol, BGP, was not designed with performance in mind. It primarily 
+You would think that the main benefit of a CDN is caching, but it’s actually the underlying network substrate. The public internet is composed of thousands of networks, and its core routing protocol, BGP, was not designed with performance in mind. It primarilyuses the number of hops to cost how expensive a path is with respect to another, without considering their latencies or congestion. As the name implies, a CDN is a network. More specifically, an overlay network[3] built on top of the internet that exploits a variety of techniques to reduce the response time of network requests and increase the bandwidth of data transfers.
 
 > 1“Amazon CloudFront,” https://aws.amazon.com/cloudfront/ 
 
-> 2“Akamai,” https://www.akamai.com/ 
-
-
-152 uses the number of hops to cost how expensive a path is with respect to another, without considering their latencies or congestion. As the name implies, a CDN is a network. More specifically, an overlay network[3] built on top of the internet that exploits a variety of techniques to reduce the response time of network requests and increase the bandwidth of data transfers. 
+> 2“Akamai,” https://www.akamai.com/
 
 When we first discussed TCP in chapter 2, we talked about the importance of minimizing the latency between a client and a server. No matter how fast the server is, if the client is located on the other side of the world from it, the response time is going to be over 100 ms just because of the network latency, which is physically limited by the speed of light. Not to mention the increased error rate when sending data across the public internet over long distances. 
 
@@ -23,18 +20,13 @@ This is why CDN clusters are placed in multiple geographical locations to be clo
 
 CDN servers are also placed at _internet exchange points_ , where ISPs connect to each other. That way, virtually the entire communication from the origin server to the clients flows over network links that are part of the CDN, and the brief hops on either end have low latencies due to their short distance. 
 
-The routing algorithms of the overlay network are optimized to select paths with reduced latencies and congestion, based on continuously updated data about the health of the network. Additionally, TCP optimizations are exploited where possible, such as using pools of persistent connections between servers 
+The routing algorithms of the overlay network are optimized to select paths with reduced latencies and congestion, based on continuously updated data about the health of the network. Additionally, TCP optimizations are exploited where possible, such as using pools of persistent connections between serversto avoid the overhead of setting up new connections and using optimal TCP window sizes to maximize the effective bandwidth (see Figure 15.1).
 
 > 3“The Akamai Network: A Platform for HighPerformance Internet Applications,” https://groups.cs.umass.edu/ramesh/wp-content/uploads/sites/3/ 2019/12/The-akamai-network-a-platform-for-high-performance-internetapplications.pdf 
 
-> 4“Load Balancing at the Frontend,” https://landing.google.com/sre/srebook/chapters/load-balancing-frontend/ 
-
-
-153 to avoid the overhead of setting up new connections and using optimal TCP window sizes to maximize the effective bandwidth (see Figure 15.1). 
-
+> 4“Load Balancing at the Frontend,” https://landing.google.com/sre/srebook/chapters/load-balancing-frontend/
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0171-03.png)
-
 
 Figure 15.1: A CDN reduces the round trip time of network calls for clients and the load for the origin server. 
 
@@ -50,11 +42,7 @@ There is a tradeoff between the number of edge clusters and the cache _hit ratio
 
 > 6A cache hit occurs when the requested data can be found in the cache, while a cache miss occurs when it cannot. 
 
-
-154 
-
 The higher the number of edge clusters, the more geographically dispersed clients they can serve, but the lower the cache hit ratio will be, and consequently, the higher the load on the origin server. To alleviate this issue, the CDN can have one or more intermediary caching clusters deployed in a smaller number of geographical locations, which cache a larger fraction of the original content. 
 
 Within a CDN cluster, the content is partitioned among multiple servers so that each one serves only a specific subset of it; this is necessary as no single server would be able to hold all the data. Because data partitioning is a core scalability pattern, we will take a closer look at it in the next chapter. 
-
 

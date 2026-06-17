@@ -20,7 +20,6 @@ A data-intensive application is typically built from standard building blocks th
 
 If that sounds painfully obvious, that’s just because these _data systems_ are such a successful abstraction: we use them all the time without thinking too much. When building an application, most engineers wouldn’t dream of writing a new data storage engine from scratch, because databases are a perfectly good tool for the job. 
 
-
 But reality is not that simple. There are many database systems with different characteristics, because different applications have different requirements. There are various approaches to caching, several ways of building search indexes, and so on. When building an application, we still need to figure out which tools and which approaches are the most appropriate for the task at hand. And it can be hard to combine tools when you need to do something that a single tool cannot do alone. 
 
 This book is a journey through both the principles and the practicalities of data systems, and how you can use them to build data-intensive applications. We will explore what different tools have in common, what distinguishes them, and how they achieve their characteristics. 
@@ -39,9 +38,7 @@ Secondly, increasingly many applications now have such demanding or wide-ranging
 
 For example, if you have an application-managed caching layer (using Memcached or similar), or a full-text search server (such as Elasticsearch or Solr) separate from your main database, it is normally the application code’s responsibility to keep those caches and indexes in sync with the main database. Figure 1-1 gives a glimpse of what this may look like (we will go into detail in later chapters). 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0027-00.png)
-
 
 _Figure 1-1. One possible architecture for a data system that combines several components._ 
 
@@ -50,7 +47,6 @@ When you combine several tools in order to provide a service, the service’s in
 If you are designing a data system or service, a lot of tricky questions arise. How do you ensure that the data remains correct and complete, even when things go wrong internally? How do you provide consistently good performance to clients, even when parts of your system are degraded? How do you scale to handle an increase in load? What does a good API for the service look like? 
 
 There are many factors that may influence the design of a data system, including the skills and experience of the people involved, legacy system dependencies, the timescale for delivery, your organization’s tolerance of different kinds of risk, regulatory constraints, etc. Those factors depend very much on the situation. 
-
 
 In this book, we focus on three concerns that are important in most software systems: 
 
@@ -82,10 +78,7 @@ Everybody has an intuitive idea of what it means for something to be reliable or
 
 If all those things together mean “working correctly,” then we can understand _reliability_ as meaning, roughly, “continuing to work correctly, even when things go wrong.” 
 
-The things that can go wrong are called _faults_ , and systems that anticipate faults and can cope with them are called _fault-tolerant_ or _resilient_ . The former term is slightly misleading: it suggests that we could make a system tolerant of every possible kind of fault, which in reality is not feasible. If the entire planet Earth (and all servers on it) were swallowed by a black hole, tolerance of that fault would require web hosting in 
-
-
-space—good luck getting that budget item approved. So it only makes sense to talk about tolerating _certain types_ of faults. 
+The things that can go wrong are called _faults_ , and systems that anticipate faults and can cope with them are called _fault-tolerant_ or _resilient_ . The former term is slightly misleading: it suggests that we could make a system tolerant of every possible kind of fault, which in reality is not feasible. If the entire planet Earth (and all servers on it) were swallowed by a black hole, tolerance of that fault would require web hosting in space—good luck getting that budget item approved. So it only makes sense to talk about tolerating _certain types_ of faults. 
 
 Note that a fault is not the same as a failure [2]. A fault is usually defined as one component of the system deviating from its spec, whereas a _failure_ is when the system as a whole stops providing the required service to the user. It is impossible to reduce the probability of a fault to zero; therefore it is usually best to design fault-tolerance mechanisms that prevent faults from causing failures. In this book we cover several techniques for building reliable systems from unreliable parts. 
 
@@ -100,7 +93,6 @@ When we think of causes of system failure, hardware faults quickly come to mind.
 Hard disks are reported as having a mean time to failure (MTTF) of about 10 to 50 years [5, 6]. Thus, on a storage cluster with 10,000 disks, we should expect on average one disk to die per day. 
 
 Our first response is usually to add redundancy to the individual hardware components in order to reduce the failure rate of the system. Disks may be set up in a RAID configuration, servers may have dual power supplies and hot-swappable CPUs, and datacenters may have batteries and diesel generators for backup power. When one component dies, the redundant component can take its place while the broken component is replaced. This approach cannot completely prevent hardware problems from causing failures, but it is well understood and can often keep a machine running uninterrupted for years. 
-
 
 Until recently, redundancy of hardware components was sufficient for most applications, since it makes total failure of a single machine fairly rare. As long as you can restore a backup onto a new machine fairly quickly, the downtime in case of failure is not catastrophic in most applications. Thus, multi-machine redundancy was only required by a small number of applications for which high availability was absolutely essential. 
 
@@ -119,7 +111,6 @@ Another class of fault is a systematic error within the system [8]. Such faults 
 - A runaway process that uses up some shared resource—CPU time, memory, disk space, or network bandwidth. 
 
 > i. Defined in “Approaches for Coping with Load” on page 17. 
-
 
 - A service that the system depends on that slows down, becomes unresponsive, or starts returning corrupted responses. 
 
@@ -141,7 +132,6 @@ How do we make our systems reliable, in spite of unreliable humans? The best sys
 
 - Test thoroughly at all levels, from unit tests to whole-system integration tests and manual tests [3]. Automated testing is widely used, well understood, and especially valuable for covering corner cases that rarely arise in normal operation. 
 
-
 - Allow quick and easy recovery from human errors, to minimize the impact in the case of a failure. For example, make it fast to roll back configuration changes, roll out new code gradually (so that any unexpected bugs affect only a small subset of users), and provide tools to recompute data (in case it turns out that the old computation was incorrect). 
 
 - Set up detailed and clear monitoring, such as performance metrics and error rates. In other engineering disciplines this is referred to as _telemetry_ . (Once a rocket has left the ground, telemetry is essential for tracking what is happening, and for understanding failures [14].) Monitoring can show us early warning signals and allow us to check whether any assumptions or constraints are being violated. When a problem occurs, metrics can be invaluable in diagnosing the issue. 
@@ -160,10 +150,7 @@ There are situations in which we may choose to sacrifice reliability in order to
 
 Even if a system is working reliably today, that doesn’t mean it will necessarily work reliably in the future. One common reason for degradation is increased load: perhaps the system has grown from 10,000 concurrent users to 100,000 concurrent users, or from 1 million to 10 million. Perhaps it is processing much larger volumes of data than it did before. 
 
-_Scalability_ is the term we use to describe a system’s ability to cope with increased load. Note, however, that it is not a one-dimensional label that we can attach to a system: it is meaningless to say “X is scalable” or “Y doesn’t scale.” Rather, discussing 
-
-
-scalability means considering questions like “If the system grows in a particular way, what are our options for coping with the growth?” and “How can we add computing resources to handle the additional load?” 
+_Scalability_ is the term we use to describe a system’s ability to cope with increased load. Note, however, that it is not a one-dimensional label that we can attach to a system: it is meaningless to say “X is scalable” or “Y doesn’t scale.” Rather, discussing scalability means considering questions like “If the system grows in a particular way, what are our options for coping with the growth?” and “How can we add computing resources to handle the additional load?” 
 
 ### Describing Load
 
@@ -192,27 +179,19 @@ WHERE follows.follower_id = current_user
 
 > ii. A term borrowed from electronic engineering, where it describes the number of logic gate inputs that are attached to another gate’s output. The output needs to supply enough current to drive all the attached inputs. In transaction processing systems, we use it to describe the number of requests to other services that we need to make in order to serve one incoming request. 
 
-
 2. Maintain a cache for each user’s home timeline—like a mailbox of tweets for each recipient user (see Figure 1-3). When a user _posts a tweet_ , look up all the people who follow that user, and insert the new tweet into each of their home timeline caches. The request to read the home timeline is then cheap, because its result has been computed ahead of time. 
-
 
 ![](../images/Designing_Data_Intensive_Applications-0034-01.png)
 
-
 _Figure 1-2. Simple relational schema for implementing a Twitter home timeline._ 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0034-03.png)
-
 
 _Figure 1-3. Twitter’s data pipeline for delivering tweets to followers, with load parameters as of November 2012 [16]._ 
 
 The first version of Twitter used approach 1, but the systems struggled to keep up with the load of home timeline queries, so the company switched to approach 2. This works better because the average rate of published tweets is almost two orders of magnitude lower than the rate of home timeline reads, and so in this case it’s preferable to do more work at write time and less at read time. 
 
-However, the downside of approach 2 is that posting a tweet now requires a lot of extra work. On average, a tweet is delivered to about 75 followers, so 4.6k tweets per second become 345k writes per second to the home timeline caches. But this average hides the fact that the number of followers per user varies wildly, and some users 
-
-
-have over 30 million followers. This means that a single tweet may result in over 30 million writes to home timelines! Doing this in a timely manner—Twitter tries to deliver tweets to followers within five seconds—is a significant challenge. 
+However, the downside of approach 2 is that posting a tweet now requires a lot of extra work. On average, a tweet is delivered to about 75 followers, so 4.6k tweets per second become 345k writes per second to the home timeline caches. But this average hides the fact that the number of followers per user varies wildly, and some users have over 30 million followers. This means that a single tweet may result in over 30 million writes to home timelines! Doing this in a timely manner—Twitter tries to deliver tweets to followers within five seconds—is a significant challenge. 
 
 In the example of Twitter, the distribution of followers per user (maybe weighted by how often those users tweet) is a key load parameter for discussing scalability, since it determines the fan-out load. Your application may have very different characteristics, but you can apply similar principles to reasoning about its load. 
 
@@ -232,9 +211,7 @@ In a batch processing system such as Hadoop, we usually care about _throughput_ 
 
 > iii. In an ideal world, the running time of a batch job is the size of the dataset divided by the throughput. In practice, the running time is often longer, due to skew (data not being spread evenly across worker processes) and needing to wait for the slowest task to complete. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0036-00.png)
-
 
 **Latency and response time**
 
@@ -244,18 +221,13 @@ Even if you only make the same request over and over again, you’ll get a sligh
 
 In Figure 1-4, each gray bar represents a request to a service, and its height shows how long that request took. Most requests are reasonably fast, but there are occasional _outliers_ that take much longer. Perhaps the slow requests are intrinsically more expensive, e.g., because they process more data. But even in a scenario where you’d think all requests should take the same time, you get variation: random additional latency could be introduced by a context switch to a background process, the loss of a network packet and TCP retransmission, a garbage collection pause, a page fault forcing a read from disk, mechanical vibrations in the server rack [18], or many other causes. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0036-05.png)
-
 
 _Figure 1-4. Illustrating mean and percentiles: response times for a sample of 100 requests to a service._ 
 
 It’s common to see the _average_ response time of a service reported. (Strictly speaking, the term “average” doesn’t refer to any particular formula, but in practice it is usually understood as the _arithmetic mean_ : given _n_ values, add up all the values, and divide by _n_ .) However, the mean is not a very good metric if you want to know your “typical” response time, because it doesn’t tell you how many users actually experienced that delay. 
 
-Usually it is better to use _percentiles_ . If you take your list of response times and sort it from fastest to slowest, then the _median_ is the halfway point: for example, if your 
-
-
-median response time is 200 ms, that means half your requests return in less than 200 ms, and half your requests take longer than that. 
+Usually it is better to use _percentiles_ . If you take your list of response times and sort it from fastest to slowest, then the _median_ is the halfway point: for example, if your median response time is 200 ms, that means half your requests return in less than 200 ms, and half your requests take longer than that. 
 
 This makes the median a good metric if you want to know how long users typically have to wait: half of user requests are served in less than the median response time, and the other half take longer than the median. The median is also known as the _50th percentile_ , and sometimes abbreviated as _p50_ . Note that the median refers to a single request; if the user makes several requests (over the course of a session, or because several resources are included in a single page), the probability that at least one of them is slower than the median is much greater than 50%. 
 
@@ -267,10 +239,7 @@ On the other hand, optimizing the 99.99th percentile (the slowest 1 in 10,000 re
 
 For example, percentiles are often used in _service level objectives_ (SLOs) and _service level agreements_ (SLAs), contracts that define the expected performance and availability of a service. An SLA may state that the service is considered to be up if it has a median response time of less than 200 ms and a 99th percentile under 1 s (if the response time is longer, it might as well be down), and the service may be required to be up at least 99.9% of the time. These metrics set expectations for clients of the service and allow customers to demand a refund if the SLA is not met. 
 
-Queueing delays often account for a large part of the response time at high percentiles. As a server can only process a small number of things in parallel (limited, for 
-
-
-example, by its number of CPU cores), it only takes a small number of slow requests to hold up the processing of subsequent requests—an effect sometimes known as _head-of-line blocking_ . Even if those subsequent requests are fast to process on the server, the client will see a slow overall response time due to the time waiting for the prior request to complete. Due to this effect, it is important to measure response times on the client side. 
+Queueing delays often account for a large part of the response time at high percentiles. As a server can only process a small number of things in parallel (limited, for example, by its number of CPU cores), it only takes a small number of slow requests to hold up the processing of subsequent requests—an effect sometimes known as _head-of-line blocking_ . Even if those subsequent requests are fast to process on the server, the client will see a slow overall response time due to the time waiting for the prior request to complete. Due to this effect, it is important to measure response times on the client side. 
 
 When generating load artificially in order to test the scalability of a system, the loadgenerating client needs to keep sending requests independently of the response time. If the client waits for the previous request to complete before sending the next one, that behavior has the effect of artificially keeping the queues shorter in the test than they would be in reality, which skews the measurements [23]. 
 
@@ -282,9 +251,7 @@ If you want to add response time percentiles to the monitoring dashboards for yo
 
 The naïve implementation is to keep a list of response times for all requests within the time window and to sort that list every minute. If that is too inefficient for you, there are algorithms that can calculate a good approximation of percentiles at minimal CPU and memory cost, such as forward decay [25], t-digest [26], or HdrHistogram [27]. Beware that averaging percentiles, e.g., to reduce the time resolution or to combine data from several machines, is mathematically meaningless—the right way of aggregating response time data is to add the histograms [28]. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0039-00.png)
-
 
 _Figure 1-5. When several backend calls are needed to serve a request, it takes just a single slow backend request to slow down the entire end-user request._ 
 
@@ -297,7 +264,6 @@ An architecture that is appropriate for one level of load is unlikely to cope wi
 People often talk of a dichotomy between _scaling up_ ( _vertical scaling_ , moving to a more powerful machine) and _scaling out_ ( _horizontal scaling_ , distributing the load across multiple smaller machines). Distributing load across multiple machines is also known as a _shared-nothing_ architecture. A system that can run on a single machine is often simpler, but high-end machines can become very expensive, so very intensive workloads often can’t avoid scaling out. In reality, good architectures usually involve a pragmatic mixture of approaches: for example, using several fairly powerful machines can still be simpler and cheaper than a large number of small virtual machines. 
 
 Some systems are _elastic_ , meaning that they can automatically add computing resources when they detect a load increase, whereas other systems are scaled manually (a human analyzes the capacity and decides to add more machines to the system). An elastic system can be useful if load is highly unpredictable, but manually scaled systems are simpler and may have fewer operational surprises (see “Rebalancing Partitions” on page 209). 
-
 
 While distributing stateless services across multiple machines is fairly straightforward, taking stateful data systems from a single node to a distributed setup can introduce a lot of additional complexity. For this reason, common wisdom until recently was to keep your database on a single node (scale up) until scaling cost or highavailability requirements forced you to make it distributed. 
 
@@ -347,7 +313,6 @@ Operations teams are vital to keeping a software system running smoothly. A good
 
 - Keeping tabs on how different systems affect each other, so that a problematic change can be avoided before it causes damage 
 
-
 - Anticipating future problems and solving them before they occur (e.g., capacity planning) 
 
 - Establishing good practices and tools for deployment, configuration management, and more 
@@ -380,7 +345,6 @@ Good operability means making routine tasks easy, allowing the operations team t
 
 Small software projects can have delightfully simple and expressive code, but as projects get larger, they often become very complex and difficult to understand. This complexity slows down everyone who needs to work on the system, further increasing the cost of maintenance. A software project mired in complexity is sometimes described as a _big ball of mud_ [30]. 
 
-
 There are various possible symptoms of complexity: explosion of the state space, tight coupling of modules, tangled dependencies, inconsistent naming and terminology, hacks aimed at solving performance problems, special-casing to work around issues elsewhere, and many more. Much has been said on this topic already [31, 32, 33]. 
 
 When complexity makes maintenance hard, budgets and schedules are often overrun. In complex software, there is also a greater risk of introducing bugs when making a change: when the system is harder for developers to understand and reason about, hidden assumptions, unintended consequences, and unexpected interactions are more easily overlooked. Conversely, reducing complexity greatly improves the maintainability of software, and thus simplicity should be a key goal for the systems we build. 
@@ -397,10 +361,7 @@ Throughout this book, we will keep our eyes open for good abstractions that allo
 
 ### Evolvability: Making Change Easy
 
-It’s extremely unlikely that your system’s requirements will remain unchanged forever. They are much more likely to be in constant flux: you learn new facts, previously unanticipated use cases emerge, business priorities change, users request new 
-
-
-features, new platforms replace old platforms, legal or regulatory requirements change, growth of the system forces architectural changes, etc. 
+It’s extremely unlikely that your system’s requirements will remain unchanged forever. They are much more likely to be in constant flux: you learn new facts, previously unanticipated use cases emerge, business priorities change, users request new features, new platforms replace old platforms, legal or regulatory requirements change, growth of the system forces architectural changes, etc. 
 
 In terms of organizational processes, _Agile_ working patterns provide a framework for adapting to change. The Agile community has also developed technical tools and patterns that are helpful when developing software in a frequently changing environment, such as test-driven development (TDD) and refactoring. 
 
@@ -440,7 +401,6 @@ Later in the book, in Part III, we will look at patterns for systems that consis
 
 [7] Laurie Voss: “AWS: The Good, the Bad and the Ugly,” _blog.awe.sm_ , December 18, 2012. 
 
-
 [8] Haryadi S. Gunawi, Mingzhe Hao, Tanakorn Leesatapornwongsa, et al.: “What Bugs Live in the Cloud?,” at _5th ACM Symposium on Cloud Computing_ (SoCC), November 2014. doi:10.1145/2670979.2670986 
 
 [9] Nelson Minar: “Leap Second Crashes Half the Internet,” _somebits.com_ , July 3, 2012. 
@@ -472,7 +432,6 @@ Later in the book, in Part III, we will look at patterns for systems that consis
 [22] Jake Brutlag: “Speed Matters for Google Web Search,” _googleresearch.blogspot.co.uk_ , June 22, 2009. 
 
 [23] Tyler Treat: “Everything You Know About Latency Is Wrong,” _bravenewgeek.com_ , December 12, 2015. 
-
 
 [24] Jeffrey Dean and Luiz André Barroso: “The Tail at Scale,” _Communications of the ACM_ , volume 56, number 2, pages 74–80, February 2013. doi: 10.1145/2408776.2408794 
 

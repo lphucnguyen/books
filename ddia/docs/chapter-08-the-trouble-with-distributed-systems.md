@@ -12,7 +12,6 @@ Working with distributed systems is fundamentally different from writing softwar
 
 i. With one exception: we will assume that faults are _non-Byzantine_ (see “Byzantine Faults” on page 304). 
 
-
 In the end, our task as engineers is to build systems that do their job (i.e., meet the guarantees that users are expecting), in spite of everything going wrong. In Chapter 9, we will look at some examples of algorithms that can provide such guarantees in a distributed system. But first, in this chapter, we must understand what challenges we are up against. 
 
 This chapter is a thoroughly pessimistic and depressing overview of things that may go wrong in a distributed system. We will look into problems with networks (“Unreliable Networks” on page 277); clocks and timing issues (“Unreliable Clocks” on page 287); and we’ll discuss to what degree they are avoidable. The consequences of all these issues are disorienting, so we’ll explore how to think about the state of a distributed system and how to reason about things that have happened (“Knowledge, Truth, and Lies” on page 300). 
@@ -26,7 +25,6 @@ There is no fundamental reason why software on a single computer should be flaky
 This is a deliberate choice in the design of computers: if an internal fault occurs, we prefer a computer to crash completely rather than returning a wrong result, because wrong results are difficult and confusing to deal with. Thus, computers hide the fuzzy physical reality on which they are implemented and present an idealized system model that operates with mathematical perfection. A CPU instruction always does the same thing; if you write some data to memory or disk, that data remains intact and doesn’t get randomly corrupted. This design goal of always-correct computation goes all the way back to the very first digital computer [3]. 
 
 When you are writing software that runs on several computers, connected by a network, the situation is fundamentally different. In distributed systems, we are no longer operating in an idealized system model—we have no choice but to confront the messy reality of the physical world. And in the physical world, a remarkably wide range of things can go wrong, as illustrated by this anecdote [4]: 
-
 
 In my limited experience I’ve dealt with long-lived network partitions in a single data center (DC), PDU [power distribution unit] failures, switch failures, accidental power cycles of whole racks, whole-DC backbone failures, whole-DC power failures, and a hypoglycemic driver smashing his Ford pickup truck into a DC’s HVAC [heating, ventilation, and air conditioning] system. And I’m not even an ops guy. 
 
@@ -50,7 +48,6 @@ With these philosophies come very different approaches to handling faults. In a 
 
 In this book we focus on systems for implementing internet services, which usually look very different from supercomputers: 
 
-
 - Many internet-related applications are _online_ , in the sense that they need to be able to serve users with low latency at any time. Making the service unavailable— for example, stopping the cluster for repair—is not acceptable. In contrast, offline (batch) jobs like weather simulations can be stopped and restarted with fairly low impact. 
 
 - Supercomputers are typically built from specialized hardware, where each node is quite reliable, and nodes communicate through shared memory and remote direct memory access (RDMA). On the other hand, nodes in cloud services are built from commodity machines, which can provide equivalent performance at lower cost due to economies of scale, but also have higher failure rates. 
@@ -66,7 +63,6 @@ In this book we focus on systems for implementing internet services, which usual
 If we want to make distributed systems work, we must accept the possibility of partial failure and build fault-tolerance mechanisms into the software. In other words, we need to build a reliable system from unreliable components. (As discussed in “Reliability” on page 6, there is no such thing as perfect reliability, so we’ll need to understand the limits of what we can realistically promise.) 
 
 Even in smaller systems consisting of only a few nodes, it’s important to think about partial failure. In a small system, it’s quite likely that most of the components are working correctly most of the time. However, sooner or later, some part of the system 
-
 
 _will_ become faulty, and the software will have to somehow handle it. The fault handling must be part of the software design, and you (as operator of the software) need to know what behavior to expect from the software in the case of a fault. 
 
@@ -86,10 +82,7 @@ Although the more reliable higher-level system is not perfect, it’s still usef
 
 ## Unreliable Networks
 
-As discussed in the introduction to Part II, the distributed systems we focus on in this book are _shared-nothing systems_ : i.e., a bunch of machines connected by a network. The network is the only way those machines can communicate—we assume that each 
-
-
-machine has its own memory and disk, and one machine cannot access another machine’s memory or disk (except by making requests to a service over the network). 
+As discussed in the introduction to Part II, the distributed systems we focus on in this book are _shared-nothing systems_ : i.e., a bunch of machines connected by a network. The network is the only way those machines can communicate—we assume that each machine has its own memory and disk, and one machine cannot access another machine’s memory or disk (except by making requests to a service over the network). 
 
 Shared-nothing is not the only way of building systems, but it has become the dominant approach for building internet services, for several reasons: it’s comparatively cheap because it requires no special hardware, it can make use of commoditized cloud computing services, and it can achieve high reliability through redundancy across multiple geographically distributed datacenters. 
 
@@ -107,12 +100,9 @@ The internet and most internal networks in datacenters (often Ethernet) are _asy
 
 6. The remote node may have processed your request, but the response has been delayed and will be delivered later (perhaps the network or your own machine is overloaded). 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0300-09.png)
 
-
 _Figure 8-1. If you send a request and don’t get a response, it’s not possible to distinguish whether (a) the request was lost, (b) the remote node is down, or (c) the response was lost._ 
-
 
 The sender can’t even tell whether the packet was delivered: the only option is for the recipient to send a response message, which may in turn be lost or delayed. These issues are indistinguishable in an asynchronous network: the only information you have is that you haven’t received a response yet. If you send a request to another node and don’t receive a response, it is _impossible_ to tell why. 
 
@@ -126,14 +116,11 @@ There are some systematic studies, and plenty of anecdotal evidence, showing tha
 
 Public cloud services such as EC2 are notorious for having frequent transient network glitches [14], and well-managed private datacenter networks can be stabler environments. Nevertheless, nobody is immune from network problems: for example, a problem during a software upgrade for a switch could trigger a network topology reconfiguration, during which network packets could be delayed for more than a minute [17]. Sharks might bite undersea cables and damage them [18]. Other surprising faults include a network interface that sometimes drops all inbound packets but sends outbound packets successfully [19]: just because a network link works in one direction doesn’t guarantee it’s also working in the opposite direction. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0301-06.png)
-
 
 **Network partitions**
 
 When one part of the network is cut off from the rest due to a network fault, that is sometimes called a _network partition_ or _netsplit_ . In this book we’ll generally stick with the more general term _network fault_ , to avoid confusion with partitions (shards) of a storage system, as discussed in Chapter 6. 
-
 
 Even if network faults are rare in your environment, the fact that faults _can_ occur means that your software needs to be able to handle them. Whenever any communication happens over a network, it may fail—there is no way around it. 
 
@@ -155,7 +142,6 @@ Unfortunately, the uncertainty about the network makes it difficult to tell whet
 
 - If a node process crashed (or was killed by an administrator) but the node’s operating system is still running, a script can notify other nodes about the crash so that another node can take over quickly without having to wait for a timeout to expire. For example, HBase does this [23]. 
 
-
 - If you have access to the management interface of the network switches in your datacenter, you can query them to detect link failures at a hardware level (e.g., if the remote machine is powered down). This option is ruled out if you’re connecting via the internet, or if you’re in a shared datacenter with no access to the switches themselves, or if you can’t reach the management interface due to a network problem. 
 
 - If a router is sure that the IP address you’re trying to connect to is unreachable, it may reply to you with an ICMP Destination Unreachable packet. However, the router doesn’t have a magic failure detection capability either—it is subject to the same limitations as other participants of the network. 
@@ -174,7 +160,6 @@ Prematurely declaring a node dead is problematic: if the node is actually alive 
 
 When a node is declared dead, its responsibilities need to be transferred to other nodes, which places additional load on other nodes and the network. If the system is already struggling with high load, declaring nodes dead prematurely can make the problem worse. In particular, it could happen that the node actually wasn’t dead but only slow to respond due to overload; transferring its load to other nodes can cause a cascading failure (in the extreme case, all nodes declare each other dead, and everything stops working). 
 
-
 Imagine a fictitious system with a network that guaranteed a maximum delay for packets—every packet is either delivered within some time _d_ , or it is lost, but delivery never takes longer than _d_ . Furthermore, assume that you can guarantee that a nonfailed node always handles a request within some time _r_ . In this case, you could guarantee that every successful request receives a response within time 2 _d_ + _r_ —and if you don’t receive a response within that time, you know that either the network or the remote node is not working. If this was true, 2 _d_ + _r_ would be a reasonable timeout to use. 
 
 Unfortunately, most systems we work with have neither of those guarantees: asynchronous networks have _unbounded delays_ (that is, they try to deliver packets as quickly as possible, but there is no upper limit on the time it may take for a packet to arrive), and most server implementations cannot guarantee that they can handle requests within some maximum time (see “Response time guarantees” on page 298). For failure detection, it’s not sufficient for the system to be fast most of the time: if your timeout is low, it only takes a transient spike in round-trip times to throw the system off-balance. 
@@ -189,14 +174,9 @@ When driving a car, travel times on road networks often vary most due to traffic
 
 - In virtualized environments, a running operating system is often paused for tens of milliseconds while another virtual machine uses a CPU core. During this time, the VM cannot consume any data from the network, so the incoming data is queued (buffered) by the virtual machine monitor [26], further increasing the variability of network delays. 
 
-- TCP performs _flow control_ (also known as _congestion avoidance_ or _backpressure_ ), in which a node limits its own rate of sending in order to avoid overloading a 
-
-
-network link or the receiving node [27]. This means additional queueing at the sender before the data even enters the network. 
-
+- TCP performs _flow control_ (also known as _congestion avoidance_ or _backpressure_ ), in which a node limits its own rate of sending in order to avoid overloading a network link or the receiving node [27]. This means additional queueing at the sender before the data even enters the network. 
 
 ![](../images/Designing_Data_Intensive_Applications-0305-01.png)
-
 
 _Figure 8-2. If several machines send network traffic to the same destination, its switch queue can fill up. Here, ports 1, 2, and 4 are all trying to send packets to port 3._ 
 
@@ -208,10 +188,7 @@ Some latency-sensitive applications, such as videoconferencing and Voice over IP
 
 UDP is a good choice in situations where delayed data is worthless. For example, in a VoIP phone call, there probably isn’t enough time to retransmit a lost packet before its data is due to be played over the loudspeakers. In this case, there’s no point in retransmitting the packet—the application must instead fill the missing packet’s time slot with silence (causing a brief interruption in the sound) and move on in the stream. The retry happens at the human layer instead. (“Could you repeat that please? The sound just cut out for a moment.”) 
 
-All of these factors contribute to the variability of network delays. Queueing delays have an especially wide range when a system is close to its maximum capacity: a sys‐ 
-
-
-tem with plenty of spare capacity can easily drain queues, whereas in a highly utilized system, long queues can build up very quickly. 
+All of these factors contribute to the variability of network delays. Queueing delays have an especially wide range when a system is close to its maximum capacity: a sys‐ tem with plenty of spare capacity can easily drain queues, whereas in a highly utilized system, long queues can build up very quickly. 
 
 In public clouds and multi-tenant datacenters, resources are shared among many customers: the network links and switches, and even each machine’s network interface and CPUs (when running on virtual machines), are shared. Batch workloads such as MapReduce (see Chapter 10) can easily saturate network links. As you have no control over or insight into other customers’ usage of the shared resources, network delays can be highly variable if someone near you (a _noisy neighbor_ ) is using a lot of resources [28, 29]. 
 
@@ -227,7 +204,6 @@ To answer this question, it’s interesting to compare datacenter networks to th
 
 When you make a call over the telephone network, it establishes a _circuit_ : a fixed, guaranteed amount of bandwidth is allocated for the call, along the entire route between the two callers. This circuit remains in place until the call ends [32]. For example, an ISDN network runs at a fixed rate of 4,000 frames per second. When a call is established, it is allocated 16 bits of space within each frame (in each direction). Thus, for the duration of the call, each side is guaranteed to be able to send exactly 16 bits of audio data every 250 microseconds [33, 34]. 
 
-
 This kind of network is _synchronous_ : even as data passes through several routers, it does not suffer from queueing, because the 16 bits of space for the call have already been reserved in the next hop of the network. And because there is no queueing, the maximum end-to-end latency of the network is fixed. We call this a _bounded delay_ . 
 
 **Can we not simply make network delays predictable?**
@@ -240,12 +216,9 @@ Why do datacenter networks and the internet use packet switching? The answer is 
 
 If you wanted to transfer a file over a circuit, you would have to guess a bandwidth allocation. If you guess too low, the transfer is unnecessarily slow, leaving network capacity unused. If you guess too high, the circuit cannot be set up (because the network cannot allow a circuit to be created if its bandwidth allocation cannot be guaranteed). Thus, using circuits for bursty data transfers wastes network capacity and makes transfers unnecessarily slow. By contrast, TCP dynamically adapts the rate of data transfer to the available network capacity. 
 
-There have been some attempts to build hybrid networks that support both circuit switching and packet switching, such as ATM.[iii] InfiniBand has some similarities [35]: it implements end-to-end flow control at the link layer, which reduces the need for 
-
-ii. Except perhaps for an occasional keepalive packet, if TCP keepalive is enabled. 
+There have been some attempts to build hybrid networks that support both circuit switching and packet switching, such as ATM.[iii] InfiniBand has some similarities [35]: it implements end-to-end flow control at the link layer, which reduces the need for ii. Except perhaps for an occasional keepalive packet, if TCP keepalive is enabled. 
 
 > iii. _Asynchronous Transfer Mode_ (ATM) was a competitor to Ethernet in the 1980s [32], but it didn’t gain much adoption outside of telephone network core switches. It has nothing to do with automatic teller machines (also known as cash machines), despite sharing an acronym. Perhaps, in some parallel universe, the internet is based on something like ATM—in that universe, internet video calls are probably a lot more reliable than they are in ours, because they don’t suffer from dropped and delayed packets. 
-
 
 queueing in the network, although it can still suffer from delays due to link congestion [36]. With careful use of _quality of service_ (QoS, prioritization and scheduling of packets) and _admission control_ (rate-limiting senders), it is possible to emulate circuit switching on packet networks, or provide statistically bounded delay [25, 32]. 
 
@@ -262,7 +235,6 @@ A similar situation arises with CPUs: if you share each CPU core dynamically bet
 Latency guarantees are achievable in certain environments, if resources are statically partitioned (e.g., dedicated hardware and exclusive bandwidth allocations). However, it comes at the cost of reduced utilization—in other words, it is more expensive. On the other hand, multi-tenancy with dynamic resource partitioning provides better utilization, so it is cheaper, but it has the downside of variable delays. 
 
 Variable delays in networks are not a law of nature, but simply the result of a cost/ benefit trade-off. 
-
 
 However, such quality of service is currently not enabled in multi-tenant datacenters and public clouds, or when communicating via the internet.[iv] Currently deployed technology does not allow us to make any guarantees about delays or reliability of the network: we have to assume that network congestion, queueing, and unbounded delays will happen. Consequently, there’s no “correct” value for timeouts—they need to be determined experimentally. 
 
@@ -294,7 +266,6 @@ Moreover, each machine on the network has its own clock, which is an actual hard
 
 > iv. Peering agreements between internet service providers and the establishment of routes through the Border Gateway Protocol (BGP), bear closer resemblance to circuit switching than IP itself. At this level, it is possible to buy dedicated bandwidth. However, internet routing operates at the level of networks, not individual connections between hosts, and at a much longer timescale. 
 
-
 slower than on other machines. It is possible to synchronize clocks to some degree: the most commonly used mechanism is the Network Time Protocol (NTP), which allows the computer clock to be adjusted according to the time reported by a group of servers [37]. The servers in turn get their time from a more accurate time source, such as a GPS receiver. 
 
 ### Monotonic Versus Time-of-Day Clocks
@@ -315,7 +286,6 @@ A monotonic clock is suitable for measuring a duration (time interval), such as 
 
 > v. Although the clock is called _real-time_ , it has nothing to do with real-time operating systems, as discussed in “Response time guarantees” on page 298. 
 
-
 You can check the value of the monotonic clock at one point in time, do something, and then check the clock again at a later time. The _difference_ between the two values tells you how much time elapsed between the two checks. However, the _absolute_ value of the clock is meaningless: it might be the number of nanoseconds since the computer was started, or something similarly arbitrary. In particular, it makes no sense to compare monotonic clock values from two different computers, because they don’t mean the same thing. 
 
 On a server with multiple CPU sockets, there may be a separate timer per CPU, which is not necessarily synchronized with other CPUs. Operating systems compensate for any discrepancy and try to present a monotonic view of the clock to application threads, even as they are scheduled across different CPUs. However, it is wise to take this guarantee of monotonicity with a pinch of salt [40]. 
@@ -332,7 +302,6 @@ Monotonic clocks don’t need synchronization, but time-of-day clocks need to be
 
 - If a computer’s clock differs too much from an NTP server, it may refuse to synchronize, or the local clock will be forcibly reset [37]. Any applications observing the time before and after this reset may see time go backward or suddenly jump forward. 
 
-
 - If a node is accidentally firewalled off from NTP servers, the misconfiguration may go unnoticed for some time. Anecdotal evidence suggests that this does happen in practice. 
 
 - NTP synchronization can only be as good as the network delay, so there is a limit to its accuracy when you’re on a congested network with variable packet delays. One experiment showed that a minimum error of 35 ms is achievable when synchronizing over the internet [42], though occasional spikes in network delay lead to errors of around a second. Depending on the configuration, large network delays can cause the NTP client to give up entirely. 
@@ -347,10 +316,7 @@ Monotonic clocks don’t need synchronization, but time-of-day clocks need to be
 
 It is possible to achieve very good clock accuracy if you care about it sufficiently to invest significant resources. For example, the MiFID II draft European regulation for financial institutions requires all high-frequency trading funds to synchronize their clocks to within 100 microseconds of UTC, in order to help debug market anomalies such as “flash crashes” and to help detect market manipulation [51]. 
 
-Such accuracy can be achieved using GPS receivers, the Precision Time Protocol (PTP) [52], and careful deployment and monitoring. However, it requires significant effort and expertise, and there are plenty of ways clock synchronization can go 
-
-
-wrong. If your NTP daemon is misconfigured, or a firewall is blocking NTP traffic, the clock error due to drift can quickly become large. 
+Such accuracy can be achieved using GPS receivers, the Precision Time Protocol (PTP) [52], and careful deployment and monitoring. However, it requires significant effort and expertise, and there are plenty of ways clock synchronization can go wrong. If your NTP daemon is misconfigured, or a firewall is blocking NTP traffic, the clock error due to drift can quickly become large. 
 
 ### Relying on Synchronized Clocks
 
@@ -368,9 +334,7 @@ Let’s consider one particular situation in which it is tempting, but dangerous
 
 Figure 8-3 illustrates a dangerous use of time-of-day clocks in a database with multileader replication (the example is similar to Figure 5-9). Client A writes _x_ = 1 on node 1; the write is replicated to node 3; client B increments _x_ on node 3 (we now have _x_ = 2); and finally, both writes are replicated to node 2. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0314-00.png)
-
 
 _Figure 8-3. The write by client B is causally later than the write by client A, but B’s write has an earlier timestamp._ 
 
@@ -382,10 +346,7 @@ This conflict resolution strategy is called _last write wins_ (LWW), and it is w
 
 - Database writes can mysteriously disappear: a node with a lagging clock is unable to overwrite values previously written by a node with a fast clock until the clock skew between the nodes has elapsed [54, 55]. This scenario can cause arbitrary amounts of data to be silently dropped without any error being reported to the application. 
 
-- LWW cannot distinguish between writes that occurred sequentially in quick succession (in Figure 8-3, client B’s increment definitely occurs _after_ client A’s write) and writes that were truly concurrent (neither writer was aware of the other). Additional causality tracking mechanisms, such as version vectors, are 
-
-
-needed in order to prevent violations of causality (see “Detecting Concurrent Writes” on page 184). 
+- LWW cannot distinguish between writes that occurred sequentially in quick succession (in Figure 8-3, client B’s increment definitely occurs _after_ client A’s write) and writes that were truly concurrent (neither writer was aware of the other). Additional causality tracking mechanisms, such as version vectors, are needed in order to prevent violations of causality (see “Detecting Concurrent Writes” on page 184). 
 
 - It is possible for two nodes to independently generate writes with the same timestamp, especially when the clock only has millisecond resolution. An additional tiebreaker value (which can simply be a large random number) is required to resolve such conflicts, but this approach can also lead to violations of causality [53]. 
 
@@ -399,10 +360,7 @@ So-called _logical clocks_ [56, 57], which are based on incrementing counters ra
 
 You may be able to read a machine’s time-of-day clock with microsecond or even nanosecond resolution. But even if you can get such a fine-grained measurement, that doesn’t mean the value is actually accurate to such precision. In fact, it most likely is not—as mentioned previously, the drift in an imprecise quartz clock can easily be several milliseconds, even if you synchronize with an NTP server on the local network every minute. With an NTP server on the public internet, the best possible accuracy is probably to the tens of milliseconds, and the error may easily spike to over 100 ms when there is network congestion [57]. 
 
-Thus, it doesn’t make sense to think of a clock reading as a point in time—it is more like a range of times, within a confidence interval: for example, a system may be 95% confident that the time now is between 10.3 and 10.5 seconds past the minute, but it 
-
-
-doesn’t know any more precisely than that [58]. If we only know the time +/– 100 ms, the microsecond digits in the timestamp are essentially meaningless. 
+Thus, it doesn’t make sense to think of a clock reading as a point in time—it is more like a range of times, within a confidence interval: for example, a system may be 95% confident that the time now is between 10.3 and 10.5 seconds past the minute, but it doesn’t know any more precisely than that [58]. If we only know the time +/– 100 ms, the microsecond digits in the timestamp are essentially meaningless. 
 
 The uncertainty bound can be calculated based on your time source. If you have a GPS receiver or atomic (caesium) clock directly attached to your computer, the expected error range is reported by the manufacturer. If you’re getting the time from a server, the uncertainty is based on the expected quartz drift since your last sync with the server, plus the NTP server’s uncertainty, plus the network round-trip time to the server (to a first approximation, and assuming you trust the server). 
 
@@ -416,10 +374,7 @@ In “Snapshot Isolation and Repeatable Read” on page 237 we discussed _snapsh
 
 The most common implementation of snapshot isolation requires a monotonically increasing transaction ID. If a write happened later than the snapshot (i.e., the write has a greater transaction ID than the snapshot), that write is invisible to the snapshot transaction. On a single-node database, a simple counter is sufficient for generating transaction IDs. 
 
-However, when a database is distributed across many machines, potentially in multiple datacenters, a global, monotonically increasing transaction ID (across all partitions) is difficult to generate, because it requires coordination. The transaction ID must reflect causality: if transaction B reads a value that was written by transaction A, then B must have a higher transaction ID than A—otherwise, the snapshot would not 
-
-
-be consistent. With lots of small, rapid transactions, creating transaction IDs in a distributed system becomes an untenable bottleneck.[vi] 
+However, when a database is distributed across many machines, potentially in multiple datacenters, a global, monotonically increasing transaction ID (across all partitions) is difficult to generate, because it requires coordination. The transaction ID must reflect causality: if transaction B reads a value that was written by transaction A, then B must have a higher transaction ID than A—otherwise, the snapshot would not be consistent. With lots of small, rapid transactions, creating transaction IDs in a distributed system becomes an untenable bottleneck.[vi] 
 
 Can we use the timestamps from synchronized time-of-day clocks as transaction IDs? If we could get the synchronization good enough, they would have the right properties: later transactions have a higher timestamp. The problem, of course, is the uncertainty about clock accuracy. 
 
@@ -436,7 +391,6 @@ Let’s consider another example of dangerous clock use in a distributed system.
 One option is for the leader to obtain a _lease_ from the other nodes, which is similar to a lock with a timeout [63]. Only one node can hold the lease at any one time—thus, when a node obtains a lease, it knows that it is the leader for some amount of time, until the lease expires. In order to remain leader, the node must periodically renew 
 
 > vi. There are distributed sequence number generators, such as Twitter’s Snowflake, that generate _approximately_ monotonically increasing unique IDs in a scalable way (e.g., by allocating blocks of the ID space to different nodes). However, they typically cannot guarantee an ordering that is consistent with causality, because the timescale at which blocks of IDs are assigned is longer than the timescale of database reads and writes. See also “Ordering Guarantees” on page 339. 
-
 
 the lease before it expires. If the node fails, it stops renewing the lease, so another node can take over when it expires. 
 
@@ -463,10 +417,7 @@ However, what if there is an unexpected pause in the execution of the program? F
 
 Is it crazy to assume that a thread might be paused for so long? Unfortunately not. There are various reasons why this could happen: 
 
-- Many programming language runtimes (such as the Java Virtual Machine) have a _garbage collector_ (GC) that occasionally needs to stop all running threads. These _“stop-the-world” GC pauses_ have sometimes been known to last for several minutes [64]! Even so-called “concurrent” garbage collectors like the HotSpot JVM’s CMS cannot fully run in parallel with the application code—even they need to stop the world from time to time [65]. Although the pauses can often be 
-
-
-reduced by changing allocation patterns or tuning GC settings [66], we must assume the worst if we want to offer robust guarantees. 
+- Many programming language runtimes (such as the Java Virtual Machine) have a _garbage collector_ (GC) that occasionally needs to stop all running threads. These _“stop-the-world” GC pauses_ have sometimes been known to last for several minutes [64]! Even so-called “concurrent” garbage collectors like the HotSpot JVM’s CMS cannot fully run in parallel with the application code—even they need to stop the world from time to time [65]. Although the pauses can often be reduced by changing allocation patterns or tuning GC settings [66], we must assume the worst if we want to offer robust guarantees. 
 
 - In virtualized environments, a virtual machine can be _suspended_ (pausing the execution of all processes and saving the contents of memory to disk) and _resumed_ (restoring the contents of memory and continuing execution). This pause can occur at any time in a process’s execution and can last for an arbitrary length of time. This feature is sometimes used for _live migration_ of virtual machines from one host to another without a reboot, in which case the length of the pause depends on the rate at which processes are writing to memory [67]. 
 
@@ -480,7 +431,6 @@ reduced by changing allocation patterns or tuning GC settings [66], we must assu
 
 - A Unix process can be paused by sending it the `SIGSTOP` signal, for example by pressing Ctrl-Z in a shell. This signal immediately stops the process from getting any more CPU cycles until it is resumed with `SIGCONT` , at which point it continues running where it left off. Even if your environment does not normally use `SIGSTOP` , it might be sent accidentally by an operations engineer. 
 
-
 All of these occurrences can _preempt_ the running thread at any point and resume it at some later time, without the thread even noticing. The problem is similar to making multi-threaded code on a single machine thread-safe: you can’t assume anything about timing, because arbitrary context switches and parallelism may occur. 
 
 When writing multi-threaded code on a single machine, we have fairly good tools for making it thread-safe: mutexes, semaphores, atomic counters, lock-free data structures, blocking queues, and so on. Unfortunately, these tools don’t directly translate to distributed systems, because a distributed system has no shared memory—only messages sent over an unreliable network. 
@@ -493,9 +443,7 @@ In many programming languages and operating systems, threads and processes may p
 
 Some software runs in environments where a failure to respond within a specified time can cause serious damage: computers that control aircraft, rockets, robots, cars, and other physical objects must respond quickly and predictably to their sensor inputs. In these systems, there is a specified _deadline_ by which the software must respond; if it doesn’t meet the deadline, that may cause a failure of the entire system. These are so-called _hard real-time_ systems. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0320-06.png)
-
 
 **Is real-time really real?**
 
@@ -503,10 +451,7 @@ In embedded systems, _real-time_ means that a system is carefully designed and t
 
 For example, if your car’s onboard sensors detect that you are currently experiencing a crash, you wouldn’t want the release of the airbag to be delayed due to an inopportune GC pause in the airbag release system. 
 
-Providing real-time guarantees in a system requires support from all levels of the software stack: a _real-time operating system_ (RTOS) that allows processes to be scheduled with a guaranteed allocation of CPU time in specified intervals is needed; library 
-
-
-functions must document their worst-case execution times; dynamic memory allocation may be restricted or disallowed entirely (real-time garbage collectors exist, but the application must still ensure that it doesn’t give the GC too much work to do); and an enormous amount of testing and measurement must be done to ensure that guarantees are being met. 
+Providing real-time guarantees in a system requires support from all levels of the software stack: a _real-time operating system_ (RTOS) that allows processes to be scheduled with a guaranteed allocation of CPU time in specified intervals is needed; library functions must document their worst-case execution times; dynamic memory allocation may be restricted or disallowed entirely (real-time garbage collectors exist, but the application must still ensure that it doesn’t give the GC too much work to do); and an enormous amount of testing and measurement must be done to ensure that guarantees are being met. 
 
 All of this requires a large amount of additional work and severely restricts the range of programming languages, libraries, and tools that can be used (since most languages and tools do not provide real-time guarantees). For these reasons, developing real-time systems is very expensive, and they are most commonly used in safetycritical embedded devices. Moreover, “real-time” is not the same as “highperformance”—in fact, real-time systems may have lower throughput, since they have to prioritize timely responses above all else (see also “Latency and Resource Utilization” on page 286). 
 
@@ -521,7 +466,6 @@ An emerging idea is to treat GC pauses like brief planned outages of a node, and
 A variant of this idea is to use the garbage collector only for short-lived objects (which are fast to collect) and to restart processes periodically, before they accumulate enough long-lived objects to require a full GC of long-lived objects [65, 73]. One node can be restarted at a time, and traffic can be shifted away from the node before the planned restart, like in a rolling upgrade (see Chapter 4). 
 
 These measures cannot fully prevent garbage collection pauses, but they can usefully reduce their impact on the application. 
-
 
 **Knowledge, truth and lies**
 
@@ -538,7 +482,6 @@ However, although it is possible to make software well behaved in an unreliable 
 ### The Truth Is Defined by the Majority
 
 Imagine a network with an asymmetric fault: a node is able to receive all messages sent to it, but any outgoing messages from that node are dropped or delayed [19]. Even though that node is working perfectly well, and is receiving requests from other nodes, the other nodes cannot hear its responses. After some timeout, the other nodes declare it dead, because they haven’t heard from the node. The situation unfolds like a nightmare: the semi-disconnected node is dragged to the graveyard, kicking and screaming “I’m not dead!”—but since nobody can hear its screaming, the funeral procession continues with stoic determination. 
-
 
 In a slightly less nightmarish scenario, the semi-disconnected node may notice that the messages it is sending are not being acknowledged by other nodes, and so realize that there must be a fault in the network. Nevertheless, the node is wrongly declared dead by the other nodes, and the semi-disconnected node cannot do anything about it. 
 
@@ -558,7 +501,6 @@ Frequently, a system requires there to be only one of some thing. For example:
 
 - Only one transaction or client is allowed to hold the lock for a particular resource or object, to prevent concurrently writing to it and corrupting it. 
 
-
 - Only one user is allowed to register a particular username, because a username must uniquely identify a user. 
 
 Implementing this in a distributed system requires care: even if a node believes that it is “the chosen one” (the leader of the partition, the holder of the lock, the request handler of the user who successfully grabbed the username), that doesn’t necessarily mean a quorum of nodes agrees! A node may have formerly been the leader, but if the other nodes declared it dead in the meantime (e.g., due to a network interruption or GC pause), it may have been demoted and another leader may have already been elected. 
@@ -567,22 +509,17 @@ If a node continues acting as the chosen one, even though the majority of nodes 
 
 For example, Figure 8-4 shows a data corruption bug due to an incorrect implementation of locking. (The bug is not theoretical: HBase used to have this problem [74, 75].) Say you want to ensure that a file in a storage service can only be accessed by one client at a time, because if multiple clients tried to write to it, the file would become corrupted. You try to implement this by requiring a client to obtain a lease from a lock service before accessing the file. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0324-04.png)
-
 
 _Figure 8-4. Incorrect implementation of a distributed lock: client 1 believes that it still has a valid lease, even though it has expired, and thus corrupts a file in storage._ 
 
 The problem is an example of what we discussed in “Process Pauses” on page 295: if the client holding the lease is paused for too long, its lease expires. Another client can obtain a lease for the same file, and start writing to the file. When the paused client comes back, it believes (incorrectly) that it still has a valid lease and proceeds to also write to the file. As a result, the clients’ writes clash and corrupt the file. 
 
-
 **Fencing tokens**
 
 When using a lock or lease to protect access to some resource, such as the file storage in Figure 8-4, we need to ensure that a node that is under a false belief of being “the chosen one” cannot disrupt the rest of the system. A fairly simple technique that achieves this goal is called _fencing_ , and is illustrated in Figure 8-5. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0325-02.png)
-
 
 _Figure 8-5. Making access to storage safe by allowing writes only in the order of increasing fencing tokens._ 
 
@@ -593,7 +530,6 @@ In Figure 8-5, client 1 acquires the lease with a token of 33, but then it goes 
 If ZooKeeper is used as lock service, the transaction ID `zxid` or the node version `cversion` can be used as fencing token. Since they are guaranteed to be monotonically increasing, they have the required properties [74]. 
 
 Note that this mechanism requires the resource itself to take an active role in checking tokens by rejecting any writes with an older token than one that has already been processed—it is not sufficient to rely on clients checking their lock status themselves. For resources that do not explicitly support fencing tokens, you might still be able work around the limitation (for example, in the case of a file storage service you could include the fencing token in the filename). However, some kind of check is necessary to avoid processing requests outside of the lock’s protection. 
-
 
 Checking a token on the server side may seem like a downside, but it is arguably a good thing: it is unwise for a service to assume that its clients will always be well behaved, because the clients are often run by people whose priorities are very different from the priorities of the people running the service [76]. Thus, it is a good idea for any service to protect itself from accidentally abusive clients. 
 
@@ -613,7 +549,6 @@ In the Byzantine version of the problem, there are _n_ generals who need to agre
 
 Byzantium was an ancient Greek city that later became Constantinople, in the place which is now Istanbul in Turkey. There isn’t any historic evidence that the generals of Byzantium were any more prone to intrigue and conspiracy than those elsewhere. Rather, the name is derived from _Byzantine_ in the sense of _excessively complicated, bureaucratic, devious_ , which was used in politics long before computers [79]. Lamport wanted to choose a nationality that would not offend any readers, and he was advised that calling it _The Albanian Generals Problem_ was not such a good idea [80]. 
 
-
 A system is _Byzantine fault-tolerant_ if it continues to operate correctly even if some of the nodes are malfunctioning and not obeying the protocol, or if malicious attackers are interfering with the network. This concern is relevant in certain specific circumstances. For example: 
 
 - In aerospace environments, the data in a computer’s memory or CPU register could become corrupted by radiation, leading it to respond to other nodes in arbitrarily unpredictable ways. Since a system failure would be very expensive (e.g., an aircraft crashing and killing everyone on board, or a rocket colliding with the International Space Station), flight control systems must tolerate Byzantine faults [81, 82]. 
@@ -625,7 +560,6 @@ However, in the kinds of systems we discuss in this book, we can usually safely 
 Web applications do need to expect arbitrary and malicious behavior of clients that are under end-user control, such as web browsers. This is why input validation, sanitization, and output escaping are so important: to prevent SQL injection and crosssite scripting, for example. However, we typically don’t use Byzantine fault-tolerant protocols here, but simply make the server the authority on deciding what client behavior is and isn’t allowed. In peer-to-peer networks, where there is no such central authority, Byzantine fault tolerance is more relevant. 
 
 A bug in the software could be regarded as a Byzantine fault, but if you deploy the same software to all nodes, then a Byzantine fault-tolerant algorithm cannot save you. Most Byzantine fault-tolerant algorithms require a supermajority of more than twothirds of the nodes to be functioning correctly (i.e., if you have four nodes, at most one may malfunction). To use this approach against bugs, you would have to have four independent implementations of the same software and hope that a bug only appears in one of the four implementations. 
-
 
 Similarly, it would be appealing if a protocol could protect us from vulnerabilities, security compromises, and malicious attacks. Unfortunately, this is not realistic either: in most systems, if an attacker can compromise one node, they can probably compromise all of them, because they are probably running the same software. Thus, traditional mechanisms (authentication, access control, encryption, firewalls, and so on) continue to be the main protection against attackers. 
 
@@ -643,10 +577,7 @@ Although we assume that nodes are generally honest, it can be worth adding mecha
 
 Many algorithms have been designed to solve distributed systems problems—for example, we will examine solutions for the consensus problem in Chapter 9. In order to be useful, these algorithms need to tolerate the various faults of distributed systems that we discussed in this chapter. 
 
-Algorithms need to be written in a way that does not depend too heavily on the details of the hardware and software configuration on which they are run. This in 
-
-
-turn requires that we somehow formalize the kinds of faults that we expect to happen in a system. We do this by defining a _system model_ , which is an abstraction that describes what things an algorithm may assume. 
+Algorithms need to be written in a way that does not depend too heavily on the details of the hardware and software configuration on which they are run. This in turn requires that we somehow formalize the kinds of faults that we expect to happen in a system. We do this by defining a _system model_ , which is an abstraction that describes what things an algorithm may assume. 
 
 With regard to timing assumptions, three system models are in common use: 
 
@@ -675,7 +606,6 @@ We assume that nodes may crash at any moment, and perhaps start responding again
 **Byzantine (arbitrary) faults**
 
 Nodes may do absolutely anything, including trying to trick and deceive other nodes, as described in the last section. 
-
 
 For modeling real systems, the partially synchronous model with crash-recovery faults is generally the most useful model. But how do distributed algorithms cope with that model? 
 
@@ -707,7 +637,6 @@ What distinguishes the two kinds of properties? A giveaway is that liveness prop
 
 Safety is often informally defined as _nothing bad happens_ , and liveness as _something good eventually happens_ . However, it’s best to not read too much into those informal definitions, because the meaning of good and bad is subjective. The actual definitions of safety and liveness are precise and mathematical [90]: 
 
-
 - If a safety property is violated, we can point at a particular point in time at which it was broken (for example, if the uniqueness property was violated, we can identify the particular operation in which a duplicate fencing token was returned). After a safety property has been violated, the violation cannot be undone—the damage is already done. 
 
 - A liveness property works the other way round: it may not hold at some point in time (for example, a node may have sent a request but not yet received a response), but there is always hope that it may be satisfied in the future (namely by receiving a response). 
@@ -723,7 +652,6 @@ Safety and liveness properties and system models are very useful for reasoning a
 For example, algorithms in the crash-recovery model generally assume that data in stable storage survives crashes. However, what happens if the data on disk is corrupted, or the data is wiped out due to hardware error or misconfiguration [91]? What happens if a server has a firmware bug and fails to recognize its hard drives on reboot, even though the drives are correctly attached to the server [92]? 
 
 Quorum algorithms (see “Quorums for reading and writing” on page 179) rely on a node remembering the data that it claims to have stored. If a node may suffer from amnesia and forget previously stored data, that breaks the quorum condition, and thus breaks the correctness of the algorithm. Perhaps a new system model is needed, in which we assume that stable storage mostly survives crashes, but may sometimes be lost. But that model then becomes harder to reason about. 
-
 
 The theoretical description of an algorithm can declare that certain things are simply assumed not to happen—and in non-Byzantine systems, we do have to make some assumptions about faults that can and cannot happen. However, a real implementation may still have to include code to handle the case where something happens that was assumed to be impossible, even if that handling boils down to `printf("Sucks to be you")` and `exit(666)` —i.e., letting a human operator clean up the mess [93]. (This is arguably the difference between computer science and software engineering.) 
 
@@ -753,10 +681,7 @@ However, as discussed in the introduction to Part II, scalability is not the onl
 
 In this chapter we also went on some tangents to explore whether the unreliability of networks, clocks, and processes is an inevitable law of nature. We saw that it isn’t: it is possible to give hard real-time response guarantees and bounded delays in networks, but doing so is very expensive and results in lower utilization of hardware resources. Most non-safety-critical systems choose cheap and unreliable over expensive and reliable. 
 
-We also touched on supercomputers, which assume reliable components and thus have to be stopped and restarted entirely when a component does fail. By contrast, distributed systems can run forever without being interrupted at the service level, because all faults and maintenance can be handled at the node level—at least in 
-
-
-theory. (In practice, if a bad configuration change is rolled out to all nodes, that will still bring a distributed system to its knees.) 
+We also touched on supercomputers, which assume reliable components and thus have to be stopped and restarted entirely when a component does fail. By contrast, distributed systems can run forever without being interrupted at the service level, because all faults and maintenance can be handled at the node level—at least in theory. (In practice, if a bad configuration change is rolled out to all nodes, that will still bring a distributed system to its knees.) 
 
 This chapter has been all about problems, and has given us a bleak outlook. In the next chapter we will move on to solutions, and discuss some algorithms that have been designed to cope with all the problems in distributed systems. 
 
@@ -781,7 +706,6 @@ This chapter has been all about problems, and has given us a bleak outlook. In t
 [9] Arjun Singh, Joon Ong, Amit Agarwal, et al.: “Jupiter Rising: A Decade of Clos Topologies and Centralized Control in Google’s Datacenter Network,” at _Annual Conference of the ACM Special Interest Group on Data Communication_ (SIGCOMM), August 2015. doi:10.1145/2785956.2787508 
 
 [10] Glenn K. Lockwood: “Hadoop’s Uncomfortable Fit in HPC,” _glennklockwood.blogspot.co.uk_ , May 16, 2014. 
-
 
 [11] John von Neumann: “Probabilistic Logics and the Synthesis of Reliable Organisms from Unreliable Components,” in _Automata Studies (AM-34)_ , edited by Claude E. Shannon and John McCarthy, Princeton University Press, 1956. ISBN: 978-0-691-07916-5 
 
@@ -813,7 +737,6 @@ This chapter has been all about problems, and has given us a bleak outlook. In t
 
 [25] Matthew P. Grosvenor, Malte Schwarzkopf, Ionel Gog, et al.: “Queues Don’t Matter When You Can JUMP Them!,” at _12th USENIX Symposium on Networked Systems Design and Implementation_ (NSDI), May 2015. 
 
-
 [26] Guohui Wang and T. S. Eugene Ng: “The Impact of Virtualization on Network Performance of Amazon EC2 Data Center,” at _29th IEEE International Conference on Computer Communications_ (INFOCOM), March 2010. doi:10.1109/INFCOM. 2010.5461931 
 
 [27] Van Jacobson: “Congestion Avoidance and Control,” at _ACM Symposium on Communications Architectures and Protocols_ (SIGCOMM), August 1988. doi: 10.1145/52324.52356 
@@ -843,7 +766,6 @@ This chapter has been all about problems, and has given us a bleak outlook. In t
 [39] David Holmes: “Inside the Hotspot VM: Clocks, Timers and Scheduling Events – Part I – Windows,” _blogs.oracle.com_ , October 2, 2006. 
 
 [40] Steve Loughran: “Time on Multi-Core, Multi-Socket Servers,” _steveloughran.blogspot.co.uk_ , September 17, 2015. 
-
 
 [41] James C. Corbett, Jeffrey Dean, Michael Epstein, et al.: “Spanner: Google’s Globally-Distributed Database,” at _10th USENIX Symposium on Operating System Design and Implementation_ (OSDI), October 2012. 
 
@@ -875,7 +797,6 @@ This chapter has been all about problems, and has given us a bleak outlook. In t
 
 [55] Kyle Kingsbury: “The Trouble with Timestamps,” _aphyr.com_ , October 12, 2013. 
 
-
 [56] Leslie Lamport: “Time, Clocks, and the Ordering of Events in a Distributed System,” _Communications of the ACM_ , volume 21, number 7, pages 558–565, July 1978. doi:10.1145/359545.359563 
 
 [57] Sandeep Kulkarni, Murat Demirbas, Deepak Madeppa, et al.: “Logical Physical Clocks and Consistent Snapshots in Globally Distributed Databases,” State University of New York at Buffalo, Computer Science and Engineering Technical Report 2014-04, May 2014. 
@@ -903,7 +824,6 @@ This chapter has been all about problems, and has given us a bleak outlook. In t
 [68] Mike Shaver: “fsyncers and Curveballs,” _shaver.off.net_ , May 25, 2008. 
 
 [69] Zhenyun Zhuang and Cuong Tran: “Eliminating Large JVM GC Pauses Caused by Background IO Traffic,” _engineering.linkedin.com_ , February 10, 2016. 
-
 
 [70] David Terei and Amit Levy: “Blade: A Data Center Garbage Collector,” arXiv: 1504.02578, April 13, 2015. 
 
@@ -937,7 +857,6 @@ This chapter has been all about problems, and has given us a bleak outlook. In t
 
 [85] Evan Gilman: “The Discovery of Apache ZooKeeper’s Poison Packet,” _pagerduty.com_ , May 7, 2015. 
 
-
 [86] Jonathan Stone and Craig Partridge: “When the CRC and TCP Checksum Disagree,” at _ACM Conference on Applications, Technologies, Architectures, and Protocols for Computer Communication_ (SIGCOMM), August 2000. doi: 10.1145/347059.347561 
 
 [87] Evan Jones: “How Both TCP and Ethernet Checksums Fail,” _evanjones.ca_ , October 5, 2015. 
@@ -957,5 +876,4 @@ This chapter has been all about problems, and has given us a bleak outlook. In t
 [94] Thanh Do, Mingzhe Hao, Tanakorn Leesatapornwongsa, et al.: “Limplock: Understanding the Impact of Limpware on Scale-out Cloud Systems,” at _4th ACM Symposium on Cloud Computing_ (SoCC), October 2013. doi: 10.1145/2523616.2523627 
 
 [95] Frank McSherry, Michael Isard, and Derek G. Murray: “Scalability! But at What COST?,” at _15th USENIX Workshop on Hot Topics in Operating Systems_ (HotOS), May 2015. 
-
 

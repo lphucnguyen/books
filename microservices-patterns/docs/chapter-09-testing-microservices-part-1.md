@@ -14,10 +14,7 @@ FTGO, like many organizations, had adopted a traditional approach to testing. _T
 
 - _Manual testing is extremely inefficient_ —You should never ask a human to do what a machine can do better. Compared to machines, humans are slow and can’t work 24/7. You won’t be able to deliver software rapidly and safely if you rely on manual testing. It’s essential that you write automated tests. 
 
-- _Testing is done far too late in the delivery process_ —There certainly is a role for tests that critique an application after it’s been written, but experience has shown that those tests are insufficient. A much better approach is for developers to 
-
-
-write automated tests as part of development. It improves their productivity because, for example, they’ll have tests that provide immediate feedback while editing code. 
+- _Testing is done far too late in the delivery process_ —There certainly is a role for tests that critique an application after it’s been written, but experience has shown that those tests are insufficient. A much better approach is for developers to write automated tests as part of development. It improves their productivity because, for example, they’ll have tests that provide immediate feedback while editing code. 
 
 In this regard, FTGO is a fairly typical organization. The Sauce Labs Testing Trends in 2018 report paints a fairly gloomy picture of the state of test automation (https:// saucelabs.com/resources/white-papers/testing-trends-for-2018). It describes how only 26% of organizations are mostly automated, and a minuscule 3% are fully automated! 
 
@@ -34,7 +31,6 @@ Let’s start by taking a look at testing strategies for microservices.
 **Why an introduction to testing?**
 
 You may be wondering why this chapter includes an introduction to basic testing concepts. If you’re already familiar with concepts such as the test pyramid and the different types of tests, feel free to speed-read this chapter and move onto the next one, which focuses on microservices-specific testing topics. But based on my experiences consulting for and training clients all over the world, a fundamental weakness of many software development organizations is the lack of automated testing. That’s because if you want to deliver software quickly and reliably, it’s _absolutely essential_ to do automated testing. It’s the only way to have a short _lead time_ , which is the time it takes to get committed code into production. Perhaps even more importantly, automated testing is essential because it forces you to develop a testable application. It’s typically very difficult to introduce automating testing into an already large, complex application. In other words, the fast track to monolithic hell is to not write automated tests. 
-
 
 ## 9.1 Testing strategies for microservice architectures
 
@@ -57,28 +53,19 @@ In other words, the purpose of a test is, as figure 9.1 shows, to verify the beh
 
 Let’s first look at the concept of an automated test. Then I discuss the different kinds of tests that you’ll need to write. After that, I discuss the test pyramid, which describes the relative proportions of the different types of tests that you should write. 
 
-
-_**Testing strategies for microservice architectures**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0325-02.png)
-
 
 **----- Start of picture text -----**<br>
 Test suite<br>Test Verifies behavior of System Under<br>Test (SUT)<br>Figure 9.1 The goal of a test is to<br>verify the behavior of the system<br>under test. An SUT might be as<br>small as a class or as large as an<br>entire application.<br>**----- End of picture text -----**<br>
-
 
 **WRITING AUTOMATED TESTS**
 
 Automated tests are usually written using a testing framework. JUnit, for example, is a popular Java testing framework. Figure 9.2 shows the structure of an automated test. Each test is implemented by a test method, which belongs to a test class. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0325-05.png)
-
 
 **----- Start of picture text -----**<br>
 Test class<br>Test method Fixture<br>Setup<br>Execute<br>Executes<br>Test runne r Test method SUT<br>Verify<br>Teardown<br>Test method<br>**----- End of picture text -----**<br>
-
 
 Figure 9.2 Each automated test is implemented by a test method, which belongs to a test class. A test consists of four phases: _setup_ , which initializes the test fixture, which is everything required to run the test; _execute_ , which invokes the SUT; _verify_ , which verifies the outcome of the test; and _teardown_ , which cleans up the test fixture. 
 
@@ -90,7 +77,6 @@ An automated test typically consists of four phases (http://xunitpatterns.com/ F
 
 - 3 _Verify_ —Make assertions about the invocation’s outcome and the state of the SUT. For example, verify the method’s return value and the new state of the class under test. 
 
-
 - 4 _Teardown_ —Clean up the test fixture, if necessary. Many tests omit this phase, but some types of database test will, for example, roll back a transaction initiated by the setup phase. 
 
 In order to reduce code duplication and simplify tests, a test class might have setup methods that are run before a test method, and teardown methods that are run afterwards. A test _suite_ is a set of test classes. The tests are executed by a _test runner_ . 
@@ -101,13 +87,10 @@ An SUT often has dependencies. The trouble with dependencies is that they can co
 
 The solution, as figure 9.3 shows, is to replace the SUT’s dependencies with test doubles. A _test double_ is an object that simulates the behavior of the dependency. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0326-07.png)
-
 
 **----- Start of picture text -----**<br>
 Slow, complex Tests System Under<br>Dependency<br>test Test (SUT)<br>Replaced with<br>Faster, simpler Tests System Under<br>Test double<br>test Test (SUT)<br>**----- End of picture text -----**<br>
-
 
 Figure 9.3 Replacing a dependency with a test double enables the SUT to be tested in isolation. The test is simpler and faster. 
 
@@ -116,9 +99,6 @@ There are two types of test doubles: stubs and mocks. The terms _stubs_ and _moc
 Later on in this chapter, you’ll see examples of test doubles in action. For example, section 9.2.5 shows how to test the OrderController class in isolation by using a test double for the OrderService class. In that example, the OrderService test double is implemented using Mockito, a popular mock object framework for Java. Chapter 10 shows how to test Order Service using test doubles for the other services that it invokes. Those test doubles respond to command messages sent by Order Service. 
 
 Let’s now look at the different types of tests. 
-
-
-_**Testing strategies for microservice architectures**_ 
 
 **THE DIFFERENT TYPES OF TESTS**
 
@@ -148,13 +128,10 @@ A good way to categorize tests is Brian Marick’s _test quadrant_ (www.exampler
 
 - _Whether the goal of the test is to support programming or critique the application_ —Developers use tests that support programming as part of their daily work. Tests that critique the application aim to identify areas that need improvement. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0328-02.png)
-
 
 **----- Start of picture text -----**<br>
 Business facing<br>Q2 AUTOMATED Q3 MANUAL<br>Exploratory<br>Functional/<br>testing, usability<br>acceptance tests<br>testing<br>Q1 AUTOMATED Q4 MANUAL/<br>AUTOMATED<br>Non-functional<br>Unit,<br>acceptance tests:<br>integration,<br>performance<br>component<br>and more<br>Technology facing<br>Critique project<br>Support programming<br>**----- End of picture text -----**<br>
-
 
 Figure 9.4 The test quadrant categorizes tests along two dimensions. The first dimension is whether a test is business facing or technology facing. The second is whether the purpose of the test is to support programming or critique the application. 
 
@@ -180,16 +157,10 @@ The test pyramid, shown in figure 9.5, is a good guide (https://martinfowler.com
 
 The key idea of the test pyramid is that as we move up the pyramid we should write fewer and fewer tests. We should write lots of unit tests and very few end-to-end tests. 
 
-
-_**Testing strategies for microservice architectures**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0329-02.png)
-
 
 **----- Start of picture text -----**<br>
 Slow, brittle, costly<br>Acceptance tests for End-to-end<br>an application<br>Acceptance tests<br>Component<br>for a service<br>Verify that a service<br>communicates with Integration<br>its dependencies<br>Test the business logic Unit Fast, reliable, cheap<br>**----- End of picture text -----**<br>
-
 
 Figure 9.5 The test pyramid describes the relative proportions of each type of test that you need to write. As you move up the pyramid, you should write fewer and fewer tests. 
 
@@ -205,16 +176,12 @@ In contrast, interprocess communication is central to microservice architecture.
 
 As described in chapter 3, services communicate with each other using a variety of interaction styles and IPC mechanisms. Some services use request/response-style interaction that’s implemented using a synchronous protocol, such as REST or gRPC. 
 
-
 Other services interact through request/asynchronous reply or publish/subscribe using asynchronous messaging. For instance, figure 9.6 shows how some of the services in the FTGO application communicate. Each arrow points from a consumer service to a producer service. 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0330-03.png)
 
-
 **----- Start of picture text -----**<br>
 Key<br>REST client REST service<br>Subscriber E Domain event<br>publisher Invokes services<br>(Command message) C Replier using HTTP<br>requestor<br>API<br>gateway<br>Restaurant Delivery<br>Service Service<br>E<br>Consumer E Order History<br>Service Service<br>C E Subscribes to<br>order* events<br>E<br>C<br>Order Kitchen<br>C<br>Service Service<br>Order Service saga<br>sends commands Accounting<br>to various services. Service<br>**----- End of picture text -----**<br>
-
 
 Figure 9.6 Some of the interservice communication in the FTGO application. Each arrow points from a consumer service to a producer service. 
 
@@ -225,10 +192,6 @@ The arrow points in the direction of the dependency, from the consumer of the AP
 - _Domain event consumer_  _publisher_ —Order History Service consumes events published by Order Service. 
 
 - _Command message requestor_  _replier_ —Order Service sends command messages to various services and consumes the replies. 
-
-
-_**Testing strategies for microservice architectures**_ 
-
 
 Each interaction between a pair of services represents an agreement or contract between the two services. Order History Service and Order Service must, for example, agree on the event message structure and the channel that they’re published to. Similarly, the API gateway and the services must agree on the REST API endpoints. And Order Service and each service that it invokes using asynchronous request/ response must agree on the command channel and the format of the command and reply messages. 
 
@@ -252,19 +215,12 @@ A consumer contract test focuses on verifying that the “shape” of a provider
 
 It’s important to remember that contract tests don’t thoroughly test the provider’s business logic. That’s the job of unit tests. Later on, you’ll see that consumer contract tests for a REST API are in fact mock controller tests. 
 
-
-_**Testing microservices: Part 1**_ 
-
-
 The team that develops the consumer writes a contract test suite and adds it (for example, via a pull request) to the provider’s test suite. The developers of other services that invoke Order Service also contribute a test suite, as shown in figure 9.7. Each test suite will test those aspects of Order Service’s API that are relevant to each consumer. The test suite for Order History Service, for example, verifies that Order Service publishes the expected events. 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0332-04.png)
 
-
 **----- Start of picture text -----**<br>
 API gateway team Order History Service team ... Service team<br>Writes Writes Writes<br>API gateway - Order History ... Service -<br>Order Service Service - Order Order Service<br>contract test Service contract contract test<br>suite test suite suite<br>Order Service deployment pipeline<br>Tests Tests Tests<br>Order<br>Service<br>**----- End of picture text -----**<br>
-
 
 Figure 9.7 Each team that develops a service that consumes **Order Service** ’s API contributes a contract test suite. The test suite verifies that the API matches the consumer’s expectations. This test suite, along with those contributed by other teams, is run by **Order Service** ’s deployment pipeline. 
 
@@ -275,10 +231,6 @@ These test suites are executed by the deployment pipeline for Order Service. If 
 Verify that a service meets the expectations of its clients See http://microservices.io/patterns/testing/service-integration-contract-test.html. 
 
 Consumer-driven contract tests typically use testing by example. The interaction between a consumer and provider is defined by a set of examples, known as contracts. Each _contract_ consists of example messages that are exchanged during one interaction. 
-
-
-_**Testing strategies for microservice architectures**_ 
-
 
 For instance, a contract for a REST API consists of an example HTTP request and response. On the surface, it may seem better to define the interaction using schemas written using, for example, OpenAPI or JSON schema. But it turns out schemas aren’t that useful when writing tests. A test can validate the response using the schema but it still needs to invoke the provider with an example request. 
 
@@ -298,13 +250,10 @@ Say, for example, you’re working on API Gateway and want to write a consumer c
 
 - 2 The Order Service team tests Order Service using consumer contract tests, which Spring Cloud Contract code generates from contracts. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0334-02.png)
-
 
 **----- Start of picture text -----**<br>
 Contract.make {<br>request {..} Order Service<br>response {...} consumer<br>Writes } Code generated contract tests<br>} from<br>API gateway team<br>Develops Tests<br>Published<br>Order<br>API gateway contract Service<br>Maven repository<br>Tests Develops<br>Reads Publishes<br>API gateway<br>integration test<br>Order Service team<br>**----- End of picture text -----**<br>
-
 
 Figure 9.8 The **API Gateway** team writes the contracts. The **Order Service** team uses those contracts to test **Order Service** and publishes them to a repository. The **API Gateway** team uses the published contracts to test **API Gateway** . 
 
@@ -334,10 +283,6 @@ org.springframework.cloud.contract.spec.Contract.make {
 }
 ```
 
-
-_**Testing strategies for microservice architectures**_ 
-
-
 The request element is an HTTP request for the REST endpoint GET /orders/ {orderId}. The response element is an HTTP response that describes an Order expected by API Gateway. The Groovy contracts are part of the provider’s code base. Each consumer team writes contracts that describe how their service interacts with the provider and gives them, perhaps via a Git pull request, to the provider team. The provider team is responsible for packaging the contracts as a JAR and publishing them to a Maven repository. The consumer-side tests download the JAR from the repository. 
 
 Each contract’s request and response play dual roles of test data and the specification of expected behavior. In a consumer-side test, the contract is used to configure a stub, which is similar to a Mockito mock object and simulates the behavior of Order Service. It enables API Gateway to be tested without running Order Service. In the provider-side test, the generated test class invokes the provider with the contract’s request and verifies that it returns a response that matches the contract’s response. The next chapter discusses the details of how to use Spring Cloud Contract, but now we’re going to look at how to use consumer contract testing for messaging APIs. 
@@ -352,18 +297,12 @@ A contract for an asynchronous request/response interaction is similar to an HTT
 
 ### 9.1.3 The deployment pipeline
 
-Every service has a deployment pipeline. Jez Humble’s book, Continuous Delivery (Addison-Wesley, 2010) describes a _deployment pipeline_ as the automated process of getting code from the developer’s desktop into production. As figure 9.9 shows, it consists 
-
-
-of a series of stages that execute test suites, followed by a stage that releases or deploys the service. Ideally, it’s fully automated, but it might contain manual steps. A deployment pipeline is often implemented using a Continuous Integration (CI) server, such as Jenkins. 
-
+Every service has a deployment pipeline. Jez Humble’s book, Continuous Delivery (Addison-Wesley, 2010) describes a _deployment pipeline_ as the automated process of getting code from the developer’s desktop into production. As figure 9.9 shows, it consists of a series of stages that execute test suites, followed by a stage that releases or deploys the service. Ideally, it’s fully automated, but it might contain manual steps. A deployment pipeline is often implemented using a Continuous Integration (CI) server, such as Jenkins. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0336-03.png)
 
-
 **----- Start of picture text -----**<br>
 Fast feedback Slow feedback<br>Not production Production<br>ready ready<br>Deployment pipeline<br>Commit Integration Component<br>Pre-commit Deploy Production<br>tests tests tests<br>tests stage environment<br>stage stage stage<br>**----- End of picture text -----**<br>
-
 
 Figure 9.9 An example deployment pipeline for **Order Service** . It consists of a series of stages. The pre-commit tests are run by the developer prior to committing their code. The remaining stages are executed by an automated tool, such as the Jenkins CI server. 
 
@@ -385,8 +324,6 @@ The CI server runs the commit stage when a developer commits a change. It execut
 
 In this example, the deployment pipeline is fully automated all the way from commit to deployment. There are, however, situations that require manual steps. For example, you might need a manual testing stage, such as a staging environment. In such a scenario, the code progresses to the next stage when a tester clicks a button to indicate that it was successful. Alternatively, a deployment pipeline for an on-premise 
 
-
-_**Writing unit tests for a service**_
 product would release the new version of the service. Later on, the released services would be packaged into a product release and shipped to customers. 
 
 Now that we’ve looked at the organization of the deployment pipeline and when it executes the different types of tests, let’s head to the bottom of the test pyramid and look at how to write unit tests for a service. 
@@ -397,16 +334,12 @@ Imagine that you want to write a test that verifies that the FTGO application’
 
 As figure 9.10 shows, unit tests are the lowest level of the test pyramid. They’re technology-facing tests that support development. A unit test verifies that a _unit_ , which is a very small part of a service, works correctly. A unit is typically a class, so the goal of unit testing is to verify that it behaves as expected. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0337-07.png)
-
 
 **----- Start of picture text -----**<br>
 Stub/mock<br>dependency 1<br>Solitary Tests Stub/mock<br>Cl ass<br>unit test dependency 2<br>Stub/mock<br>dependency<br>End-to-end ...<br>Component<br>Dependency 1<br>Integration<br>Social Tests<br>unit test Cl ass Dependency 2<br>Unit<br>Dependency<br>...<br>**----- End of picture text -----**<br>
 
-
 Figure 9.10 Unit tests are the base of the pyramid. They’re fast running, easy to write, and reliable. A solitary unit test tests a class in isolation, using mocks or stubs for its dependencies. A sociable unit test tests a class and its dependencies. 
-
 
 There are two types of unit tests (https://martinfowler.com/bliki/UnitTest.html): 
 
@@ -416,19 +349,12 @@ There are two types of unit tests (https://martinfowler.com/bliki/UnitTest.html)
 
 The responsibilities of the class and its role in the architecture determine which type of test to use. Figure 9.11 shows the hexagonal architecture of a typical service and the type of unit test that you’ll typically use for each kind of class. Controller and service classes are often tested using solitary unit tests. Domain objects, such as entities and value objects, are typically tested using sociable unit tests. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0338-06.png)
-
 
 **----- Start of picture text -----**<br>
 POST/something<br>Solitary GET/something/id<br>unit test<br>Controller<br>Inbound<br>message<br>adapter<br>«Message Channel» Domain logic<br>Service<br>Solitary Sociable<br>unit test unit test<br>Entity<br>Value<br>object<br>Saga<br>Outbound<br>m essage<br>adapter<br>«Message Channel» Repository<br>Database<br>adapter<br>Database<br>**----- End of picture text -----**<br>
 
-
 Figure 9.11 The responsibilities of a class determine whether to use a solitary or sociable unit test. 
-
-
-_**Writing unit tests for a service**_ 
-
 
 The typical testing strategy for each class is as follows: 
 
@@ -471,10 +397,7 @@ public class OrderTest {
 }
 ```
 
-The @Test shouldCalculateTotal() method verifies that Order.getOrderTotal() returns the expected value. Unit tests thoroughly test the business logic. They are 
-
-
-sociable unit tests for the Order class and its dependencies. You can use them as compile-time tests because they execute extremely quickly. The Order class relies on the Money value object, so it’s important to test that class as well. Let’s see how to do that. 
+The @Test shouldCalculateTotal() method verifies that Order.getOrderTotal() returns the expected value. Unit tests thoroughly test the business logic. They are sociable unit tests for the Order class and its dependencies. You can use them as compile-time tests because they execute extremely quickly. The Order class relies on the Money value object, so it’s important to test that class as well. Let’s see how to do that. 
 
 ### 9.2.2 Writing unit tests for value objects
 
@@ -507,13 +430,7 @@ Entities and value objects are the building blocks of a service’s business log
 
 ### 9.2.3 Developing unit tests for sagas
 
-A saga, such as the CreateOrderSaga class, implements important business logic, so needs to be tested. It’s a persistent object that sends command messages to saga participants and processes their replies. As described in chapter 4, CreateOrderSaga exchanges command/reply messages with several services, such as Consumer Service and Kitchen Service. A test for this class creates a saga and verifies that it sends the 
-
-
-_**Writing unit tests for a service**_ 
-
-
-expected sequence of messages to the saga participants. One test you need to write is for the happy path. You must also write tests for the various scenarios where the saga rolls back because a saga participant sent back a failure message. 
+A saga, such as the CreateOrderSaga class, implements important business logic, so needs to be tested. It’s a persistent object that sends command messages to saga participants and processes their replies. As described in chapter 4, CreateOrderSaga exchanges command/reply messages with several services, such as Consumer Service and Kitchen Service. A test for this class creates a saga and verifies that it sends the expected sequence of messages to the saga participants. One test you need to write is for the happy path. You must also write tests for the various scenarios where the saga rolls back because a saga participant sent back a failure message. 
 
 One approach would be to write tests that use a real database and message broker along with stubs to simulate the various saga participants. For example, a stub for Consumer Service would subscribe to the consumerService command channel and send back the desired reply message. But tests written using this approach would be quite slow. A much more effective approach is to write tests that mock those classes that interact with the database and message broker. That way, we can focus on testing the saga’s core responsibility. 
 
@@ -543,7 +460,6 @@ public class CreateOrderSagaTest {
   public void shouldRejectOrderDueToConsumerVerificationFailed() { 
     given() 
       .saga(new CreateOrderSaga(kitchenServiceProxy), 
-            new CreateOrderSagaState(ORDER_ID, CHICKEN_VINDALOO_ORDER_DETAILS)) 
     .expect() 
       .command(new ValidateOrderByConsumer(CONSUMER_ID, ORDER_ID, CHICKEN_VINDALOO_ORDER_TOTAL)) 
       .to(ConsumerServiceChannels.consumerServiceChannel) 
@@ -621,7 +537,6 @@ Now that we’ve seen how to unit test the domain logic classes, let’s look at
 
 Services, such as Order Service, typically have one or more controllers that handle HTTP requests from other services and the API gateway. A controller class consists of a set of request handler methods. Each method implements a REST API endpoint. A method’s parameters represent values from the HTTP request, such as path variables. It typically invokes a domain service or a repository and returns a response object. 
 
-
 OrderController, for instance, invokes OrderService and OrderRepository. An effective testing strategy for controllers is solitary unit tests that mock the services and repositories. 
 
 You could write a test class similar to the OrderServiceTest class to instantiate a controller class and invoke its methods. But this approach doesn’t test some important functionality, such as request routing. It’s much more effective to use a mock MVC testing framework, such as Spring Mock Mvc, which is part of the Spring Framework, or Rest Assured Mock MVC, which builds on Spring Mock Mvc. Tests written using one of these frameworks make what appear to be HTTP requests and make assertions about HTTP responses. These frameworks enable you to test HTTP request routing and conversion of Java objects to and from JSON without having to make real network calls. Under the covers, Spring Mock Mvc instantiates just enough of the Spring MVC classes to make this possible. 
@@ -671,10 +586,7 @@ Controllers aren’t the only adapters that handle requests from external system
 
 Services often process messages sent by external systems. Order Service, for example, has OrderEventConsumer, which is a message adapter that handles domain events published by other services. Like controllers, message adapters tend to be simple classes that invoke domain services. Each of a message adapter’s methods typically invokes a service method with data from the message or event. 
 
-We can unit test message adapters using an approach similar to the one we used for unit testing controllers. Each test instances the message adapter, sends a message to a channel, and verifies that the service mock was invoked correctly. Behind the 
-
-
-scenes, though, the messaging infrastructure is stubbed, so no message broker is involved. Let’s look at how to test the OrderEventConsumer class. 
+We can unit test message adapters using an approach similar to the one we used for unit testing controllers. Each test instances the message adapter, sends a message to a channel, and verifies that the service mock was invoked correctly. Behind the scenes, though, the messaging infrastructure is stubbed, so no message broker is involved. Let’s look at how to test the OrderEventConsumer class. 
 
 Listing 9.7 shows part of the OrderEventConsumerTest class, which tests OrderEventConsumer. It verifies that OrderEventConsumer routes each event to the appropriate handler method and correctly invokes OrderService. The test uses the Eventuate Tram Mock Messaging framework, which provides an easy-to-use DSL for writing mock messaging tests that uses the same given-when-then format as Rest Assured. Each test instantiates OrderEventConsumer injected with a mock OrderService, publishes a domain event, and verifies that OrderEventConsumer correctly invokes the service mock. 
 
@@ -708,7 +620,6 @@ public class OrderEventConsumerTest {
 
 The setUp() method creates an OrderEventConsumer injected with a mock OrderService. The shouldCreateMenu() method publishes a RestaurantCreated event and verifies that OrderEventConsumer invoked OrderService.createMenu(). The OrderEventConsumerTest class and the other unit test classes execute extremely quickly. The unit tests run in just a few seconds. 
 
-
 ## Summary
 
 But the unit tests don’t verify that a service, such as Order Service, properly interacts with other services. For example, the unit tests don’t verify that an Order can be persisted in MySQL. Nor do they verify that CreateOrderSaga sends command messages in the right format to the right message channel. And they don’t verify that the RestaurantCreated event processed by OrderEventConsumer has the same structure as the event published by Restaurant Service. In order to verify that a service properly interacts with other services, we must write integration tests. We also need to write component tests that test an entire service in isolation. The next chapter discusses how to conduct those types of tests, as well as end-to-end tests. 
@@ -722,5 +633,4 @@ But the unit tests don’t verify that a service, such as Order Service, properl
 - A good way to simplify and speed up a test is to use test doubles. A test double is an object that simulates the behavior of a SUT’s dependency. There are two types of test doubles: stubs and mocks. A stub is a test double that returns values to the SUT. A mock is a test double that a test uses to verify that the SUT correctly invokes a dependency. 
 
 - Use the test pyramid to determine where to focus your testing efforts for your services. The majority of your tests should be fast, reliable, and easy-to-write unit tests. You must minimize the number of end-to-end tests, because they’re slow, brittle, and time consuming to write. 
-
 

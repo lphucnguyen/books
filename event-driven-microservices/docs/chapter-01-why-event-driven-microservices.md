@@ -10,7 +10,6 @@ The same is true with computer system architectures. You need only look at the h
 
 The medium of the asynchronously produced and consumed event has been fundamentally shifted by modern technology. These events can now be persisted indefinitely, at extremely large scale, and be consumed by any service as many times as necessary. Compute resources can be easily acquired and released on-demand, enabling the easy creation and management of microservices. Microservices can store and manage their data according to their own needs, and do so at a scale that was previously limited to batch-based big-data solutions. These improvements to the humble and simple event-driven medium have far-reaching impacts that not only change computer architectures, but also completely reshape how teams, people, and organizations create systems and businesses. 
 
-
 ## What Are Event-Driven Microservices?
 
 Microservices and microservice-style architectures have existed for many years, in many different forms, under many different names. Service-oriented architectures (SOAs) are often composed of multiple microservices synchronously communicating directly with one another. Message-passing architectures use consumable events to asynchronously communicate with one another. Event-based communication is certainly not new, but the need for handling big data sets, at scale and in real time, _is_ new and necessitates a change from the old architectural styles. 
@@ -21,9 +20,7 @@ The services themselves are small and purpose-built, created to help fulfill the
 
 This combination of event streams and microservices forms an interconnected graph of activity across a business organization. Traditional computer architectures, composed of monoliths and intermonolith communications, have a similar graph structure. Both of these graphs are shown in Figure 1-1. 
 
-
 ![](../images/Event-Driven_Microservices-0021-00.png)
-
 
 _Figure 1-1. The graph structures of microservices and monoliths_ 
 
@@ -45,7 +42,6 @@ A component of the main domain. Each subdomain focuses on a specific subset of r
 
 **Introduction to Domain-Driven Design and Bounded Contexts | 3** 
 
-
 **Domain (and subdomain) model** 
 
 An abstraction of the actual domain useful for business purposes. The pieces and properties of the domain that are most important to the business are used to generate the model. The main domain model of an business is discernible through the products the business provides its customers, the interfaces by which customers interact with the products, and the various other processes and functions by which the business fulfills its stated goals. Models often need to be refined as the domain changes and as business priorities shift. A domain model is part of the solution space, as it is a construct the business uses to solve problems. 
@@ -64,7 +60,6 @@ Every organization forms a single domain between itself and the outside world. E
 
 This domain is broken down into subdomains—perhaps, for a technology-centric company, an Engineering department, a Sales department, and a Customer Support department. Each subdomain has its own requirements and duties and may itself be subdivided. This division process repeats until the subdomain models are granular and actionable and can be translated into small and independent services by the implementing teams. Bounded contexts are established around these subdomains and form the basis for the creation of microservices. 
 
-
 ### Aligning Bounded Contexts with Business Requirements
 
 It is common for the business requirements of a product to change during its lifetime, perhaps due to organizational changes or new feature requests. In contrast, it’s rare for a company to need to change the underlying implementation of any given product without accompanying business requirement changes. This is why bounded contexts should be built around business requirements and not technological requirements. 
@@ -77,17 +72,13 @@ Figure 1-2 shows both scenarios: sole ownership on the left and cross-cutting ow
 
 **Introduction to Domain-Driven Design and Bounded Contexts | 5** 
 
-
 ![](../images/Event-Driven_Microservices-0024-00.png)
-
 
 _Figure 1-2. Alignment on business contexts versus on technological contexts_ 
 
 Modeling event-driven microservices architectures around business requirements is preferred, though there are tradeoffs with this approach. Code may be replicated a number of times, and many services may use similar data access patterns. Product developers may try to reduce repetition by sharing data sources with other products or by coupling on boundaries. In these cases, the subsequent tight coupling may be far more costly in the long run than repeating logic and storing similar data. These tradeoffs will be examined in greater detail throughout this book. 
 
-
 ![](../images/Event-Driven_Microservices-0024-03.png)
-
 
 Keep loose coupling between bounded contexts, and focus on minimizing intercontext dependencies. This will allow bounded context implementations to change as necessary, without subsequently breaking many (or any) other systems. 
 
@@ -97,14 +88,11 @@ Additionally, each team may be required to have full stack expertise, which can 
 
 An organization’s teams, systems, and people all must communicate with one another to fulfill their goals. These communications form an interconnected topology of dependencies called a _communication structure_ . There are three main communication structures, and each affects the way businesses operate. 
 
-
 ### Business Communication Structures
 
 The business communication structure (Figure 1-3) dictates communication between teams and departments, each driven by the major requirements and responsibilities assigned to it. For example, Engineering produces the software products, Sales sells to customers, and Support ensures that customers and clients are satisfied. The organization of teams and the provisioning of their goals, from the major business units down to the work of the individual contributor, fall under this structure. Business requirements, their assignment to teams, and team compositions all change over time, which can greatly impact the relationship between the business communication structure and the implementation communication structure. 
 
-
 ![](../images/Event-Driven_Microservices-0025-02.png)
-
 
 _Figure 1-3. Sample business communications structure_ 
 
@@ -112,12 +100,9 @@ _Figure 1-3. Sample business communications structure_
 
 The _implementation communication structure_ (Figure 1-4) is the data and logic pertaining to the subdomain model as dictated by the organization. It formalizes business processes, data structures, and system design so that business operations can be performed quickly and efficiently. This results in a tradeoff in flexibility for the business communication structure, as redefining the business requirements that must be satisfied by the implementation requires a rewrite of the logic. These rewrites are most often iterative modifications to the subdomain model and associated code, which over time reflect the evolution of the implementation to fulfill the new business requirements. 
 
-
 The quintessential example of an implementation communication structure for software engineering is the monolithic database application. The business logic of the application communicates internally via either function calls or shared state. This monolithic application, in turn, is used to satisfy the business requirements dictated by the business communication structure. 
 
-
 ![](../images/Event-Driven_Microservices-0026-01.png)
-
 
 _Figure 1-4. Sample implementation communication structure_ 
 
@@ -125,9 +110,7 @@ _Figure 1-4. Sample implementation communication structure_
 
 The data communication structure (Figure 1-5) is the process through which data is communicated across the business and particularly between implementations. Although a data communication structure comprising email, instant messaging, and meetings is often used for communicating business changes, it has largely been neglected for software implementations. Its role has usually been fulfilled ad hoc, from system to system, with the implementation communication structure often playing double duty by including data communication functions in addition to its own requirements. This has caused many problems in how companies grow and change over time, the impact of which is evaluated in the next section. 
 
-
 ![](../images/Event-Driven_Microservices-0027-00.png)
-
 
 _Figure 1-5. Sample ad hoc data communication structure_ 
 
@@ -143,12 +126,9 @@ Because domain concepts span the business, domain data is often needed by other 
 
 Data communication structures play a pivotal role in how an organization designs and builds products, but for many organizations this structure has long been missing. As noted, implementation communication structures frequently play this role in addition to their own. 
 
-
 Some organizations attempt to mitigate the inability to access domain data from other implementations, but these efforts have their own drawbacks. For example, shared databases are often used, though these frequently promote anti-patterns and often cannot scale sufficiently to accommodate all performance requirements. Databases may provide read-only replicas; however, this can expose their inner data models unnecessarily. Batch processes can dump data to a file store to be read by other processes, but this approach can create issues around data consistency and multiple sources of truth. Lastly, all of these solutions result in a strong coupling between implementations and further harden an architecture into direct point-to-point relationships. 
 
-
 ![](../images/Event-Driven_Microservices-0028-01.png)
-
 
 If you find that it is too hard to access data in your organization or that your products are scope-creeping because all the data is located in a single implementation, you’re likely experiencing the effects of poor data communication structures. This problem will be magnified as the organization grows, develops new products, and increasingly needs to access commonly used domain data. 
 
@@ -162,10 +142,7 @@ The team is at a crossroads: do they implement the new business requirement in a
 
 ### Option 1: Make a New Service
 
-The business requirement is different enough that it could make sense to put it into a new service. But what about data? This new business function needs some of the old data, but that data is currently locked up in the existing service. Additionally, the team doesn’t really have a process for launching new, fully independent services. On the other hand, the team is getting to be a bit big, and the company is growing 
-
-
-quickly. If the team has to be divided in the future, having modular and independent systems may make divvying up ownership much easier. 
+The business requirement is different enough that it could make sense to put it into a new service. But what about data? This new business function needs some of the old data, but that data is currently locked up in the existing service. Additionally, the team doesn’t really have a process for launching new, fully independent services. On the other hand, the team is getting to be a bit big, and the company is growing quickly. If the team has to be divided in the future, having modular and independent systems may make divvying up ownership much easier. 
 
 There are risks associated with this approach. The team must figure out a way to source data from their original data store and copy it to their new data store. They need to ensure that they don’t expose the inner workings and that the changes they make to their data structures won’t affect any other teams copying their data. Additionally, the data being copied will always be somewhat stale, as they can only afford to copy production data in real time every 30 minutes so as not to saturate the data store with queries. This connection will need to be monitored and maintained to ensure that it is running correctly. 
 
@@ -183,7 +160,6 @@ Most teams would choose the second option—adding the functionality to the exis
 
 - Accessing another system’s data is difficult to do reliably, especially at scale and in real time. 
 
-
 - Creating and managing new services has substantial overhead and risk associated with it, especially if there is no established way to do so within the organization. 
 
 Accessing local data is always easier than accessing data in another data store. Any data encapsulated in another team’s data store is difficult to obtain, as it requires crossing both implementation and business communication boundaries. This becomes increasingly difficult to maintain and scale as data, connection count, and performance requirements grow. 
@@ -194,12 +170,9 @@ Copied data will always be somewhat stale by the time the query is complete and 
 
 The inability to correctly disseminate data throughout a company is not due to a fundamental flaw in the concept. Quite the contrary: it’s due to a weak or nonexistent data communication structure. In the preceding scenario, the team’s implementation communication structure is performing double duty as an extremely limited data communication structure. 
 
-
 ![](../images/Event-Driven_Microservices-0030-05.png)
 
-
 One of the tenets of event-driven microservices is that core business data should be easy to obtain and usable by any service that requires it. This replaces the ad hoc data communication structure in this scenario with a formalized data communication structure. For the hypothetical team, this data communication structure could eliminate most of the difficulties of obtaining data from other systems. 
-
 
 ### The Team Scenario, Continued
 
@@ -223,10 +196,7 @@ There are two conflicting pressures on the original team. It was influenced to k
 
 The event-driven approach offers an alternative to the traditional behavior of implementation and data communication structures. Event-based communications are not a drop-in replacement for request-response communications, but rather a completely 
 
-**Event-Driven Communication Structures | 13** 
-
-
-different way of communicating between services. An event-streaming data communication structure decouples the production and ownership of data from the access to it. Services no longer couple directly through a request-response API, but instead through event data defined within event streams (this process is covered more in Chapter 3). Producers’ responsibilities are limited to producing well-defined data into their respective event streams. 
+**Event-Driven Communication Structures | 13** different way of communicating between services. An event-streaming data communication structure decouples the production and ownership of data from the access to it. Services no longer couple directly through a request-response API, but instead through event data defined within event streams (this process is covered more in Chapter 3). Producers’ responsibilities are limited to producing well-defined data into their respective event streams. 
 
 ### Events Are the Basis of Communication
 
@@ -240,10 +210,7 @@ Each event in a stream is a statement of fact, and together these statements for
 
 The event-based data communication structure differs from an overextended implementation communication structure in that it is incapable of providing any querying or data lookup functionality. All business and application logic must be encapsulated within the producer and consumer of the events. 
 
-Data access and modeling requirements are completely shifted to the consumer, with consumers each obtaining their own copy of events from the source event streams. Any querying complexity is also shifted from the implementation communication structure of the data owner to that of the consumer. The consumer remains fully responsible for any mixing of data from multiple event streams, special query functionality, or other business-specific implementation logic. Both producers and consumers are otherwise relieved of their duty to provide querying mechanisms, data transfer mechanisms, APIs (application programming interfaces), and cross-team 
-
-
-services for the means of communicating data. They are now limited in their responsibility to only solving the needs of their immediate bounded context. 
+Data access and modeling requirements are completely shifted to the consumer, with consumers each obtaining their own copy of events from the source event streams. Any querying complexity is also shifted from the implementation communication structure of the data owner to that of the consumer. The consumer remains fully responsible for any mixing of data from multiple event streams, special query functionality, or other business-specific implementation logic. Both producers and consumers are otherwise relieved of their duty to provide querying mechanisms, data transfer mechanisms, APIs (application programming interfaces), and cross-team services for the means of communicating data. They are now limited in their responsibility to only solving the needs of their immediate bounded context. 
 
 ### Data Communication Is Improved Across the Organization
 
@@ -268,7 +235,6 @@ Services map neatly to bounded contexts and can be easily rewritten when busines
 Individual services can be scaled up and down as needed. 
 
 **Asynchronous Event-Driven Microservices | 15** 
-
 
 **Technological flexibility** 
 
@@ -298,10 +264,7 @@ A new business requirement is introduced to the team. It’s somewhat related to
 
 Previous technical issues—such as figuring out where to source the data and how to sink it, handling batch syncing issues, and implementing synchronous APIs—are largely removed now. The team can spin up a new microservice and ingest the necessary data from the event streams, all the way back to the beginning of time if needed. It is entirely possible that the team mixes in common data used in their other services, so long as that data is used solely to fulfill the needs of the new bounded context. The storage and structure of this data are left entirely up to the team, which can choose which fields to keep and which to discard. 
 
-Business risks are also alleviated, as the small, finer-grained services allow for single team ownership, enabling the teams to scale and reorganize as necessary. When the team grows too large to manage under a single business owner, they can split up as 
-
-
-required and reassign the microservice ownership. The ownership of the event data moves with the producing service, and organizational decisions can be made to reduce the amount of cross-team communication required to perform future work. 
+Business risks are also alleviated, as the small, finer-grained services allow for single team ownership, enabling the teams to scale and reorganize as necessary. When the team grows too large to manage under a single business owner, they can split up as required and reassign the microservice ownership. The ownership of the event data moves with the producing service, and organizational decisions can be made to reduce the amount of cross-team communication required to perform future work. 
 
 The nature of the microservice prevents spaghetti code and expansive monoliths from taking hold, provided that the overhead for creating new services and obtaining the necessary data is minimal. Scaling concerns are now focused on individual eventprocessing services, which can scale their CPU, memory, disk, and instance count as required. The remaining scaling requirements are offloaded onto the data communication structure, which must ensure that it can handle the various loads of services consuming from and producing to its event streams. 
 
@@ -318,7 +281,6 @@ There are a number of issues with synchronous microservices that make them diffi
 Furthermore, note that neither point-to-point request-response microservices nor asynchronous event-driven microservices are strictly better than the other. Both have their place in an organization, as some tasks are far better suited to one over the 
 
 > 1 See, for example, _Building Microservices_ by Sam Newman (O’Reilly, 2015) and _Microservices for the Enterprise_ by Kasun Indrasiri and Prabath Siriwardena (Apress, 2018). 
-
 
 other. However, my own experience, as well as that of many of my peers and colleagues, indicates that EDM architectures offer an unparalleled flexibility that is absent in synchronous request-response microservices. Perhaps you’ll come to agree as you proceed through this book, but at the very least, you’ll gain an understanding of their strengths and drawbacks. 
 
@@ -342,10 +304,7 @@ Multiple API definitions and service versions will often need to exist at the sa
 
 **Data access tied to the implementation** 
 
-Synchronous microservices have all the same problems as traditional services when it comes to accessing external data. Although there are service design strategies for 
-
-
-mitigating the need to access external data, microservices will often still need to access commonly used data from other services. This puts the onus of data access and scalability back on the implementation communication structure. 
+Synchronous microservices have all the same problems as traditional services when it comes to accessing external data. Although there are service design strategies for mitigating the need to access external data, microservices will often still need to access commonly used data from other services. This puts the onus of data access and scalability back on the implementation communication structure. 
 
 **Distributed monoliths** 
 
@@ -365,12 +324,9 @@ Services hosting web and mobile experiences are by and large powered by request-
 
 The experience factor is also quite important, especially as many developers in today’s market tend to be much more experienced with synchronous, monolithic-style coding. This makes acquiring talent for synchronous systems easier, in general, than acquiring talent for asynchronous event-driven development. 
 
-
 ![](../images/Event-Driven_Microservices-0037-10.png)
 
-
 A company’s architecture could only rarely, if ever, be based entirely on event-driven microservices. Hybrid architectures will certainly be the norm, where synchronous and asynchronous solutions are deployed side-by-side as the problem space requires. 
-
 
 ## Summary
 

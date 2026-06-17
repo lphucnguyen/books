@@ -6,7 +6,6 @@ In reality, data systems are often more complex. In a large application you ofte
 
 In this final part of the book, we will examine the issues around integrating multiple different data systems, potentially with different data models and optimized for different access patterns, into one coherent application architecture. This aspect of system-building is often overlooked by vendors who claim that their product can satisfy all your needs. In reality, integrating disparate systems is one of the most important things that needs to be done in a nontrivial application. 
 
-
 **Systems of Record and Derived Data**
 
 On a high level, systems that store and process data can be grouped into two broad categories: 
@@ -27,9 +26,7 @@ Most databases, storage engines, and query languages are not inherently either a
 
 By being clear about which data is derived from which other data, you can bring clarity to an otherwise confusing system architecture. This point will be a running theme throughout this part of the book. 
 
-
 **Overview of Chapters**
 
 We will start in Chapter 10 by examining batch-oriented dataflow systems such as MapReduce, and see how they give us good tools and principles for building largescale data systems. In Chapter 11 we will take those ideas and apply them to data streams, which allow us to do the same kinds of things with lower delays. Chapter 12 concludes the book by exploring ideas about how we might use these tools to build reliable, scalable, and maintainable applications in the future. 
-
 

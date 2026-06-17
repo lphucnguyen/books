@@ -16,7 +16,6 @@ In this chapter we will assume that your dataset is so small that each machine c
 
 If the data that you’re replicating does not change over time, then replication is easy: you just need to copy the data to every node once, and you’re done. All of the difficulty in replication lies in handling _changes_ to replicated data, and that’s what this chapter is about. We will discuss three popular algorithms for replicating changes between nodes: _single-leader_ , _multi-leader_ , and _leaderless_ replication. Almost all distributed databases use one of these three approaches. They all have various pros and cons, which we will examine in detail. 
 
-
 There are many trade-offs to consider with replication: for example, whether to use synchronous or asynchronous replication, and how to handle failed replicas. Those are often configuration options in databases, and although the details vary by database, the general principles are similar across many different implementations. We will discuss the consequences of such choices in this chapter. 
 
 Replication of databases is an old topic—the principles haven’t changed much since they were studied in the 1970s [1], because the fundamental constraints of networks have remained the same. However, outside of research, many developers continued to assume for a long time that a database consisted of just one node. Mainstream use of distributed databases is more recent. Since many application developers are new to this area, there has been a lot of misunderstanding around issues such as _eventual consistency_ . In “Problems with Replication Lag” on page 161 we will get more precise about eventual consistency and discuss things like the _read-your-writes_ and _monotonic reads_ guarantees. 
@@ -33,12 +32,9 @@ Every write to the database needs to be processed by every replica; otherwise, t
 
 > i. Different people have different definitions for _hot_ , _warm_ , and _cold_ standby servers. In PostgreSQL, for example, _hot standby_ is used to refer to a replica that accepts reads from clients, whereas a _warm standby_ processes changes from the leader but doesn’t process any queries from clients. For purposes of this book, the difference isn’t important. 
 
-
 3. When a client wants to read from the database, it can query either the leader or any of the followers. However, writes are only accepted on the leader (the followers are read-only from the client’s point of view). 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0175-01.png)
-
 
 _Figure 5-1. Leader-based (master–slave) replication._ 
 
@@ -52,9 +48,7 @@ Think about what happens in Figure 5-1, where the user of a website updates thei
 
 Figure 5-2 shows the communication between various components of the system: the user’s client, the leader, and two followers. Time flows from left to right. A request or response message is shown as a thick arrow. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0176-00.png)
-
 
 _Figure 5-2. Leader-based replication with one synchronous and one asynchronous follower._ 
 
@@ -64,10 +58,7 @@ The diagram shows that there is a substantial delay before follower 2 processes 
 
 The advantage of synchronous replication is that the follower is guaranteed to have an up-to-date copy of the data that is consistent with the leader. If the leader suddenly fails, we can be sure that the data is still available on the follower. The disadvantage is that if the synchronous follower doesn’t respond (because it has crashed, or there is a network fault, or for any other reason), the write cannot be processed. The leader must block all writes and wait until the synchronous replica is available again. 
 
-For that reason, it is impractical for all followers to be synchronous: any one node outage would cause the whole system to grind to a halt. In practice, if you enable synchronous replication on a database, it usually means that _one_ of the followers is synchronous, and the others are asynchronous. If the synchronous follower becomes unavailable or slow, one of the asynchronous followers is made synchronous. This guarantees that you have an up-to-date copy of the data on at least two nodes: the 
-
-
-leader and one synchronous follower. This configuration is sometimes also called _semi-synchronous_ [7]. 
+For that reason, it is impractical for all followers to be synchronous: any one node outage would cause the whole system to grind to a halt. In practice, if you enable synchronous replication on a database, it usually means that _one_ of the followers is synchronous, and the others are asynchronous. If the synchronous follower becomes unavailable or slow, one of the asynchronous followers is made synchronous. This guarantees that you have an up-to-date copy of the data on at least two nodes: the leader and one synchronous follower. This configuration is sometimes also called _semi-synchronous_ [7]. 
 
 Often, leader-based replication is configured to be completely asynchronous. In this case, if the leader fails and is not recoverable, any writes that have not yet been replicated to followers are lost. This means that a write is not guaranteed to be durable, even if it has been confirmed to the client. However, a fully asynchronous configuration has the advantage that the leader can continue processing writes, even if all of its followers have fallen behind. 
 
@@ -86,7 +77,6 @@ From time to time, you need to set up new followers—perhaps to increase the nu
 Simply copying data files from one node to another is typically not sufficient: clients are constantly writing to the database, and the data is always in flux, so a standard file copy would see different parts of the database at different points in time. The result might not make any sense. 
 
 You could make the files on disk consistent by locking the database (making it unavailable for writes), but that would go against our goal of high availability. Fortunately, setting up a follower can usually be done without downtime. Conceptually, the process looks like this: 
-
 
 1. Take a consistent snapshot of the leader’s database at some point in time—if possible, without taking a lock on the entire database. Most databases have this feature, as it is also required for backups. In some cases, third-party tools are needed, such as _innobackupex_ for MySQL [12]. 
 
@@ -108,7 +98,6 @@ How do you achieve high availability with leader-based replication?
 
 On its local disk, each follower keeps a log of the data changes it has received from the leader. If a follower crashes and is restarted, or if the network between the leader and the follower is temporarily interrupted, the follower can recover quite easily: from its log, it knows the last transaction that was processed before the fault occurred. Thus, the follower can connect to the leader and request all the data changes that occurred during the time when the follower was disconnected. When it has applied these changes, it has caught up to the leader and can continue receiving a stream of data changes as before. 
 
-
 **Leader failure: Failover**
 
 Handling a failure of the leader is trickier: one of the followers needs to be promoted to be the new leader, clients need to be reconfigured to send their writes to the new leader, and the other followers need to start consuming data changes from the new leader. This process is called _failover_ . 
@@ -125,10 +114,7 @@ Failover is fraught with things that can go wrong:
 
 - If asynchronous replication is used, the new leader may not have received all the writes from the old leader before it failed. If the former leader rejoins the cluster after a new leader has been chosen, what should happen to those writes? The new leader may have received conflicting writes in the meantime. The most common solution is for the old leader’s unreplicated writes to simply be discarded, which may violate clients’ durability expectations. 
 
-- Discarding writes is especially dangerous if other storage systems outside of the database need to be coordinated with the database contents. For example, in one incident at GitHub [13], an out-of-date MySQL follower was promoted to leader. The database used an autoincrementing counter to assign primary keys to new 
-
-
-rows, but because the new leader’s counter lagged behind the old leader’s, it reused some primary keys that were previously assigned by the old leader. These primary keys were also used in a Redis store, so the reuse of primary keys resulted in inconsistency between MySQL and Redis, which caused some private data to be disclosed to the wrong users. 
+- Discarding writes is especially dangerous if other storage systems outside of the database need to be coordinated with the database contents. For example, in one incident at GitHub [13], an out-of-date MySQL follower was promoted to leader. The database used an autoincrementing counter to assign primary keys to new rows, but because the new leader’s counter lagged behind the old leader’s, it reused some primary keys that were previously assigned by the old leader. These primary keys were also used in a Redis store, so the reuse of primary keys resulted in inconsistency between MySQL and Redis, which caused some private data to be disclosed to the wrong users. 
 
 - In certain fault scenarios (see Chapter 8), it could happen that two nodes both believe that they are the leader. This situation is called _split brain_ , and it is dangerous: if both leaders accept writes, and there is no process for resolving conflicts (see “Multi-Leader Replication” on page 168), data is likely to be lost or corrupted. As a safety catch, some systems have a mechanism to shut down one node if two leaders are detected.[ii] However, if this mechanism is not carefully designed, you can end up with both nodes being shut down [14]. 
 
@@ -147,7 +133,6 @@ How does leader-based replication work under the hood? Several different replica
 In the simplest case, the leader logs every write request ( _statement_ ) that it executes and sends that statement log to its followers. For a relational database, this means that every `INSERT` , `UPDATE` , or `DELETE` statement is forwarded to followers, and each 
 
 > ii. This approach is known as _fencing_ or, more emphatically, _Shoot The Other Node In The Head_ (STONITH). We will discuss fencing in more detail in “The leader and the lock” on page 301. 
-
 
 follower parses and executes that SQL statement as if it had been received from a client. 
 
@@ -173,7 +158,6 @@ In Chapter 3 we discussed how storage engines represent data on disk, and we fou
 
 In either case, the log is an append-only sequence of bytes containing all writes to the database. We can use the exact same log to build a replica on another node: besides writing the log to disk, the leader also sends it across the network to its followers. 
 
-
 When the follower processes this log, it builds a copy of the exact same data structures as found on the leader. 
 
 This method of replication is used in PostgreSQL and Oracle, among others [16]. The main disadvantage is that the log describes the data on a very low level: a WAL contains details of which bytes were changed in which disk blocks. This makes replication closely coupled to the storage engine. If the database changes its storage format from one version to another, it is typically not possible to run different versions of the database software on the leader and the followers. 
@@ -196,10 +180,7 @@ A transaction that modifies several rows generates several such log records, fol
 
 Since a logical log is decoupled from the storage engine internals, it can more easily be kept backward compatible, allowing the leader and the follower to run different versions of the database software, or even different storage engines. 
 
-A logical log format is also easier for external applications to parse. This aspect is useful if you want to send the contents of a database to an external system, such as a data 
-
-
-warehouse for offline analysis, or for building custom indexes and caches [18]. This technique is called _change data capture_ , and we will return to it in Chapter 11. 
+A logical log format is also easier for external applications to parse. This aspect is useful if you want to send the contents of a database to an external system, such as a data warehouse for offline analysis, or for building custom indexes and caches [18]. This technique is called _change data capture_ , and we will return to it in Chapter 11. 
 
 **Trigger-based replication**
 
@@ -217,10 +198,7 @@ Being able to tolerate node failures is just one reason for wanting replication.
 
 Leader-based replication requires all writes to go through a single node, but readonly queries can go to any replica. For workloads that consist of mostly reads and only a small percentage of writes (a common pattern on the web), there is an attractive option: create many followers, and distribute the read requests across those followers. This removes load from the leader and allows read requests to be served by nearby replicas. 
 
-In this _read-scaling_ architecture, you can increase the capacity for serving read-only requests simply by adding more followers. However, this approach only realistically works with asynchronous replication—if you tried to synchronously replicate to all followers, a single node failure or network outage would make the entire system 
-
-
-unavailable for writing. And the more nodes you have, the likelier it is that one will be down, so a fully synchronous configuration would be very unreliable. 
+In this _read-scaling_ architecture, you can increase the capacity for serving read-only requests simply by adding more followers. However, this approach only realistically works with asynchronous replication—if you tried to synchronously replicate to all followers, a single node failure or network outage would make the entire system unavailable for writing. And the more nodes you have, the likelier it is that one will be down, so a fully synchronous configuration would be very unreliable. 
 
 Unfortunately, if an application reads from an _asynchronous_ follower, it may see outdated information if the follower has fallen behind. This leads to apparent inconsistencies in the database: if you run the same query on the leader and a follower at the same time, you may get different results, because not all writes have been reflected in the follower. This inconsistency is just a temporary state—if you stop writing to the database and wait a while, the followers will eventually catch up and become consistent with the leader. For that reason, this effect is known as _eventual consistency_ [22, 23].[iii] 
 
@@ -236,9 +214,7 @@ With asynchronous replication, there is a problem, illustrated in Figure 5-3: if
 
 > iii. The term _eventual consistency_ was coined by Douglas Terry et al. [24], popularized by Werner Vogels [22], and became the battle cry of many NoSQL projects. However, not only NoSQL databases are eventually consistent: followers in an asynchronously replicated relational database have the same characteristics. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0185-00.png)
-
 
 _Figure 5-3. A user makes a write, followed by a read from a stale replica. To prevent this anomaly, we need read-after-write consistency._ 
 
@@ -250,10 +226,7 @@ How can we implement read-after-write consistency in a system with leader-based 
 
 - If most things in the application are potentially editable by the user, that approach won’t be effective, as most things would have to be read from the leader (negating the benefit of read scaling). In that case, other criteria may be used to decide whether to read from the leader. For example, you could track the time of the last update and, for one minute after the last update, make all reads from the leader. You could also monitor the replication lag on followers and prevent queries on any follower that is more than one minute behind the leader. 
 
-- The client can remember the timestamp of its most recent write—then the system can ensure that the replica serving any reads for that user reflects updates at least until that timestamp. If a replica is not sufficiently up to date, either the read can be handled by another replica or the query can wait until the replica has 
-
-
-caught up. The timestamp could be a _logical timestamp_ (something that indicates ordering of writes, such as the log sequence number) or the actual system clock (in which case clock synchronization becomes critical; see “Unreliable Clocks” on page 287). 
+- The client can remember the timestamp of its most recent write—then the system can ensure that the replica serving any reads for that user reflects updates at least until that timestamp. If a replica is not sufficiently up to date, either the read can be handled by another replica or the query can wait until the replica has caught up. The timestamp could be a _logical timestamp_ (something that indicates ordering of writes, such as the log sequence number) or the actual system clock (in which case clock synchronization becomes critical; see “Unreliable Clocks” on page 287). 
 
 - If your replicas are distributed across multiple datacenters (for geographical proximity to users or for availability), there is additional complexity. Any request that needs to be served by the leader must be routed to the datacenter that contains the leader. 
 
@@ -271,9 +244,7 @@ Our second example of an anomaly that can occur when reading from asynchronous f
 
 This can happen if a user makes several reads from different replicas. For example, Figure 5-4 shows user 2345 making the same query twice, first to a follower with little lag, then to a follower with greater lag. (This scenario is quite likely if the user refreshes a web page, and each request is routed to a random server.) The first query returns a comment that was recently added by user 1234, but the second query doesn’t return anything because the lagging follower has not yet picked up that write. In effect, the second query is observing the system at an earlier point in time than the first query. This wouldn’t be so bad if the first query hadn’t returned anything, because user 2345 probably wouldn’t know that user 1234 had recently added a comment. However, it’s very confusing for user 2345 if they first see user 1234’s comment appear, and then see it disappear again. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0187-01.png)
-
 
 _Figure 5-4. A user first reads from a fresh replica, then from a stale replica. Time appears to go backward. To prevent this anomaly, we need monotonic reads._ 
 
@@ -293,7 +264,6 @@ How far into the future can you see, Mrs. Cake?
 
 About ten seconds usually, Mr. Poons. 
 
-
 There is a causal dependency between those two sentences: Mrs. Cake heard Mr. Poons’s question and answered it. 
 
 Now, imagine a third person is listening to this conversation through followers. The things said by Mrs. Cake go through a follower with little lag, but the things said by Mr. Poons have a longer replication lag (see Figure 5-5). This observer would hear the following: 
@@ -308,18 +278,13 @@ How far into the future can you see, Mrs. Cake?
 
 To the observer it looks as though Mrs. Cake is answering the question before Mr. Poons has even asked it. Such psychic powers are impressive, but very confusing [25]. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0188-07.png)
-
 
 _Figure 5-5. If some partitions are replicated slower than others, an observer may see the answer before they see the question._ 
 
 Preventing this kind of anomaly requires another type of guarantee: _consistent prefix reads_ [23]. This guarantee says that if a sequence of writes happens in a certain order, then anyone reading those writes will see them appear in the same order. 
 
-This is a particular problem in partitioned (sharded) databases, which we will discuss in Chapter 6. If the database always applies writes in the same order, reads always see a consistent prefix, so this anomaly cannot happen. However, in many distributed 
-
-
-databases, different partitions operate independently, so there is no global ordering of writes: when a user reads from the database, they may see some parts of the database in an older state and some in a newer state. 
+This is a particular problem in partitioned (sharded) databases, which we will discuss in Chapter 6. If the database always applies writes in the same order, reads always see a consistent prefix, so this anomaly cannot happen. However, in many distributed databases, different partitions operate independently, so there is no global ordering of writes: when a user reads from the database, they may see some parts of the database in an older state and some in a newer state. 
 
 One solution is to make sure that any writes that are causally related to each other are written to the same partition—but in some applications that cannot be done efficiently. There are also algorithms that explicitly keep track of causal dependencies, a topic that we will return to in “The “happens-before” relationship and concurrency” on page 186. 
 
@@ -332,7 +297,6 @@ As discussed earlier, there are ways in which an application can provide a stron
 It would be better if application developers didn’t have to worry about subtle replication issues and could just trust their databases to “do the right thing.” This is why _transactions_ exist: they are a way for a database to provide stronger guarantees so that the application can be simpler. 
 
 Single-node transactions have existed for a long time. However, in the move to distributed (replicated and partitioned) databases, many systems have abandoned them, claiming that transactions are too expensive in terms of performance and availability, and asserting that eventual consistency is inevitable in a scalable system. There is some truth in that statement, but it is overly simplistic, and we will develop a more nuanced view over the course of the rest of this book. We will return to the topic of transactions in Chapters 7 and 9, and we will discuss some alternative mechanisms in Part III. 
-
 
 ## Multi-Leader Replication
 
@@ -354,9 +318,7 @@ In a multi-leader configuration, you can have a leader in _each_ datacenter. Fig
 
 > iv. If the database is partitioned (see Chapter 6), each partition has one leader. Different partitions may have their leaders on different nodes, but each partition must nevertheless have one leader node. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0191-00.png)
-
 
 _Figure 5-6. Multi-leader replication across multiple datacenters._ 
 
@@ -375,7 +337,6 @@ In a single-leader configuration, if the datacenter with the leader fails, failo
 Traffic between datacenters usually goes over the public internet, which may be less reliable than the local network within a datacenter. A single-leader configuration is very sensitive to problems in this inter-datacenter link, because writes are made synchronously over this link. A multi-leader configuration with asynchronous replication can usually tolerate network problems better: a temporary network interruption does not prevent writes being processed. 
 
 **Multi-Leader Replication | 169** 
-
 
 Some databases support multi-leader configurations by default, but it is also often implemented with external tools, such as Tungsten Replicator for MySQL [26], BDR for PostgreSQL [27], and GoldenGate for Oracle [19]. 
 
@@ -399,7 +360,6 @@ There are tools that aim to make this kind of multi-leader configuration easier.
 
 _Real-time collaborative editing_ applications allow several people to edit a document simultaneously. For example, Etherpad [30] and Google Docs [31] allow multiple people to concurrently edit a text document or spreadsheet (the algorithm is briefly discussed in “Automatic Conflict Resolution” on page 174). 
 
-
 We don’t usually think of collaborative editing as a database replication problem, but it has a lot in common with the previously mentioned offline editing use case. When one user edits a document, the changes are instantly applied to their local replica (the state of the document in their web browser or client application) and asynchronously replicated to the server and any other users who are editing the same document. 
 
 If you want to guarantee that there will be no editing conflicts, the application must obtain a lock on the document before a user can edit it. If another user wants to edit the same document, they first have to wait until the first user has committed their changes and released the lock. This collaboration model is equivalent to single-leader replication with transactions on the leader. 
@@ -412,14 +372,11 @@ The biggest problem with multi-leader replication is that write conflicts can oc
 
 For example, consider a wiki page that is simultaneously being edited by two users, as shown in Figure 5-7. User 1 changes the title of the page from A to B, and user 2 changes the title from A to C at the same time. Each user’s change is successfully applied to their local leader. However, when the changes are asynchronously replicated, a conflict is detected [33]. This problem does not occur in a single-leader database. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0193-06.png)
-
 
 _Figure 5-7. A write conflict caused by two leaders concurrently updating the same record._ 
 
 **Multi-Leader Replication | 171** 
-
 
 **Synchronous versus asynchronous conflict detection**
 
@@ -442,7 +399,6 @@ A single-leader database applies writes in a sequential order: if there are seve
 In a multi-leader configuration, there is no defined ordering of writes, so it’s not clear what the final value should be. In Figure 5-7, at leader 1 the title is first updated to B and then to C; at leader 2 it is first updated to C and then to B. Neither order is “more correct” than the other. 
 
 If each replica simply applied writes in the order that it saw the writes, the database would end up in an inconsistent state: the final value would be C at leader 1 and B at leader 2. That is not acceptable—every replication scheme must ensure that the data is eventually the same in all replicas. Thus, the database must resolve the conflict in a 
-
 
 _convergent_ way, which means that all replicas must arrive at the same final value when all changes have been replicated. 
 
@@ -472,7 +428,6 @@ Note that conflict resolution usually applies at the level of an individual row 
 
 **Multi-Leader Replication | 173** 
 
-
 **Automatic Conflict Resolution**
 
 Conflict resolution rules can quickly become complicated, and custom code can be error-prone. Amazon is a frequently cited example of surprising effects due to a conflict resolution handler: for some time, the conflict resolution logic on the shopping cart would preserve items added to the cart, but not items removed from the cart. Thus, customers would sometimes see items reappearing in their carts even though they had previously been removed [37]. 
@@ -491,10 +446,7 @@ Implementations of these algorithms in databases are still young, but it’s lik
 
 Some kinds of conflict are obvious. In the example in Figure 5-7, two writes concurrently modified the same field in the same record, setting it to two different values. There is little doubt that this is a conflict. 
 
-Other kinds of conflict can be more subtle to detect. For example, consider a meeting room booking system: it tracks which room is booked by which group of people at which time. This application needs to ensure that each room is only booked by one group of people at any one time (i.e., there must not be any overlapping bookings for the same room). In this case, a conflict may arise if two different bookings are created for the same room at the same time. Even if the application checks availability before 
-
-
-allowing a user to make a booking, there can be a conflict if the two bookings are made on two different leaders. 
+Other kinds of conflict can be more subtle to detect. For example, consider a meeting room booking system: it tracks which room is booked by which group of people at which time. This application needs to ensure that each room is only booked by one group of people at any one time (i.e., there must not be any overlapping bookings for the same room). In this case, a conflict may arise if two different bookings are created for the same room at the same time. Even if the application checks availability before allowing a user to make a booking, there can be a conflict if the two bookings are made on two different leaders. 
 
 There isn’t a quick ready-made answer, but in the following chapters we will trace a path toward a good understanding of this problem. We will see some more examples of conflicts in Chapter 7, and in Chapter 12 we will discuss scalable approaches for detecting and resolving conflicts in a replicated system. 
 
@@ -502,9 +454,7 @@ There isn’t a quick ready-made answer, but in the following chapters we will t
 
 A _replication topology_ describes the communication paths along which writes are propagated from one node to another. If you have two leaders, like in Figure 5-7, there is only one plausible topology: leader 1 must send all of its writes to leader 2, and vice versa. With more than two leaders, various different topologies are possible. Some examples are illustrated in Figure 5-8. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0197-04.png)
-
 
 _Figure 5-8. Three example topologies in which multi-leader replication can be set up._ 
 
@@ -514,27 +464,19 @@ In circular and star topologies, a write may need to pass through several nodes 
 
 > v. Not to be confused with a _star schema_ (see “Stars and Snowflakes: Schemas for Analytics” on page 93), which describes the structure of a data model, not the communication topology between nodes. 
 
-**Multi-Leader Replication | 175** 
-
-
-with its own identifier, that data change is ignored, because the node knows that it has already been processed. 
+**Multi-Leader Replication | 175** with its own identifier, that data change is ignored, because the node knows that it has already been processed. 
 
 A problem with circular and star topologies is that if just one node fails, it can interrupt the flow of replication messages between other nodes, causing them to be unable to communicate until the node is fixed. The topology could be reconfigured to work around the failed node, but in most deployments such reconfiguration would have to be done manually. The fault tolerance of a more densely connected topology (such as all-to-all) is better because it allows messages to travel along different paths, avoiding a single point of failure. 
 
 On the other hand, all-to-all topologies can have issues too. In particular, some network links may be faster than others (e.g., due to network congestion), with the result that some replication messages may “overtake” others, as illustrated in Figure 5-9. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0198-03.png)
-
 
 _Figure 5-9. With multi-leader replication, writes may arrive in the wrong order at some replicas._ 
 
 In Figure 5-9, client A inserts a row into a table on leader 1, and client B updates that row on leader 3. However, leader 2 may receive the writes in a different order: it may first receive the update (which, from its point of view, is an update to a row that does not exist in the database) and only later receive the corresponding insert (which should have preceded the update). 
 
-This is a problem of causality, similar to the one we saw in “Consistent Prefix Reads” on page 165: the update depends on the prior insert, so we need to make sure that all nodes process the insert first, and then the update. Simply attaching a timestamp to 
-
-
-every write is not sufficient, because clocks cannot be trusted to be sufficiently in sync to correctly order these events at leader 2 (see Chapter 8). 
+This is a problem of causality, similar to the one we saw in “Consistent Prefix Reads” on page 165: the update depends on the prior insert, so we need to make sure that all nodes process the insert first, and then the update. Simply attaching a timestamp to every write is not sufficient, because clocks cannot be trusted to be sufficiently in sync to correctly order these events at leader 2 (see Chapter 8). 
 
 To order these events correctly, a technique called _version vectors_ can be used, which we will discuss later in this chapter (see “Detecting Concurrent Writes” on page 184). However, conflict detection techniques are poorly implemented in many multi-leader replication systems. For example, at the time of writing, PostgreSQL BDR does not provide causal ordering of writes [27], and Tungsten Replicator for MySQL doesn’t even try to detect conflicts [34]. 
 
@@ -554,14 +496,11 @@ Imagine you have a database with three replicas, and one of the replicas is curr
 
 > vi. Dynamo is not available to users outside of Amazon. Confusingly, AWS offers a hosted database product called _DynamoDB_ , which uses a completely different architecture: it is based on single-leader replication. 
 
-
 configuration, if you want to continue processing writes, you may need to perform a failover (see “Handling Node Outages” on page 156). 
 
 On the other hand, in a leaderless configuration, failover does not exist. Figure 5-10 shows what happens: the client (user 1234) sends the write to all three replicas in parallel, and the two available replicas accept the write but the unavailable replica misses it. Let’s say that it’s sufficient for two out of three replicas to acknowledge the write: after user 1234 has received two _ok_ responses, we consider the write to be successful. The client simply ignores the fact that one of the replicas missed the write. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0200-02.png)
-
 
 _Figure 5-10. A quorum write, quorum read, and read repair after a node outage._ 
 
@@ -572,7 +511,6 @@ To solve that problem, when a client reads from the database, it doesn’t just 
 **Read repair and anti-entropy**
 
 The replication scheme should ensure that eventually all the data is copied to every replica. After an unavailable node comes back online, how does it catch up on the writes that it missed? 
-
 
 Two mechanisms are often used in Dynamo-style datastores: 
 
@@ -596,12 +534,9 @@ More generally, if there are _n_ replicas, every write must be confirmed by _w_ 
 
 > vii. Sometimes this kind of quorum is called a _strict quorum_ , to contrast with _sloppy quorums_ (discussed in “Sloppy Quorums and Hinted Handoff” on page 183). 
 
-
 In Dynamo-style databases, the parameters _n_ , _w_ , and _r_ are typically configurable. A common choice is to make _n_ an odd number (typically 3 or 5) and to set _w_ = _r_ = ( _n_ + 1) / 2 (rounded up). However, you can vary the numbers as you see fit. For example, a workload with few writes and many reads may benefit from setting _w_ = _n_ and _r_ = 1. This makes reads faster, but has the disadvantage that just one failed node causes all database writes to fail. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0202-01.png)
-
 
 There may be more than _n_ nodes in the cluster, but any given value is stored only on _n_ nodes. This allows the dataset to be partitioned, supporting datasets that are larger than you can fit on one node. We will return to partitioning in Chapter 6. 
 
@@ -617,12 +552,9 @@ The quorum condition, _w_ + _r_ > _n_ , allows the system to tolerate unavailabl
 
 - Normally, reads and writes are always sent to all _n_ replicas in parallel. The parameters _w_ and _r_ determine how many nodes we wait for—i.e., how many of the _n_ nodes need to report success before we consider the read or write to be successful. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0202-09.png)
 
-
 _Figure 5-11. If w + r > n, at least one of the r replicas you read from must have seen the most recent successful write._ 
-
 
 If fewer than the required _w_ or _r_ nodes are available, writes or reads return an error. A node could be unavailable for many reasons: because the node is down (crashed, powered down), due to an error executing the operation (can’t write because the disk is full), due to a network interruption between the client and the node, or for any number of other reasons. We only care whether the node returned a successful response and don’t need to distinguish between different kinds of fault. 
 
@@ -642,7 +574,6 @@ However, even with _w_ + _r_ > _n_ , there are likely to be edge cases where sta
 
 - If two writes occur concurrently, it is not clear which one happened first. In this case, the only safe solution is to merge the concurrent writes (see “Handling Write Conflicts” on page 171). If a winner is picked based on a timestamp (last write wins), writes can be lost due to clock skew [35]. We will return to this topic in “Detecting Concurrent Writes” on page 184. 
 
-
 - If a write happens concurrently with a read, the write may be reflected on only some of the replicas. In this case, it’s undetermined whether the read returns the old or the new value. 
 
 - If a write succeeded on some replicas but failed on others (for example because the disks on some nodes are full), and overall succeeded on fewer than _w_ replicas, it is not rolled back on the replicas where it succeeded. This means that if a write was reported as failed, subsequent reads may or may not return the value from that write [47]. 
@@ -661,10 +592,7 @@ From an operational perspective, it’s important to monitor whether your databa
 
 For leader-based replication, the database typically exposes metrics for the replication lag, which you can feed into a monitoring system. This is possible because writes are applied to the leader and to followers in the same order, and each node has a position in the replication log (the number of writes it has applied locally). By subtracting a follower’s current position from the leader’s current position, you can measure the amount of replication lag. 
 
-However, in systems with leaderless replication, there is no fixed order in which writes are applied, which makes monitoring more difficult. Moreover, if the database 
-
-
-only uses read repair (no anti-entropy), there is no limit to how old a value might be —if a value is only infrequently read, the value returned by a stale replica may be ancient. 
+However, in systems with leaderless replication, there is no fixed order in which writes are applied, which makes monitoring more difficult. Moreover, if the database only uses read repair (no anti-entropy), there is no limit to how old a value might be —if a value is only infrequently read, the value returned by a stale replica may be ancient. 
 
 There has been some research on measuring replica staleness in databases with leaderless replication and predicting the expected percentage of stale reads depending on the parameters _n_ , _w_ , and _r_ [48]. This is unfortunately not yet common practice, but it would be good to include staleness measurements in the standard set of metrics for databases. Eventual consistency is a deliberately vague guarantee, but for operability it’s important to be able to quantify “eventual.” 
 
@@ -682,10 +610,7 @@ In a large cluster (with significantly more than _n_ nodes) it’s likely that t
 
 The latter is known as a _sloppy quorum_ [37]: writes and reads still require _w_ and _r_ successful responses, but those may include nodes that are not among the designated _n_ “home” nodes for a value. By analogy, if you lock yourself out of your house, you may knock on the neighbor’s door and ask whether you may stay on their couch temporarily. 
 
-Once the network interruption is fixed, any writes that one node temporarily accepted on behalf of another node are sent to the appropriate “home” nodes. This is 
-
-
-called _hinted handoff_ . (Once you find the keys to your house again, your neighbor politely asks you to get off their couch and go home.) 
+Once the network interruption is fixed, any writes that one node temporarily accepted on behalf of another node are sent to the appropriate “home” nodes. This is called _hinted handoff_ . (Once you find the keys to your house again, your neighbor politely asks you to get off their couch and go home.) 
 
 Sloppy quorums are particularly useful for increasing write availability: as long as _any w_ nodes are available, the database can accept writes. However, this means that even when _w_ + _r_ > _n_ , you cannot be sure to read the latest value for a key, because the latest value may have been temporarily written to some nodes outside of _n_ [47]. 
 
@@ -705,7 +630,6 @@ Riak keeps all communication between clients and database nodes local to one dat
 
 Dynamo-style databases allow several clients to concurrently write to the same key, which means that conflicts will occur even if strict quorums are used. The situation is similar to multi-leader replication (see “Handling Write Conflicts” on page 171), although in Dynamo-style databases conflicts can also arise during read repair or hinted handoff. 
 
-
 The problem is that events may arrive in a different order at different nodes, due to variable network delays and partial failures. For example, Figure 5-12 shows two clients, A and B, simultaneously writing to a key _X_ in a three-node datastore: 
 
 - Node 1 receives the write from A, but never receives the write from B due to a transient outage. 
@@ -714,9 +638,7 @@ The problem is that events may arrive in a different order at different nodes, d
 
 - Node 3 first receives the write from B, then the write from A. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0207-04.png)
-
 
 _Figure 5-12. Concurrent writes in a Dynamo-style datastore: there is no well-defined ordering._ 
 
@@ -725,7 +647,6 @@ If each node simply overwrote the value for a key whenever it received a write r
 In order to become eventually consistent, the replicas should converge toward the same value. How do they do that? One might hope that replicated databases would handle this automatically, but unfortunately most implementations are quite poor: if you want to avoid losing data, you—the application developer—need to know a lot about the internals of your database’s conflict handling. 
 
 We briefly touched on some techniques for conflict resolution in “Handling Write Conflicts” on page 171. Before we wrap up this chapter, let’s explore the issue in a bit more detail. 
-
 
 **Last write wins (discarding concurrent writes)**
 
@@ -747,7 +668,6 @@ How do we decide whether two operations are concurrent or not? To develop an int
 
 - In Figure 5-9, the two writes are not concurrent: A’s insert _happens before_ B’s increment, because the value incremented by B is the value inserted by A. In other words, B’s operation builds upon A’s operation, so B’s operation must have happened later. We also say that B is _causally dependent_ on A. 
 
-
 - On the other hand, the two writes in Figure 5-12 are concurrent: when each client starts the operation, it does not know that another client is also performing an operation on the same key. Thus, there is no causal dependency between the operations. 
 
 An operation A _happens before_ another operation B if B knows about A, or depends on A, or builds upon A in some way. Whether one operation happens before another operation is the key to defining what concurrency means. In fact, we can simply say that two operations are _concurrent_ if neither happens before the other (i.e., neither knows about the other) [54]. 
@@ -764,10 +684,7 @@ In computer systems, two operations might be concurrent even though the speed of
 
 **Capturing the happens-before relationship**
 
-Let’s look at an algorithm that determines whether two operations are concurrent, or whether one happened before another. To keep things simple, let’s start with a data‐ 
-
-
-base that has only one replica. Once we have worked out how to do this on a single replica, we can generalize the approach to a leaderless database with multiple replicas. 
+Let’s look at an algorithm that determines whether two operations are concurrent, or whether one happened before another. To keep things simple, let’s start with a data‐ base that has only one replica. Once we have worked out how to do this on a single replica, we can generalize the approach to a leaderless database with multiple replicas. 
 
 Figure 5-13 shows two clients concurrently adding items to the same shopping cart. (If that example strikes you as too inane, imagine instead two air traffic controllers concurrently adding aircraft to the sector they are tracking.) Initially, the cart is empty. Between them, the clients make five writes to the database: 
 
@@ -781,22 +698,17 @@ Figure 5-13 shows two clients concurrently adding items to the same shopping car
 
 5. Finally, client 1 wants to add `bacon` . It previously received `[milk, flour]` and `[eggs]` from the server at version 3, so it merges those, adds `bacon` , and sends the final value `[milk, flour, eggs, bacon]` to the server, along with the version number 3. This overwrites `[milk, flour]` (note that `[eggs]` was already overwritten in the last step) but is concurrent with `[eggs, milk, ham]` , so the server keeps those two concurrent values. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0211-00.png)
-
 
 _Figure 5-13. Capturing causal dependencies between two clients concurrently editing a shopping cart._ 
 
 The dataflow between the operations in Figure 5-13 is illustrated graphically in Figure 5-14. The arrows indicate which operation _happened before_ which other operation, in the sense that the later operation _knew about_ or _depended on_ the earlier one. In this example, the clients are never fully up to date with the data on the server, since there is always another operation going on concurrently. But old versions of the value do get overwritten eventually, and no writes are lost. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0211-03.png)
-
 
 _Figure 5-14. Graph of causal dependencies in Figure 5-13._ 
 
 Note that the server can determine whether two operations are concurrent by looking at the version numbers—it does not need to interpret the value itself (so the value could be any data structure). The algorithm works as follows: 
-
 
 - The server maintains a version number for every key, increments the version number every time that key is written, and stores the new version number along with the value written. 
 
@@ -832,14 +744,11 @@ Like the version numbers in Figure 5-13, version vectors are sent from the datab
 
 Also, like in the single-replica example, the application may need to merge siblings. The version vector structure ensures that it is safe to read from one replica and subsequently write back to another replica. Doing so may result in siblings being created, but no data is lost as long as siblings are merged correctly. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0213-08.png)
-
 
 **Version vectors and vector clocks**
 
 A _version vector_ is sometimes also called a _vector clock_ , even though they are not quite the same. The difference is subtle—please see the references for details [57, 60, 61]. In brief, when comparing the state of replicas, version vectors are the right data structure to use. 
-
 
 ## Summary
 
@@ -877,10 +786,7 @@ Clients send each write to one of several leader nodes, any of which can accept 
 
 Clients send each write to several nodes, and read from several nodes in parallel in order to detect and correct nodes with stale data. 
 
-Each approach has advantages and disadvantages. Single-leader replication is popular because it is fairly easy to understand and there is no conflict resolution to worry about. Multi-leader and leaderless replication can be more robust in the presence of 
-
-
-faulty nodes, network interruptions, and latency spikes—at the cost of being harder to reason about and providing only very weak consistency guarantees. 
+Each approach has advantages and disadvantages. Single-leader replication is popular because it is fairly easy to understand and there is no conflict resolution to worry about. Multi-leader and leaderless replication can be more robust in the presence of faulty nodes, network interruptions, and latency spikes—at the cost of being harder to reason about and providing only very weak consistency guarantees. 
 
 Replication can be synchronous or asynchronous, which has a profound effect on the system behavior when there is a fault. Although asynchronous replication can be fast when the system is running smoothly, it’s important to figure out what happens when replication lag increases and servers fail. If a leader fails and you promote an asynchronously updated follower to be the new leader, recently committed data may be lost. 
 
@@ -909,7 +815,6 @@ In the next chapter we will continue looking at data that is distributed across 
 [2] “Oracle Active Data Guard Real-Time Data Protection and Availability,” Oracle White Paper, June 2013. 
 
 [3] “AlwaysOn Availability Groups,” in _SQL Server Books Online_ , Microsoft, 2012. 
-
 
 [4] Lin Qiao, Kapil Surlaker, Shirshanka Das, et al.: “On Brewing Fresh Espresso: LinkedIn’s Distributed Data Serving Platform,” at _ACM International Conference on Management of Data_ (SIGMOD), June 2013. 
 
@@ -945,7 +850,6 @@ In the next chapter we will continue looking at data that is distributed across 
 
 [20] Shirshanka Das, Chavdar Botev, Kapil Surlaker, et al.: “All Aboard the Databus!,” at _ACM Symposium on Cloud Computing_ (SoCC), October 2012. 
 
-
 [21] Greg Sabino Mullane: “Version 5 of Bucardo Database Replication System,” _blog.endpoint.com_ , June 23, 2014. 
 
 [22] Werner Vogels: “Eventually Consistent,” _ACM Queue_ , volume 6, number 6, pages 14–19, October 2008. doi:10.1145/1466443.1466448 
@@ -978,7 +882,6 @@ In the next chapter we will continue looking at data that is distributed across 
 
 [36] Riley Berton: “Is Bi-Directional Replication (BDR) in Postgres Transactional?,” _sdf.org_ , January 4, 2016. 
 
-
 [37] Giuseppe DeCandia, Deniz Hastorun, Madan Jampani, et al.: “Dynamo: Amazon’s Highly Available Key-Value Store,” at _21st ACM Symposium on Operating Systems Principles_ (SOSP), October 2007. 
 
 [38] Marc Shapiro, Nuno Preguiça, Carlos Baquero, and Marek Zawirski: “A Comprehensive Study of Convergent and Commutative Replicated Data Types,” INRIA Research Report no. 7506, January 2011. 
@@ -1010,7 +913,6 @@ In the next chapter we will continue looking at data that is distributed across 
 [51] “Apache Cassandra 2.0 Documentation,” DataStax, Inc., 2014. 
 
 [52] “Riak Enterprise: Multi-Datacenter Replication.” Technical whitepaper, Basho Technologies, Inc., September 2014. 
-
 
 [53] Jonathan Ellis: “Why Cassandra Doesn’t Need Vector Clocks,” _datastax.com_ , September 2, 2013. 
 

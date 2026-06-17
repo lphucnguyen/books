@@ -8,14 +8,11 @@ Event-driven microservices share the testing best practices that are common to a
 
 Now, before going much further, it’s important to note that this chapter is meant to be a companion to more extensive works on the principles and how-tos of testing. After all, many books, blogs, and documents have been written on testing, and I certainly can’t cover testing to the extent that they do. This chapter primarily looks at eventdriven-specific testing methodologies and principles and how they integrate into the overall testing picture. Consult your own sources on language-specific testing frameworks and testing best practices to complement this chapter. 
 
-
 ## Unit-Testing Topology Functions
 
 Unit tests are used to test the smallest pieces of code in an application to ensure that they work as expected. These small testing units provide a foundation for which larger, more comprehensive tests can be written to test higher functionality of the application. Event-driven topologies often apply transformation, aggregation, mapping, and reduction functions to events, making these functions ideal candidates for unit testing. 
 
-
 ![](../images/Event-Driven_Microservices-0274-02.png)
-
 
 Make sure to test boundary conditions, such as null and maximum values, for each of your functions. 
 
@@ -38,7 +35,6 @@ Stateful functions are generally more complicated to test than stateless ones. S
 
 Here is an example of a stateful aggregation function that might be found in a basic producer-consumer implementation: 
 
-
 ```
 publicLongaddValueToAggregation(Stringkey,LongeventValue){
 ```
@@ -60,7 +56,6 @@ This function is used to sum all `eventValue` s for each key. Mocking the endpoi
 The full-featured lightweight and heavyweight frameworks typically provide the means to locally test your entire topology. If your framework does not, the community of users and contributors may have created a third-party option that provides this functionality (this is another reason to choose a framework with a strong community). For example, Apache Spark has two separate third-party options for unit tests, `StreamingSuiteBase` and spark-fast-tests, in addition to providing a built-in `MemoryStream` class for fine-grained control over stream input and output. Apache Flink provides its own topology testing options, as does Apache Beam. As for lightweight stream frameworks, Kafka Streams provides the means to test topologies using the `TopologyTestDriver` , which mocks out the functionality of the framework without requiring you to set up an entire event broker. 
 
 Topology testing is more complex than a single unit test and exercises the entire topology as specified by your business logic. You can think of your topology as a single, large, complex function with many moving parts. The topology testing frameworks allow you to fully control _which_ events are produced to the input streams as well as _when_ they are created. You can generate events with specific values; events that are out of order, contain invalid timestamps, or include invalid data; and events that are used to exercise corner-case logic. By doing so, you can ensure that operations such as time-based aggregations, event scheduling, and stateful functions perform as expected. 
-
 
 For example, consider the following map-reduce-style topology definition: 
 
@@ -85,7 +80,6 @@ Microservice integration testing comes in two main flavors: _local_ integration 
 
 A third flavor is a hybrid option, where certain parts of your microservice and its test environment are hosted or executed locally and others done remotely. Since it’s technically impossible to evaluate all combinations and permutations of this hybrid pattern, I’ll just focus on the two main cases and leave it up to you to determine your own requirements should they differ. 
 
-
 There are several overarching questions that you should keep in mind for the remainder of this chapter: 
 
 ...
@@ -97,7 +91,6 @@ The next sections will help you understand some of the options available to you,
 Local integration testing allows for a significant range of functional and nonfunctional testing. This form of testing uses a local copy of the production environment where the microservice will be deployed. At a minimum this means creating an event broker, schema registry, any microservice-specific data stores, the microservice itself, and any required processing framework, such as when you are using a heavyweight framework or FaaS. You could also introduce containerization, logging, and even the container management system, but they are not strictly related to the business logic of the microservice and so are not absolutely necessary. 
 
 The biggest benefit of spinning up your own locally controllable environment is that you get to control each system independently. You can programmatically create scenarios that replicate actual production situations, such as intermittent failures, outof-order events, and loss of network access. You also get to test the integration of the framework with your business logic. Local integration testing also provides the means to test the basic functionality of horizontal scaling, particularly where copartitioning and state are concerned. 
-
 
 Another significant benefit of local integration testing is that you can effectively test both event-driven and request-response logic at the same time, in the same workflows. You have full control over when events are injected into the input streams, and can issue requests at any point before, during, or after the events have been processed. It may be helpful to think of the request-response API as just another source of events for the purposes of testing your microservice. 
 
@@ -141,7 +134,6 @@ The application and the processing framework are typically intertwined, and you 
 
 - Inducing a worker instance failure to mimic losing an application instance (heavyweight frameworks) 
 
-
 **The application** 
 
 Application-level control predominantly involves managing the number of instances running at any given time. Integration testing should include scaling the instance count (dynamically, if supported) to ensure that: 
@@ -158,9 +150,7 @@ Embedding testing libraries into your code is by far the narrowest of the option
 For example, the test code of a Kafka Streams application starts its own Kafka broker, schema registry, and microservice topology instances. The test code can then start and stop topology instances, publish events, await responses, incur broker outages, and induce other failure modes. Upon termination, all of the components are terminated, and the state is cleaned up. Consider the following pseudocode (declarations and instantiations skipped for brevity): 
 
 ...
-```
-
-if(event...)//validate the consumer output
+``` if(event...)//validate the consumer output
 //pass the test if correct
 else
 //fail the test.
@@ -172,14 +162,9 @@ Kafka Streams is a particularly relevant example because it illustrates the limi
 
 One option for setting up an environment to perform these tests is simply to install and configure all required systems locally. This is a low-overhead approach particularly if you’re just starting out with microservices, but if every teammate must do the same, it becomes expensive and complex to debug if they’re each running slightly different versions. As with most things microservices, it’s often best to avoid duplicating steps and instead provide supportive tooling that eliminates the overhead. 
 
-A more flexible option is to create a single container that has all of the necessary components installed and configured. This container can be used by any team that 
-
-
-wants to test its application in this way. You can maintain an open source contribution model (even if internal to the organization), allowing fixes, updates, and new features to be added back for the benefit of all teams. This model is flexible enough to be used with any programming language, though it’s far easier to use with a programmatic API that allows for easy communication with the system components in the container. A lightweight processing framework example is shown in Figure 15-1, with the schema registry, event broker, and necessary topics created internally to the container. The microservice instance itself is executed externally to the container, and simply references the addresses of the broker and schema registry from its testing config file. 
-
+A more flexible option is to create a single container that has all of the necessary components installed and configured. This container can be used by any team that wants to test its application in this way. You can maintain an open source contribution model (even if internal to the organization), allowing fixes, updates, and new features to be added back for the benefit of all teams. This model is flexible enough to be used with any programming language, though it’s far easier to use with a programmatic API that allows for easy communication with the system components in the container. A lightweight processing framework example is shown in Figure 15-1, with the schema registry, event broker, and necessary topics created internally to the container. The microservice instance itself is executed externally to the container, and simply references the addresses of the broker and schema registry from its testing config file. 
 
 ![](../images/Event-Driven_Microservices-0281-01.png)
-
 
 _Figure 15-1. Lightweight microservice using containerized testing dependencies for local integration testing_ 
 
@@ -191,21 +176,17 @@ Google’s PubSub, for example, has an emulator that can provide sufficient loca
 
 Applications using FaaS platforms can leverage local testing libraries provided by the hosting service. Google Cloud functions can be tested locally, as can Amazon’s 
 
-
 Lambda functions and Microsoft Azure’s functions. The open source solutions OpenWhisk, OpenFaaS, and Kubeless, as discussed in Chapter 9, provide similar testing mechanisms, which you can find via a quick web search. These options allow you to configure a complete FaaS environment locally, such that you can test on a platform configured to be as similar to production as possible. 
 
 Establishing an integration testing environment for applications using heavyweight frameworks is similar to the process of establishing one for FaaS frameworks. Each requires that the framework be installed and configured, with the application submitting the processing job directly to the framework. With heavyweight frameworks, a typical single-container installation will just need to run the master and worker instances side-by-side along with the event broker and any other dependencies. With the heavyweight framework set up, you simply need to submit the processing job to the master and await test output on the output event streams. An example is illustrated in Figure 15-2, where the entire set of dependencies has been containerized for easy distribution among developers. 
 
-
 ![](../images/Event-Driven_Microservices-0282-02.png)
-
 
 _Figure 15-2. Heavyweight microservice using containerized testing dependencies for local integration testing_ 
 
 ### Integrate Remote Services That Have No Local Options
 
 Some services used in production may simply not have any locally available options, and this is a disadvantage for both development and integration testing. A current example is the absence of any emulator for Microsoft Azure’s Event Hub. The lack of a locally available implementation means that remote environments must be provisioned for each developer, in addition to integration testing environments for these applications. This is also where lines can begin to blur, as integration testing up to this point has been primarily about isolating a single application instance in a disposable, easily managed, local environment. The overhead incurred in this scenario can be a real impediment to independent development and integration testing efforts, so be sure to give it careful consideration before moving forward. 
-
 
 Alleviating this issue generally requires close coordination with infrastructure teams to ensure either that independent testing environments can be independently provisioned via access controls or that a large, common environment can be created for all to use (this has its own issues, as discussed later in the chapter). Security issues may arise from developers having to connect their local staging environment to remote resources. Cleanup and management of the remote staging environment(s) can also become problematic. There are many ways to approach this challenge, but the problems that the situation may pose are too large to comprehensively tackle here. 
 
@@ -215,9 +196,7 @@ The good news is that most of the biggest closed source service providers are ma
 
 Full remote integration testing enables you to perform specific tests that are difficult to conduct in local environments. For example, performance and load testing are essential for ensuring that the microservice under test achieves its service-level objectives. Event processing throughput, request-response latency, instance scaling, and failure recovery are all enabled by full integration testing. 
 
-
 ![](../images/Event-Driven_Microservices-0283-04.png)
-
 
 The goal of full integration testing is to create an environment as close to possible as that of production, including event streams, event data volume, event schemas, and request-response patterns (if applicable), in which to run the application. 
 
@@ -225,10 +204,7 @@ Full integration testing is generally done in one of three following ways. You c
 
 ### Programmatically Create a Temporary Integration Testing Environment
 
-“Cluster Creation and Management” on page 248 examined the advantages of having programmatically generated event brokers and compute resource managers. You can leverage these tools to generate temporary environments for your integration testing. A separate set of brokers can be created along with individually reserved compute resources to run the containerized microservices under test. One added benefit of using this approach for full integration testing is that it regularly exercises the process 
-
-
-of creating new brokers and compute environments. This ensures that any breakages that occur in the scripts or any bugs in the configuration will be exposed at the next integration test. 
+“Cluster Creation and Management” on page 248 examined the advantages of having programmatically generated event brokers and compute resource managers. You can leverage these tools to generate temporary environments for your integration testing. A separate set of brokers can be created along with individually reserved compute resources to run the containerized microservices under test. One added benefit of using this approach for full integration testing is that it regularly exercises the process of creating new brokers and compute environments. This ensures that any breakages that occur in the scripts or any bugs in the configuration will be exposed at the next integration test. 
 
 The next issue in a newly brought-up environment is that it lacks both event streams and event data. These are, of course, both essential for testing your microservice. You can obtain the names of the event streams to create either by directly asking the user or by using a configuration file within the microservice codebase to be accessed by the tooling. The partition count must mirror that of the production system to ensure that the microservice’s scaling, copartitioning, and repartitioning logic is correctly exercised. 
 
@@ -257,7 +233,6 @@ Events can be copied from the production cluster over to the newly created event
 - It requires significant investment in streamlining the creation and copying process to reduce barriers to usage. 
 
 - It may expose sensitive production events. 
-
 
 **Populating with events from a curated testing source** 
 
@@ -328,9 +303,7 @@ Another option involves creating a single testing environment with a shared pool
 
 - It inaccurately represents the entire range of events found in production. 
 
-
 ![](../images/Event-Driven_Microservices-0287-02.png)
-
 
 This strategy is the worst of the options in terms of usability, as the event broker eventually becomes a dumping ground of confusing event streams and broken data. 
 

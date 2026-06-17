@@ -14,10 +14,6 @@ When Mary started investigating the microservice architecture, one of her bigges
 
 ACID (Atomicity, Consistency, Isolation, Durability) transactions greatly simplify the job of the developer by providing the illusion that each transaction has exclusive access to the data. In a microservice architecture, transactions that are within a single service can still use ACID transactions. The challenge, however, lies in implementing transactions for operations that update data owned by multiple services. 
 
-
-_**Transaction management in a microservice architecture**_ 
-
-
 For example, as described in chapter 2, the createOrder() operation spans numerous services, including Order Service, Kitchen Service, and Accounting Service. Operations such as these need a transaction management mechanism that works across services. 
 
 Mary discovered that, as mentioned in chapter 2, the traditional approach to distributed transaction management isn’t a good choice for modern applications. Instead of an ACID transactions, an operation that spans services must use what’s known as a _saga_ , a message-driven sequence of local transactions, to maintain data consistency. One challenge with sagas is that they are ACD (Atomicity, Consistency, Durability). They lack the isolation feature of traditional ACID transactions. As a result, an application must use what are known as _countermeasures_ , design techniques that prevent or reduce the impact of concurrency anomalies caused by the lack of isolation. 
@@ -30,10 +26,7 @@ Let’s start by taking a look at the challenge of managing transactions in a mi
 
 ## 4.1 Transaction management in a microservice architecture
 
-Almost every request handled by an enterprise application is executed within a database transaction. Enterprise application developers use frameworks and libraries that simplify transaction management. Some frameworks and libraries provide a programmatic API for explicitly beginning, committing, and rolling back transactions. Other frameworks, such as the Spring framework, provide a declarative mechanism. Spring provides an @Transactional annotation that arranges for method invocations to be 
-
-
-automatically executed within a transaction. As a result, it’s straightforward to write transactional business logic. 
+Almost every request handled by an enterprise application is executed within a database transaction. Enterprise application developers use frameworks and libraries that simplify transaction management. Some frameworks and libraries provide a programmatic API for explicitly beginning, committing, and rolling back transactions. Other frameworks, such as the Spring framework, provide a declarative mechanism. Spring provides an @Transactional annotation that arranges for method invocations to be automatically executed within a transaction. As a result, it’s straightforward to write transactional business logic. 
 
 Or, to be more precise, transaction management is straightforward in a monolithic application that accesses a single database. Transaction management is more challenging in a complex monolithic application that uses multiple databases and message brokers. And in a microservice architecture, transactions span multiple services, each of which has its own database. In this situation, the application must use a more elaborate mechanism to manage transactions. As you’ll learn, the traditional approach of using distributed transactions isn’t a viable option for modern applications. Instead, a microservices-based application must use sagas. 
 
@@ -51,23 +44,16 @@ Because each service has its own database, you need to use a mechanism to mainta
 
 The traditional approach to maintaining data consistency across multiple services, databases, or message brokers is to use distributed transactions. The de facto standard for distributed transaction management is the X/Open Distributed Transaction Processing (DTP) Model (X/Open XA—see https://en.wikipedia.org/wiki/X/Open_XA). XA uses _two-phase commit_ (2PC) to ensure that all participants in a transaction either commit or rollback. An XA-compliant technology stack consists of XA-compliant databases and message brokers, database drivers, and messaging APIs, and an interprocess communication mechanism that propagates the XA global transaction ID. Most SQL databases are XA compliant, as are some message brokers. Java EE applications can, for example, use JTA to perform distributed transactions. 
 
-
-_**Transaction management in a microservice architecture**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0143-02.png)
-
 
 **----- Start of picture text -----**<br>
 The createOrder() operation reads from createOrder()<br>Consumer Service and updates data<br>in Order Service, Kitchen Service,<br>and Accounting Service. Order<br>controller<br>Order Service<br>Order<br>Data consistency required<br>Reads Writes Writes<br>Consumer Ticket Account<br>Consumer Service Kitchen Service Accounting Service<br>**----- End of picture text -----**<br>
-
 
 Figure 4.1 The **createOrder()** operation updates data in several services. It must use a mechanism to maintain data consistency across those services. 
 
 As simple as this sounds, there are a variety of problems with distributed transactions. One problem is that many modern technologies, including NoSQL databases such as MongoDB and Cassandra, don’t support them. Also, distributed transactions aren’t supported by modern message brokers such as RabbitMQ and Apache Kafka. As a result, if you insist on using distributed transactions, you can’t use many modern technologies. 
 
 Another problem with distributed transactions is that they are a form of synchronous IPC, which reduces availability. In order for a distributed transaction to commit, all the participating services must be available. As described in chapter 3, the availability is the product of the availability of all of the participants in the transaction. If a distributed transaction involves two services that are 99.5% available, then the overall availability is 99%, which is significantly less. Each additional service involved in a distributed transaction further reduces availability. There is even Eric Brewer’s CAP theorem, which states that a system can only have two of the following three properties: 
-
 
 consistency, availability, and partition tolerance (https://en.wikipedia.org/wiki/CAP _theorem). Today, architects prefer to have a system that’s available rather than one that’s consistent. 
 
@@ -89,16 +75,10 @@ Sagas differ from ACID transactions in a couple of important ways. As I describe
 
 The example saga used throughout this chapter is the Create Order Saga, which is shown in figure 4.2. The Order Service implements the createOrder() operation using this saga. The saga’s first local transaction is initiated by the external request to create an order. The other five local transactions are each triggered by completion of the previous one. 
 
-
-_**Transaction management in a microservice architecture**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0145-02.png)
-
 
 **----- Start of picture text -----**<br>
 Order Service Consumer Service Kitchen Service Accounting Service<br>Saga<br>Txn:1<br>Create order<br>Txn: 12<br>Create Verify c o nsumerrder<br>Txn:3<br>Create ticket<br>Txn:4<br>Authorize card<br>Txn:5<br>Approve ticket<br>Txn:6<br>Approve order<br>**----- End of picture text -----**<br>
-
 
 Figure 4.2 Creating an **Order** using a saga. The **createOrder()** operation is implemented by a saga that consists of local transactions in several services. 
 
@@ -122,20 +102,14 @@ On the surface, sagas seem straightforward, but there are a few challenges to us
 
 **SAGAS USE COMPENSATING TRANSACTIONS TO ROLL BACK CHANGES**
 
-A great feature of traditional ACID transactions is that the business logic can easily roll back a transaction if it detects the violation of a business rule. It executes a ROLLBACK statement, and the database undoes all the changes made so far. Unfortunately, sagas can’t be automatically rolled back, because each step commits its changes to the local database. This means, for example, that if the authorization of the credit card fails in the fourth step of the Create Order Saga, the FTGO application must explicitly 
-
-
-undo the changes made by the first three steps. You must write what are known as _compensating transactions_ . 
+A great feature of traditional ACID transactions is that the business logic can easily roll back a transaction if it detects the violation of a business rule. It executes a ROLLBACK statement, and the database undoes all the changes made so far. Unfortunately, sagas can’t be automatically rolled back, because each step commits its changes to the local database. This means, for example, that if the authorization of the credit card fails in the fourth step of the Create Order Saga, the FTGO application must explicitly undo the changes made by the first three steps. You must write what are known as _compensating transactions_ . 
 
 Suppose that the ( _n_ + 1)[th] transaction of a saga fails. The effects of the previous _n_ transactions must be undone. Conceptually, each of those steps, Ti, has a corresponding compensating transaction, Ci, which undoes the effects of the Ti. To undo the effects of those first _n_ steps, the saga must execute each Ci in reverse order. The sequence of steps is T1 … Tn, Cn … C1, as shown in figure 4.3. In this example, Tn+1 fails, which requires steps T1 … Tn to be undone. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0146-04.png)
-
 
 **----- Start of picture text -----**<br>
 The changes made by T1...Tn The compensating transactions undo<br>have been committed. the changes made by T1...Tn.<br>Saga<br>T1 ... T n FAILST n +1 C n ... C1<br>**----- End of picture text -----**<br>
-
 
 Figure 4.3 When a step of a saga fails because of a business rule violation, the saga must explicitly undo the updates made by previous steps by executing compensating transactions. 
 
@@ -153,17 +127,11 @@ If a local transaction fails, the saga’s coordination mechanism must execute c
 
 Section 4.3 discusses how the first three steps of the Create Order Saga are termed _compensatable transactions_ because they’re followed by steps that can fail, how the fourth step is termed the saga’s _pivot transaction_ because it’s followed by steps that 
 
-
-_**Coordinating sagas**_ 
-
 Table 4.1 The compensating transactions for the **Create Order Saga** 
 
 |Step|Service|Transaction|Compensating transaction|
 |---|---|---|---|
-|1<br>2<br>3<br>4<br>5<br>6|Order Service<br>Consumer Service<br>Kitchen Service<br>Accounting Service<br>Kitchen Service<br>Order Service|createOrder()<br>verifyConsumerDetails()<br>createTicket()<br>authorizeCreditCard()<br>approveTicket()<br>approveOrder()|rejectOrder()<br>—<br>rejectTicket()<br>—<br>—<br>—|
-
-
-never fail, and how the last two steps are termed _retriable transactions_ because they always succeed. 
+|1<br>2<br>3<br>4<br>5<br>6|Order Service<br>Consumer Service<br>Kitchen Service<br>Accounting Service<br>Kitchen Service<br>Order Service|createOrder()<br>verifyConsumerDetails()<br>createTicket()<br>authorizeCreditCard()<br>approveTicket()<br>approveOrder()|rejectOrder()<br>—<br>rejectTicket()<br>—<br>—<br>—| never fail, and how the last two steps are termed _retriable transactions_ because they always succeed. 
 
 To see how compensating transactions are used, imagine a scenario where the authorization of the consumer’s credit card fails. In this scenario, the saga executes the following local transactions: 
 
@@ -187,7 +155,6 @@ A saga’s implementation consists of logic that coordinates the steps of the sa
 
 - _Choreography_ —Distribute the decision making and sequencing among the saga participants. They primarily communicate by exchanging events. 
 
-
 - _Orchestration_ —Centralize a saga’s coordination logic in a saga orchestrator class. A saga _orchestrator_ sends command messages to saga participants telling them which operations to perform. 
 
 Let’s look at each option, starting with choreography. 
@@ -200,19 +167,12 @@ One way you can implement a saga is by using choreography. When using choreograp
 
 Figure 4.4 shows the design of the choreography-based version of the Create Order Saga. The participants communicate by exchanging events. Each participant, starting with the Order Service, updates its database and publishes an event that triggers the next participant. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0148-08.png)
-
 
 **----- Start of picture text -----**<br>
 Key<br>Message broker<br>Publish<br>Subscribe<br>Order events 2 Consumer Service<br>1<br>Consumer verified<br>Order created<br>2. verifyConsumerDetails()<br>3<br>Consumer events<br>Ticket created<br>Order Kitchen Service<br>Service<br>1. createOrder() 6 3. createTicket()<br>7. approveOrder() 6. approveTicket()<br>4<br>7 Ticket events 5a<br>5b Accounting Service<br>5<br>Credit card authorized<br>4. createPendingAuthorization()<br>6. authorizeCard()<br>Credit card events<br>**----- End of picture text -----**<br>
 
-
 Figure 4.4 Implementing the **Create Order Saga** using choreography. The saga participants communicate by exchanging events. 
-
-
-_**Coordinating sagas**_ 
-
 
 The happy path through this saga is as follows: 
 
@@ -250,13 +210,10 @@ The sequence of events is as follows:
 
 As you can see, the participants of choreography-based sagas interact using publish/ subscribe. Let’s take a closer look at some issues you’ll need to consider when implementing publish/subscribe-based communication for your sagas. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0150-02.png)
-
 
 **----- Start of picture text -----**<br>
 Key<br>Message broker<br>Publish<br>Subscribe<br>Order events 2 Consumer Service<br>1<br>Consumer verified<br>Order created<br>2. verifyConsumerDetails()<br>3<br>Consumer events<br>Ticket created<br>Order Kitchen Service<br>Service<br>1. createOrder() 6 3. createTicket()<br>7. rejectOrder() 6. rejectTicket()<br>4<br>7 Ticket events 5a<br>5b Accounting Service<br>5<br>Credit card authorization failed<br>4. createPendingAuthorization()<br>6. authorizeCard()<br>Credit card events<br>**----- End of picture text -----**<br>
-
 
 Figure 4.5 The sequence of events in the **Create Order Saga** when the authorization of the consumer’s credit card fails. **Accounting Service** publishes the **Credit Card Authorization Failed** event, which causes **Kitchen Service** to reject the **Ticket** , and **Order Service** to reject the **Order** . 
 
@@ -265,10 +222,6 @@ Figure 4.5 The sequence of events in the **Create Order Saga** when the authoriz
 There are a couple of interservice communication-related issues that you must consider when implementing choreography-based sagas. The first issue is ensuring that a saga participant updates its database and publishes an event as part of a database transaction. Each step of a choreography-based saga updates the database and publishes an event. For example, in the Create Order Saga, Kitchen Service receives a Consumer Verified event, creates a Ticket, and publishes a Ticket Created event. It’s essential that the database update and the publishing of the event happen atomically. Consequently, to communicate reliably, the saga participants must use transactional messaging, described in chapter 3. 
 
 The second issue you need to consider is ensuring that a saga participant must be able to map each event that it receives to its own data. For example, when Order Service receives a Credit Card Authorized event, it must be able to look up the corresponding Order. The solution is for a saga participant to publish events containing a _correlation id_ , which is data that enables other participants to perform the mapping. 
-
-
-_**Coordinating sagas**_ 
-
 
 For example, the participants of the Create Order Saga can use the orderId as a correlation ID that’s passed from one participant to the next. Accounting Service publishes a Credit Card Authorized event containing the orderId from the TicketCreated event. When Order Service receives a Credit Card Authorized event, it uses the orderId to retrieve the corresponding Order. Similarly, Kitchen Service uses the orderId from that event to retrieve the corresponding Ticket. 
 
@@ -294,26 +247,18 @@ Choreography can work well for simple sagas, but because of these drawbacks it�
 
 Orchestration is another way to implement sagas. When using orchestration, you define an orchestrator class whose sole responsibility is to tell the saga participants what to do. The saga orchestrator communicates with the participants using command/ async reply-style interaction. To execute a saga step, it sends a command message to a participant telling it what operation to perform. After the saga participant has performed the operation, it sends a reply message to the orchestrator. The orchestrator then processes the message and determines which saga step to perform next. 
 
-
 To show how orchestration-based sagas work, I’ll first describe an example. Then I’ll describe how to model orchestration-based sagas as state machines. I’ll discuss how to make use of transactional messaging to ensure reliable communication between the saga orchestrator and the saga participants. I’ll then describe the benefits and drawbacks of using orchestration-based sagas. 
 
 **IMPLEMENTING THE CREATE ORDER SAGA USING ORCHESTRATION**
 
 Figure 4.6 shows the design of the orchestration-based version of the Create Order Saga. The saga is orchestrated by the CreateOrderSaga class, which invokes the saga participants using asynchronous request/response. This class keeps track of the process and sends command messages to saga participants, such as Kitchen Service and Consumer Service. The CreateOrderSaga class reads reply messages from its reply channel and then determines the next step, if any, in the saga. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0152-05.png)
-
 
 **----- Start of picture text -----**<br>
 Order Service Key<br>Command message<br>Reply message<br>Message broker<br>1<br>Verify consumer<br>2 Consumer<br>Consumer Service Service<br>Consumer verified<br>request channel<br>4<br>3 7 Create order Ticket created<br>Create Create Approve saga reply channel<br>order saga ticket restaurant<br>orchestrator order Kitchen<br>Service<br>Kitchen Service 6<br>5<br>request channel<br>Authorize Card<br>card authorized<br>8 Accounting Service<br>Approve request channel<br>Accounting<br>order<br>Service<br>Order Service<br>request channel<br>**----- End of picture text -----**<br>
 
-
 Figure 4.6 Implementing the **Create Order Saga** using orchestration. **Order Service** implements a saga orchestrator, which invokes the saga participants using asynchronous request/ response. 
-
-
-_**Coordinating sagas**_ 
-
 
 Order Service first creates an Order and a Create Order Saga orchestrator. After that, the flow for the happy path is as follows: 
 
@@ -353,23 +298,16 @@ Figure 4.7 shows the state machine model for the Create Order Saga. This state m
 
 - Order Rejected—A final state indicating that the Order was rejected by one of the participants. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0154-02.png)
-
 
 **----- Start of picture text -----**<br>
 ConsumerVerificationFailed/<br>/Send VerifyConsumer Verifing send RejectOrder Rejecting Order<br>consumer order rejected<br>ConsumerVerified/<br>send CreateRestaurantOrder<br>Creating<br>ticket<br>Ticket creation failed/<br>Ticket created/ send RejectOrder<br>send AuthorizeCard<br>Card authorization failed/<br>Authorizing send RejectTicket Rejecting<br>card ticket<br>Card authorized/<br>send ApproveTicket<br>Approving<br>ticket<br>Ticket approved/<br>send ApproveOrder<br>Approving<br>order<br>Order approved<br>Order<br>approved<br>**----- End of picture text -----**<br>
-
 
 Figure 4.7 The state machine model for the **Create Order Saga** 
 
 The state machine also defines numerous state transitions. For example, the state machine transitions from the Creating Ticket state to either the Authorizing Card or the Rejected Order state. It transitions to the Authorizing Card state when it receives a successful reply to the Create Ticket command. Alternatively, if Kitchen Service couldn’t create the Ticket, the state machine transitions to the Rejected Order state. 
 
 The state machine’s initial action is to send the VerifyConsumer command to Consumer Service. The response from Consumer Service triggers the next state transition. If the consumer was successfully verified, the saga creates the Ticket and transitions to the Creating Ticket state. But if the consumer verification failed, the saga rejects the Order and transitions to the Rejecting Order state. The state machine undergoes numerous other state transitions, driven by the responses from saga participants, until it reaches a final state of either Order Approved or Order Rejected. 
-
-
-_**Coordinating sagas**_ 
-
 
 **SAGA ORCHESTRATION AND TRANSACTIONAL MESSAGING**
 
@@ -391,7 +329,6 @@ Orchestration also has a drawback: the risk of centralizing too much business lo
 
 I recommend using orchestration for all but the simplest sagas. Implementing the coordination logic for your sagas is just one of the design problems you need to solve. Another, which is perhaps the biggest challenge that you’ll face when using sagas, is handling the lack of isolation. Let’s take a look at that problem and how to solve it. 
 
-
 ## 4.3 Handling the lack of isolation
 
 The _I_ in ACID stands for _isolation_ . The isolation property of ACID transactions ensures that the outcome of executing multiple transactions concurrently is the same as if they were executed in some serial order. The database provides the illusion that each ACID transaction has exclusive access to the data. Isolation makes it a lot easier to write business logic that executes concurrently. 
@@ -411,9 +348,6 @@ On the surface, the lack of isolation sounds unworkable. But in practice, it’s
 The next section discusses a set of saga design strategies that deal with the lack of isolation. These strategies are known as _countermeasures_ . Some countermeasures implement isolation at the application level. Other countermeasures reduce the business risk of the lack of isolation. By using countermeasures, you can write saga-based business logic that works correctly. 
 
 I’ll begin the section by describing the anomalies that are caused by the lack of isolation. After that, I’ll talk about countermeasures that either eliminate those anomalies or reduce their business risk. 
-
-
-_**Handling the lack of isolation**_ 
 
 ### 4.3.1 Overview of anomalies
 
@@ -461,7 +395,6 @@ In this scenario, the Create Order Saga does a dirty read of the available credi
 
 Let’s look at how to prevent this and other kinds of anomalies from impacting an application. 
 
-
 ### 4.3.2 Countermeasures for handling the lack of isolation
 
 The saga transaction model is ACD, and its lack of isolation can result in anomalies that cause applications to misbehave. It’s the responsibility of the developer to write sagas in a way that either prevents the anomalies or minimizes their impact on the business. This may sound like a daunting task, but you’ve already seen an example of a strategy that prevents anomalies. An Order’s use of *_PENDING states, such as APPROVAL _PENDING, is an example of one such strategy. Sagas that update Orders, such as the Create Order Saga, begin by setting the state of an Order to *_PENDING. The *_PENDING state tells other transactions that the Order is being updated by a saga and to act accordingly. 
@@ -490,10 +423,6 @@ The countermeasures paper mentioned in the last section defines a useful model f
 
 - _Pivot transaction_ —The go/no-go point in a saga. If the pivot transaction commits, the saga will run until completion. A pivot transaction can be a transaction that’s neither compensatable nor retriable. Alternatively, it can be the last compensatable transaction or the first retriable transaction. 
 
-
-_**Handling the lack of isolation**_ 
-
-
 - _Retriable transactions_ —Transactions that follow the pivot transaction and are guaranteed to succeed. 
 
 **Compensatable transactions: Must support roll back** 
@@ -507,7 +436,6 @@ _**Handling the lack of isolation**_
 ||5|Restaurant Order Service|approveRestaurantOrder()|-||
 ||6|Order Service|approveOrder()|-||
 
-
 **Pivot transactions: Retriable transactions: The saga’s go/no-go transaction. Guaranteed to complete If it succeeds, then the saga runs to completion.** 
 
 Figure 4.8 A saga consists of three different types of transactions: compensatable transactions, which can be rolled back, so have a compensating transaction, a pivot transaction, which is the saga’s go/no-go point, and retriable transactions, which are transactions that don’t need to be rolled back and are guaranteed to complete. 
@@ -520,10 +448,7 @@ Let’s now look at each countermeasure, starting with the semantic lock counter
 
 **COUNTERMEASURE: SEMANTIC LOCK**
 
-When using the semantic lock countermeasure, a saga’s compensatable transaction sets a flag in any record that it creates or updates. The flag indicates that the record 
-
-
-isn’t _committed_ and could potentially change. The flag can either be a lock that prevents other transactions from accessing the record or a warning that indicates that other transactions should treat that record with suspicion. It’s cleared by either a retriable transaction—saga is completing successfully—or by a compensating transaction: the saga is rolling back. 
+When using the semantic lock countermeasure, a saga’s compensatable transaction sets a flag in any record that it creates or updates. The flag indicates that the record isn’t _committed_ and could potentially change. The flag can either be a lock that prevents other transactions from accessing the record or a warning that indicates that other transactions should treat that record with suspicion. It’s cleared by either a retriable transaction—saga is completing successfully—or by a compensating transaction: the saga is rolling back. 
 
 The Order.state field is a great example of a semantic lock. The *_PENDING states, such as APPROVAL_PENDING and REVISION_PENDING, implement a semantic lock. They tell other sagas that access an Order that a saga is in the process of updating the Order. For instance, the first step of the Create Order Saga, which is a compensatable transaction, creates an Order in an APPROVAL_PENDING state. The final step of the Create Order Saga, which is a retriable transaction, changes the field to APPROVED. A compensating transaction changes the field to REJECTED. 
 
@@ -541,13 +466,7 @@ Consider, for example, a scenario where a saga needs to be rolled back after a c
 
 **COUNTERMEASURE: PESSIMISTIC VIEW**
 
-Another way to deal with the lack of isolation is the _pessimistic view_ countermeasure. It reorders the steps of a saga to minimize business risk due to a dirty read. Consider, for example, the scenario earlier used to describe the dirty read anomaly. In that scenario, the Create Order Saga performed a dirty read of the available credit and created an 
-
-
-_**Handling the lack of isolation**_ 
-
-
-order that exceeded the consumer credit limit. To reduce the risk of that happening, this countermeasure would reorder the Cancel Order Saga: 
+Another way to deal with the lack of isolation is the _pessimistic view_ countermeasure. It reorders the steps of a saga to minimize business risk due to a dirty read. Consider, for example, the scenario earlier used to describe the dirty read anomaly. In that scenario, the Create Order Saga performed a dirty read of the available credit and created an order that exceeded the consumer credit limit. To reduce the risk of that happening, this countermeasure would reorder the Cancel Order Saga: 
 
 - 1 Order Service—Change the state of the Order to cancelled. 
 
@@ -573,7 +492,6 @@ One way for the Accounting Service to handle these out-of-order requests is for 
 
 The final countermeasure is the _by value_ countermeasure. It’s a strategy for selecting concurrency mechanisms based on business risk. An application that uses this countermeasure uses the properties of each request to decide between using sagas and distributed transactions. It executes low-risk requests using sagas, perhaps applying the countermeasures described in the preceding section. But it executes high-risk requests involving, for example, large amounts of money, using distributed transactions. 
 
-
 This strategy enables an application to dynamically make trade-offs about business risk, availability, and scalability. 
 
 It’s likely that you’ll need to use one or more of these countermeasures when implementing sagas in your application. Let’s look at the detailed design and implementation of the Create Order Saga, which uses the semantic lock countermeasure. 
@@ -582,21 +500,12 @@ It’s likely that you’ll need to use one or more of these countermeasures whe
 
 Now that we’ve looked at various saga design and implementation issues, let’s see an example. Figure 4.9 shows the design of Order Service. The service’s business logic consists of traditional business logic classes, such as Order Service and the Order 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0162-06.png)
-
 
 **----- Start of picture text -----**<br>
 Handles commands sent by the the Processes replies from<br>Create Order Saga to the Order Service saga participants<br>createOrder()<br>cancelOrder()<br>...<br>Order Service<br>controller<br>OrderServiceRequests<br>Order<br>command<br>handlers<br>OrderService<br>createOrder()<br>cancelOrder() CreateOrderSagaReplies<br>approveOrder() Reply<br>rejectOrder()<br>... consumer<br>OrderRepository CreateOrder<br>Saga<br>save()<br>findById()<br>...<br>OrderService<br>Proxy<br>Order<br>KitchenService AccountingServiceRequests<br>Proxy<br>Command<br>message<br>publisher<br>ConsumerServiceRequests<br>KitchenServiceRequests<br>Defines the Restaurant Order Sends commands to Orchestrator for the<br>Service’s messaging API saga participants Create Order Saga<br>**----- End of picture text -----**<br>
 
-
-Figure 4.9 The design of the **Order Service** and its sagas 
-
-
-_**The design of the Order Service and the Create Order Saga**_ 
-
-
-entity. There are also saga orchestrator classes, including the CreateOrderSaga class, which orchestrates Create Order Saga. Also, because Order Service participates in its own sagas, it has an OrderCommandHandlers adapter class that handles command messages by invoking OrderService. 
+Figure 4.9 The design of the **Order Service** and its sagas entity. There are also saga orchestrator classes, including the CreateOrderSaga class, which orchestrates Create Order Saga. Also, because Order Service participates in its own sagas, it has an OrderCommandHandlers adapter class that handles command messages by invoking OrderService. 
 
 Some parts of Order Service should look familiar. As in a traditional application, the core of the business logic is implemented by the OrderService, Order, and OrderRepository classes. In this chapter, I’ll briefly describe these classes. I describe them in more detail in chapter 5. 
 
@@ -608,16 +517,12 @@ Let’s look in more detail at the design, starting with the OrderService class.
 
 The OrderService class is a domain service called by the service’s API layer. It’s responsible for creating and managing orders. Figure 4.10 shows OrderService and some of its collaborators. OrderService creates and updates Orders, invokes the OrderRepository to persist Orders, and creates sagas, such as the CreateOrderSaga, using the SagaManager. The SagaManager class is one of the classes provided by the Eventuate Tram Saga framework, which is a framework for writing saga orchestrators and participants, and is discussed a little later in this section. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0163-08.png)
-
 
 **----- Start of picture text -----**<br>
 OrderService<br>createOrder()<br>...<br>OrderRepository CreateOrder<br>Saga<br>save()<br>findOne()<br>... SagaManager<br>create(..)<br>Order<br>**----- End of picture text -----**<br>
 
-
 Figure 4.10 **OrderService** creates and updates **Orders** , invokes the **OrderRepository** to persist **Orders** , and creates sagas, including the **CreateOrderSaga** . 
-
 
 I’ll discuss this class in more detail in chapter 5. For now, let’s focus on the createOrder() method. The following listing shows OrderService’s createOrder() method. This method first creates an Order and then creates an CreateOrderSaga to validate the order. 
 
@@ -655,16 +560,10 @@ The createOrder() method creates an Order by calling the factory method Order .c
 
 Let’s look at the CreateOrderSaga and its associated classes. 
 
-
-_**The design of the Order Service and the Create Order Saga**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0165-02.png)
-
 
 **----- Start of picture text -----**<br>
 this.sagaDefinition=<br>step()<br>The state of a saga .withCompensation(...)<br>.step()<br>.invokeParticipant(...)<br>.step()<br>CreateOrder .invokeParticipant(...)<br>OrderService<br>Saga .onReply(...)<br>.withCompensation(...)<br>Creates<br>Kitchen<br>CreateOrder ServiceProxy<br>SagaState<br>Invokes<br>orderId OrderService Describes a<br>orderDetails Proxy message channel<br>...<br>Manages Implements<br>Eventuate tram sagas<br>«interface» Abstract superclass<br>SimpleSaga CommandEndpoint for saga<br>orchestrators<br>SagaManager<br>SagaDefinition<br>create() getSagaDefinition()<br>... Describes the<br>SagaDefinition<br>steps of a saga<br>Uses<br>Order database<br>«table» CreateOrderSaga<br>SAGA_INSTANCE Eventuate tram replies<br>The SagaManager handles persisting a saga, Stores the state OrderService<br>sending the command messages that it of saga instances requests<br>generates, subscribing to reply messages,<br>and invoking the saga to handle replies.<br>**----- End of picture text -----**<br>
-
 
 Figure 4.11 The **OrderService** 's sagas, such as **Create Order Saga** , are implemented using the Eventuate Tram Saga framework. 
 
@@ -673,7 +572,6 @@ Figure 4.11 The **OrderService** 's sagas, such as **Create Order Saga** , are i
 Figure 4.11 shows the classes that implement the Create Order Saga. The responsibilities of each class are as follows: 
 
 - CreateOrderSaga—A singleton class that defines the saga’s state machine. It invokes the CreateOrderSagaState to create command messages and sends them to participants using message channels specified by the saga participant proxy classes, such as KitchenServiceProxy. 
-
 
 - CreateOrderSagaState—A saga’s persistent state, which creates command messages. 
 
@@ -736,16 +634,11 @@ Listing 4.3 The definition of the third step of the saga
       .onReply(CreateTicketReply.class, CreateOrderSagaState::handleCreateTicketReply) 
       .withCompensation(kitchenService.cancel, CreateOrderSagaState::makeCancelCreateTicketCommand) 
 // ...
-```
-
-public CreateOrderSaga(..., KitchenServiceProxy kitchenService, ...) { 
+``` public CreateOrderSaga(..., KitchenServiceProxy kitchenService, ...) { 
 
 The call to invokeParticipant() defines the forward transaction. It creates the CreateTicket command message by calling CreateOrderSagaState.makeCreateTicketCommand() and sends it to the channel specified by kitchenService.create. The call to onReply() specifies that CreateOrderSagaState.handleCreateTicketReply() should be called when a successful reply is received from Kitchen Service. This method stores the returned ticketId in the CreateOrderSagaState. The call to withCompensation() defines the compensating transaction. It creates a RejectTicketCommand command message by calling CreateOrderSagaState.makeCancelCreateTicket() and sends it to the channel specified by kitchenService.create. 
 
-The other steps of the saga are defined in a similar fashion. The CreateOrderSagaState creates each message, which is sent by the saga to the messaging endpoint 
-
-
-defined by a KitchenServiceProxy. Let’s take a look at each of those classes, starting with CreateOrderSagaState. 
+The other steps of the saga are defined in a similar fashion. The CreateOrderSagaState creates each message, which is sent by the saga to the messaging endpoint defined by a KitchenServiceProxy. Let’s take a look at each of those classes, starting with CreateOrderSagaState. 
 
 **THE CREATEORDERSAGASTATE CLASS**
 
@@ -789,10 +682,6 @@ public class CreateOrderSagaState {
 ```
 The CreateOrderSaga invokes the CreateOrderSagaState to create the command messages. It sends those command messages to the endpoints defined by the SagaParticipantProxy classes. Let’s take a look at one of those classes: KitchenServiceProxy. 
 
-
-_**The design of the Order Service and the Create Order Saga**_ 
-
-
 **THE KITCHENSERVICEPROXY CLASS**
 
 The KitchenServiceProxy class, shown in listing 4.5, defines the command message endpoints for Kitchen Service. There are three endpoints: 
@@ -831,18 +720,14 @@ public class KitchenServiceProxy {
 
 Proxy classes, such as KitchenServiceProxy, aren’t strictly necessary. A saga could simply send command messages directly to participants. But proxy classes have two important benefits. First, a proxy class defines static typed endpoints, which reduces the chance of a saga sending the wrong message to a service. Second, a proxy class is a well-defined API for invoking a service that makes the code easier to understand and test. For example, chapter 10 describes how to write tests for KitchenServiceProxy that verify that Order Service correctly invokes Kitchen Service. Without KitchenServiceProxy, it would be impossible to write such a narrowly scoped test. 
 
-
 **THE EVENTUATE TRAM SAGA FRAMEWORK**
 
 The Eventuate Tram Saga, shown in figure 4.12, is a framework for writing both saga orchestrators and saga participants. It uses transactional messaging capabilities of Eventuate Tram, discussed in chapter 3. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0170-04.png)
-
 
 **----- Start of picture text -----**<br>
 The SagaManager handles persisting a Describes a<br>saga, sending the command messages message channel<br>that it generates, subscribing to reply Routes command<br>messages, and invoking the saga to Abstract superclass messages to<br>handle replies. for saga orchestrators message handlers<br>Eventuate tram saga framework<br>Orchestration Participant<br>SimpleSaga SagaCommand<br>SagaManager SagaDefinition Dispatcher<br>CommandEndpoint<br>getSagaDefinition()<br>create(sagaState)<br>... SagaDefinition HandlersBuilderSagaCommand<br>Uses<br>Order database<br>«table» Sends<br>and receives<br>SAGA_INSTANCE Eventuate tram<br>Channels<br>Stores the state of Describes the<br>saga instances steps of a saga<br>**----- End of picture text -----**<br>
-
 
 Figure 4.12 Eventuate Tram Saga is a framework for writing both saga orchestrators and saga participants. 
 
@@ -856,16 +741,10 @@ The saga orchestration package is the most complex part of the framework. It pro
 
 - 4 The CreateOrderSagaState is invoked to generate a command message. 
 
-
-_**The design of the Order Service and the Create Order Saga**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0171-02.png)
-
 
 **----- Start of picture text -----**<br>
 OrderService CreateOrderSagaState SagaManager CreateOrderSaga SagaDefinition EventuateTram Database<br>new()<br>create(sagaState)<br>getSagaDefinition()<br>executeFirstStep(sagaState)<br>makeValidateOrderByConsumerCommand()<br>sendMessage(command)<br>saveSagaInstance(sagaState)<br>**----- End of picture text -----**<br>
-
 
 Figure 4.13 The sequence of events when **OrderService** creates an instance of **Create Order Saga** 
 
@@ -875,13 +754,10 @@ Figure 4.13 The sequence of events when **OrderService** creates an instance of 
 
 Figure 4.14 shows the sequence of events when SagaManager receives a reply from Consumer Service. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0171-07.png)
-
 
 **----- Start of picture text -----**<br>
 EventuateTram SagaManager Database CreateOrderSaga SagaDefinition CreateOrderSagaState<br>handleMessage()<br>loadSagaInstance()<br>getSagaDefinition()<br>executeFirstStep(sagaState)<br>makeValidateOrderByConsumerCommand()<br>sendMessage<br>(command)<br>saveSagaInstance<br>(sageState)<br>**----- End of picture text -----**<br>
-
 
 Figure 4.14 The sequence of events when the **SagaManager** receives a reply message from a saga participant 
 
@@ -892,7 +768,6 @@ The sequence of events is as follows:
 - 2 SagaManager retrieves the saga instance from the database. 
 
 - 3 SagaManager executes the next step of the saga definition. 
-
 
 - 4 CreateOrderSagaState is invoked to generate a command message. 
 
@@ -910,19 +785,12 @@ Order Service participates in its own sagas. For example, CreateOrderSaga invoke
 
 Each handler method invokes OrderService to update an Order and makes a reply message. The SagaCommandDispatcher class routes the command messages to the appropriate handler method and sends the reply. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0172-10.png)
-
 
 **----- Start of picture text -----**<br>
 Routes command messages to<br>handlers and sends replies<br>Eventuate<br>Tram Sagas<br>SagaCommand<br>Dispatcher<br>Invokes<br>OrderCommandHandlers<br>Uses<br>approveOrder()<br>rejectOrder()<br>Reads ...<br>OrderService<br>requests Eventuate tram Invokes<br>Sends OrderService<br>CreateOrderSaga approveOrder()<br>replies rejectOrder()<br>...<br>**----- End of picture text -----**<br>
 
-
 Figure 4.15 **OrderCommandHandlers** implements command handlers for the commands that are sent by the various **Order Service** sagas. 
-
-
-_**The design of the Order Service and the Create Order Saga**_ 
-
 
 The following listing shows the OrderCommandHandlers class. Its commandHandlers() method maps command message types to handler methods. Each handler method takes a command message as a parameter, invokes OrderService, and returns a reply message. 
 
@@ -949,9 +817,7 @@ public class OrderCommandHandlers {
   } 
 
   public Message rejectOrder(CommandMessage<RejectOrderCommand> cm) { 
-    long orderId = cm.getCommand().getOrderId(); 
     orderService.rejectOrder(orderId); 
-    return withSuccess(); 
   } 
 }
 ```
@@ -1009,7 +875,6 @@ public class OrderServiceConfiguration {
 
 This class defines several Spring @Beans including orderService, createOrderSagaManager, createOrderSaga, orderCommandHandlers, and orderCommandHandlersDispatcher. It also defines Spring @Beans for the various proxy classes, including kitchenServiceProxy and orderServiceProxy. 
 
-
 ## Summary
 
 CreateOrderSaga is only one of Order Service’s many sagas. Many of its other system operations also use sagas. For example, the cancelOrder() operation uses a Cancel Order Saga, and the reviseOrder() operation uses a Revise Order Saga. As a result, even though many services have an external API that uses a synchronous protocol, such as REST or gRPC, a large amount of interservice communication will use asynchronous messaging. 
@@ -1024,11 +889,5 @@ As you can see, transaction management and some aspects of business logic design
 
 - Designing saga-based business logic can be challenging because, unlike ACID transactions, sagas aren’t isolated from one another. You must often use countermeasures, which are design strategies that prevent concurrency anomalies caused by the ACD transaction model. An application may even need to use locking in order to simplify the business logic, even though that risks deadlocks. 
 
-
  
-
-
-isks deadlocks. 
-
-
 

@@ -17,10 +17,7 @@ Most applications are built by layering one data model on top of another. For ea
 
 4. On yet lower levels, hardware engineers have figured out how to represent bytes in terms of electrical currents, pulses of light, magnetic fields, and more. 
 
-In a complex application there may be more intermediary levels, such as APIs built upon APIs, but the basic idea is still the same: each layer hides the complexity of the layers below it by providing a clean data model. These abstractions allow different 
-
-
-groups of people—for example, the engineers at the database vendor and the application developers using their database—to work together effectively. 
+In a complex application there may be more intermediary levels, such as APIs built upon APIs, but the basic idea is still the same: each layer hides the complexity of the layers below it by providing a clean data model. These abstractions allow different groups of people—for example, the engineers at the database vendor and the application developers using their database—to work together effectively. 
 
 There are many different kinds of data models, and every data model embodies assumptions about how it is going to be used. Some kinds of usage are easy and some are not supported; some operations are fast and some perform badly; some data transformations feel natural and some are awkward. 
 
@@ -38,10 +35,7 @@ The roots of relational databases lie in _business data processing_ , which was 
 
 Other databases at that time forced application developers to think a lot about the internal representation of the data in the database. The goal of the relational model was to hide that implementation detail behind a cleaner interface. 
 
-Over the years, there have been many competing approaches to data storage and querying. In the 1970s and early 1980s, the _network model_ and the _hierarchical model_ 
-
-
-were the main alternatives, but the relational model came to dominate them. Object databases came and went again in the late 1980s and early 1990s. XML databases appeared in the early 2000s, but have only seen niche adoption. Each competitor to the relational model generated a lot of hype in its time, but it never lasted [2]. 
+Over the years, there have been many competing approaches to data storage and querying. In the 1970s and early 1980s, the _network model_ and the _hierarchical model_ were the main alternatives, but the relational model came to dominate them. Object databases came and went again in the late 1980s and early 1990s. XML databases appeared in the early 2000s, but have only seen niche adoption. Each competitor to the relational model generated a lot of hype in its time, but it never lasted [2]. 
 
 As computers became vastly more powerful and networked, they started being used for increasingly diverse purposes. And remarkably, relational databases turned out to generalize very well, beyond their original scope of business data processing, to a broad variety of use cases. Much of what you see on the web today is still powered by relational databases, be it online publishing, discussion, social networking, ecommerce, games, software-as-a-service productivity applications, or much more. 
 
@@ -63,10 +57,7 @@ Different applications have different requirements, and the best choice of techn
 
 ### The Object-Relational Mismatch
 
-Most application development today is done in object-oriented programming languages, which leads to a common criticism of the SQL data model: if data is stored in relational tables, an awkward translation layer is required between the objects in the 
-
-
-application code and the database model of tables, rows, and columns. The disconnect between the models is sometimes called an _impedance mismatch_ .[i] 
+Most application development today is done in object-oriented programming languages, which leads to a common criticism of the SQL data model: if data is stored in relational tables, an awkward translation layer is required between the objects in the application code and the database model of tables, rows, and columns. The disconnect between the models is sometimes called an _impedance mismatch_ .[i] 
 
 Object-relational mapping (ORM) frameworks like ActiveRecord and Hibernate reduce the amount of boilerplate code required for this translation layer, but they can’t completely hide the differences between the two models. 
 
@@ -80,9 +71,7 @@ For example, Figure 2-1 illustrates how a résumé (a LinkedIn profile) could be
 
 > i. A term borrowed from electronics. Every electric circuit has a certain impedance (resistance to alternating current) on its inputs and outputs. When you connect one circuit’s output to another one’s input, the power transfer across the connection is maximized if the output and input impedances of the two circuits match. An impedance mismatch can lead to signal reflections and other troubles. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0053-00.png)
-
 
 _Figure 2-1. Representing a LinkedIn profile using a relational schema. Photo of Bill Gates courtesy of Wikimedia Commons, Ricardo Stuckert, Agência Brasil._ 
 
@@ -120,12 +109,9 @@ The JSON representation has better _locality_ than the multi-table schema in Fig
 
 The one-to-many relationships from the user profile to the user’s positions, educational history, and contact information imply a tree structure in the data, and the JSON representation makes this tree structure explicit (see Figure 2-2). 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0054-04.png)
 
-
 _Figure 2-2. One-to-many relationships forming a tree structure._ 
-
 
 ### Many-to-One and Many-to-Many Relationships
 
@@ -149,9 +135,7 @@ The advantage of using an ID is that because it has no meaning to humans, it nev
 
 ii. Literature on the relational model distinguishes several different normal forms, but the distinctions are of little practical interest. As a rule of thumb, if you’re duplicating values that could be stored in just one place, the schema is not normalized. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0056-00.png)
-
 
 Database administrators and developers love to argue about normalization and denormalization, but we will suspend judgment for now. In Part III of this book we will return to this topic and explore systematic ways of dealing with caching, denormalization, and derived data. 
 
@@ -171,20 +155,15 @@ Say you want to add a new feature: one user can write a recommendation for anoth
 
 iii. At the time of writing, joins are supported in RethinkDB, not supported in MongoDB, and only supported in predeclared views in CouchDB. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0057-00.png)
-
 
 _Figure 2-3. The company name is not just a string, but a link to a company entity. Screenshot of linkedin.com._ 
 
 Figure 2-4 illustrates how these new features require many-to-many relationships. The data within each dotted rectangle can be grouped into one document, but the references to organizations, schools, and other users need to be represented as references, and require joins when queried. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0057-03.png)
 
-
 _Figure 2-4. Extending résumés with many-to-many relationships._ 
-
 
 ### Are Document Databases Repeating History?
 
@@ -206,7 +185,6 @@ The network model was standardized by a committee called the Conference on Data 
 
 The CODASYL model was a generalization of the hierarchical model. In the tree structure of the hierarchical model, every record has exactly one parent; in the network model, a record could have multiple parents. For example, there could be one record for the `"Greater Seattle Area"` region, and every user who lived in that region could be linked to it. This allowed many-to-one and many-to-many relationships to be modeled. 
 
-
 The links between records in the network model were not foreign keys, but more like pointers in a programming language (while still being stored on disk). The only way of accessing a record was to follow a path from a root record along these chains of links. This was called an _access path_ . 
 
 In the simplest case, an access path could be like the traversal of a linked list: start at the head of the list, and look at one record at a time until you find the one you want. But in a world of many-to-many relationships, several different paths can lead to the same record, and a programmer working with the network model had to keep track of these different access paths in their head. 
@@ -222,7 +200,6 @@ What the relational model did, by contrast, was to lay out all the data in the o
 In a relational database, the query optimizer automatically decides which parts of the query to execute in which order, and which indexes to use. Those choices are effectively the “access path,” but the big difference is that they are made automatically by 
 
 > iv. Foreign key constraints allow you to restrict modifications, but such constraints are not required by the relational model. Even with constraints, joins on foreign keys are performed at query time, whereas in CODASYL, the join was effectively done at insert time. 
-
 
 the query optimizer, not by the application developer, so we rarely need to think about them. 
 
@@ -246,7 +223,6 @@ The main arguments in favor of the document data model are schema flexibility, b
 
 If the data in your application has a document-like structure (i.e., a tree of one-tomany relationships, where typically the entire tree is loaded at once), then it’s proba‐ 
 
-
 — bly a good idea to use a document model. The relational technique of _shredding_ splitting a document-like structure into multiple tables (like `positions` , `education` , and `contact_info` in Figure 2-1)—can lead to cumbersome schemas and unnecessarily complicated application code. 
 
 The document model has limitations: for example, you cannot refer directly to a nested item within a document, but instead you need to say something like “the second item in the list of positions for user 251” (much like an access path in the hierarchical model). However, as long as documents are not too deeply nested, that is not usually a problem. 
@@ -261,10 +237,7 @@ It’s not possible to say in general which data model leads to simpler applicat
 
 Most document databases, and the JSON support in relational databases, do not enforce any schema on the data in documents. XML support in relational databases usually comes with optional schema validation. No schema means that arbitrary keys and values can be added to a document, and when reading, clients have no guarantees as to what fields the documents may contain. 
 
-Document databases are sometimes called _schemaless_ , but that’s misleading, as the code that reads the data usually assumes some kind of structure—i.e., there is an implicit schema, but it is not enforced by the database [20]. A more accurate term is _schema-on-read_ (the structure of the data is implicit, and only interpreted when the data is read), in contrast with _schema-on-write_ (the traditional approach of relational 
-
-
-databases, where the schema is explicit and the database ensures all written data conforms to it) [21]. 
+Document databases are sometimes called _schemaless_ , but that’s misleading, as the code that reads the data usually assumes some kind of structure—i.e., there is an implicit schema, but it is not enforced by the database [20]. A more accurate term is _schema-on-read_ (the structure of the data is implicit, and only interpreted when the data is read), in contrast with _schema-on-write_ (the traditional approach of relational databases, where the schema is explicit and the database ensures all written data conforms to it) [21]. 
 
 Schema-on-read is similar to dynamic (runtime) type checking in programming languages, whereas schema-on-write is similar to static (compile-time) type checking. Just as the advocates of static and dynamic type checking have big debates about their relative merits [22], enforcement of schemas in database is a contentious topic, and in general there’s no right or wrong answer. 
 
@@ -293,7 +266,6 @@ The schema-on-read approach is advantageous if the items in the collection don�
 
 - There are many different types of objects, and it is not practical to put each type of object in its own table. 
 
-
 - The structure of the data is determined by external systems over which you have no control and which may change at any time. 
 
 In situations like these, a schema may hurt more than it helps, and schemaless documents can be a much more natural data model. But in cases where all records are expected to have the same structure, schemas are a useful mechanism for documenting and enforcing that structure. We will discuss schemas and schema evolution in more detail in Chapter 4. 
@@ -311,7 +283,6 @@ We will also see more on locality in Chapter 3.
 **Convergence of document and relational databases**
 
 Most relational database systems (other than MySQL) have supported XML since the mid-2000s. This includes functions to make local modifications to XML documents and the ability to index and query inside XML documents, which allows applications to use data models very similar to what they would do when using a document database. 
-
 
 PostgreSQL since version 9.3 [8], MySQL since version 5.7, and IBM DB2 since version 10.5 [30] also have a similar level of support for JSON documents. Given the popularity of JSON for web APIs, it is likely that other relational databases will follow in their footsteps and add JSON support. 
 
@@ -343,7 +314,6 @@ In the relational algebra, you would instead write: sharks  =  σfamily = “Sha
 
 > v. Codd’s original description of the relational model [1] actually allowed something quite similar to JSON documents within a relational schema. He called it _nonsimple domains_ . The idea was that a value in a row doesn’t have to just be a primitive datatype like a number or a string, but could also be a nested relation (table)—so you can have an arbitrarily nested tree structure as a value, much like the JSON or XML support that was added to SQL over 30 years later. 
 
-
 where σ (the Greek letter sigma) is the selection operator, returning only those animals that match the condition _family = “Sharks”_ . 
 
 When SQL was defined, it followed the structure of the relational algebra fairly closely: 
@@ -363,7 +333,6 @@ For example, in the imperative code shown at the beginning of this section, the 
 The SQL example doesn’t guarantee any particular ordering, and so it doesn’t mind if the order changes. But if the query is written as imperative code, the database can never be sure whether the code is relying on the ordering or not. The fact that SQL is more limited in functionality gives the database much more room for automatic optimizations. 
 
 Finally, declarative languages often lend themselves to parallel execution. Today, CPUs are getting faster by adding more cores, not by running at significantly higher clock speeds than before [31]. Imperative code is very hard to parallelize across multiple cores and multiple machines, because it specifies instructions that must be performed in a particular order. Declarative languages have a better chance of getting faster in parallel execution because they specify only the pattern of the results, not the algorithm that is used to determine the results. The database is free to use a parallel implementation of the query language, if appropriate [32]. 
-
 
 ### Declarative Queries on the Web
 
@@ -406,7 +375,6 @@ li.selected > p {
 
 Here the CSS selector `li.selected > p` declares the pattern of elements to which we want to apply the blue style: namely, all `<p>` elements whose direct parent is an `<li>` element with a CSS class of `selected` . The element `<p>Sharks</p>` in the example matches this pattern, but `<p>Whales</p>` does not match because its `<li>` parent lacks `class="selected"` . 
 
-
 If you were using XSL instead of CSS, you could do something similar: 
 
 ```xml
@@ -441,7 +409,6 @@ This JavaScript imperatively sets the element `<p>Sharks</p>` to have a blue bac
 - If the `selected` class is removed (e.g., because the user clicks a different page), the blue color won’t be removed, even if the code is rerun—and so the item will remain highlighted until the entire page is reloaded. With CSS, the browser automatically detects when the `li.selected > p` rule no longer applies and removes the blue background as soon as the `selected` class is removed. 
 
 - If you want to take advantage of a new API, such as `document.getElementsBy ClassName("selected")` or even `document.evaluate()` —which may improve performance—you have to rewrite the code. On the other hand, browser vendors can improve the performance of CSS and XPath without breaking compatibility. 
-
 
 In a web browser, using declarative CSS styling is much better than manipulating styles imperatively in JavaScript. Similarly, in databases, declarative query languages like SQL turned out to be much better than imperative query APIs.[vi] 
 
@@ -491,7 +458,6 @@ db.observations.mapReduce(
 );
 ```
 
-
 The filter to consider only shark species can be specified declaratively (this is a MongoDB-specific extension to MapReduce). 
 
 The JavaScript function `map` is called once for every document that matches `query` , with `this` set to the document object. 
@@ -521,7 +487,6 @@ For example, say the `observations` collection contains these two documents:
 }
 ```
 
-
 The `map` function would be called once for each document, resulting in `emit("1995-12", 3)` and `emit("1995-12", 4)` . Subsequently, the `reduce` function would be called with `reduce("1995-12", [3, 4])` , returning `7` . 
 
 The `map` and `reduce` functions are somewhat restricted in what they are allowed to do. They must be _pure_ functions, which means they only use the data that is passed to them as input, they cannot perform additional database queries, and they must not have any side effects. These restrictions allow the database to run the functions anywhere, in any order, and rerun them on failure. However, they are nevertheless powerful: they can parse strings, call library functions, perform calculations, and more. 
@@ -546,7 +511,6 @@ db.observations.aggregate([
 ```
 
 The aggregation pipeline language is similar in expressiveness to a subset of SQL, but it uses a JSON-based syntax rather than SQL’s English-sentence-style syntax; the difference is perhaps a matter of taste. The moral of the story is that a NoSQL system may find itself accidentally reinventing SQL, albeit in disguise. 
-
 
 ## Graph-Like Data Models
 
@@ -576,9 +540,7 @@ In this section we will use the example shown in Figure 2-5. It could be taken f
 
 **Graph-Like Data Models | 49** 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0072-00.png)
-
 
 _Figure 2-5. Example of graph-structured data (boxes represent vertices, arrows represent edges)._ 
 
@@ -601,7 +563,6 @@ Each edge consists of:
 - A unique identifier 
 
 - The vertex at which the edge starts (the _tail vertex_ ) 
-
 
 - The vertex at which the edge ends (the _head vertex_ ) 
 
@@ -641,10 +602,7 @@ Some important aspects of this model are:
 
 Those features give graphs a great deal of flexibility for data modeling, as illustrated in Figure 2-5. The figure shows a few things that would be difficult to express in a traditional relational schema, such as different kinds of regional structures in different countries (France has _départements_ and _régions_ , whereas the US has _counties_ and _states_ ), quirks of history such as a country within a country (ignoring for now the 
 
-**Graph-Like Data Models | 51** 
-
-
-intricacies of sovereign states and nations), and varying granularity of data (Lucy’s current residence is specified as a city, whereas her place of birth is specified only at the level of a state). 
+**Graph-Like Data Models | 51** intricacies of sovereign states and nations), and varying granularity of data (Lucy’s current residence is specified as a city, whereas her place of birth is specified only at the level of a state). 
 
 You could imagine extending the graph to also include many other facts about Lucy and Alain, or other people. For instance, you could use it to indicate any food allergies they have (by introducing a vertex for each allergen, and an edge between a person and an allergen to indicate an allergy), and link the allergens with a set of vertices that show which foods contain which substances. Then you could write a query to find out what is safe for each person to eat. Graphs are good for evolvability: as you add features to your application, a graph can easily be extended to accommodate changes in your application’s data structures. 
 
@@ -668,10 +626,7 @@ CREATE
 
 When all the vertices and edges of Figure 2-5 are added to the database, we can start asking interesting questions: for example, _find the names of all the people who emigrated from the United States to Europe_ . To be more precise, here we want to find all the vertices that have a `BORN_IN` edge to a location within the US, and also a `LIVING_IN` edge to a location within Europe, and return the `name` property of each of those vertices. 
 
-Example 2-4 shows how to express that query in Cypher. The same arrow notation is used in a `MATCH` clause to find patterns in the graph: `(person) -[:BORN_IN]-> ()` 
-
-
-matches any two vertices that are related by an edge labeled `BORN_IN` . The tail vertex of that edge is bound to the variable `person` , and the head vertex is left unnamed. 
+Example 2-4 shows how to express that query in Cypher. The same arrow notation is used in a `MATCH` clause to find patterns in the graph: `(person) -[:BORN_IN]-> ()` matches any two vertices that are related by an edge labeled `BORN_IN` . The tail vertex of that edge is bound to the variable `person` , and the head vertex is left unnamed. 
 
 _Example 2-4. Cypher query to find people who emigrated from the US to Europe_ 
 
@@ -704,10 +659,7 @@ Example 2-2 suggested that graph data can be represented in a relational databas
 
 The answer is yes, but with some difficulty. In a relational database, you usually know in advance which joins you need in your query. In a graph query, you may need to 
 
-**Graph-Like Data Models | 53** 
-
-
-traverse a variable number of edges before you find the vertex you’re looking for— that is, the number of joins is not fixed in advance. 
+**Graph-Like Data Models | 53** traverse a variable number of edges before you find the vertex you’re looking for— that is, the number of joins is not fixed in advance. 
 
 In our example, that happens in the `() -[:WITHIN*0..]-> ()` rule in the Cypher query. A person’s `LIVES_IN` edge may point at any kind of location: a street, a city, a district, a region, a state, etc. A city may be `WITHIN` a region, a region `WITHIN` a state, a state `WITHIN` a country, etc. The `LIVES_IN` edge may point directly at the location vertex you’re looking for, or it may be several levels removed in the location hierarchy. 
 
@@ -776,7 +728,6 @@ In a triple-store, all information is stored in the form of very simple three-pa
 
 **Graph-Like Data Models | 55** 
 
-
 The subject of a triple is equivalent to a vertex in a graph. The object is one of two things: 
 
 1. A value in a primitive datatype, such as a string or a number. In that case, the predicate and object of the triple are equivalent to the key and value of a property on the subject vertex. For example, ( _lucy_ , _age_ , _33_ ) is like a vertex `lucy` with properties `{"age":33}` . 
@@ -809,7 +760,6 @@ In this example, vertices of the graph are written as `_:` _`someName`_ . The na
 
 It’s quite repetitive to repeat the same subject over and over again, but fortunately you can use semicolons to say multiple things about the same subject. This makes the Turtle format quite nice and readable: see Example 2-7. 
 
-
 _Example 2-7. A more concise way of writing the data in Example 2-6_ 
 
 ```
@@ -837,7 +787,6 @@ The Turtle language we used in Example 2-7 is a human-readable format for RDF da
 vii. Technically, Datomic uses 5-tuples rather than triples; the two additional fields are metadata for versioning. 
 
 **Graph-Like Data Models | 57** 
-
 
 _Example 2-8. The data of Example 2-7, expressed using RDF/XML syntax_ 
 
@@ -873,7 +822,6 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 RDF has a few quirks due to the fact that it is designed for internet-wide data exchange. The subject, predicate, and object of a triple are often URIs. For example, a predicate might be an URI such as `<http://my-company.com/namespace#within>` or `<http://my-company.com/namespace#lives_in>` , rather than just `WITHIN` or `LIVES_IN` . The reasoning behind this design is that you should be able to combine your data with someone else’s data, and if they attach a different meaning to the word `within` or `lives_in` , you won’t get a conflict because their predicates are actually `<http://other.org/foo#within>` and `<http://other.org/foo#lives_in>` . 
 
 The URL `<http://my-company.com/namespace>` doesn’t necessarily need to resolve to anything—from RDF’s point of view, it is simply a namespace. To avoid potential confusion with `http://` URLs, the examples in this section use non-resolvable URIs such as `urn:example:within` . Fortunately, you can just specify this prefix once at the top of the file, and then forget about it. 
-
 
 **The SPARQL query language**
 
@@ -919,7 +867,6 @@ SPARQL is a nice query language—even if the semantic web never happens, it can
 
 **Graph-Like Data Models | 59** 
 
-
 **Graph Databases Compared to the Network Model**
 
 In “Are Document Databases Repeating History?” on page 36 we discussed how CODASYL and the relational model competed to solve the problem of many-tomany relationships in IMS. At first glance, CODASYL’s network model looks similar to the graph model. Are graph databases the second coming of CODASYL in disguise? 
@@ -941,7 +888,6 @@ _Datalog_ is a much older language than SPARQL or Cypher, having been studied ex
 In practice, Datalog is used in a few data systems: for example, it is the query language of Datomic [40], and Cascalog [47] is a Datalog implementation for querying large datasets in Hadoop.[viii] 
 
 > viii. Datomic and Cascalog use a Clojure S-expression syntax for Datalog. In the following examples we use a Prolog syntax, which is a little easier to read, but this makes no functional difference. 
-
 
 Datalog’s data model is similar to the triple-store model, generalized a bit. Instead of writing a triple as ( _subject_ , _predicate_ , _object_ ), we write it as _predicate_ ( _subject_ , _object_ ). Example 2-10 shows how to write the data from our example in Datalog. 
 
@@ -984,7 +930,6 @@ Cypher and SPARQL jump in right away with `SELECT` , but Datalog takes a small s
 
 **Graph-Like Data Models | 61** 
 
-
 In rules, words that start with an uppercase letter are variables, and predicates are matched like in Cypher and SPARQL. For example, `name(Location, Name)` matches the triple `name(namerica, 'North America')` with variable bindings `Location = namerica` and `Name = 'North America'` . 
 
 A rule applies if the system can find a match for _all_ predicates on the righthand side of the `:-` operator. When the rule applies, it’s as though the lefthand side of the `:-` was added to the database (with variables replaced by the values they matched). 
@@ -999,14 +944,11 @@ One possible way of applying the rules is thus:
 
 By repeated application of rules 1 and 2, the `within_recursive` predicate can tell us all the locations in North America (or any other location name) contained in our database. This process is illustrated in Figure 2-6. 
 
-
 ![](../images/Designing_Data_Intensive_Applications-0084-07.png)
-
 
 _Figure 2-6. Determining that Idaho is in North America, using the Datalog rules from Example 2-11._ 
 
 Now rule 3 can find people who were born in some location `BornIn` and live in some location `LivingIn` . By querying with `BornIn = 'United States'` and `LivingIn = 'Europe'` , and leaving the person as a variable `Who` , we ask the Datalog system to find out which values can appear for the variable `Who` . So, finally we get the same answer as in the earlier Cypher and SPARQL queries. 
-
 
 The Datalog approach requires a different kind of thinking to the other query languages discussed in this chapter, but it’s a very powerful approach, because rules can be combined and reused in different queries. It’s less convenient for simple one-off queries, but it can cope better if your data is complex. 
 
@@ -1029,7 +971,6 @@ Each data model comes with its own query language or framework, and we discussed
 Although we have covered a lot of ground, there are still many data models left unmentioned. To give just a few brief examples: 
 
 - Researchers working with genome data often need to perform _sequencesimilarity searches_ , which means taking one very long string (representing a 
-
 
 DNA molecule) and matching it against a large database of strings that are similar, but not identical. None of the databases described here can handle this kind of usage, which is why researchers have written specialized genome database software like GenBank [48]. 
 
@@ -1058,7 +999,6 @@ We have to leave it there for now. In the next chapter we will discuss some of t
 [8] “PostgreSQL 9.3.1 Documentation,” The PostgreSQL Global Development Group, 2013. 
 
 [9] “The MongoDB 2.4 Manual,” MongoDB, Inc., 2013. 
-
 
 [10] “RethinkDB 1.11 Documentation,” _rethinkdb.com_ , 2013. 
 
@@ -1089,7 +1029,6 @@ We have to leave it there for now. In the next chapter we will discuss some of t
 [24] “Percona Toolkit Documentation: pt-online-schema-change,” Percona Ireland Ltd., 2013. 
 
 [25] Rany Keddo, Tobias Bielohlawek, and Tobias Schmidt: “Large Hadron Migrator,” SoundCloud, 2013. 
-
 
 [26] Shlomi Noach: “gh-ost: GitHub’s Online Schema Migration Tool for MySQL,” _githubengineering.com_ , August 1, 2016. 
 
@@ -1124,7 +1063,6 @@ We have to leave it there for now. In the next chapter we will discuss some of t
 [41] W3C RDF Working Group: “Resource Description Framework (RDF),” _w3.org_ , 10 February 2004. 
 
 [42] “Apache Jena,” Apache Software Foundation. 
-
 
 [43] Steve Harris, Andy Seaborne, and Eric Prud’hommeaux: “SPARQL 1.1 Query Language,” W3C Recommendation, March 2013. 
 

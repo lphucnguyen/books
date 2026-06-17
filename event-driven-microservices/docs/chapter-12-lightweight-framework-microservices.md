@@ -6,14 +6,9 @@ Lightweight frameworks provide similar functionality to heavyweight frameworks, 
 
 Lightweight frameworks offer stream processing features that rival those of heavyweight frameworks, and in a number of cases, exceed them. Materialization of streams into tables, along with simple out-of-the-box join functionality, makes it easy to handle streams and the relational data that inevitably ends up in them. Note that while table materializing functionality is not unique to lightweight frameworks, its ready inclusion and ease of use are indicative of the complex stateful problems that lightweight frameworks can address. 
 
-The lightweight model relies upon the event broker to provide the mechanisms for data locality and copartitioning through the use of internal event streams. The event broker also acts as the mechanism of durable storage for a microservice’s internal state via the use of changelogs, as discussed in “Recording State to a Changelog Event Stream” on page 112. By leveraging the CMS, you deploy lightweight microservices like any other event-driven application. You handle application parallelism simply by adding and removing instances, using the CMS to provide the scaling and failure 
-
-
-management mechanisms. Figure 12-1 illustrates the basic lightweight model, including an internal event stream used to communicate between instances. 
-
+The lightweight model relies upon the event broker to provide the mechanisms for data locality and copartitioning through the use of internal event streams. The event broker also acts as the mechanism of durable storage for a microservice’s internal state via the use of changelogs, as discussed in “Recording State to a Changelog Event Stream” on page 112. By leveraging the CMS, you deploy lightweight microservices like any other event-driven application. You handle application parallelism simply by adding and removing instances, using the CMS to provide the scaling and failure management mechanisms. Figure 12-1 illustrates the basic lightweight model, including an internal event stream used to communicate between instances. 
 
 ![](../images/Event-Driven_Microservices-0218-01.png)
-
 
 _Figure 12-1. The lightweight framework model, showcasing the usage of internal event streams for repartitioning data_ 
 
@@ -27,14 +22,11 @@ Data of the same key must be local to a given processing instance for any key-ba
 
 The lightweight framework leverages the event broker to provide this communication path and illustrates the deeper integration of the lightweight application with the event broker. Contrast this with the heavyweight framework, where shuffling requires extensive coordination directly between the nodes. When combined with application management options provided by the CMS, the lightweight framework is much more aligned than the heavyweight framework with the application deployment and management required of modern-day microservices. 
 
-
 ## Handling State and Using Changelogs
 
 The default mode of operation for lightweight frameworks is to use internal state backed by changelogs stored in the event broker. Using internal state allows for each microservice to control the resources it acquires using deployment configurations. 
 
-
 ![](../images/Event-Driven_Microservices-0219-02.png)
-
 
 Since every lightweight application is fully independent of the others, one application could request to run on instances with very high-performance local disk, while another could request to run on instances with extremely large, albeit perhaps much slower, harddisk drives. 
 
@@ -48,9 +40,7 @@ Scaling a microservice and recovering from failures are effectively the same pro
 
 One of the main benefits of the lightweight framework model is that applications can be dynamically scaled as they are under execution. There is no need to restart an application just to change parallelism, though there may be a delay in processing due to consumer group rebalancing and rematerialization of state from the changelog. Figure 12-2 illustrates the process of scaling an application up. The assigned input partitions are rebalanced (including any internal streams) and the state is restored from the changelogs prior to continuation of work. 
 
-
 ![](../images/Event-Driven_Microservices-0220-00.png)
-
 
 _Figure 12-2. Scaling up a lightweight microservice_ 
 
@@ -65,7 +55,6 @@ Event shuffling in lightweight framework microservices is simple, as events are 
 Upon scaling, an instance with new internal state assignments must load the data from the changelog before processing any new events. This process is similar to how checkpoints are loaded from durable storage in heavyweight solutions. The operator state (the mappings of `<partitionId, offset>` ) for all event stream partitions, both input and internal, is stored within the consumer group for the individual application. The keyed state (pairs of `<key, state>` ) is stored within the changelog for each state store in the application. 
 
 When reloading from a changelog, the application instance must prioritize consumption and loading of all internal stateful data prior to processing any new events. This is the state restoration phase, and any processing of events before state is fully restored risks creating nondeterministic results. Once state has been fully restored for each state store within the application topology, consumption of both input and internal streams may be safely resumed. 
-
 
 ### State Replication and Hot Replicas
 
@@ -91,16 +80,13 @@ Currently, there are two main options that fit the lightweight framework model, 
 
 Kafka Streams is a feature-rich stream processing library that is embedded within an individual application, where the input and output events are stored in the Kafka cluster. It combines the simplicity of writing and deploying standard JVM-based applications with a powerful stream-processing framework leveraging deep integration with the Kafka cluster. 
 
-
 ### Apache Samza: Embedded Mode
 
 Samza offers many of the same features as Kafka Streams, though it lags behind in some features related to independent deployment. Samza predates Kafka Streams, and its original deployment model is based on using a heavyweight cluster. It is only relatively recently that Samza released an embedded mode, which closely mirrors Kafka Streams’ application writing, deployment, and management lifecycle. 
 
 Samza’s embedded mode allows you to embed this functionality within individual applications, just like any other Java library. This deployment mode removes the need for a dedicated heavyweight cluster, instead relying on the lightweight framework model discussed in the previous section. By default, Samza does rely on using Apache Zookeeper for coordination across individual instances, but you can modify this to use other coordination mechanisms such as Kubernetes. 
 
-
 ![](../images/Event-Driven_Microservices-0222-03.png)
-
 
 **Apache Samza’s embedded mode may not provide all of the functionality that it has in cluster mode.** 
 
@@ -112,7 +98,6 @@ Both Kafka Streams and Samza are based in Java, which limits their use to JVM-ba
 
 Apache Samza supports a SQL-like language out of the box, though its functionality is currently limited to simple stateless queries. Kafka Streams doesn’t have first-party SQL support, though its enterprise sponsor, Confluent, provides KSQL under its own community license. Much like the heavyweight solutions, these SQL solutions are wrappers on top of the underlying stream libraries and may not provide the entirety of functions and features that would otherwise be available from the stream libraries directly. 
 
-
 ## Stream-Table-Table Join: Enrichment Pattern
 
 Say you are working for the same large-scale advertising company as in “Example: Session Windowing of Clicks and Views” on page 194, but you are a downstream consumer of the session windows. As a quick reminder, the format of the windowed session events is shown in Table 12-1. 
@@ -122,7 +107,6 @@ _Table 12-1. Advertisement-Sessions stream key/value definitions_
 |**Key**|**Value**|
 |---|---|
 |`WindowKey<Window windowId, String userId>`|`Action[] sequentialUserActions`|
-
 
 Here, an action constitutes the following: 
 
@@ -144,7 +128,6 @@ _Table 12-2. Advertisement-Conversions stream key/value definitions_
 |---|---|
 |`Long advertisementId`|`Long conversionSum`|
 
-
 2. Group all of the advertisement conversion events by `advertisementId` , and sum their values into a grand total. 
 
 3. Join all conversion events by `advertisementId` on the materialized advertisement entity stream so that your service can determine which customer owns the advertisement for billing purposes, as shown in Table 12-3: 
@@ -155,9 +138,7 @@ _Table 12-3. Advertisement entity stream key/value definitions_
 |---|---|
 |`Long advertisementId`|`Advertisement<String name, String address, …>`|
 
-
 **Stream-Table-Table Join: Enrichment Pattern | 205** 
-
 
 Here’s an example of some Kafka Streams source code that you could expect to see for this operation. A KStream is the high-level abstraction of a stream, while a KTable is a high-level abstraction of a table, generated by materializing the advertisement entity stream. 
 
@@ -194,12 +175,9 @@ conversions
 
 The topology represented by the code is as follows, illustrated in Figure 12-3. 
 
-
 ![](../images/Event-Driven_Microservices-0224-08.png)
 
-
 _Figure 12-3. Processing topology for advertising engagement-sessions_ 
-
 
 **Stage 1a and 2a** 
 
@@ -223,17 +201,13 @@ _Table 12-4. Total-Advertisement-Conversions stream key/value definition_
 |`AdKey2`|`600`|
 |`AdKey3`|`38`|
 
-
 Thus, a new `Advertisement-Conversions` event of key `(AdKey1, 15)` processed by this aggregation operator would increment the internal state store value of `AdKey1` from `402` to `417` . 
 
 **Stage 4** 
 
 The last step of this topology is to join the materialized `Total-AdvertisementConversions` table created in stage 3 with the repartitioned `Advertisement` entity stream. You’ve already established the groundwork for this join by copartitioning 
 
-**Stream-Table-Table Join: Enrichment Pattern | 207** 
-
-
-the input streams in stages 2a and 2b, ensuring that all `advertisementId` data is local to its processing instance. The entities in the `Advertisement` stream are materialized into their own partition-local state stores and subsequently joined with the `Total-Advertisement-Conversions` . 
+**Stream-Table-Table Join: Enrichment Pattern | 207** the input streams in stages 2a and 2b, ensuring that all `advertisementId` data is local to its processing instance. The entities in the `Advertisement` stream are materialized into their own partition-local state stores and subsequently joined with the `Total-Advertisement-Conversions` . 
 
 A _join function_ is used to specify the desired results from the join, much like a `select` statement is used in SQL to select only the fields that the application requires. A Java join function for this scenario may look something like this: 
 
@@ -270,12 +244,9 @@ _Table 12-5. Enriched-Advertising-Engagements stream key/value definitions_
 |`AdKey4`|`sum=10, name="Gary’s Grahams", type="Food"`|
 |`AdKey5`|`sum=10, name=null, type=null`|
 
-
 This sample table shows the expected aggregations from stage 3, joined with the `Advertising` entity data. `AdKey4` and `AdKey5` each show the results of a full outer join: no conversions have yet occurred for `AdKey4` , while there is no advertising entity data yet available for `AdKey5` . 
 
-
 ![](../images/Event-Driven_Microservices-0227-01.png)
-
 
 Check your documentation to validate which types of joins are available for your framework. Kafka Streams supports foreign-key table-table joins, which can be extremely useful for handling relational event data. 
 

@@ -6,10 +6,7 @@
 
 The underlying assumptions of 2PC are that the coordinator and the participants are available and that the duration of the transaction is short-lived. While we can do something about the participants’ availability by using state machine replication, we can’t do much about transactions that, due to their nature, take a long time to execute, like hours or days. In this case, blocking just isn’t an option. Additionally, if the participants belong to different organizations, the organizations might be unwilling to grant each other the power to block their systems to run transactions they don’t control. 
 
-To solve this problem, we can look for solutions in the real world. For example, consider a fund transfer between two banks via a 
-
-
-128 cashier’s check. First, the bank issuing the check deducts the funds from the source account. Then, the check is physically transported to the other bank and there it’s finally deposited to the destination account. For the fund transfer to work, the check cannot be lost or deposited more than once. Since neither the source nor destination bank had to wait on each other while the transaction was in progress, the fund transfer via check is an asynchronous (nonblocking) atomic transaction. However, the price to pay for this is that the source and destination account are in an inconsistent state while the check is being transferred. So although asynchronous transactions are atomic, they are not isolated from each other. 
+To solve this problem, we can look for solutions in the real world. For example, consider a fund transfer between two banks via a cashier’s check. First, the bank issuing the check deducts the funds from the source account. Then, the check is physically transported to the other bank and there it’s finally deposited to the destination account. For the fund transfer to work, the check cannot be lost or deposited more than once. Since neither the source nor destination bank had to wait on each other while the transaction was in progress, the fund transfer via check is an asynchronous (nonblocking) atomic transaction. However, the price to pay for this is that the source and destination account are in an inconsistent state while the check is being transferred. So although asynchronous transactions are atomic, they are not isolated from each other. 
 
 Now, because a check is just a message, we can generalize this idea with the concept of _persistent_ messages sent over the network, i.e., messages that that are guaranteed to be processed _exactly once_ . In this chapter, we will discuss a few implementations of asynchrounous transactions based on this concept. 
 
@@ -17,14 +14,11 @@ Now, because a check is just a message, we can generalize this idea with the con
 
 A common pattern[1] in modern applications is to replicate the same data to different data stores tailored to different use cases. For example, suppose we own a product catalog service backed by a relational database, and we decide to offer an advanced full-text search capability in its API. Although some relational databases offer a basic full-text search functionality, a dedicated service such as Elasticsearch[2] is required for more advanced use cases. 
 
-To integrate with the search service, the catalog service needs to update both the relational database and the search service when a new product is added, or an existing product is modified or deleted. The service could update the relational database first and then the search service, but if the service crashes before updating the search service, the system would be left in an inconsistent 
+To integrate with the search service, the catalog service needs to update both the relational database and the search service when a new product is added, or an existing product is modified or deleted. The service could update the relational database first and then the search service, but if the service crashes before updating the search service, the system would be left in an inconsistentstate. So we need to wrap the two updates into a transaction somehow.
 
 > 1“Online Event Processing: Achieving consistency where distributed transactions have failed,” https://queue.acm.org/detail.cfm?id=3321612 
 
-> 2“Elasticsearch: A distributed, RESTful search and analytics engine,” https:// www.elastic.co/elasticsearch/ 
-
-
-129 state. So we need to wrap the two updates into a transaction somehow. 
+> 2“Elasticsearch: A distributed, RESTful search and analytics engine,” https:// www.elastic.co/elasticsearch/
 
 We could consider using 2PC, but while the relational database supports the X/Open XA[3] 2PC standard, the search service doesn’t, which means we would have to implement the protocol for the search service somehow. We also don’t want the catalog service to block if the search service is temporarily unavailable. Although we want the two data stores to be in sync, we can accept some temporary inconsistencies. So eventual consistency is acceptable for our use case. 
 
@@ -32,14 +26,11 @@ We can solve this problem by having the catalog service send a persistent messag
 
 The outbox table can then be monitored by a dedicated _relay process_ . When the relay process discovers a new message, it sends the message to the destination, the search service. The relay process deletes the message from the table only when it receives an acknolowedgment that it was was delivered successfully. Unsurprisingly, it’s possible for the same message to be delivered multiple times. For example, if the relay process crashes after sending the message but before removing it from the table, it will resend the message when it restarts. To guarantee that the destination processes the message only once, an idempotency key is assigned to it so that the message can be deduplicated (we discussed this in chapter 5.7). 
 
-In practice, the relay process doesn’t send messages directly to the 
+In practice, the relay process doesn’t send messages directly to thensactional-outbox.html destination. Instead, it forwards messages to a message channel[5] , like Kafka[6] or Azure Event Hubs[7] , responsible for delivering them to one or more destinations in the same order as they were appended. Later in chapter 23, we will discuss message channels in more detail.
 
 > 3“Distributed Transaction Processing: The XA Specification,” https://pubs.ope ngroup.org/onlinepubs/009680699/toc.pdf 
 
-> 4“Pattern: Transactional outbox,” https://microservices.io/patterns/data/tra nsactional-outbox.html 
-
-
-130 destination. Instead, it forwards messages to a message channel[5] , like Kafka[6] or Azure Event Hubs[7] , responsible for delivering them to one or more destinations in the same order as they were appended. Later in chapter 23, we will discuss message channels in more detail. 
+> 4“Pattern: Transactional outbox,” https://microservices.io/patterns/data/tra
 
 If you squint a little, you will see that what we have just implemented here is conceptually similar to state machine replication, where the state is represented by the products in the catalog, and the replication happens through a log of operations (the outbox table). 
 
@@ -55,9 +46,6 @@ The _Saga_[8] pattern provides a solution to this problem. A saga is a distribut
 
 > 7“Azure Event Hubs: A fully managed, real-time data ingestion service,” https: //azure.microsoft.com/en-gb/services/event-hubs/ 8“Sagas,” https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas. pdf 
 
-
-131 
-
 Another way to think about sagas is that every local transaction 𝑇𝑖 assumes all the other local transactions will succeed. It’s a guess, and it’s likely to be a good one, but still a guess at the end of the day. So when the guess is wrong, a mistake has been made, and an “apology[9] ” needs to be issued in the form of compensating transactions 𝐶𝑖. This is similar to what happens in the real world when, e.g., a flight is overbooked. 
 
 A saga can be implemented with an orchestrator, i.e., the transaction coordinator, that manages the execution of the local transactions across the processes involved, i.e., the transaction’s participants. In our example, the travel booking service is the transaction’s coordinator, while the flight and hotel booking services are the transaction’s participants. The saga is composed of three local transactions: 𝑇1 books a flight, 𝑇2 books a hotel, and 𝐶1 cancels the flight booked with 𝑇1. 
@@ -70,18 +58,13 @@ At a high level, the saga can be implemented with the _workflow_[10] depicted in
 
 3. If the hotel booking fails, the transaction needs to be aborted. The coordinator sends a cancellation request (𝐶1) to the flight service to cancel the previously booked flight. Without the cancellation, the transaction would be left in an inconsistent state, which would break its atomicity guarantee. 
 
-The coordinator can communicate asynchronously with the participants via message channels to tolerate temporary failures. As the transaction requires multiple steps to succeed, and the coordinator 
+The coordinator can communicate asynchronously with the participants via message channels to tolerate temporary failures. As the transaction requires multiple steps to succeed, and the coordinatorcan fail at any time, it needs to persist the state of the transaction as it advances. By modeling the transaction as a state machine, the coordinator can durably checkpoint its state to a data store as it transitions from one state to the next. This ensures that if the coordinator crashes and restarts, or another process is elected as the coordinator, it can resume the transaction from where it left off by reading the last checkpoint.
 
 > 9”Building on Quicksand,” https://dsf.berkeley.edu/cs286/papers/quicksan d-cidr2009.pdf 
 
-> 10“Clarifying the Saga pattern,” http://web.archive.org/web/20161205130022 /http://kellabyte.com:80/2012/05/30/clarifying-the-saga-pattern 
-
-
-132 can fail at any time, it needs to persist the state of the transaction as it advances. By modeling the transaction as a state machine, the coordinator can durably checkpoint its state to a data store as it transitions from one state to the next. This ensures that if the coordinator crashes and restarts, or another process is elected as the coordinator, it can resume the transaction from where it left off by reading the last checkpoint. 
-
+> 10“Clarifying the Saga pattern,” http://web.archive.org/web/20161205130022 /http://kellabyte.com:80/2012/05/30/clarifying-the-saga-pattern
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0150-03.png)
-
 
 Figure 13.1: A workflow implementing an asynchronous transaction 
 
@@ -99,7 +82,6 @@ We started our journey into asynchronous transactions as a way to work around th
 
 > 13“Semantic ACID properties in multidatabases using remote procedure calls and update propagations,” https://dl.acm.org/doi/10.5555/284472.284478 
 
-
 # **Summary** 
 
 If you pick any textbook about distributed systems or database systems, I guarantee you will find entire chapters dedicated to the topics discussed in this part. In fact, you can find entire books written about them! Although you could argue that it’s unlikely you will ever have to implement core distributed algorithms such as state machine replication from scratch, I feel it’s important to have seen these at least once as it will make you a better “user” of the abstractions they provide. 
@@ -112,11 +94,7 @@ The other important takeaway is that coordination adds complexity and impacts sc
 
 - keeping coordination off the critical path, as chain replication does; 
 
-
-136 
-
 - proceeding without coordination and “apologize” when an inconsistency is detected, as sagas do; 
 
 - using protocols that guarantee some form of consistency without coordination, like CRDTs. 
-
 

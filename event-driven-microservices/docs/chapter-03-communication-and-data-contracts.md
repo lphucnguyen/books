@@ -12,29 +12,23 @@ The format of the data to be communicated and the logic under which it is create
 
 There are two components of a well-defined data contract. First is the _data definition_ , or what will be produced (i.e., the fields, types, and various data structures). The second component is the _triggering logic_ , or why it is produced (i.e., the specific business logic that triggered the event’s creation). Changes can be made to both the data definition and the triggering logic as the business requirements evolve. 
 
-
 You must take care when changing the data definition, so as not to delete or alter fields that are being used by downstream consumers. Similarly, you must also be careful when modifying the triggering logic. It is far more common to change the data definition than the triggering mechanism, as altering the latter often breaks the meaning of the original event definition. 
 
 ### Using Explicit Schemas as Contracts
 
 The best way to enforce data contracts and provide consistency is to define a schema for each event. The producer defines an explicit schema detailing the data definition and the triggering logic, with all events of the same type adhering to this format. In doing so, the producer provides a mechanism for communicating its event format to all prospective consumers. The consumers, in turn, can confidently build their microservice business logic against the schematized data. 
 
-
 ![](../images/Event-Driven_Microservices-0058-03.png)
-
 
 Any implementation of event-based communication between a producer and consumer that lacks an _explicit_ predefined schema will inevitably end up relying on an _implicit_ schema. Implicit data contracts are brittle and susceptible to uncontrolled change, which can cause much undue hardship to downstream consumers. 
 
 A consumer must be able to extract the data necessary for its business processes, and it cannot do that without having a set of expectations about what data should be available. Consumers must often rely on tribal knowledge and interteam communication to resolve data issues, a process that is not scalable as the number of event streams and teams increases. There is also substantial risk in requiring each consumer to independently interpret the data, as a consumer may interpret it differently than its peers, which leads to inconsistent views of the single source of truth. 
 
-
 ![](../images/Event-Driven_Microservices-0058-06.png)
-
 
 It may be tempting to build a common library that interprets any given event for all services, but this creates problems with multiple language formats, event evolutions, and independent release cycles. Duplicating efforts across services to ensure a consistent view of implicitly defined data is nontrivial and best avoided completely. 
 
 Producers are also at a disadvantage with implicit schemas. Even with the best of intentions, a producer may not notice (or perhaps their unit tests don’t reveal) that they have altered their event data definition. Without an explicit check of their service’s event format, this situation may go unnoticed until it causes downstream consumers to fail. Explicit schemas give security and stability to both consumers and producers. 
-
 
 ### Schema Definition Comments
 
@@ -58,7 +52,6 @@ Allows for data produced with a newer schema to be read as though it were produc
 
 **Event-Driven Data Contracts | 41** 
 
-
 **Backward compatibility** 
 
 Allows for data produced with an older schema to be read as though it were produced with a newer schema. This enables a consumer of data to use a newer schema to read older data. There are several scenarios where this is particularly useful: 
@@ -77,18 +70,13 @@ The union of forward compatibility and backward compatibility, this is the stron
 
 A _code generator_ is used to turn an event schema into a class definition or equivalent structure for a given programming language. This class definition is used by the producer to create and populate new event objects. The producer is required by the compiler or serializer (depending on the implementation) to respect data types and populate all non-nullable fields that are specified in the original schema. The objects created by the producer are then converted into their serialized format and sent to the event broker, as shown in Figure 3-1. 
 
-
 ![](../images/Event-Driven_Microservices-0060-09.png)
-
 
 _Figure 3-1. Producer event production workflow using a code generator_ 
 
-
 The consumer of the event data maintains its own version of the schema, which is often the same version as the producer’s but could be an older or newer schema, depending on the usage of schema evolution. If full compatibility is being observed, the service can use any version of the schema to generate its definitions. The consumer reads the event and deserializes it using the schema version that it was encoded with. The event format is stored either alongside the message, which can be prohibitively expensive at scale, or in a schema registry and accessed on-demand (see “Schema Registry” on page 241). Once deserialized into its original format, the event can be converted to the version of the schema supported by the consumer. Evolution rules come into play at this point, with defaults being applied to missing fields, and unused fields dropped completely. Finally, the data is converted into an object based on the schema-generated class. At this point, the consumer’s business logic may begin its operations. This process is shown in Figure 3-2. 
 
-
 ![](../images/Event-Driven_Microservices-0061-01.png)
-
 
 _Figure 3-2. Consumer event consumption and conversion workflow using a code generator; note that the consumer converts events from schema v2, as created by the producer, to v1, the schema format used by the consumer_ 
 
@@ -110,17 +98,13 @@ Breaking changes to an entity schema are fairly rare, as this circumstance typic
 
 The first option is the easiest for the producer, but it simply pushes off the resolution of the different entity definitions onto the consumer. This contradicts the goal of _reducing_ the need for consumers to interpret the data individually and increases the risk of misinterpretation, inconsistent processing between services, and significantly higher complexity in maintaining systems. 
 
-
 ![](../images/Event-Driven_Microservices-0062-08.png)
-
 
 The reality is that the consumer will never be in a better position than the producer for resolving divergent schema definitions. It is bad practice to defer this responsibility to the consumer. 
 
 The second option is more difficult for the producer, but ensures that the business entities, both old and new, are redefined consistently. In practice, the producer must reprocess the source data that led to the generation of the old entities and apply the new business logic to re-create the entities under the new format. This approach forces the organization as a whole to resolve what these entities mean and how they should be understood and used by producer and consumer alike. 
 
-
 ![](../images/Event-Driven_Microservices-0063-00.png)
-
 
 Leave the old entities under the old schema in their original event stream, because you may need them for reprocessing validation and forensic investigations. Produce the new and updated entities using the new schema to a new stream. 
 
@@ -128,9 +112,7 @@ Leave the old entities under the old schema in their original event stream, beca
 
 Nonentity events tend to be simpler to deal with when you are incorporating breaking changes. The simplest option is to create a new event stream and begin producing the new events to that stream. The consumers of the old stream must be notified so that they can register themselves as consumers of the new event stream. Each consuming service must also account for the divergence in business logic between the two event definitions. 
 
-
 ![](../images/Event-Driven_Microservices-0063-04.png)
-
 
 Don’t mix different event types in an event stream, especially event types that are evolutionarily incompatible. Event stream overhead is cheap, and the logical separation is important in ensuring that consumers have full information and explicit definitions when dealing with the events they need to process. 
 
@@ -140,14 +122,9 @@ Given that the old event stream no longer has new events being produced to it, t
 
 While there are many options available for formatting and serializing event data, data contracts are best fulfilled with strongly defined formats such as Avro, Thrift, or Protobuf. Some of the most popular event broker frameworks have support for serializing and deserializing events encoded with these formats. For example, both Apache Kafka and Apache Pulsar support JSON, Protobuf, and Avro schema formats. The mechanism of support for both of the technologies is the schema registry, which is covered in more detail in “Schema Registry” on page 241. Though a detailed evaluation and comparison of these serialization options is beyond the scope of this book, there are a number of online resources available that can help you decide among these particular options. 
 
-You may be tempted to choose a more flexible option in the form of plain-text events using simple key/value pairs, which still offers some structure but provides no explicit schema or schema evolution frameworks. Proceed cautiously with this approach, 
-
-
-however, as it can compromise microservices’ ability to remain isolated from one another via a strong data contract, requiring far more interteam communication. 
-
+You may be tempted to choose a more flexible option in the form of plain-text events using simple key/value pairs, which still offers some structure but provides no explicit schema or schema evolution frameworks. Proceed cautiously with this approach, however, as it can compromise microservices’ ability to remain isolated from one another via a strong data contract, requiring far more interteam communication. 
 
 ![](../images/Event-Driven_Microservices-0064-01.png)
-
 
 Unstructured plain-text events usually become a burden to both the producer and the consumer, particularly as use cases and data changes over time. As mentioned, I recommend instead choosing a strongly defined, explicit schema format that supports controlled schema evolution, such as Apache Avro or Protobuf. I do not recommend JSON, as it does not provide full-compatibility schema evolution. 
 
@@ -162,7 +139,6 @@ A good event definition is not simply a message indicating that _something_ happ
 ### Use a Singular Event Definition per Stream
 
 An event stream should contain events representing a single logical event. It is not advisable to mix different types of events within an event stream, because doing so can muddle the definitions of what the event is and what the stream represents. It is difficult to validate the schemas being produced, as new schemas may be added dynamically in such a scenario. Though there are special circumstances where you may wish to ignore this principle, the vast majority of event streams produced and consumed within your architectural workflow should each have a strict, single definition. 
-
 
 ### Use the Narrowest Data Types
 
@@ -186,16 +162,11 @@ Enums are often avoided because producers fear creating a new enum token that is
 
 One common anti-pattern is adding a `type` field to an event definition, where different `type` values indicate specific subfeatures of the event. This is generally done for data that is “similar yet different” and is often a result of the implementer incorrectly identifying the events as single-purpose. Though it may seem like a time-saving measure or a simplification of a data access pattern, overloading events with `type` parameters is rarely a good idea. 
 
-There are several problems with this approach. Each `type` parameter value usually has a fundamentally different business meaning, even if its technical representation is 
-
-
-nearly identical to the others. It is also possible for these meanings to change over time and for the scope that an event covers to creep. Some of these types may require the addition of new parameters to track type-specific information, whereas other types require separate parameters. Eventually you could have a situation where there are several very distinct events all inhabiting the same event schema, making it difficult to reason about what the event truly represents. 
+There are several problems with this approach. Each `type` parameter value usually has a fundamentally different business meaning, even if its technical representation is nearly identical to the others. It is also possible for these meanings to change over time and for the scope that an event covers to creep. Some of these types may require the addition of new parameters to track type-specific information, whereas other types require separate parameters. Eventually you could have a situation where there are several very distinct events all inhabiting the same event schema, making it difficult to reason about what the event truly represents. 
 
 This complexity affects not only the developers who must maintain and populate these events, but also the data’s consumers, who need to have a consistent understanding about what data is published and why. If the data contract changes, they expect to be able to isolate themselves from those changes. Adding extra field types requires them to filter for only data that they care about. There is a risk that the consumer will fail to fully understand the various meanings of the types, leading to incorrect consumption and logically wrong code. For each consumer, additional processing must also be done to discard events that aren’t relevant to that consumer. 
 
-
 ![](../images/Event-Driven_Microservices-0066-02.png)
-
 
 It is very important to note that adding `type` fields does not reduce or eliminate the underlying complexity inherent in the data being produced. In fact, this complexity is merely shifted from multiple distinct event streams with distinct schemas to a union of all the schemas merged into one event stream. It could be argued that this actually _increases_ the complexity. Future evolution of the schema becomes more difficult, as does maintaining the code that produces the events. 
 
@@ -215,13 +186,10 @@ ProductEngagement {
 }
 ```
 
-
 Now imagine a new business requirement comes in: you need to track who watched the movie trailer before watching the movie. There are no previews for books, and though a boolean would suit the movie-watching case, it must be nullable to allow for book engagements. 
 
 ```
 ProductEngagement {
-  productId: Long,
-  productType: TypeEnum,
   actionType: ActionEnum,
   //Only applies to type=Movie
   watchedPreview: {null, Boolean}
@@ -236,9 +204,6 @@ Another new business requirement comes in: you need to track users who place a b
 TypeEnum: Book, Movie
 ActionEnum: Click, Bookmark
 ProductEngagement {
-  productId: Long,
-  productType: TypeEnum,
-  actionType: ActionEnum,
   //Only applies to productType=Movie
   watchedPreview: {null, Boolean},
   //Only applies to productType=Book,actionType=Bookmark
@@ -255,7 +220,6 @@ MovieClick {
 }
 ```
 
-
 ```
 BookClick {
   bookId: Long
@@ -270,14 +234,11 @@ The `productType` and `actionType` enumerations are now gone, and the schemas ha
 
 The takeaway from this example is not that the original creator of the event definition made a mistake. In fact, at the time, the business cared about _any_ product engagements but no _specific_ product engagement, so the original definition is quite reasonable. As soon as the business requirements changed to include tracking moviespecific events, the owner of the service needed to re-evaluate whether the event definition was still serving a single purpose, or if it was instead now covering multiple purposes. Due to the business requiring lower-level details of an event, it became clear that, while the event could serve multiple purposes, it soon would become complex and unwieldy to do so. 
 
-
 ![](../images/Event-Driven_Microservices-0068-03.png)
-
 
 Avoid adding `type` fields in your events that overload the meaning of the event. This can cause significant difficulty in evolving and maintaining the event format. 
 
 Take some time to consider how your schemas may evolve. Identify the main business purpose of the data being produced, the scope, the domain, and whether you’re building it as single-purpose. Validate that the schemas accurately reflect business concerns, especially for systems that cover a broad scope of business function responsibility. It could be that the business scope and the technical implementation are misaligned. Finally, evolving business requirements may require you to revisit the event definitions and potentially change them beyond just incremental definitions of a single schema. Events may need to be split up and redefined completely should sufficient business changes occur. 
-
 
 ### Minimize the Size of Events
 
@@ -296,7 +257,6 @@ When designing a new event, it is important to involve any anticipated consumers
 Avoid using events as a semaphore or a signal. These events simply indicate that something has occurred without being the single source of truth for the results. 
 
 Consider a very simple example where a system outputs an event indicating that work has been completed for an arbitrary job. Although the event itself indicates the work is done, the actual result of the work is not included in the event. This means that to consume this event properly, you must find where the completed work actually resides. Once there are two sources of truth for a piece of data, consistency problems arise. 
-
 
 ## Summary
 

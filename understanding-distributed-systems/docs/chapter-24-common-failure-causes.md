@@ -12,9 +12,6 @@ Any physical part of a machine can fail. HDDs, memory modules, power supplies, m
 
 > 1“A Conceptual Framework for System Fault Tolerance,” https://resources.sei. cmu.edu/asset_files/TechnicalReport/1992_005_001_16112.pdf 
 
-
-234 
-
 As we will discuss later, we can address many of these infrastructure faults with redundancy. You would think that these faults are the main cause for distributed applications failing, but in reality, they often fail for very mundane reasons. 
 
 # **24.2 Incorrect error handling** 
@@ -29,7 +26,7 @@ In hindsight, this is perhaps not too surprising, given that error handling tend
 
 Configuration changes are one of the leading root causes for catastrophic failures[4] . It’s not just misconfigurations that cause problems, but also valid configuration changes to enable rarely-used features that no longer work as expected (or never did). 
 
-What makes configuration changes particularly dangerous is that their effects can be delayed[5] . If an application reads a configura- 
+What makes configuration changes particularly dangerous is that their effects can be delayed[5] . If an application reads a configuration value only when it’s actually needed, an invalid value might take effect only hours or days after it has changed and thus escape early detection.
 
 > 2“Simple Testing Can Prevent Most Critical Failures: An Analysis of Production Failures in Distributed Data-Intensive Systems,” https://www.usenix.org/syste m/files/conference/osdi14/osdi14-paper-yuan.pdf 
 
@@ -37,10 +34,7 @@ What makes configuration changes particularly dangerous is that their effects ca
 
 > 4“A List of Post-mortems: Config Errors,” https://github.com/danluu/postmortems#config-errors 
 
-> 5“Early Detection of Configuration Errors to Reduce Failure Damage,” https: //www.usenix.org/system/files/conference/osdi16/osdi16-xu.pdf 
-
-
-235 tion value only when it’s actually needed, an invalid value might take effect only hours or days after it has changed and thus escape early detection. 
+> 5“Early Detection of Configuration Errors to Reduce Failure Damage,” https: //www.usenix.org/system/files/conference/osdi16/osdi16-xu.pdf
 
 This is why configuration changes should be version-controlled, tested, and released just like code changes, and their validation should happen preventively when the change happens. In chapter 30, we will discuss safe release practices for code and configuration changes in the context of continuous deployments. 
 
@@ -62,9 +56,6 @@ Similarly, the TLS certificate used by an application for its HTTP endpoints is 
 
 > 9“Microsoft Teams goes down after Microsoft forgot to renew a certificate,” ht tps://www.theverge.com/2020/2/3/21120248/microsoft-teams-down-outagecertificate-issue-status 
 
-
-236 
-
 Ideally, SPOFs should be identified when the system is designed. The best way to detect them is to examine every system component and ask what would happen if it were to fail. Some SPOFs can be architected away, e.g., by introducing redundancy, while others can’t. In that case, the only option left is to reduce the SPOF’s blast radius, i.e., the damage the SPOF inflicts on the system when it fails. Many of the resiliency patterns we will discuss later reduce the blast radius of failures. 
 
 # **24.5 Network faults** 
@@ -79,9 +70,6 @@ In the next section, we will explore another common cause of gray failures.
 
 > 11“Gray Failure: The Achilles’ Heel of Cloud-Scale Systems,” https://www.mi crosoft.com/en-us/research/wp-content/uploads/2017/06/paper-1.pdf 
 
-
-237 
-
 # **24.6 Resource leaks** 
 
 From an observer’s point of view, a very slow process is not very different from one that isn’t running at all — neither can perform useful work. Resource leaks are one of the most common causes of slow processes. 
@@ -92,10 +80,7 @@ Memory is just one of the many resources that can leak. Take thread pools, for e
 
 You might think that making _asynchronous_ calls rather than synchronous ones would help in the previous case. However, modern HTTP clients use socket pools to avoid recreating TCP connections and paying a performance fee, as discussed in chapter 2. If a request is made without a timeout, the connection is never returned to the pool. As the pool has a limited maximum size, eventually, there won’t be any connections left. 
 
-On top of that, your code isn’t the only thing accessing memory, threads, and sockets. The libraries your application depends on use the same resources, and they can hit the same issues we just 
-
-
-238 discussed. 
+On top of that, your code isn’t the only thing accessing memory, threads, and sockets. The libraries your application depends on use the same resources, and they can hit the same issues we just discussed. 
 
 # **24.7 Load pressure** 
 
@@ -113,16 +98,11 @@ While some load surges can be handled by automation that adds capacity (e.g., au
 
 # **24.8 Cascading failures** 
 
-You would think that if a system has hundreds of processes, it shouldn’t make much of a difference if a small percentage are slow or unreachable. The thing about faults is that they have the potential to spread virally and cascade from one process to the other until the whole system crumbles to its knees. This happens when 
-
-
-239 system components depend on each other, and a failure in one increases the probability of failure in others. 
+You would think that if a system has hundreds of processes, it shouldn’t make much of a difference if a small percentage are slow or unreachable. The thing about faults is that they have the potential to spread virally and cascade from one process to the other until the whole system crumbles to its knees. This happens when system components depend on each other, and a failure in one increases the probability of failure in others. 
 
 For example, suppose multiple clients are querying two database replicas, A and B, behind a load balancer. Each replica handles about 50 transactions per second (see Figure 24.1). 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0257-04.png)
-
 
 Figure 24.1: Two replicas behind a load balancer; each is handling half the load. 
 
@@ -132,12 +112,7 @@ If replica A struggles to keep up with the incoming requests, the clients will e
 
 Suppose now that replica B becomes available again and the load balancer puts it back in the pool. Because it’s the only replica in the pool, it will be flooded with requests, causing it to overload and eventually be removed again. 
 
-
-240 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0258-02.png)
-
 
 Figure 24.2: When replica B becomes unavailable, A will be hit with more load, which can strain it beyond its capacity. 
 
@@ -149,21 +124,15 @@ A big enough corrective action is usually needed to break the loop, like tempora
 
 As it should be evident by now, a distributed application needs to accept that faults are inevitable and be prepared to detect, react to, and repair them as they occur. 
 
-At this point, you might feel overwhelmed by the sheer amount of things that can go wrong. But just because a specific fault has 
+At this point, you might feel overwhelmed by the sheer amount of things that can go wrong. But just because a specific fault hasnces/hotos/2021/papers/hotos21-s11-bronson.pdf a chance of happening, it doesn’t mean we have to do something about it. We first have to consider the probability it will manifest and the impact it will cause to the system’s users when it does. By multiplying the two factors together, we get a risk score[13] that we can use to prioritize which faults to address (see Figure 24.3) first. For example, a fault that is very likely to happen, and has a large impact, should be tackled head on; on the other hand, a fault with a low likelihood and low impact can wait.
 
-> 12“Metastable Failures in Distributed Systems,” https://sigops.org/s/confere nces/hotos/2021/papers/hotos21-s11-bronson.pdf 
-
-
-241 a chance of happening, it doesn’t mean we have to do something about it. We first have to consider the probability it will manifest and the impact it will cause to the system’s users when it does. By multiplying the two factors together, we get a risk score[13] that we can use to prioritize which faults to address (see Figure 24.3) first. For example, a fault that is very likely to happen, and has a large impact, should be tackled head on; on the other hand, a fault with a low likelihood and low impact can wait. 
-
+> 12“Metastable Failures in Distributed Systems,” https://sigops.org/s/confere
 
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0259-03.png)
-
 
 Figure 24.3: Risk matrix 
 
 Once we decide that we need to do something about a specific fault, we can try to reduce its probability and/or reduce its impact. This will be the main focus of the next chapters. 
 
 > 13“Risk matrix,” https://en.wikipedia.org/wiki/Risk_matrix 
-
 

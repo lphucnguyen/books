@@ -2,7 +2,6 @@
 
 **Scalability** 
 
-
 # **Introduction** 
 
 _“Treat servers like cattle, not pets.”_ 
@@ -17,14 +16,9 @@ In this part, we will walk through the journey of scaling a simple CRUD web appl
 
 14“Amazon Route 53,” https://aws.amazon.com/route53/ 
 
-
-140 
-
 Users interact with _Cruder_ through their browsers. Typically, a browser issues a DNS request to resolve the domain name to an IP address (if it doesn’t have it cached already), opens a TLS connection with the server, and sends its first HTTP _GET_ request to it (see Figure 13.2). 
 
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0158-02.png)
-
 
 Figure 13.2: Cruder’s architecture 
 
@@ -34,9 +28,7 @@ And so, as the number of requests grows, the application server will require mor
 
 The simplest and quickest way to increase the capacity is to _scale up_ the machine hosting the application. For example, we could: 
 
-- increase the number of threads capable of running simulta141 
-
-neously by provisioning more processors or cores, 
+- increase the number of threads capable of running simulta141 neously by provisioning more processors or cores, 
 
 - increase disk throughput by provisioning more disks (RAID), 
 
@@ -56,12 +48,7 @@ Chapter 14 discusses the use of client-side caching to reduce the number of requ
 
 Chapter 15 describes using a content delivery network (CDN), a geographically distributed network of managed reverse proxies, 
 
-
-142 
-
-
 ![](../images/Roberto_Vitillo_-_Understanding_Distributed_Systems_-_2nd_Edition_-2022--0160-01.png)
-
 
 Figure 13.3: Moving the database to its own dedicated machine is an example of functional decomposition to further reduce the number of requests the application needs to handle. 
 
@@ -71,10 +58,7 @@ Chapter 17 discusses the benefits of offloading the storage of large static file
 
 Chapter 18 talks about how to increase the application’s capacity by load-balancing requests across a pool of servers. The chapter starts with a simple approach based on DNS and then explores more flexible solutions that operate at the transport and application layers of the network stack. 
 
-Chapter 19 describes how to scale out the application’s relational database using replication and partitioning and the challenges that 
-
-
-143 come with it. It then introduces NoSQL data stores as a solution to these challenges and recounts their evolution since their initial adoption in the industry. 
+Chapter 19 describes how to scale out the application’s relational database using replication and partitioning and the challenges that come with it. It then introduces NoSQL data stores as a solution to these challenges and recounts their evolution since their initial adoption in the industry. 
 
 Chapter 20 takes a stab at discussing caching from a more general point of view by diving into the benefits and pitfalls of putting a cache in front of the application’s data store. Although caching is a deceptively simple technique, it can create subtle consistency and operational issues that are all too easy to dismiss. 
 
@@ -83,5 +67,4 @@ Chapter 21 talks about scaling the development of the application across multipl
 Chapter 22 describes the benefits of separating the serving of client requests ( _data plane_ ) from the management of the system’s metadata and configuration ( _control plane_ ), which is a common pattern in large-scale systems. 
 
 Chapter 23 explores the use of asynchronous messaging channels to decouple the communication between services, allowing two services to communicate even if one of them is temporarily unavailable. Messaging offers many other benefits, which we will explore in the chapter along with its best practices and pitfalls. 
-
 

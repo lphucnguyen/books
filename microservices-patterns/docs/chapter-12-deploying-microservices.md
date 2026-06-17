@@ -22,23 +22,18 @@
 
 Mary and her team at FTGO are almost finished writing their first service. Although it’s not yet feature complete, it’s running on developer laptops and the Jenkins CI server. But that’s not good enough. Software has no value to FTGO until it’s running in production and available to users. FTGO needs to deploy their service into production. 
 
-
 _Deployment_ is a combination of two interrelated concepts: process and architecture. The deployment process consists of the steps that must be performed by people— developers and operations—in order to get software into production. The deployment architecture defines the structure of the environment in which that software runs. Both aspects of deployment have changed radically since I first started developing Enterprise Java applications in the late 1990s. The manual process of developers throwing code over the wall to production has become highly automated. As figure 12.1 shows, physical production environments have been replaced by increasingly lightweight and ephemeral computing infrastructure. 
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0414-03.png)
 
-
 **----- Start of picture text -----**<br>
 Lightweight,<br>ephemeral,<br>automated<br>Application<br>Application<br>Serverless<br>runtime<br>Application<br>Container<br>runtime Hidden<br>Application infrastructure<br>Virtual Virtual<br>machine machine<br>Heavyweight,<br>Physical Physical Physical Physical<br>permanent,<br>machine machine machine machine<br>manual<br>Time<br>1990s 2006 2013 2014<br>AWS EC2 Initial Docker AWS Lambda<br>released release introduced<br>**----- End of picture text -----**<br>
-
 
 Figure 12.1 Heavyweight and long-lived physical machines have been abstracted away by increasingly lightweight and ephemeral technologies. 
 
 Back in the 1990s, if you wanted to deploy an application into production, the first step was to throw your application along with a set of operating instructions over the wall to operations. You might, for example, file a trouble ticket asking operations to deploy the application. Whatever happened next was entirely the responsibility of operations, unless they encountered a problem they needed your help to fix. Typically, operations bought and installed expensive and heavyweight application servers such as WebLogic or WebSphere. Then they would log in to the application server console and deploy your applications. They would lovingly care for those machines, as if they were pets, installing patches and updating the software. 
 
 In the mid 2000s, the expensive application servers were replaced with open source, lightweight web containers such as Apache Tomcat and Jetty. You could still run multiple applications on each web container, but having one application per web container became feasible. Also, virtual machines started to replace physical machines. 
-
 
 But machines were still treated as beloved pets, and deployment was still a fundamentally manual process. 
 
@@ -50,16 +45,12 @@ It’s no coincidence that the evolution of deployment processes and architectur
 
 Figure 12.2 shows a high-level view of a production environment. The production environment enables developers to configure and manage their services, the deployment 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0415-06.png)
-
 
 **----- Start of picture text -----**<br>
 Service<br>Monitoring A<br>Observe and<br>troubleshoot Dash- Consumes<br>services boards Service Service services<br>Routing<br>B C<br>Developer User<br>Alerting<br>Service<br>Configure<br>D<br>and manage<br>services<br>Service Runtime<br>Deployment management Service<br>pipeline Update interface management<br>services<br>**----- End of picture text -----**<br>
 
-
 Figure 12.2 A simplified view of the production environment. It provides four main capabilities: service management enables developers to deploy and manage their services, runtime management ensures that the services are running, monitoring visualizes service behavior and generates alerts, and request routing routes requests from users to the services. 
-
 
 pipeline to deploy new versions of services, and users to access functionality implemented by those services. 
 
@@ -89,9 +80,6 @@ Let’s first look at how to deploy services as language-specific packages.
 
 Let’s imagine that you want to deploy the FTGO application’s Restaurant Service, which is a Spring Boot-based Java application. One way to deploy this service is by using the Service as a language-specific package pattern. When using this pattern, what’s deployed in production and what’s managed by the service runtime is a service in its language-specific package. In the case of Restaurant Service, that’s either the executable JAR file or a WAR file. For other languages, such as NodeJS, a service is a directory of source code and modules. For some languages, such as GoLang, a service is an operating system-specific executable. 
 
-
-_**Deploying services using the Language-specific packaging format pattern**_ 
-
 Pattern: Language-specific packaging format 
 
 Deploy a language-specific package into production. See http://microservices.io/ patterns/deployment/language-specific-packaging.html. 
@@ -100,13 +88,10 @@ To deploy Restaurant Service on a machine, you would first install the necessary
 
 Ideally, you’ve set up your deployment pipeline to automatically deploy the service to production, as shown in figure 12.3. The deployment pipeline builds an executable JAR file or WAR file. It then invokes the production environment’s service management interface to deploy the new version. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0417-06.png)
-
 
 **----- Start of picture text -----**<br>
 Build time Runtime Service instance<br>JVM<br>process JVM<br>JVM process<br>process<br>JDK/JRE JDK/JRE<br>Executable<br>JAR/WAR file Machine Machine<br>Service Deployment<br>Service runtime management<br>code pipeline<br>Production<br>**----- End of picture text -----**<br>
-
 
 Figure 12.3 The deployment pipeline builds an executable JAR file and deploys it into production. In production, each service instance is a JVM running on a machine that has the JDK or JRE installed. 
 
@@ -114,25 +99,19 @@ A service instance is typically a single process but sometimes may be a group of
 
 Sometimes you might deploy a single service instance on a machine, while retaining the option to deploy multiple service instances on the same machine. For example, as figure 12.4 shows, you could run multiple JVMs on a single machine. Each JVM runs a single service instance. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0418-02.png)
-
 
 **----- Start of picture text -----**<br>
 Service Service Service<br>instance A instance B instance ...<br>Tomcat Tomcat Tomcat<br>JVM JVM JVM<br>Process Process Process<br>Physical or virtual machine<br>**----- End of picture text -----**<br>
-
 
 Figure 12.4 Deploying multiple service instances on the same machine. They might be instances of the same service or instances of different services. The overhead of the OS is shared among the service instances. Each service instance is a separate process, so there’s some isolation between them. 
 
 Some languages also let you run multiple services instances in a single process. For example, as figure 12.5 shows, you can run multiple Java services on a single Apache Tomcat. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0418-05.png)
-
 
 **----- Start of picture text -----**<br>
 Service Service Service<br>instance A instance B instance ...<br>Tomcat<br>JVM<br>Process<br>Physical or virtual machine<br>**----- End of picture text -----**<br>
-
 
 Figure 12.5 Deploying multiple services instances on the same web container or application server. They might be instances of the same service or instances of different services. The overhead of the OS and runtime is shared among all the service instances. But because the service instances are in the same process, there’s no isolation between them. 
 
@@ -149,10 +128,6 @@ The Service as a language-specific package pattern has a few benefits:
 - Efficient resource utilization, especially when running multiple instances on the same machine or within the same process 
 
 Let’s look at each one. 
-
-
-_**Deploying services using the Language-specific packaging format pattern**_ 
-
 
 **FAST DEPLOYMENT**
 
@@ -188,7 +163,6 @@ To make matters worse, services can be written in a variety of languages and fra
 
 Another drawback is that you can’t constrain the resources consumed by a service instance. A process can potentially consume all of a machine’s CPU or memory, starving other service instances and operating systems of resources. This might happen, for example, because of a bug. 
 
-
 **LACK OF ISOLATION WHEN RUNNING MULTIPLE SERVICE INSTANCES ON THE SAME MACHINE**
 
 The problem is even worse when running multiple instances on the same machine. The lack of isolation means that a misbehaving service instance can impact other service instances. As a result, the application risks being unreliable, especially when running multiple service instances on the same machine. 
@@ -211,16 +185,10 @@ Deploy services packaged as VM images into production. Each service instance is 
 
 The virtual machine image is built by the service’s deployment pipeline. The deployment pipeline, as figure 12.6 shows, runs a VM image builder to create a VM image that contains the service’s code and whatever software is required to run it. For example, the VM builder for a FTGO service installs the JDK and the service’s executable JAR. The VM image builder configures the VM image machine to run the application when the VM boots, using Linux’s init system, such as upstart. 
 
-
-_**Deploying services using the Service as a virtual machine pattern**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0421-02.png)
-
 
 **----- Start of picture text -----**<br>
 Build time Runtime<br>Autoscaling group<br>Requests EC2 instance<br>Elastic load<br>balancer<br>Service<br>Deployed as<br>EC2 instance<br>Service VM image Creates AMI<br>code builder (VM Service<br>image)<br>Deployment pipeline<br>EC2 instance<br>Service<br>**----- End of picture text -----**<br>
-
 
 Figure 12.6 The deployment pipeline packages a service as a virtual machine image, such as an EC2 AMI, containing everything required to run the service, including the language runtime. At runtime, each service instance is a VM, such as an EC2 instance, instantiated from that image. An EC2 Elastic Load Balancer routes requests to the instances. 
 
@@ -231,7 +199,6 @@ There are a variety of tools that your deployment pipeline can use to build VM i
 Elastic Beanstalk, which is provided by AWS, is an easy way to deploy your services using VMs. You upload your code, such as a WAR file, and Elastic Beanstalk deploys it as one or more load-balanced and managed EC2 instances. Elastic Beanstalk is perhaps not quite as fashionable as, say, Kubernetes, but it’s an easy way to deploy a microservices-based application on EC2. 
 
 Interestingly, Elastic Beanstalk combines elements of the three deployment patterns described in this chapter. It supports several packaging formats for several languages, including Java, Ruby, and .NET. It deploys the application as VMs, but rather than building an AMI, it uses a base image that installs the application on startup. 
-
 
 _(continued)_ 
 
@@ -275,10 +242,6 @@ The Service as a VM pattern also has some drawbacks:
 
 Let’s look at each drawback in turn. 
 
-
-_**Deploying services using the Service as a container pattern**_ 
-
-
 **LESS-EFFICIENT RESOURCE UTILIZATION**
 
 Each service instance has the overhead of an entire virtual machine, including its operating system. Moreover, a typical public IaaS virtual machine offers a limited set of VM sizes, so the VM will probably be underutilized. This is less likely to be a problem for Java-based services because they’re relatively heavyweight. But this pattern might be an inefficient way of deploying lightweight NodeJS and GoLang services. 
@@ -303,16 +266,12 @@ From the perspective of a process running in a container, it’s as if it’s ru
 
 Deploy services packaged as container images into production. Each service instance is a container. See http://microservices.io/patterns/deployment/service-per-container .html. 
 
-
 **Each container is a sandbox that isolates the processes.**
-
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0424-03.png)
 
-
 **----- Start of picture text -----**<br>
 Service Service Service<br>process process process<br>Container Container Container<br>Container runtime, such as Docker<br>Operating System<br>Machine<br>**----- End of picture text -----**<br>
-
 
 **Shared by all of the containers** 
 
@@ -324,16 +283,10 @@ Figure 12.8 shows the process of deploying a service as a container. At build-ti
 
 Let’s take a look at build-time and runtime steps in more detail. 
 
-
-_**Deploying services using the Service as a container pattern**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0425-02.png)
-
 
 **----- Start of picture text -----**<br>
 Build time Runtime<br>VM<br>Container<br>Service<br>instance<br>$ docker build ... Deployed<br>as Container<br>Service<br>instance<br>Service Container Creates Service<br>container<br>code builder tool<br>image<br>Deployment pipeline Container runtime<br>Container<br>image registry VM<br>Deployed<br>as Container<br>Docker<br>Service<br>file<br>instance<br>Container runtime<br>**----- End of picture text -----**<br>
-
 
 Figure 12.8 A service is packaged as a container image, which is stored in a registry. At runtime the service consists of multiple containers instantiated from that image. Containers typically run on virtual machines. A single VM will usually run multiple containers. 
 
@@ -345,7 +298,6 @@ To deploy a service as a container, you must package it as a container image. A 
 
 The first step in building an image is to create a Dockerfile. A _Dockerfile_ describes how to build a Docker container image. It specifies the base container image, a series of instructions for installing software and configuring the container, and the shell command to run when the container is created. Listing 12.1 shows the Dockerfile used to build an image for Restaurant Service. It builds a container image containing the service’s executable JAR file. It configures the container to run the java -jar command on startup. 
 
-
 Listing 12.1 The **Dockerfile** used to build **Restaurant Service** 
 
 ```dockerfile
@@ -355,7 +307,6 @@ CMD java ${JAVA_OPTS} -jar ftgo-restaurant-service.jar
 HEALTHCHECK --start-period=30s --interval=5s CMD curl http://localhost:8080/actuator/health || exit 1 
 COPY build/libs/ftgo-restaurant-service.jar . 
 ```
-
 
 The base image openjdk:8u171-jre-alpine is a minimal footprint Linux image containing the JRE. The Dockerfile copies the service’s JAR into the image and configures the image to execute the JAR on startup. It also configures Docker to periodically invoke the health check endpoint, described in chapter 11. The HEALTHCHECK directive says to invoke the health check endpoint API, described in chapter 11, every 5 seconds after an initial 30-second delay, which gives the service time to start. 
 
@@ -377,8 +328,6 @@ The final step of the build process is to push the newly built Docker image to w
 
 You must use two Docker commands to push an image to a registry. First, you use the docker tag command to give the image a name that’s prefixed with the hostname 
 
-
-_**Deploying services using the Service as a container pattern**_
 and optional port of the registry. The image name is also suffixed with the version, which will be important when you make a new release of the service. For example, if the hostname of the registry is registry.acme.com, you would use this command to tag the image: docker tag ftgo-restaurant-service registry.acme.com/ftgo-restaurantservice:1.0.0.RELEASE 
 
 Next you use the docker push command to upload that tagged image to the registry: docker push registry.acme.com/ftgo-restaurant-service:1.0.0.RELEASE 
@@ -403,9 +352,7 @@ docker run \
   -e SPRING_DATASOURCE_URL=... \ 
   -e SPRING_DATASOURCE_USERNAME=... \ 
   -e SPRING_DATASOURCE_PASSWORD=... \ 
-  registry.acme.com/ftgo-restaurant-service:1.0.0.RELEASE 
 ```
-
 
 The docker run command pulls the image from the registry if necessary. It then creates and starts the container, which runs the java -jar command specified in the Dockerfile. 
 
@@ -429,10 +376,6 @@ Deploying services as containers has several benefits. First, containers have ma
 
 But unlike virtual machines, containers are a lightweight technology. Container images are typically fast to build. For example, on my laptop it takes as little as five seconds to package a Spring Boot application as a container image. Moving a container image over the network, such as to and from the container registry, is also relatively fast, primarily because only a subset of an image’s layers need to be transferred. Containers also start very quickly, because there’s no lengthy OS boot process. When a container starts, all that runs is the service. 
 
-
-_**Deploying the FTGO application with Kubernetes**_ 
-
-
 ### 12.3.3 Drawbacks of deploying services as containers
 
 One significant drawback of containers is that you’re responsible for the undifferentiated heavy lifting of administering the container images. You must patch the operating system and runtime. Also, unless you’re using a hosted container solution such as Google Container Engine or AWS ECS, you must administer the container infrastructure and possibly the VM infrastructure it runs on. 
@@ -455,13 +398,10 @@ A Docker orchestration framework, such as Kubernetes , has three main functions:
 
 - _Service management_ —Implements the concept of named and versioned services that map directly to services in the microservice architecture. The orchestration framework ensures that the desired number of healthy instances is running at all times. It load balances requests across them. The orchestration framework performs rolling upgrades of services and lets you roll back to an old version. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0430-02.png)
-
 
 **----- Start of picture text -----**<br>
 SVC SVC SVC<br>A B C<br>Container Container Container<br>Service management<br>Scheduling<br>Resource management<br>Docker orchestration framework<br>Docker Docker Docker<br>Operating Operating Operating<br>system system system<br>Machine Machine Machine<br>**----- End of picture text -----**<br>
-
 
 Figure 12.9 A Docker orchestration framework turns a set of machines running Docker into a cluster of resources. It assigns containers to machines. The framework attempts to keep the desired number of healthy containers running at all times. 
 
@@ -477,16 +417,10 @@ A master runs several components, including the following:
 
 - _Etcd_ —A key-value NoSQL database that stores the cluster data. 
 
-
-_**Deploying the FTGO application with Kubernetes**_ 
-
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0431-02.png)
-
 
 **----- Start of picture text -----**<br>
 Kubernetes master<br>Scheduler<br>Kubecti<br>API Server<br>CLI<br>Developer<br>Controller<br>management<br>Deployment<br>pipeline<br>etcd<br>Configuration Aplication<br>commands user<br>Application<br>requests<br>Kubernetes node Kubernetes node<br>Kubelet Kube-proxy Kubelet Kube-proxy<br>Pod Pod<br>SVC SVC<br>**----- End of picture text -----**<br>
-
 
 Figure 12.10 A Kubernetes cluster consists of a master, which manages the cluster, and nodes, which run the services. Developers and the deployment pipeline interact with Kubernetes through the API server, which along with other cluster-management software runs on the master. Application containers run on nodes. Each node runs a Kubelet, which manages the application container, and a kube-proxy, which routes application requests to the pods, either directly as a proxy or indirectly by configuring iptables routing rules built into the Linux kernel. 
 
@@ -501,7 +435,6 @@ A node runs several components, including the following:
 - _Kube-proxy_ —Manages networking, including load balancing across pods 
 
 - _Pods_ —The application services 
-
 
 Let’s now look at key Kubernetes concepts you’ll need to master to deploy services on Kubernetes. 
 
@@ -522,10 +455,6 @@ Now that we’ve reviewed the key Kubernetes concepts, let’s see them in actio
 ### 12.4.2 Deploying the Restaurant service on Kubernetes
 
 As mentioned earlier, to deploy a service on Kubernetes, you need to define a deployment. The easiest way to create a Kubernetes object such as a deployment is by writing a YAML file. Listing 12.4 is a YAML file defining a deployment for Restaurant Service. This deployment specifies running two replicas of a pod. The pod has just one container. 
-
-
-_**Deploying the FTGO application with Kubernetes**_ 
-
 
 The container definition specifies the Docker image running along with other attributes, such as the values of environment variables. The container’s environment variables are the service’s externalized configuration. They are read by Spring Boot and made available as properties in the application context. 
 
@@ -563,7 +492,6 @@ spec:
         - name: SPRING_DATASOURCE_PASSWORD 
           valueFrom: 
             secretKeyRef: 
-              name: ftgo-db-secret 
               key: password 
         - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME 
           value: com.mysql.jdbc.Driver 
@@ -579,10 +507,7 @@ spec:
           periodSeconds: 20 
         readinessProbe: 
           httpGet: 
-            path: /actuator/health 
             port: 8080 
-          initialDelaySeconds: 60 
-          periodSeconds: 20 
 ```
 
 This deployment definition configures Kubernetes to invoke Restaurant Service’s health check endpoint. As described in chapter 11, a health check endpoint enables Kubernetes to determine the health of the service instance. Kubernetes implements two different checks. The first check is readinessProbe, which it uses to determine whether it should route traffic to a service instance. In this example, Kubernetes invokes the /actuator/health HTTP endpoint every 20 seconds after an initial 30second delay, which gives it a chance to initialize. If some number (default is 1) of consecutive readinessProbes succeeds, Kubernetes considers the service to be ready, whereas if some number (default, 3) of consecutive readinessProbes fail, it’s considered not to be ready. Kubernetes will only route traffic to the service instance when the readinessProbe indicates that it’s ready. 
@@ -602,10 +527,6 @@ This command creates a secret containing the database user ID and password speci
 **CREATING A KUBERNETES SERVICE**
 
 At this point the pods are running, and the Kubernetes deployment will do its best to keep them running. The problem is that the pods have dynamically assigned IP addresses and, as such, aren’t that useful to a client that wants to make an HTTP request. As described in chapter 3, the solution is to use a service discovery mechanism. 
-
-
-_**Deploying the FTGO application with Kubernetes**_ 
-
 
 One approach is to use a client-side discovery mechanism and install a service registry, such as Netflix OSS Eureka. Fortunately, we can avoid doing that by using the service discovery mechanism built in to Kubernetes and define a Kubernetes service. 
 
@@ -636,7 +557,6 @@ Now that we’ve created the Kubernetes service, any clients of Restaurant Servi
 
 The Kubernetes service for Restaurant Service, shown in listing 12.5, is only accessible from within the cluster. That’s not a problem for Restaurant Service, but what about API Gateway? Its role is to route traffic from the outside world to the service. It therefore needs to be accessible from outside the cluster. Fortunately, a Kubernetes service supports this use case as well. The service we looked at earlier is a ClusterIP service, which is the default, but there are, however, two other types of services: NodePort and LoadBalancer. 
 
-
 A NodePort service is accessible via a cluster-wide port on all the nodes in the cluster. Any traffic to that port on any cluster node is load balanced to the backend pods. You must select an available port in the range of 30000–32767. For example, listing 12.6 shows a service that routes traffic to port 30000 of Consumer Service. 
 
 Listing 12.6 The YAML definition of a **NodePort** service that routes traffic to port 8082 of **Consumer Service** 
@@ -651,7 +571,6 @@ spec:
   ports: 
   - nodePort: 30000 
     port: 80 
-    targetPort: 8080 
   selector: 
     app: ftgo-api-gateway 
 ```
@@ -672,9 +591,6 @@ Imagine you’ve updated Restaurant Service and want to deploy those changes int
 
 Kubernetes will then perform a rolling upgrade of the pods. It will incrementally create pods running version 1.1.0.RELEASE and terminate the pods running version 
 
-
-_**Deploying the FTGO application with Kubernetes**_ 
-
 1.0.0.RELEASE. What’s great about how Kubernetes does this is that it doesn’t terminate old pods until their replacements are ready to handle requests. It uses the readinessProbe mechanism, a health check mechanism described earlier in this section, to determine whether a pod is ready. As a result, there will always be pods available to handle requests. Eventually, assuming the new pods start successfully, all the deployment’s pods will be running the new version. 
 
 But what if there’s a problem and the version 1.1.0.RELEASE pods don’t start? Perhaps there’s a bug, such as a misspelled container image name or a missing environment variable for a new configuration property. If the pods fail to start, the deployment will become stuck. At that point, you have two options. One option is to fix the YAML file and rerun kubectl apply -f to update the deployment. The other option is to roll back the deployment. 
@@ -690,7 +606,6 @@ A Kubernetes deployment is a good way to deploy a service without downtime. But 
 The traditional way to roll out a new version of a service is to first test it in a staging environment. Then, once it’s passed the test in staging, you deploy in production by doing a rolling upgrade that replaces old instances of the service with new service instances. On one hand, as you just saw, Kubernetes deployments make doing a rolling upgrade very straightforward. On the other hand, this approach assumes that once a service version has passed the tests in the staging environment, it will work in production. Sadly, this is not always the case. 
 
 One reason is because staging is unlikely to be an exact clone, if for no other reason than the production environment is likely to be much larger and handle much more traffic. It’s also time consuming to keep the two environments synchronized. As a result of discrepancies, it’s likely that some bugs will only show up in production. And even it were an exact clone, you can’t guarantee that testing will catch all bugs. 
-
 
 A much more reliable way to roll out a new version is to separate deployment from release: 
 
@@ -724,10 +639,6 @@ The Istio website describes Istio as an “An open platform to connect, manage, 
 
 - _Security_ —Secures interservice communication using Transport Layer Security (TLS) 
 
-
-_**Deploying the FTGO application with Kubernetes**_ 
-
-
 - _Telemetry_ —Captures metrics about network traffic and implements distributed tracing 
 
 - _Policy enforcement_ —Enforces quotas and rate limits 
@@ -738,16 +649,12 @@ Figure 12.11 shows Istio’s architecture. It consists of a control plane and a 
 
 The two main components of the control plane are the Pilot and the Mixer. The _Pilot_ extracts information about deployed services from the underlying infrastructure. When running on Kubernetes, for example, the Pilot retrieves the services and healthy pods. It configures the Envoy proxies to route traffic according to the defined routing rules. The _Mixer_ collects telemetry from the Envoy proxies and enforces policies. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0439-07.png)
-
 
 **----- Start of picture text -----**<br>
 Key<br>Configuration<br>Pod Pod Requests<br>Consumer Policy check<br>API Gateway<br>container Service Telemetry<br>container<br>GET/consumers/1 GET/consumers/1<br>GET/consumers/1 Host: ftgo-consumer-service Host: ftgo-consumer-service<br>GET/consumers/1 Istio Envoy Istio data plane Istio Envoy<br>container container<br>Telemetry<br>Configures Checks Logging<br>Server<br>Pilot Mixer<br>Istio control plane Metrics<br>Server<br>Queries for deployed services<br>Kubernetes Monitoring infrastructure<br>Service registry<br>Service Pod<br>**----- End of picture text -----**<br>
 
-
 Figure 12.11 Istio consists of a control plane, whose components include the Pilot and the Mixer, and a data plane, which consists of Envoy proxy servers. The Pilot extracts information about deployed services from the underlying infrastructure and configures the data plane. The Mixer enforces policies such as quotas and gathers telemetry, reporting it to the monitoring infrastructure servers. The Envoy proxy servers route traffic in and out of services. There’s one Envoy proxy server per service instance. 
-
 
 The Istio Envoy proxy is a modified version of Envoy (www.envoyproxy.io). It’s a highperformance proxy that supports a variety of protocols, including TCP, low-level protocols such as HTTP and HTTPS, and higher-level protocols. It also understands MongoDB, Redis, and DynamoDB protocols. Envoy also supports robust interservice communication with features such as circuit breakers, rate limiting, and automatic retries. It can secure communication within the application by using TLS for interEnvoy communication. 
 
@@ -771,10 +678,6 @@ Deploying a service on Istio is quite straightforward. You define a Kubernetes S
 
 - In order to run multiple versions of a service simultaneously, the name of a Kubernetes deployment must include the version, such as ftgo-consumerservice-v1, ftgo-consumer-service-v2, and so on. A deployment’s pods should have a version label, such as version: v1, which specifies the version, so that Istio can route to a specific version. 
 
-
-_**Deploying the FTGO application with Kubernetes**_ 
-
-
 Listing 12.7 Deploying Consumer Service with Istio 
 
 ```yaml
@@ -788,7 +691,6 @@ spec:
     port: 8080 
     targetPort: 8080 
   selector: 
-    app: ftgo-consumer-service 
 --- 
 apiVersion: extensions/v1beta1 
 kind: Deployment 
@@ -799,7 +701,6 @@ spec:
   template: 
     metadata: 
       labels: 
-        app: ftgo-consumer-service 
         version: v1 
     spec: 
       containers: 
@@ -817,7 +718,6 @@ If you describe your service’s pod, you’ll see that it consists of more than
 
 $ kubectl describe po ftgo-consumer-service-7db65b6f97-q9jpr Name: ftgo-consumer-service-7db65b6f97-q9jpr Namespace: default ... 
 
-
 Init Containers: **Initializes the pod** istio-init: Image: docker.io/istio/proxy_init:0.8.0 .... **The service** Containers: **container** ftgo-consumer-service: Image: msapatterns/ftgo-consumer-service:latest istio-proxy:... **The Envoy container** Image: docker.io/istio/proxyv2:0.8.0 ... 
 
 Now that we’ve deployed the service, let’s look at how to define routing rules. 
@@ -826,19 +726,12 @@ CREATE ROUTING RULES TO ROUTE TO THE V1 VERSION
 
 Let’s imagine that you deployed the ftgo-consumer-service-v2 deployment. In the absence of routing rules, Istio load balances requests across all versions of a service. It would, therefore, load balance across versions 1 and 2 of ftgo-consumer-service, which defeats the purpose of using Istio. In order to safely roll out a new version, you must define a routing rule that routes all traffic to the current v1 version. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0442-06.png)
-
 
 **----- Start of picture text -----**<br>
 Routes to the v1 subset All traffic routed to v1 Defines subsets<br>v1 and v2<br>kind: VirtualService<br>metadata:<br>name:ftgo-consumer-service<br>spec:<br>hosts:<br>-ftgo-consumer-service metadata:<br>http: Consumer labels:<br>-route:-destination: Service app: version: ftgo-consumer-service v1<br>host: ftgo-consumer-service v1 pod<br>subset: v1<br>weight: 100 kind: DestinationRule<br>metadata:<br>name:ftgo-consumer-service<br>spec:<br>GET/consumers/1 host: ftgo-consumer-service<br>host:ftgo-consumer- subsets:<br>API gateway service VirtualService DestinationRule -name:labels:v1<br>pod version: v1<br>-name: v2<br>labels:<br>version: v2<br>metadata:<br>Routing rule for the Defines subsets of Consumer labels:<br>Consumer Service pods of a service Service app: ftgo-consumer-service<br>v2 pod version: v2<br>No traffic routed to v2.<br>**----- End of picture text -----**<br>
 
-
 Figure 12.12 The routing rule for **Consumer Service** , which routes all traffic to the v1 pods. It consists of a **VirtualService** , which routes its traffic to the v1 subset, and a **DestinationRule** , which defines the v1 subset as the pods labeled with **version: v1** . Once you’ve defined this rule, you can safely deploy a new version without routing any traffic to it initially. 
-
-
-_**Deploying the FTGO application with Kubernetes**_ 
-
 
 Figure 12.12 shows the routing rule for Consumer Service that routes all traffic to v1. It consists of two Istio objects: a VirtualService and a DestinationRule. 
 
@@ -846,7 +739,6 @@ A VirtualService defines how to route requests for one or more hostnames. In thi
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3 
-kind: VirtualService 
 metadata: 
   name: ftgo-consumer-service 
 spec: 
@@ -855,7 +747,6 @@ spec:
   http: 
   - route: 
     - destination: 
-        host: ftgo-consumer-service 
         subset: v1 
 ```
 
@@ -864,12 +755,8 @@ It routes all requests for the v1 subset of the pods of Consumer Service. Later,
 In addition to VirtualService, you must also define a DestinationRule, which defines one or more subsets of pods for a service. A subset of pods is typically a service version. A DestinationRule can also define traffic policies, such as the load-balancing algorithm. Here’s the DestinationRule for Consumer Service: 
 
 ```yaml
-apiVersion: networking.istio.io/v1alpha3 
-kind: DestinationRule 
 metadata: 
-  name: ftgo-consumer-service 
 spec: 
-  host: ftgo-consumer-service 
   subsets: 
   - name: v1 
     labels: 
@@ -882,7 +769,6 @@ spec:
 This DestinationRule defines two subsets of pods: v1 and v2. The v1 subset selects pods with the label version: v1. The v2 subset selects pods with the label version: v2. 
 
 Once you’ve defined these rules, Istio will only route traffic pods labeled version: v1. It’s now safe to deploy v2. 
-
 
 DEPLOYING VERSION 2 OF CONSUMER SERVICE 
 
@@ -898,7 +784,6 @@ We can enhance the ftgoconsumer-service VirtualService to route requests with th
 apiVersion: networking.istio.io/v1alpha3 
 kind: VirtualService 
 metadata: 
-  name: ftgo-consumer-service 
 spec: 
   hosts: 
   - ftgo-consumer-service 
@@ -913,36 +798,26 @@ spec:
         subset: v2 
   - route: 
     - destination: 
-        host: ftgo-consumer-service 
         subset: v1 
 ```
 
 In addition to the original default route, VirtualService has a routing rule that routes requests with the testuser header to the v2 subset. After you’ve updated the rules, you can now test Consumer Service. Then, once you feel confident that the v2 is working, you can route some production traffic to it. Let’s look at how to do that. 
-
-
-_**Deploying services using the Serverless deployment pattern**_ 
-
 
 ROUTING PRODUCTION TRAFFIC TO VERSION 2 
 
 Here, for example, is a rule that routes 95% of traffic to v1 and 5% to v2: 
 
 ```yaml
-apiVersion: networking.istio.io/v1alpha3 
-kind: VirtualService 
 metadata: 
-  name: ftgo-consumer-service 
 spec: 
   hosts: 
   - ftgo-consumer-service 
   http: 
   - route: 
     - destination: 
-        host: ftgo-consumer-service 
         subset: v1 
       weight: 95 
     - destination: 
-        host: ftgo-consumer-service 
         subset: v2 
       weight: 5 
 ```
@@ -955,13 +830,7 @@ By letting you easily separate deployment from release, Istio makes rolling out 
 
 The Language-specific packaging (section 12.1), Service as a VM (section 12.2), and Service as a container (section 12.3) patterns are all quite different, but they share some common characteristics. The first is that with all three patterns you must preprovision some computing resources—either physical machines, virtual machines, or containers. Some deployment platforms implement autoscaling, which dynamically adjusts the number of VMs or containers based on the load. But you’ll always need to pay for some VMs or containers, even if they’re idle. 
 
-Another common characteristic is that you’re responsible for system administration. If you’re running any kind of machine, you must patch the operating system. In the case of physical machines, this also includes racking and stacking. You’re also responsible for administering the language runtime. This is an example of what Amazon called “undifferentiated heavy lifting.” Since the early days of computing, system 
-
-
-_**Deploying microservices**_ 
-
-
-administration has been one of those things you need to do. As it turns out, though, there’s a solution: serverless. 
+Another common characteristic is that you’re responsible for system administration. If you’re running any kind of machine, you must patch the operating system. In the case of physical machines, this also includes racking and stacking. You’re also responsible for administering the language runtime. This is an example of what Amazon called “undifferentiated heavy lifting.” Since the early days of computing, system administration has been one of those things you need to do. As it turns out, though, there’s a solution: serverless. 
 
 ### 12.5.1 Overview of serverless deployment with AWS Lambda
 
@@ -980,9 +849,6 @@ To deploy a service, you package your application as a ZIP file or JAR file, upl
 **Pattern: Serverless deployment**
 
 Deploy services using a serverless deployment mechanism provided by a public cloud. See http://microservices.io/patterns/deployment/serverless-deployment.html. 
-
-
-_**Deploying services using the Serverless deployment pattern**_ 
 
 ### 12.5.2 Developing a lambda function
 
@@ -1018,7 +884,6 @@ Let’s look at each one.
 
 One way to invoke a lambda function is to configure an AWS API Gateway to route HTTP requests to your lambda. The API gateway exposes your lambda function as an HTTPS endpoint. It functions as an HTTP proxy, invokes the lambda function with an HTTP request object, and expects the lambda function to return an HTTP response object. By using the API gateway with AWS Lambda you can, for example, deploy RESTful services as lambda functions. 
 
-
 **HANDLING EVENTS GENERATED BY AWS SERVICES**
 
 The second way to invoke a lambda function is to configure your lambda function to handle events generated by an AWS service. Examples of events that can trigger a lambda function include the following: 
@@ -1053,10 +918,6 @@ Deploying services using lambda functions has several benefits:
 
 - _Usage-based pricing_ —Unlike a typical IaaS cloud, which charges by the minute or hour for a VM or container even when it’s idle, AWS Lambda only charges you for the resources that are consumed while processing each request. 
 
-
-_**Deploying a RESTful service using AWS Lambda and AWS Gateway**_ 
-
-
 ### 12.5.5 Drawbacks of using lambda functions
 
 As you can see, AWS Lambda is an extremely convenient way to deploy services, but there are some significant drawbacks and limitations: 
@@ -1079,29 +940,19 @@ The architecture of the service, shown in figure 12.14, is quite similar to that
 
 The service consists of a presentation tier consisting of the request handlers, which are invoked by AWS Lambda to handle the HTTP requests, and a traditional business 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0450-02.png)
-
 
 **----- Start of picture text -----**<br>
 API gateway<br>GET/restaurant/<br>POST/restaurant<br>{restaurantId}<br>AWS Lambda<br>functions<br>ftgo-create-restaurant ftgo-find-restaurant ftgo-...<br>«class»<br>«class» «class»<br>Create<br>Restaurant FindRestaurant ...<br>Request Request<br>Request<br>Handler Handler<br>Handler<br>ftgo-restaurant-service-aws-lambda.zip<br>**----- End of picture text -----**<br>
 
-
 Figure 12.13 Deploying **Restaurant Service** as AWS Lambda functions. The AWS API Gateway routes HTTP requests to the AWS Lambda functions, which are implemented by request handler classes defined by **Restaurant Service** . 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0450-04.png)
-
 
 **----- Start of picture text -----**<br>
 POST/restaurant GET/restaurant/{restaurantId}<br>Create Find<br>Restaurant Restaurant ...<br>Request<br>Request Request<br>Handler<br>Handler Handler<br>Presentation layer<br>Business and<br>RestaurantService data access layer<br>RestaurantRepository Restaurant<br>**----- End of picture text -----**<br>
 
-
 Figure 12.14 The design of the AWS Lambda-based **Restaurant Service** . The presentation layer consists of request handler classes, which implement the lambda functions. They invoke the business tier, which is written in a traditional style consisting of a service class, an entity, and a repository. 
-
-
-_**Deploying a RESTful service using AWS Lambda and AWS Gateway**_ 
-
 
 tier. The business tier consists of RestaurantService, the Restaurant JPA entity, and RestaurantRepository, which encapsulates the database. 
 
@@ -1111,20 +962,16 @@ Let’s take a look at the FindRestaurantRequestHandler class.
 
 The FindRestaurantRequestHandler class implements the GET /restaurant/ {restaurantId} endpoint. This class along with the other request handler classes are the leaves of the class hierarchy shown in figure 12.15. The root of the hierarchy is RequestHandler, which is part of the AWS SDK. Its abstract subclasses handle errors and inject dependencies. 
 
-
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0451-06.png)
-
 
 **----- Start of picture text -----**<br>
 Request<br>Handler<br>Abstract<br>HttpHandler<br>Abstract<br>Autowiring<br>HttpRequest<br>Handler<br>Create Find<br>Restaurant Restaurant ...<br>Request<br>Request Request Handler<br>Handler Handler<br>**----- End of picture text -----**<br>
-
 
 Figure 12.15 The design of the request handler classes. The abstract superclasses implement dependency injection and error handling. 
 
 The AbstractHttpHandler class is the abstract base class for HTTP request handlers. It catches unhandled exceptions thrown during request handling and returns a 500 - internal server error response. The AbstractAutowiringHttpRequestHandler class implements dependency injection for request handlers. I’ll describe these abstract superclasses shortly, but first let’s look at the code for FindRestaurantRequestHandler. 
 
 Listing 12.9 shows the code for the FindRestaurantRequestHandler class. The FindRestaurantRequestHandler class has a handleHttpRequest() method, which takes an APIGatewayProxyRequestEvent representing an HTTP request as a parameter. It invokes RestaurantService to find the restaurant and returns an APIGatewayProxyResponseEvent describing the HTTP response. 
-
 
 Listing 12.9 The handler class for **GET /restaurant/{restaurantId}** 
 
@@ -1160,10 +1007,6 @@ public class FindRestaurantRequestHandler extends AbstractAutowiringHttpRequestH
 As you can see, it’s quite similar to a servlet, except that instead of a service() method, which takes an HttpServletRequest and returns HttpServletResponse, it has a handleHttpRequest(), which takes an APIGatewayProxyRequestEvent and returns APIGatewayProxyResponseEvent. 
 
 Let’s now take a look at its superclass, which implements dependency injection. 
-
-
-_**Deploying a RESTful service using AWS Lambda and AWS Gateway**_ 
-
 
 DEPENDENCY INJECTION USING THE ABSTRACTAUTOWIRINGHTTPREQUESTHANDLER CLASS 
 
@@ -1207,7 +1050,6 @@ This class overrides the beforeHandling() method defined by AbstractHttpHandler.
 **THE ABSTRACTHTTPHANDLER CLASS**
 
 The request handlers for Restaurant Service ultimately extend AbstractHttpHandler, shown in listing 12.11. This class implements RequestHandler<APIGatewayProxyRequestEvent and APIGatewayProxyResponseEvent>. Its key responsibility is to catch exceptions thrown when handling a request and throw a 500 error code. 
-
 
 Listing 12.11 An abstract **RequestHandler** that catches exceptions and returns a 500 HTTP response 
 
@@ -1255,10 +1097,6 @@ This task builds a ZIP with the classes and resources at the top level and the J
 
 Now that we’ve built the ZIP file, let’s look at how to deploy the lambda function. 
 
-
-_**Deploying a RESTful service using AWS Lambda and AWS Gateway**_ 
-
-
 ### 12.6.3 Deploying lambda functions using the Serverless framework
 
 Using the tools provided by AWS to deploy lambda functions and configure the API gateway is quite tedious. Fortunately, the Serverless open source project makes using lambda functions a lot easier. When using Serverless, you write a simple serverless.yml file that defines your lambda functions and their RESTful endpoints. Serverless then deploys the lambda functions and creates and configures an API gateway that routes requests to them. 
@@ -1268,9 +1106,7 @@ The following listing is an excerpt of the serverless.yml that deploys Restauran
 Listing 12.12 The **serverless.yml** deploys **Restaurant Service** . 
 
 ```yaml
-service: ftgo-application-lambda 
-
-provider: 
+service: ftgo-application-lambda provider: 
   name: aws 
   runtime: java8 
   timeout: 35 
@@ -1283,9 +1119,7 @@ provider:
     SPRING_DATASOURCE_PASSWORD: ... 
 
 package: 
-  artifact: ftgo-restaurant-service-aws-lambda/build/distributions/ftgo-restaurant-service-aws-lambda.zip 
-
-functions: 
+  artifact: ftgo-restaurant-service-aws-lambda/build/distributions/ftgo-restaurant-service-aws-lambda.zip functions: 
   create-restaurant: 
     handler: net.chrisrichardson.ftgo.restaurantservice.lambda.CreateRestaurantRequestHandler 
     events: 
@@ -1293,17 +1127,13 @@ functions:
           path: restaurants 
           method: post 
   find-restaurant: 
-    handler: net.chrisrichardson.ftgo.restaurantservice.lambda.FindRestaurantRequestHandler 
     events: 
       - http: 
           path: restaurants/{restaurantId} 
           method: get 
 ```
 
-You can then use the serverless deploy command, which reads the serverless.yml file, deploys the lambda functions, and configures the AWS API Gateway. After a short 
-
-
-wait, your service will be accessible via the API gateway’s endpoint URL. AWS Lambda will provision as many instances of each Restaurant Service lambda function that are needed to support the load. If you change the code, you can easily update the lambda by rebuilding the ZIP file and rerunning serverless deploy. No servers involved! 
+You can then use the serverless deploy command, which reads the serverless.yml file, deploys the lambda functions, and configures the AWS API Gateway. After a short wait, your service will be accessible via the API gateway’s endpoint URL. AWS Lambda will provision as many instances of each Restaurant Service lambda function that are needed to support the load. If you change the code, you can easily update the lambda by rebuilding the ZIP file and rerunning serverless deploy. No servers involved! 
 
 The evolution of infrastructure is remarkable. Not that long ago, we manually deployed applications on physical machines. Today, highly automated public clouds provide a range of virtual deployment options. One option is to deploy services as virtual machines. Or better yet, we can package services as containers and deploy them using sophisticated Docker orchestration frameworks such as Kubernetes. Sometimes we even avoid thinking about infrastructure entirely and deploy services as lightweight, ephemeral lambda functions. 
 
@@ -1319,10 +1149,8 @@ The evolution of infrastructure is remarkable. Not that long ago, we manually de
 
 - Deploying your services as language-specific packages is generally best avoided unless you only have a small number of services. For example, as described in chapter 13, when starting on your journey to microservices you’ll probably deploy the services using the same mechanism you use for your monolithic application, which is most likely this option. You should only consider setting 
 
-
 ## Summary
 up a sophisticated deployment infrastructure such as Kubernetes once you’ve developed some services. 
 
 - One of the many benefits of using a service mesh—a networking layer that mediates all network traffic in and out of services—is that it enables you to deploy a service in production, test it, and only then route production traffic to it. Separating deployment from release improves the reliability of rolling out new versions of services. 
-
 
