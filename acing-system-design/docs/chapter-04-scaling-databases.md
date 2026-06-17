@@ -313,7 +313,7 @@ Figure 4.6     An example illustration of multi-tier aggregation with partitioni
 
 We also observe that partition J–R has only one host, so it does not have a second layer. As designers, we can make such decisions based on our situation.
 
-Besides allocating a different number of hosts to each partition, another way to evenly distribute traffic is to adjust the number and width of the partitions. For example, instead of {A-I, J-R, S-Z}, we can create partitions {{A-B, D-F}, {C, G-J}, {K-S}, {T-Z}}. That is, we changed from three to four partitions and put C in the second partition. We can be creative and dynamic in addressing our system’s scalability requirements.
+Besides allocating a different number of hosts to each partition, another way to evenly distribute traffic is to adjust the number and width of the partitions. For example, instead of {A-I, J-R, S-Z}, we can create partitions {% raw %}{{A-B, D-F}, {C, G-J}, {K-S}, {T-Z}}{% endraw %}. That is, we changed from three to four partitions and put C in the second partition. We can be creative and dynamic in addressing our system’s scalability requirements.
 
 ### _4.5.4 Handling a large key space_
 
