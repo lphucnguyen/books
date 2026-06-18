@@ -471,7 +471,7 @@ An alternative approach is for the client to use anomaly detection to notice a s
 
 - Bruce, Morgan and Pereira, Paulo A., 2018. _Microservices in Action_ , chapter 3.5. Manning Publications.
 
-#### _Summary_
+## _Summary_
 
 - Rate limiting prevents service outages and unnecessary costs.
 

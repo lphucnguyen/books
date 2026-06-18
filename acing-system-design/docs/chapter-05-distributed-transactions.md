@@ -43,9 +43,7 @@ A less resource-intensive approach is to publish an event onto an event log. The
 
 In practice, we may choose not to completely follow the non-blocking philosophy of EDA, such as by performing request validation when a request is made. For example, the server may validate that the request contains all required fields and valid values; a string field may need to be nonempty and not null; it may also have a minimum and maximum length. We may make this choice so that an invalid request can fail quickly, rather than waste resources and time persisting invalid data only to find an error afterwards. Event sourcing and Change Data Capture (CDC) are examples of EDA.
 
-## _5.2_
-
-#### _Event sourcing_
+## _5.2 Event sourcing_
 
 Event sourcing is a pattern for storing data or changes to data as events in an appendonly log. According to Davis ( _Cloud Native Patterns_ by Cornelia Davis (Manning Publications, 2019)), the idea of event sourcing is that the event log is the source of truth, and all other databases are projections of the event log. Any write must first be made to the event log. After this write succeeds, one or more event handlers consume this new event and writes it to the other databases.
 
@@ -153,7 +151,9 @@ The airline ticket service and hotel room service may also need to write to a pa
 
 If a transaction to the payments service fails, the entire saga should be rolled back in reverse order using compensating transactions on the other two services.
 
-There are two ways to structure the coordination: choreography (parallel) or orchestration (linear). In the rest of this section, we discuss one example of choreography and one example of orchestration, then compare choreography vs. orchestration. Refer to https://microservices.io/patterns/data/saga.htmlforanotherexample.###_5.6.1 Choreography_
+There are two ways to structure the coordination: choreography (parallel) or orchestration (linear). In the rest of this section, we discuss one example of choreography and one example of orchestration, then compare choreography vs. orchestration. Refer to https://microservices.io/patterns/data/saga.htmlforanotherexample.
+
+###_5.6.1 Choreography_
 
 In choreography, the service that begins the saga communicates with two Kafka topics. It produces to one Kafka topic to start the distributed transaction and consumes from another Kafka topic to perform any final logic. Other services in the saga communicate directly with each other via Kafka topics.
 
@@ -316,7 +316,7 @@ The following consensus algorithms are typically more useful for achieving conse
 - _Microservices Patterns: With Examples in Java_ by Chris Richardson (Manning Publications, 2019). Chapter 3.3.7 discusses the transaction log tailing pattern. Chapter 4 is a detailed chapter on saga.
 
 
-#### _Summary_
+## _Summary_
 
 - A distributed transaction writes the same data to multiple services, with either eventual consistency or consensus.
 

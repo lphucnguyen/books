@@ -1,4 +1,4 @@
-## _Part 2_
+# _Part 2_
 
 In part 1, we learned about common topics in system design interviews. We will now go over a series of sample system design interview questions. In each question, we apply the concepts we learned in part 1 as well as introducing concepts relevant to the specific question.
 

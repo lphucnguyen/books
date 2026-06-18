@@ -402,7 +402,7 @@ We can consider the items that were out-of-scope in the functional requirements 
    - Ads and promoted posts.
 
 
-#### _Summary_
+## _Summary_
 
 - When drawing the initial high-level architecture of the news feed system, consider the main data of interest and draw the components that read and write this data to the database.
 

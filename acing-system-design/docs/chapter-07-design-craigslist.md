@@ -131,9 +131,7 @@ We can design the following SQL schema for our Craigslist user and post data.
 
 When low latency is required, such as when responding to user queries, we usually use SQL or in-memory databases with low latency such as Redis. NoSQL databases that use distributed file systems such as HDFS are for large data-processing jobs.
 
-## _7.4_
-
-#### _Initial high-level architecture_
+## _7.4 Initial high-level architecture_
 
 Referring to figure 7.1, we can discuss multiple possibilities for our initial Craigslist design, in order of complexity. We will discuss these two designs in the next two sections.
 

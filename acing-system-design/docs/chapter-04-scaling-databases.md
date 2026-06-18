@@ -559,7 +559,9 @@ Caching can be done at many levels, including client, API Gateway (Rob Vettor, D
 
 
 
-Figure 4.9     Caching at an API gateway. Diagram adapted from Rob Vettor, David Coulter, Genevieve Warren. May 17, 2020. “Caching in a cloud-native application.” Microsoft Docs. https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/azure-caching.###_4.8.1Readstrategies_
+Figure 4.9     Caching at an API gateway. Diagram adapted from Rob Vettor, David Coulter, Genevieve Warren. May 17, 2020. “Caching in a cloud-native application.” Microsoft Docs. https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/azure-caching.
+
+###_4.8.1Readstrategies_
 
 Read strategies are optimized for fast reads.
 
@@ -763,7 +765,7 @@ This chapter uses material from Web Scalability for Startup Engineers by Artur E
 
 - https://jakearchibald.com/2016/caching-best-practices/-https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control-Tom Barker _Intelligent Caching_ (O’Reilly Media, 2017)
 
-#### _Summary_
+## _Summary_
 
 - Designing a stateful service is much more complex and error-prone than a stateless service, so system designs try to keep services stateless, and use shared stateful services.
 
@@ -817,8 +819,5 @@ This chapter uses material from Web Scalability for Startup Engineers by Artur E
 - Cache invalidation strategies are different in services versus clients because we have access to the hosts in the former but not the latter.
 
 - Warming a cache allows the first user of the cached data to be served as quickly as subsequent users, but cache warming has many disadvantages.
-
-
-## ~~_5_~~
 
 

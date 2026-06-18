@@ -619,7 +619,7 @@ Here are some other possible discussion topics during the interview:
 This chapter was inspired by Uber’s Trust data quality platform, though many of the implementation details discussed in this chapter may be considerably different from Trust. A discussion of data quality at Uber can be found at https://eng.uber.com/operational-excellence-data-quality/,thoughthisarticledidnotmention Trust by name. Refer to the article for an overview of Uber’s data quality platform, including a discussion of its constituent services and their interactions between each other and users.
 
 
-#### _Summary_
+## _Summary_
 
 - During a system design interview, we can discuss auditing as a common approach to maintaining data integrity. This chapter discussed a possible system design for batch auditing.
 

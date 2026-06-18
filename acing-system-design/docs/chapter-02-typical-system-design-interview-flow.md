@@ -836,7 +836,7 @@ _**Summary**_ up performing better in the market, with higher growth in the valu
 
 Overall, what can I learn and cannot learn from this company in the next four years? When you have your offers, you can go over the information you have collected and make a thoughtful decision. https://blog.pragmaticengineer.com/reverse-interviewing/isanarticleoninterviewingyourprospectivemanager and team.
 
-#### _Summary_
+## _Summary_
 
 - Everything is a tradeoff. Low latency and high availability increase cost and complexity. Every improvement in certain aspects is a regression in others.
 

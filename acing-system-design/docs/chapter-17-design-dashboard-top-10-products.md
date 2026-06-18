@@ -432,7 +432,7 @@ Our browser app only displays the Top K list. We can extend our functional requi
 
 This chapter used material from the Top K Problem (Heavy Hitters) (https://youtu.be/kx-XDoPjoHw)presentationinthe System Design Interview YouTube channel by Mikhail Smarshchok.
 
-#### _Summary_
+## _Summary_
 
 - When accurate large-scale aggregation operations take too long, we can run a parallel streaming pipeline that uses approximation techniques to trade off accuracy for speed. Running a fast, inaccurate and a slow, accurate pipeline in parallel is called Lambda architecture.
 

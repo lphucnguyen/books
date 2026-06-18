@@ -659,7 +659,7 @@ Regulations may affect the core business of the company. In the case of Airbnb, 
 Within a country, certain regulations may be specific to listings that meet certain conditions, and the specifics may differ by each specific country, state, city, or even address (e.g., certain apartment complexes may impose their own rules).
 
 
-#### _Summary_
+## _Summary_
 
 - Airbnb is a reservation app, a marketplace app, and a customer support and operations app. Hosts, guests, and Ops are the main user groups.
 

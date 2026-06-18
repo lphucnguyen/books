@@ -1,4 +1,4 @@
-## _Part 1_
+# _Part 1_
 
 This part of the book discusses common topics in system design interviews. It sets the stage for part 2, where we discuss sample system design interview questions.
 

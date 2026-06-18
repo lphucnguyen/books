@@ -408,7 +408,7 @@ Spring Cloud Function (https://spring.io/projects/spring-cloud-function)isanemer
 
 In the rest of part 1, we discuss concepts and techniques to scale a backend service. A frontend/UI service is usually a Node.js service, and all it does is serve the same browser app written in a JavaScript framework like ReactJS or Vue.js to any user, so it can be scaled simply by adjusting the cluster size and using GeoDNS. A backend service is dynamic and can return a different response to each request. Its scalability techniques are more varied and complex. We discussed functional partitioning in the previous example and will occasionally touch on it as needed.
 
-#### _Summary_
+## _Summary_
 
 - System design interview preparation is critical to your career and also benefits your company.
 

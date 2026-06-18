@@ -202,7 +202,9 @@ A circuit breaker saves resources from being spent to make requests that are lik
 
 However, a circuit breaker makes the system more difficult to test. For example, say we have a load test that is making incorrect requests but is still properly testing our system’s limits. This test will now activate the circuit breaker, and a load that may have previously overwhelmed the downstream services and will now pass. A similar load by our customers will cause an outage. It is also difficult to estimate the appropriate error threshold and timers.
 
-A circuit breaker can be implemented on the server side. An example is Resilience4j (https://github.com/resilience4j/resilience4j).Itwasinspiredby Hystrix (https://github.com/Netflix/Hystrix),whichwasdevelopedat Netflix and transitioned to maintenance mode in 2017 (https://github.com/Netflix/Hystrix/issues/#issuecomment-440065505).Netflix’sfocushasshiftedtowardmore adaptive implementations that react to an application’s real-time performance rather than pre-configured settings, such as adaptive concurrency limits (https://netflixtechblog.medium.com/performance-under-load-3e6fa9a60581).###_3.3.4 Exponential backoff and retry_
+A circuit breaker can be implemented on the server side. An example is Resilience4j (https://github.com/resilience4j/resilience4j).Itwasinspiredby Hystrix (https://github.com/Netflix/Hystrix),whichwasdevelopedat Netflix and transitioned to maintenance mode in 2017 (https://github.com/Netflix/Hystrix/issues/#issuecomment-440065505).Netflix’sfocushasshiftedtowardmore adaptive implementations that react to an application’s real-time performance rather than pre-configured settings, such as adaptive concurrency limits (https://netflixtechblog.medium.com/performance-under-load-3e6fa9a60581).
+
+###_3.3.4 Exponential backoff and retry_
 
 Exponential backoff and retry is similar to a circuit breaker. When a client receives an error response, it will wait before reattempting the request and exponentially increase the wait duration between retries. The client also adjusts the wait period by a small random negative or positive amount, a technique called “jitter.” This prevents multiple clients from submitting retries at exactly the same time, causing a “retry storm” that may overwhelm the downstream service. Similar to a circuit breaker, when a client receives a success response, it assumes that the failure is resolved and resumes sending requests without restrictions.
 
@@ -216,7 +218,9 @@ A machine may perform certain data aggregation operations on many data points by
 
 Checkpointing is commonly applied to ETL pipelines that use message brokers such as Kafka. A machine can fetch several events from a Kafka topic, process the events, and then write the result, followed by writing a checkpoint. Should this machine fail, its replacement can resume at the most recent checkpoint.
 
-Kafka offers offset storages at the partition level in Kafka (https://kafka.apache.org/22/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html). Flinkconsumesdatafrom Kafka topics and periodically checkpoints using Flink’s distributed checkpointing mechanism (https://ci.apache.org/projects/flink/flink-docs-master/docs/dev/datastream/fault-tolerance/checkpointing/).###_3.3.7 Dead letter queue_
+Kafka offers offset storages at the partition level in Kafka (https://kafka.apache.org/22/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html). Flinkconsumesdatafrom Kafka topics and periodically checkpoints using Flink’s distributed checkpointing mechanism (https://ci.apache.org/projects/flink/flink-docs-master/docs/dev/datastream/fault-tolerance/checkpointing/).
+
+###_3.3.7 Dead letter queue_
 
 If a write request to a third-party API fails, we can queue the request in a dead letter queue and try the requests again later.
 
@@ -467,7 +471,9 @@ Continuous deployment (CD) was first mentioned in this book in section 1.4.5. As
 
 Other CD techniques include blue/green deployments, also referred to as zero downtime deployments. Refer to sources such as https://spring.io/blog/2016/05/31/zero-downtime-deployment-with-a-database,https://dzone.com/articles/zero-downtime-deployment,andhttps://craftquest.io/articles/what-are-zero-downtime-atomic-deploymentsformoreinformation.
 
-Static code analysis tools like SonarQube (https://www.sonarqube.org/)alsoimproveoursystem’smaintainability.##_3.8 Cost_
+Static code analysis tools like SonarQube (https://www.sonarqube.org/)alsoimproveoursystem’smaintainability.
+
+##_3.8 Cost_
 
 In system design discussions, we can suggest trading off other non-functional requirements for lower cost. Examples:
 
@@ -490,9 +496,7 @@ How likely is it that we will need to change dependencies in the future, particu
 
 A complete cost discussion should include consideration of the costs to decommission the system if necessary. We may decide to decommission the system for multiple reasons, such as the team deciding to change its focus or the system has too few users to justify its development and maintenance costs. We may decide to provide the existing users with their data, so we will need to extract the data into various text and/or CSV files for our users.
 
-## _3.9_
-
-#### _Security_
+## _3.9 Security_
 
 During an interview, we may need to discuss possible security vulnerabilities in our system and how we will prevent and mitigate security breaches. This includes access both from external parties and internally within our organization. The following topics are commonly discussed with regard to security:
 
@@ -551,7 +555,7 @@ Interested readers can look up the PACELC theorem, which we do not discuss in th
 A useful resource that has content similar to this chapter is _Microservices for the Enterprise: Designing, Developing, and Deploying_ (2018, Apress) by Kasun Indrasiri and Prabath Siriwardena.
 
 
-#### _Summary_
+## _Summary_
 
 - We must discuss both the functional and non-functional requirements of a system. Do not make assumptions about the non-functional requirements. Non-functional characteristics can be traded off against each other to optimize for the non-functional requirements.
 
@@ -576,8 +580,5 @@ A useful resource that has content similar to this chapter is _Microservices for
 - Privacy considerations include access control mechanisms and procedures, deletion or obfuscation of user data, and prevention and mitigation of data breaches.
 
 - Cloud native is an approach to system design that employs a collection of techniques to achieve common non-functional requirements.
-
-
-## _databases_ ~~_4_~~
 
 

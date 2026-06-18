@@ -446,7 +446,7 @@ Here are some other possible discussion topics for this system:
 
 - Our architecture is a centralized approach. Every message needs to go through our backend. We can discuss decentralized approaches, such as P2P architecture, where every device is a server and can receive requests from other devices.
 
-#### _Summary_
+## _Summary_
 
 - The main discussion of a simple text messaging app system design is about how to route large numbers of messages between a large number of clients.
 

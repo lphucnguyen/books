@@ -472,7 +472,7 @@ Other possible discussion topics include the following:
 - We can extend our system to support audio and video streaming. Discussing video streaming requires domain-specific expertise that is not required in a general system design interview, so this topic may be asked in interviews for specific roles where said expertise is required, or it may be asked as an exploratory or challenge question.
 
 
-#### _Summary_
+## _Summary_
 
 - Scalability, availability, and high download performance are required for a fileor image-sharing service. High upload performance and consistency are not required.
 

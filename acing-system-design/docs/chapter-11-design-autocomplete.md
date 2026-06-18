@@ -357,7 +357,9 @@ If both tables cannot fit in memory, a shuffled sort merge join is done, where b
 
 - Chambers, B. and Zaharia, M. Joins. _In Spark: The Definitive Guide: Big Data Processing Made Simple._ O’Reilly Media, 2018.
 
-- https://docs.qubole.com/en/latest/user-guide/engines/hive/hive-mapjoin-options.html-https://towardsdatascience.com/strategies-of-spark-join-c0e7b4572bcf###_11.7.5 Fuzzy matching and spelling correction_
+- https://docs.qubole.com/en/latest/user-guide/engines/hive/hive-mapjoin-options.html-https://towardsdatascience.com/strategies-of-spark-join-c0e7b4572bcf
+
+###_11.7.5 Fuzzy matching and spelling correction_
 
 A final processing step before we count the words is to correct misspellings in users’ search words. We can code a function that accepts a string, uses a library with a _fuzzy matching_ algorithm to correct possible misspelling, and returns either the original string or fuzzy-matched string. (Fuzzy matching, also called approximate string matching, is the technique of finding strings that match a pattern approximately. An overview of fuzzy matching algorithms is outside the scope of this book.) We can then use Spark to run this function in parallel over our list of words divided into evenly sized sublists and then write the output to HDFS.
 
@@ -555,7 +557,7 @@ Here are other possible requirements and discussion points that may come up as t
 - A service that is related but distinct from autocomplete is a spelling suggestion service, where a user receives word suggestions if they input a misspelled word. We can design a spelling suggestion service that uses experimentation techniques such as A/B testing or multi-armed bandit to measure the effect of various fuzzy matching functions on user churn.
 
 
-#### _Summary_
+## _Summary_
 
 - An autocomplete system is an example of a system that continuously ingests and processes large amount of data into a small data structure that users query for a specific purpose.
 

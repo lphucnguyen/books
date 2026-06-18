@@ -252,9 +252,7 @@ Figure 9.7    High-level architecture with an Airflow/job scheduler service. The
 
 Periodic notifications may compete with ad hoc notifications because both can be limited by the rate limiter. Each time the rate limiter prevents a notification request from immediately proceeding, this should be logged. We should have a dashboard to display the rate of rate limiting events. We also need to add an alert that triggers when there are frequent rate limiting events. Based on this information, we can scale up our cluster sizes, allocate more budget to external notification services, or request or limit certain users from excessive notifications.
 
-## _9.7_
-
-#### _Notification addressee groups_
+## _9.7 Notification addressee groups_
 
 A notification may have millions of destinations/addresses. If our users must specify each of these destinations, each user will need to maintain its own list, and there may be much duplicated recipient data among our users. Moreover, passing these millions of destinations to the notification service means heavy network traffic. It is more convenient for users to maintain the list of destinations in our notification service and use that list’s ID in making requests to send notifications. Let’s refer to such a list as a “notification addressee group.” When a user makes a request to deliver a notification, the request may contain either a list of destinations (up to a limit) or a list of Addressee Group IDs.
 
@@ -473,7 +471,7 @@ A detailed discussion of a notification service can fill an entire book and incl
 Our solution is scalable. Every component is horizontally scalable. Fault-tolerance is extremely important in this shared service, and we have constantly paid attention to it. Monitoring and availability are robust; there is no single point of failure, and the monitoring and alerting of system availability and health involves independent devices.
 
 
-#### _Summary_
+## _Summary_
 
 - A service that must serve the same functionality to many different platforms can consist of a single backend that centralizes common processing and directs requests to the appropriate component (or another service) for each platform.
 
