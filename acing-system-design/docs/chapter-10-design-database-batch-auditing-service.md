@@ -209,11 +209,19 @@ The example Python script in the following listing runs a MySQL query that check
 
 Listing 10.1     Python script and MySQL query to check the latest timestamp
 
-```python import mysql cnx = mysql.connector.connect(user='admin', password='password', host='127.0.0.1', database='transactions') cursor = cnx.cursor() query = """
+```python
+import mysql
+cnx = mysql.connector.connect(user='admin', password='password', host='127.0.0.1', database='transactions')
+cursor = cnx.cursor()
+query = """
     SELECT COUNT(*) AS cnt
     FROM Transactions
     WHERE Date(timestamp) >= Curdate() - INTERVAL 1 DAY
-""" cursor.execute(query) results = cursor.fetchall() cursor.close() cnx.close()
+"""
+cursor.execute(query)
+results = cursor.fetchall()
+cursor.close()
+cnx.close()
 # result[0][0] > 0 is the condition.
 print(result[0][0] > 0)
 # result['cnt'][0] > 0 also works.
@@ -224,7 +232,8 @@ We may need to run several database queries and compare their results. Listing 1
 
 Listing 10.2     An example script that compares the results of several queries
 
-```python import mysql queries = [
+```python
+import mysql queries = [
     {
         'database': 'transactions',
         'query': """
@@ -241,13 +250,17 @@ Listing 10.2     An example script that compares the results of several queries
             WHERE Date(timestamp) >= Curdate() - INTERVAL 1 DAY
         """
     }
-] results = [] for query in queries:
+]
+results = []
+for query in queries:
     cnx = mysql.connector.connect(user='admin', password='password', host='127.0.0.1', database=query['database'])
     cursor = cnx.cursor()
     cursor.execute(query['query'])
     results.append(cursor.fetchall())
     cursor.close()
-    cnx.close() print(result[0][0][0] > result[1][0][0])
+    cnx.close()
+
+print(result[0][0][0] > result[1][0][0])
 ```
 
 
@@ -282,7 +295,13 @@ We commented in the `validation.py.template` that we should create an Airflow ta
 
 Listing 10.3    A Python file template for an audit service
 
-```python from datetime import datetime, timedelta from airflow import DAG from airflow.operators.bash import BranchPythonOperator import mysql.connector import os import pdpyras
+```python
+from datetime import datetime, timedelta
+from airflow import DAG
+from airflow.operators.bash import BranchPythonOperator
+import mysql.connector
+import os
+import pdpyras
 
 # Example user inputs:
 # {name} – ''
@@ -312,8 +331,8 @@ Listing 10.3    A Python file template for an audit service
         routing_key = os.environ['PD_API_KEY']
         session = pdpyras.EventsAPISession(routing_key)
         dedup_key = session.trigger("{name} validation failed", "audit")
-```
- with DAG(
+
+with DAG(
     {name}, default_args={
         'depends_on_past': False,
         'email': ['zhiyong@beigel.com'],

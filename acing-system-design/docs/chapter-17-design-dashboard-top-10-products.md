@@ -165,7 +165,8 @@ Our first attempt is to use a hash table and sort by frequency counts using a ma
 
 Listing 17.1    Sample Golang function to compute Top K list
 
-```go type HeavyHitter struct {
+```go
+type HeavyHitter struct {
     identifier string frequency  int
 }
  func topK(events []String, int k) (HeavyHitter) {

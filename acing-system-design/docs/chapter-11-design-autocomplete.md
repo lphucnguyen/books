@@ -372,7 +372,8 @@ We are now ready to count the words. This can be a straightforward MapReduce ope
 
 The Scala code below implements the MapReduce approach. This code was slightly modified from https://spark.apache.org/examples.html. Wemapthewordsinthe input HDFS file to (`String, Int`) pairs called `counts`, sort by descending order of counts and then save it as another HDFS file:
 
-```scala val textFile = sc.textFile("hdfs://...")
+```scala
+val textFile = sc.textFile("hdfs://...")
 val counts = textFile.map(word => (word, 1))
                      .reduceByKey(_ + _)
                      .map(item => item.swap)
@@ -410,7 +411,8 @@ As illustrated in our word count batch ETL job DAG in figure 11.4, this step can
 
 We now have the list of top appropriate words to construct our weighted trie. This list is only a few MB, so the weighted trie can be generated on a single host. The algorithm to construct a weighted trie is outside the scope of a system design interview. It is a possible coding interview question. A partial Scala class definition is as follows, but we code in the language of our backend:
 
-```scala class TrieNode(var children: Array[TrieNode], var weight: Int) {
+```scala
+class TrieNode(var children: Array[TrieNode], var weight: Int) {
   // Functions for
 }
 ```

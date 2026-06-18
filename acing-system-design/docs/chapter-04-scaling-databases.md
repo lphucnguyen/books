@@ -207,7 +207,8 @@ TIP    Novices to Hadoop and HDFS often use the Hadoop INSERT command, which sho
 
 If we are using Spark, which saves data on HDFS, we should use `saveAsTable` or `saveAsTextFile` instead, such as the following example code snippet. Refer to the Spark documentation such as https://spark.apache.org/docs/latest/sql-data-sources-hive-tables.html.
 
-```scala val spark = SparkSession.builder().appName("Our app").config("some.config", "value").getOrCreate()
+```scala
+val spark = SparkSession.builder().appName("Our app").config("some.config", "value").getOrCreate()
 val df = spark.sparkContext.textFile({hdfs_file})
 df.createOrReplaceTempView({table_name})
 spark.sql({spark_sql_query_with_table_name}).saveAsTextFile({hdfs_directory})
