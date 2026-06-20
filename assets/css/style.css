@@ -200,6 +200,10 @@ body{
   max-width:48rem;
   margin:0 auto
 }
+.markdown-body{
+  word-wrap:break-word;
+  overflow-wrap:break-word
+}
 .markdown-body h1{
   font-size:2.5rem;
   font-weight:800;
@@ -230,7 +234,9 @@ body{
 .markdown-body a{
   color:var(--primary);
   text-decoration:underline;
-  text-underline-offset:2px
+  text-underline-offset:2px;
+  word-wrap:break-word;
+  overflow-wrap:break-word
 }
 .markdown-body img{
   max-width:100%;
