@@ -10,9 +10,18 @@ When a network call is made, it’s best practice to configure a timeout to fail
 
 Unfortunately, some network APIs don’t have a way to set a timeout in the first place, while others have no timeout configured by default. For example, JavaScript’s _XMLHttpRequest_ is _the_ web API to retrieve data from a server asynchronously, and its default timeout is zero[1] , which means there is no timeout: 
 
-**var** xhr = **new** XMLHttpRequest(); xhr.open("GET", "/api", **true** ); _// No timeout by default, so it needs to be set explicitly!_ xhr.timeout = 10000; _// 10K milliseconds_ xhr.onload = **function** () { _// Request finished_ }; xhr.ontimeout = **function** (e) { _// Request timed out_ 
-
-}; xhr.send( **null** ); 
+```javascript
+var xhr = new XMLHttpRequest();
+xhr.open("GET", "/api", true); // No timeout by default, so it needs to be set explicitly!
+xhr.timeout = 10000; // 10K milliseconds
+xhr.onload = function () {
+    // Request finished
+};
+xhr.ontimeout = function (e) {
+    // Request timed out
+};
+xhr.send(null);
+```
 
 The _fetch_ web API is a modern replacement for _XMLHttpRequest_ that uses Promises. When the fetch API was initially introduced, there was no way to set a timeout at all[2] . Browsers have only later added support for timeouts through the Abort API[3] . Things aren’t much rosier for Python; the popular _requests_ library uses a default timeout of infinity[4] . And Go’s _HTTP package_ doesn’t use timeouts[5] by default. 
 

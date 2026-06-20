@@ -16,13 +16,13 @@ Observability is a superset of monitoring. While monitoring is focused exclusive
 
 A _log_ is an immutable list of time-stamped events that happened over time. An _event_ can have different formats. In its simplest form, it’s just free-form text. It can also be structured and represented with a textual format like JSON or a binary one like Protobuf. When structured, an event is typically represented with a bag of key-value pairs: 
 
+```json
 { 
-
-"failureCount": 1, 
-
-"serviceRegion": "EastUs2", "timestamp": 1614438079 
-
+  "failureCount": 1, 
+  "serviceRegion": "EastUs2", 
+  "timestamp": 1614438079 
 } 
+```
 
 # Logs can originate from our services or external dependencies, like 
 

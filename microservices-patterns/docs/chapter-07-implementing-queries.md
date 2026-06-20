@@ -443,9 +443,14 @@ In order to be reliable, the event handler must record the event ID and update t
 
 It’s important to note that the event handler doesn’t need to record the ID of every event. If, as is the case with Eventuate, events have a monotonically increasing ID, then each record only needs to store the max(eventId) that’s received from a given aggregate instance. Furthermore, if the record corresponds to a single aggregate instance, then the event handler only needs to record max(eventId). Only records that represent joins of events from multiple aggregates must contain a map from [aggregate type, aggregate id] to max(eventId). 
 
-For example, you’ll soon see that the DynamoDB implementation of the Order History view contains items that have attributes for tracking events that look like this: {... 
+For example, you’ll soon see that the DynamoDB implementation of the Order History view contains items that have attributes for tracking events that look like this:
 
-"Order3949384394-039434903" : "0000015e0c6fc18f-0242ac1100e50002", "Delivery3949384394-039434903" : "0000015e0c6fc264-0242ac1100e50002", } 
+```json
+{
+  "Order3949384394-039434903" : "0000015e0c6fc18f-0242ac1100e50002",
+  "Delivery3949384394-039434903" : "0000015e0c6fc264-0242ac1100e50002"
+}
+```
 
 This view is a join of events published by various services. The name of each of these event-tracking attributes is «aggregateType»«aggregateId», and the value is the eventId. Later on, I describe how this works in more detail. 
 

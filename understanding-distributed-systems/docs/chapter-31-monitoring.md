@@ -24,45 +24,40 @@ At the very least, a service should emit metrics about its load (e.g., request t
 
 For example, take a fictitious HTTP handler that returns a resource. There is a whole range of questions we will want to be able to answer once it’s running in production[3] : 
 
-**def** get_resource(id): 
+```python
+def get_resource(id):
+    # Is the id valid?
+    # Was there a cache hit?
+    # How long has the resource been in the cache?
+    resource = self._cache.get(id) # in-process cache
+    if resource is not None:
+        return resource
 
-- resource = self._cache.get(id) _# in-process cache_ 
+    # Did the remote call fail, and if so, why?
+    # Did the remote call time out?
+    # How long did the call take?
+    resource = self._repository.get(id)
 
-_# Is the id valid?_ 
+    # What's the size of the cache?
+    self._cache[id] = resource
 
-- _# Was there a cache hit?_ 
-
-- _# How long has the resource been in the cache?_ 
-
-# **if** resource **is not** None: 
-
-**return** resource resource = self._repository.get(id) 
-
-- _# Did the remote call fail, and if so, why?_ 
-
-- _# Did the remote call time out?_ 
-
-- _# How long did the call take?_ self._cache[id] = resource 
-
-_# What's the size of the cache?_ 
-
-# **return** resource 
-
-_# How long did it take for the handler to run?_ 
+    # How long did it take for the handler to run?
+    return resource
+``` 
 
 Now, suppose we want to record the number of requests the handler failed to serve. One way to do that is with an event-based approach — whenever the handler fails to handle a request, it reports a failure count of 1 in an _event_[4] to a local telemetry agent, e.g.: 
 
-{ 
-
-"failureCount": 1, 
-
-"serviceRegion": "EastUs2", "timestamp": 1614438079 
+```json
+{
+  "failureCount": 1,
+  "serviceRegion": "EastUs2",
+  "timestamp": 1614438079
+}
+```
 
 > 3I have omitted error handling for simplicity. 
 
 > 4We will talk more about event logs in section 32.1; for now, assume an event is just a dictionary. 
-
-# } 
 
 The agent batches these events and emits them periodically to a remote telemetry service, which persists them in a dedicated data store for event logs. For example, this is the approach taken by Azure Monitor’s log-based metrics[5] . 
 
@@ -72,7 +67,9 @@ So is there a way to reduce costs at query time? Because metrics are time series
 
 Going back to our example, the telemetry service could preaggregate the failure count events at ingestion time. If the aggregation (i.e., the sum in our example) were to happen with a period of one hour, we would have one _failureCount_ metric per _serviceRegion_ , each containing one sample per hour, e.g.: 
 
-"00:00", 561, "01:00", 42, "02:00", 61, ... 
+```
+"00:00", 561, "01:00", 42, "02:00", 61, ...
+```
 
 The ingestion service could also create multiple pre-aggregates with different periods. This way, the pre-aggregated metric with the best period that satisfies the query can be chosen at query 
 

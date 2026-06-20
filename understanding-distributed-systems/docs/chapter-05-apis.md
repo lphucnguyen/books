@@ -92,9 +92,13 @@ Naming resources is only one part of the equation; we also have to serialize the
 
 > 11“HTTP Content negotiation,” https://developer.mozilla.org/en-US/docs/ Web/HTTP/Content_negotiation 
 
-{ "id": 42, "category": "Laptop", "price": 999 
-
-} 
+```json
+{ 
+  "id": 42, 
+  "category": "Laptop", 
+  "price": 999 
+}
+``` 
 
 # **5.3 Request methods** 
 

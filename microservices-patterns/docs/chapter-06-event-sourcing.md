@@ -826,12 +826,26 @@ Saga orchestrators are created by some service methods. Other service methods, s
 
 If a service uses an RDBMS-based event store, it can update the event store and create a saga orchestrator within the same ACID transaction. For example, imagine that the OrderService uses Eventuate Local and the Eventuate Tram saga framework. Its createOrder() method would look like this: 
 
-**class OrderService**
+```java
+@Transactional
+public class OrderService {
+  @Autowired
+  private SagaManager<CreateOrderSagaState> createOrderSagaManager;
 
-**Ensure the createOrder() executes within a database transaction.** 
+  // Ensure the createOrder() executes within a database transaction.
+  public EntityWithIdAndVersion<Order> createOrder(OrderDetails orderDetails) {
+    // Create the Order aggregate.
+    EntityWithIdAndVersion<Order> order = orderRepository.save(new CreateOrder(orderDetails));
 
-@Autowired private SagaManager<CreateOrderSagaState> createOrderSagaManager; @Transactional public EntityWithIdAndVersion<Order> createOrder(OrderDetails orderDetails) { EntityWithIdAndVersion<Order> order = **Create the Order** orderRepository.save(new CreateOrder(orderDetails)); **aggregate.** CreateOrderSagaState data = new CreateOrderSagaState(order.getId(), orderDetails); **Create the CreateOrderSaga.**
-createOrderSagaManager.create(data, Order.class, order.getId()); return order; } ... 
+    // Create the CreateOrderSaga.
+    CreateOrderSagaState data = new CreateOrderSagaState(order.getId(), orderDetails);
+    createOrderSagaManager.create(data, Order.class, order.getId());
+
+    return order;
+  }
+  ...
+}
+```
 
 It’s a combination of the OrderService in listing 6.4 and the OrderService described in chapter 4. Because Eventuate Local uses an RDBMS, it can participate in the same ACID transaction as the Eventuate Tram saga framework. But if a service uses a NoSQL-based event store, creating a saga orchestrator isn’t as straightforward. 
 
