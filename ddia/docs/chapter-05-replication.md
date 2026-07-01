@@ -398,9 +398,7 @@ A single-leader database applies writes in a sequential order: if there are seve
 
 In a multi-leader configuration, there is no defined ordering of writes, so it’s not clear what the final value should be. In Figure 5-7, at leader 1 the title is first updated to B and then to C; at leader 2 it is first updated to C and then to B. Neither order is “more correct” than the other. 
 
-If each replica simply applied writes in the order that it saw the writes, the database would end up in an inconsistent state: the final value would be C at leader 1 and B at leader 2. That is not acceptable—every replication scheme must ensure that the data is eventually the same in all replicas. Thus, the database must resolve the conflict in a 
-
-_convergent_ way, which means that all replicas must arrive at the same final value when all changes have been replicated. 
+If each replica simply applied writes in the order that it saw the writes, the database would end up in an inconsistent state: the final value would be C at leader 1 and B at leader 2. That is not acceptable—every replication scheme must ensure that the data is eventually the same in all replicas. Thus, the database must resolve the conflict in a _convergent_ way, which means that all replicas must arrive at the same final value when all changes have been replicated. 
 
 There are various ways of achieving convergent conflict resolution: 
 
