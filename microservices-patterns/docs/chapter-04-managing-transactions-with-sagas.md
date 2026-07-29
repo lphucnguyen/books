@@ -46,8 +46,19 @@ The traditional approach to maintaining data consistency across multiple service
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0143-02.png)
 
-**----- Start of picture text -----**<br>
-The createOrder() operation reads from createOrder()<br>Consumer Service and updates data<br>in Order Service, Kitchen Service,<br>and Accounting Service. Order<br>controller<br>Order Service<br>Order<br>Data consistency required<br>Reads Writes Writes<br>Consumer Ticket Account<br>Consumer Service Kitchen Service Accounting Service<br>**----- End of picture text -----**<br>
+```text
+The createOrder() operation reads from createOrder()
+Consumer Service and updates data
+in Order Service, Kitchen Service,
+and Accounting Service. Order
+controller
+Order Service
+Order
+Data consistency required
+Reads Writes Writes
+Consumer Ticket Account
+Consumer Service Kitchen Service Accounting Service
+```
 
 Figure 4.1 The **createOrder()** operation updates data in several services. It must use a mechanism to maintain data consistency across those services. 
 
@@ -77,8 +88,22 @@ The example saga used throughout this chapter is the Create Order Saga, which is
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0145-02.png)
 
-**----- Start of picture text -----**<br>
-Order Service Consumer Service Kitchen Service Accounting Service<br>Saga<br>Txn:1<br>Create order<br>Txn: 12<br>Create Verify c o nsumerrder<br>Txn:3<br>Create ticket<br>Txn:4<br>Authorize card<br>Txn:5<br>Approve ticket<br>Txn:6<br>Approve order<br>**----- End of picture text -----**<br>
+```text
+Order Service Consumer Service Kitchen Service Accounting Service
+Saga
+Txn:1
+Create order
+Txn: 12
+Create Verify c o nsumerrder
+Txn:3
+Create ticket
+Txn:4
+Authorize card
+Txn:5
+Approve ticket
+Txn:6
+Approve order
+```
 
 Figure 4.2 Creating an **Order** using a saga. The **createOrder()** operation is implemented by a saga that consists of local transactions in several services. 
 
@@ -108,8 +133,12 @@ Suppose that the ( _n_ + 1)[th] transaction of a saga fails. The effects of the 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0146-04.png)
 
-**----- Start of picture text -----**<br>
-The changes made by T1...Tn The compensating transactions undo<br>have been committed. the changes made by T1...Tn.<br>Saga<br>T1 ... T n FAILST n +1 C n ... C1<br>**----- End of picture text -----**<br>
+```text
+The changes made by T1...Tn The compensating transactions undo
+have been committed. the changes made by T1...Tn.
+Saga
+T1 ... T n FAILST n +1 C n ... C1
+```
 
 Figure 4.3 When a step of a saga fails because of a business rule violation, the saga must explicitly undo the updates made by previous steps by executing compensating transactions. 
 
@@ -169,8 +198,32 @@ Figure 4.4 shows the design of the choreography-based version of the Create Orde
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0148-08.png)
 
-**----- Start of picture text -----**<br>
-Key<br>Message broker<br>Publish<br>Subscribe<br>Order events 2 Consumer Service<br>1<br>Consumer verified<br>Order created<br>2. verifyConsumerDetails()<br>3<br>Consumer events<br>Ticket created<br>Order Kitchen Service<br>Service<br>1. createOrder() 6 3. createTicket()<br>7. approveOrder() 6. approveTicket()<br>4<br>7 Ticket events 5a<br>5b Accounting Service<br>5<br>Credit card authorized<br>4. createPendingAuthorization()<br>6. authorizeCard()<br>Credit card events<br>**----- End of picture text -----**<br>
+```text
+Key
+Message broker
+Publish
+Subscribe
+Order events 2 Consumer Service
+1
+Consumer verified
+Order created
+2. verifyConsumerDetails()
+3
+Consumer events
+Ticket created
+Order Kitchen Service
+Service
+1. createOrder() 6 3. createTicket()
+7. approveOrder() 6. approveTicket()
+4
+7 Ticket events 5a
+5b Accounting Service
+5
+Credit card authorized
+4. createPendingAuthorization()
+6. authorizeCard()
+Credit card events
+```
 
 Figure 4.4 Implementing the **Create Order Saga** using choreography. The saga participants communicate by exchanging events. 
 
@@ -212,8 +265,32 @@ As you can see, the participants of choreography-based sagas interact using publ
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0150-02.png)
 
-**----- Start of picture text -----**<br>
-Key<br>Message broker<br>Publish<br>Subscribe<br>Order events 2 Consumer Service<br>1<br>Consumer verified<br>Order created<br>2. verifyConsumerDetails()<br>3<br>Consumer events<br>Ticket created<br>Order Kitchen Service<br>Service<br>1. createOrder() 6 3. createTicket()<br>7. rejectOrder() 6. rejectTicket()<br>4<br>7 Ticket events 5a<br>5b Accounting Service<br>5<br>Credit card authorization failed<br>4. createPendingAuthorization()<br>6. authorizeCard()<br>Credit card events<br>**----- End of picture text -----**<br>
+```text
+Key
+Message broker
+Publish
+Subscribe
+Order events 2 Consumer Service
+1
+Consumer verified
+Order created
+2. verifyConsumerDetails()
+3
+Consumer events
+Ticket created
+Order Kitchen Service
+Service
+1. createOrder() 6 3. createTicket()
+7. rejectOrder() 6. rejectTicket()
+4
+7 Ticket events 5a
+5b Accounting Service
+5
+Credit card authorization failed
+4. createPendingAuthorization()
+6. authorizeCard()
+Credit card events
+```
 
 Figure 4.5 The sequence of events in the **Create Order Saga** when the authorization of the consumer’s credit card fails. **Accounting Service** publishes the **Credit Card Authorization Failed** event, which causes **Kitchen Service** to reject the **Ticket** , and **Order Service** to reject the **Order** . 
 
@@ -255,8 +332,36 @@ Figure 4.6 shows the design of the orchestration-based version of the Create Ord
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0152-05.png)
 
-**----- Start of picture text -----**<br>
-Order Service Key<br>Command message<br>Reply message<br>Message broker<br>1<br>Verify consumer<br>2 Consumer<br>Consumer Service Service<br>Consumer verified<br>request channel<br>4<br>3 7 Create order Ticket created<br>Create Create Approve saga reply channel<br>order saga ticket restaurant<br>orchestrator order Kitchen<br>Service<br>Kitchen Service 6<br>5<br>request channel<br>Authorize Card<br>card authorized<br>8 Accounting Service<br>Approve request channel<br>Accounting<br>order<br>Service<br>Order Service<br>request channel<br>**----- End of picture text -----**<br>
+```text
+Order Service Key
+Command message
+Reply message
+Message broker
+1
+Verify consumer
+2 Consumer
+Consumer Service Service
+Consumer verified
+request channel
+4
+3 7 Create order Ticket created
+Create Create Approve saga reply channel
+order saga ticket restaurant
+orchestrator order Kitchen
+Service
+Kitchen Service 6
+5
+request channel
+Authorize Card
+card authorized
+8 Accounting Service
+Approve request channel
+Accounting
+order
+Service
+Order Service
+request channel
+```
 
 Figure 4.6 Implementing the **Create Order Saga** using orchestration. **Order Service** implements a saga orchestrator, which invokes the saga participants using asynchronous request/ response. 
 
@@ -300,8 +405,32 @@ Figure 4.7 shows the state machine model for the Create Order Saga. This state m
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0154-02.png)
 
-**----- Start of picture text -----**<br>
-ConsumerVerificationFailed/<br>/Send VerifyConsumer Verifing send RejectOrder Rejecting Order<br>consumer order rejected<br>ConsumerVerified/<br>send CreateRestaurantOrder<br>Creating<br>ticket<br>Ticket creation failed/<br>Ticket created/ send RejectOrder<br>send AuthorizeCard<br>Card authorization failed/<br>Authorizing send RejectTicket Rejecting<br>card ticket<br>Card authorized/<br>send ApproveTicket<br>Approving<br>ticket<br>Ticket approved/<br>send ApproveOrder<br>Approving<br>order<br>Order approved<br>Order<br>approved<br>**----- End of picture text -----**<br>
+```text
+ConsumerVerificationFailed/
+/Send VerifyConsumer Verifing send RejectOrder Rejecting Order
+consumer order rejected
+ConsumerVerified/
+send CreateRestaurantOrder
+Creating
+ticket
+Ticket creation failed/
+Ticket created/ send RejectOrder
+send AuthorizeCard
+Card authorization failed/
+Authorizing send RejectTicket Rejecting
+card ticket
+Card authorized/
+send ApproveTicket
+Approving
+ticket
+Ticket approved/
+send ApproveOrder
+Approving
+order
+Order approved
+Order
+approved
+```
 
 Figure 4.7 The state machine model for the **Create Order Saga** 
 
@@ -502,8 +631,42 @@ Now that we’ve looked at various saga design and implementation issues, let’
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0162-06.png)
 
-**----- Start of picture text -----**<br>
-Handles commands sent by the the Processes replies from<br>Create Order Saga to the Order Service saga participants<br>createOrder()<br>cancelOrder()<br>...<br>Order Service<br>controller<br>OrderServiceRequests<br>Order<br>command<br>handlers<br>OrderService<br>createOrder()<br>cancelOrder() CreateOrderSagaReplies<br>approveOrder() Reply<br>rejectOrder()<br>... consumer<br>OrderRepository CreateOrder<br>Saga<br>save()<br>findById()<br>...<br>OrderService<br>Proxy<br>Order<br>KitchenService AccountingServiceRequests<br>Proxy<br>Command<br>message<br>publisher<br>ConsumerServiceRequests<br>KitchenServiceRequests<br>Defines the Restaurant Order Sends commands to Orchestrator for the<br>Service’s messaging API saga participants Create Order Saga<br>**----- End of picture text -----**<br>
+```text
+Handles commands sent by the the Processes replies from
+Create Order Saga to the Order Service saga participants
+createOrder()
+cancelOrder()
+...
+Order Service
+controller
+OrderServiceRequests
+Order
+command
+handlers
+OrderService
+createOrder()
+cancelOrder() CreateOrderSagaReplies
+approveOrder() Reply
+rejectOrder()
+... consumer
+OrderRepository CreateOrder
+Saga
+save()
+findById()
+...
+OrderService
+Proxy
+Order
+KitchenService AccountingServiceRequests
+Proxy
+Command
+message
+publisher
+ConsumerServiceRequests
+KitchenServiceRequests
+Defines the Restaurant Order Sends commands to Orchestrator for the
+Service’s messaging API saga participants Create Order Saga
+```
 
 Figure 4.9 The design of the **Order Service** and its sagas entity. There are also saga orchestrator classes, including the CreateOrderSaga class, which orchestrates Create Order Saga. Also, because Order Service participates in its own sagas, it has an OrderCommandHandlers adapter class that handles command messages by invoking OrderService. 
 
@@ -519,8 +682,18 @@ The OrderService class is a domain service called by the service’s API layer. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0163-08.png)
 
-**----- Start of picture text -----**<br>
-OrderService<br>createOrder()<br>...<br>OrderRepository CreateOrder<br>Saga<br>save()<br>findOne()<br>... SagaManager<br>create(..)<br>Order<br>**----- End of picture text -----**<br>
+```text
+OrderService
+createOrder()
+...
+OrderRepository CreateOrder
+Saga
+save()
+findOne()
+... SagaManager
+create(..)
+Order
+```
 
 Figure 4.10 **OrderService** creates and updates **Orders** , invokes the **OrderRepository** to persist **Orders** , and creates sagas, including the **CreateOrderSaga** . 
 
@@ -562,8 +735,45 @@ Let’s look at the CreateOrderSaga and its associated classes.
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0165-02.png)
 
-**----- Start of picture text -----**<br>
-this.sagaDefinition=<br>step()<br>The state of a saga .withCompensation(...)<br>.step()<br>.invokeParticipant(...)<br>.step()<br>CreateOrder .invokeParticipant(...)<br>OrderService<br>Saga .onReply(...)<br>.withCompensation(...)<br>Creates<br>Kitchen<br>CreateOrder ServiceProxy<br>SagaState<br>Invokes<br>orderId OrderService Describes a<br>orderDetails Proxy message channel<br>...<br>Manages Implements<br>Eventuate tram sagas<br>«interface» Abstract superclass<br>SimpleSaga CommandEndpoint for saga<br>orchestrators<br>SagaManager<br>SagaDefinition<br>create() getSagaDefinition()<br>... Describes the<br>SagaDefinition<br>steps of a saga<br>Uses<br>Order database<br>«table» CreateOrderSaga<br>SAGA_INSTANCE Eventuate tram replies<br>The SagaManager handles persisting a saga, Stores the state OrderService<br>sending the command messages that it of saga instances requests<br>generates, subscribing to reply messages,<br>and invoking the saga to handle replies.<br>**----- End of picture text -----**<br>
+```text
+this.sagaDefinition=
+step()
+The state of a saga .withCompensation(...)
+.step()
+.invokeParticipant(...)
+.step()
+CreateOrder .invokeParticipant(...)
+OrderService
+Saga .onReply(...)
+.withCompensation(...)
+Creates
+Kitchen
+CreateOrder ServiceProxy
+SagaState
+Invokes
+orderId OrderService Describes a
+orderDetails Proxy message channel
+...
+Manages Implements
+Eventuate tram sagas
+«interface» Abstract superclass
+SimpleSaga CommandEndpoint for saga
+orchestrators
+SagaManager
+SagaDefinition
+create() getSagaDefinition()
+... Describes the
+SagaDefinition
+steps of a saga
+Uses
+Order database
+«table» CreateOrderSaga
+SAGA_INSTANCE Eventuate tram replies
+The SagaManager handles persisting a saga, Stores the state OrderService
+sending the command messages that it of saga instances requests
+generates, subscribing to reply messages,
+and invoking the saga to handle replies.
+```
 
 Figure 4.11 The **OrderService** 's sagas, such as **Create Order Saga** , are implemented using the Eventuate Tram Saga framework. 
 
@@ -726,8 +936,29 @@ The Eventuate Tram Saga, shown in figure 4.12, is a framework for writing both s
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0170-04.png)
 
-**----- Start of picture text -----**<br>
-The SagaManager handles persisting a Describes a<br>saga, sending the command messages message channel<br>that it generates, subscribing to reply Routes command<br>messages, and invoking the saga to Abstract superclass messages to<br>handle replies. for saga orchestrators message handlers<br>Eventuate tram saga framework<br>Orchestration Participant<br>SimpleSaga SagaCommand<br>SagaManager SagaDefinition Dispatcher<br>CommandEndpoint<br>getSagaDefinition()<br>create(sagaState)<br>... SagaDefinition HandlersBuilderSagaCommand<br>Uses<br>Order database<br>«table» Sends<br>and receives<br>SAGA_INSTANCE Eventuate tram<br>Channels<br>Stores the state of Describes the<br>saga instances steps of a saga<br>**----- End of picture text -----**<br>
+```text
+The SagaManager handles persisting a Describes a
+saga, sending the command messages message channel
+that it generates, subscribing to reply Routes command
+messages, and invoking the saga to Abstract superclass messages to
+handle replies. for saga orchestrators message handlers
+Eventuate tram saga framework
+Orchestration Participant
+SimpleSaga SagaCommand
+SagaManager SagaDefinition Dispatcher
+CommandEndpoint
+getSagaDefinition()
+create(sagaState)
+... SagaDefinition HandlersBuilderSagaCommand
+Uses
+Order database
+«table» Sends
+and receives
+SAGA_INSTANCE Eventuate tram
+Channels
+Stores the state of Describes the
+saga instances steps of a saga
+```
 
 Figure 4.12 Eventuate Tram Saga is a framework for writing both saga orchestrators and saga participants. 
 
@@ -743,8 +974,16 @@ The saga orchestration package is the most complex part of the framework. It pro
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0171-02.png)
 
-**----- Start of picture text -----**<br>
-OrderService CreateOrderSagaState SagaManager CreateOrderSaga SagaDefinition EventuateTram Database<br>new()<br>create(sagaState)<br>getSagaDefinition()<br>executeFirstStep(sagaState)<br>makeValidateOrderByConsumerCommand()<br>sendMessage(command)<br>saveSagaInstance(sagaState)<br>**----- End of picture text -----**<br>
+```text
+OrderService CreateOrderSagaState SagaManager CreateOrderSaga SagaDefinition EventuateTram Database
+new()
+create(sagaState)
+getSagaDefinition()
+executeFirstStep(sagaState)
+makeValidateOrderByConsumerCommand()
+sendMessage(command)
+saveSagaInstance(sagaState)
+```
 
 Figure 4.13 The sequence of events when **OrderService** creates an instance of **Create Order Saga** 
 
@@ -756,8 +995,18 @@ Figure 4.14 shows the sequence of events when SagaManager receives a reply from 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0171-07.png)
 
-**----- Start of picture text -----**<br>
-EventuateTram SagaManager Database CreateOrderSaga SagaDefinition CreateOrderSagaState<br>handleMessage()<br>loadSagaInstance()<br>getSagaDefinition()<br>executeFirstStep(sagaState)<br>makeValidateOrderByConsumerCommand()<br>sendMessage<br>(command)<br>saveSagaInstance<br>(sageState)<br>**----- End of picture text -----**<br>
+```text
+EventuateTram SagaManager Database CreateOrderSaga SagaDefinition CreateOrderSagaState
+handleMessage()
+loadSagaInstance()
+getSagaDefinition()
+executeFirstStep(sagaState)
+makeValidateOrderByConsumerCommand()
+sendMessage
+(command)
+saveSagaInstance
+(sageState)
+```
 
 Figure 4.14 The sequence of events when the **SagaManager** receives a reply message from a saga participant 
 
@@ -787,8 +1036,26 @@ Each handler method invokes OrderService to update an Order and makes a reply me
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0172-10.png)
 
-**----- Start of picture text -----**<br>
-Routes command messages to<br>handlers and sends replies<br>Eventuate<br>Tram Sagas<br>SagaCommand<br>Dispatcher<br>Invokes<br>OrderCommandHandlers<br>Uses<br>approveOrder()<br>rejectOrder()<br>Reads ...<br>OrderService<br>requests Eventuate tram Invokes<br>Sends OrderService<br>CreateOrderSaga approveOrder()<br>replies rejectOrder()<br>...<br>**----- End of picture text -----**<br>
+```text
+Routes command messages to
+handlers and sends replies
+Eventuate
+Tram Sagas
+SagaCommand
+Dispatcher
+Invokes
+OrderCommandHandlers
+Uses
+approveOrder()
+rejectOrder()
+Reads ...
+OrderService
+requests Eventuate tram Invokes
+Sends OrderService
+CreateOrderSaga approveOrder()
+replies rejectOrder()
+...
+```
 
 Figure 4.15 **OrderCommandHandlers** implements command handlers for the commands that are sent by the various **Order Service** sagas. 
 

@@ -20,8 +20,35 @@ Services typically interact with other services. For example, Order Service, as 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0349-06.png)
 
-**----- Start of picture text -----**<br>
-API Consumer Event Provider Order History<br>gateway channel Service<br>Order Order<br>Service Test history<br>proxy event<br>handlers<br>Provider<br>Provider Order<br>Order aggregateevent Test<br>controller<br>publisher<br>Order<br>Service<br>Kitchen Test<br>Service<br>proxy<br>Order<br>T est Repository Consumer Command<br>channel<br>Reply Kitchen<br>channel<br>Service<br>Legend Kitchen<br>Database Service<br>Class under test command<br>handler<br>Provider<br>**----- End of picture text -----**<br>
+```text
+API Consumer Event Provider Order History
+gateway channel Service
+Order Order
+Service Test history
+proxy event
+handlers
+Provider
+Provider Order
+Order aggregateevent Test
+controller
+publisher
+Order
+Service
+Kitchen Test
+Service
+proxy
+Order
+T est Repository Consumer Command
+channel
+Reply Kitchen
+channel
+Service
+Legend Kitchen
+Database Service
+Class under test command
+handler
+Provider
+```
 
 Figure 10.1 Integration tests must verify that a service can communicate with its clients and dependencies. But rather than testing whole services, the strategy is to test the individual adapter classes that implement the communication. 
 
@@ -31,8 +58,12 @@ A much more effective strategy is to write what are known as integration tests. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0350-04.png)
 
-**----- Start of picture text -----**<br>
-End-to-end<br>Component<br>Integration<br>Unit<br>**----- End of picture text -----**<br>
+```text
+End-to-end
+Component
+Integration
+Unit
+```
 
 Figure 10.2 Integration tests are the layer above unit tests. They verify that a service can communicate with its dependencies, which includes infrastructure services, such as the database, and application services. 
 
@@ -123,8 +154,26 @@ The consumer-side OrderServiceProxyTest invokes OrderServiceProxy, which has bee
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0353-06.png)
 
-**----- Start of picture text -----**<br>
-Consumer-side integration Provider-side integration<br>test forAPI gateway test for Order Service<br>Contract.make {<br>OrderService request {..}<br>ProxyTest response {...} abstract class BaseHttp {<br>}<br>} @Before<br>Tests Uses public void setup() {<br>Reads RestAssuredMockMvc<br>.standaloneSetup(...);<br>OrderService Spring Cloud }<br>Proxy Contract }<br>HTTP Configures Generates Configures<br>Wiremock- class HttpTest Tests<br>based HTTP extends BaseHttp { Order<br>controller<br>stub server<br>}<br>**----- End of picture text -----**<br>
+```text
+Consumer-side integration Provider-side integration
+test forAPI gateway test for Order Service
+Contract.make {
+OrderService request {..}
+ProxyTest response {...} abstract class BaseHttp {
+}
+} @Before
+Tests Uses public void setup() {
+Reads RestAssuredMockMvc
+.standaloneSetup(...);
+OrderService Spring Cloud }
+Proxy Contract }
+HTTP Configures Generates Configures
+Wiremock- class HttpTest Tests
+based HTTP extends BaseHttp { Order
+controller
+stub server
+}
+```
 
 Figure 10.3 The contracts are used to verify that the adapter classes on both sides of the REST-based communication between **API Gateway** and **Order Service** conform to the contract. The consumer-side tests verify that **OrderServiceProxy** invokes **Order Service** correctly. The provider-side tests verify that **OrderController** implements the REST API endpoints correctly. 
 
@@ -249,8 +298,39 @@ Figure 10.4 shows the approach to integration testing publish/subscribe interact
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0357-04.png)
 
-**----- Start of picture text -----**<br>
-Consumer-side contract.make{ Provider-side integration<br>integration test for label 'orderCreatedEvent' test for Order Service<br>Order History Service<br>input{<br>triggeredBy('orderCreated()') class MessagingBase{<br>OrderHistory }<br>EventHandlers void orderCreated(){<br>Test outputMessage{...}<br>} }<br>Tests<br>Invokes<br>Uses<br>OrderHistory Order domain<br>EventHandlers EventPublisher<br>Spring cloud<br>contract<br>Triggers Publishes to<br>Reads from<br>'orderCreatedEvent'<br>Code Channel Tests<br>Channel generates<br>Reads from<br>Configures<br>Publishes to class MessageTest extends MessagingBase{<br>@Test<br>Messaging stub public void validate_orderCreatedEvent(){<br>orderCreated();<br>... Invokes trigger function<br>} that verifies that the output<br>} message is published to the<br>expected channel<br>**----- End of picture text -----**<br>
+```text
+Consumer-side contract.make{ Provider-side integration
+integration test for label 'orderCreatedEvent' test for Order Service
+Order History Service
+input{
+triggeredBy('orderCreated()') class MessagingBase{
+OrderHistory }
+EventHandlers void orderCreated(){
+Test outputMessage{...}
+} }
+Tests
+Invokes
+Uses
+OrderHistory Order domain
+EventHandlers EventPublisher
+Spring cloud
+contract
+Triggers Publishes to
+Reads from
+'orderCreatedEvent'
+Code Channel Tests
+Channel generates
+Reads from
+Configures
+Publishes to class MessageTest extends MessagingBase{
+@Test
+Messaging stub public void validate_orderCreatedEvent(){
+orderCreated();
+... Invokes trigger function
+} that verifies that the output
+} message is published to the
+expected channel
+```
 
 Figure 10.4 The contracts are used to test both sides of the publish/subscribe interaction. The provider-side tests verify that **OrderDomainEventPublisher** publishes events that confirm to the contract. The consumer-side tests verify that **OrderHistoryEventHandlers** consume the example events from the contract. 
 
@@ -366,8 +446,37 @@ Figure 10.5 shows how to test the interaction between Order Service and Kitchen 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0361-02.png)
 
-**----- Start of picture text -----**<br>
-Consumer-side Contract.make { Provider-side<br>inputMessage{...}<br>integration test for integration test for<br>Kitchen Service Kitchen Service<br>OutputMessage{...}<br>KitchenService } abstract class BaseMessaging{<br>Proxy<br>IntegrationTest void setUp(){...}<br>Reads<br>Tests<br>KitchenService Spring cloud KitchenService<br>Proxy contract Configures CommandHandler<br>Extends Invokes<br>Sends to Receives from Reads Sends<br>command reply<br>«mock» command<br>KitchenService<br>Command Reply Command<br>channel channel Code channel<br>Reply<br>generates Sends channel<br>Receives command<br>from Sends to Message Reads reply<br>class MessageTest extends BaseMessaging{<br>Configures<br>Messaging stub<br>} Sends input message and<br>verifies that reply matches<br>contract’s output message<br>**----- End of picture text -----**<br>
+```text
+Consumer-side Contract.make { Provider-side
+inputMessage{...}
+integration test for integration test for
+Kitchen Service Kitchen Service
+OutputMessage{...}
+KitchenService } abstract class BaseMessaging{
+Proxy
+IntegrationTest void setUp(){...}
+Reads
+Tests
+KitchenService Spring cloud KitchenService
+Proxy contract Configures CommandHandler
+Extends Invokes
+Sends to Receives from Reads Sends
+command reply
+«mock» command
+KitchenService
+Command Reply Command
+channel channel Code channel
+Reply
+generates Sends channel
+Receives command
+from Sends to Message Reads reply
+class MessageTest extends BaseMessaging{
+Configures
+Messaging stub
+} Sends input message and
+verifies that reply matches
+contract’s output message
+```
 
 Figure 10.5 The contracts are used to test the adapter classes that implement each side of the asynchronous request/response interaction. The provider-side tests verify that **KitchenServiceCommandHandler** handles commands and sends back replies. The consumer-side tests verify **KitchenServiceProxy** sends commands that conform to the contract, and that it handles the example replies from the contract. 
 
@@ -510,8 +619,17 @@ Let’s look at writing acceptance tests using Gherkin.
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0366-02.png)
 
-**----- Start of picture text -----**<br>
-Stub<br>dependency 1<br>End-to-end<br>Component Tests Servi ce Stub<br>Component test dependency 2<br>Integration<br>Stub<br>dependency<br>Unit ...<br>**----- End of picture text -----**<br>
+```text
+Stub
+dependency 1
+End-to-end
+Component Tests Servi ce Stub
+Component test dependency 2
+Integration
+Stub
+dependency
+Unit ...
+```
 
 Figure 10.6 A component test tests a service in isolation. It typically uses stubs for the service’s dependencies. 
 
@@ -657,8 +775,31 @@ Using Cucumber with the Spring Boot testing framework requires a slightly unusua
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0371-02.png)
 
-**----- Start of picture text -----**<br>
-src/component-test/resources/<br>createorder.feature<br>As a consumer of the Order Service<br>I should be able to create an order<br>Order Service<br>Scenario: Order authorized<br>docker<br>GivenGiven ausingvalida consumer valid credit card Invokes container<br>REST API<br>Runs<br>Reads<br>OrderService build.gradle<br>OrderService Uses Runs<br>Component Component MySQL dockerCompose {<br>Test DefinitionsStep Reads command Runs } ...<br>and sends<br>replies Uses<br>Reads events Docker-compose.yml<br>ftgo-order-service:<br>Kafka build: .<br>Written using the<br>ports:<br>Cucumber testing framework - "8082:8080"<br>**----- End of picture text -----**<br>
+```text
+src/component-test/resources/
+createorder.feature
+As a consumer of the Order Service
+I should be able to create an order
+Order Service
+Scenario: Order authorized
+docker
+GivenGiven ausingvalida consumer valid credit card Invokes container
+REST API
+Runs
+Reads
+OrderService build.gradle
+OrderService Uses Runs
+Component Component MySQL dockerCompose {
+Test DefinitionsStep Reads command Runs } ...
+and sends
+replies Uses
+Reads events Docker-compose.yml
+ftgo-order-service:
+Kafka build: .
+Written using the
+ports:
+Cucumber testing framework - "8082:8080"
+```
 
 Figure 10.7 The component tests for **Order Service** use the Cucumber testing framework to execute tests scenarios written using Gherkin acceptance testing DSL. The tests use Docker to run **Order Service** along with its infrastructure services, such as Apache Kafka and MySQL. 
 
@@ -812,8 +953,15 @@ Component testing tests each service separately. End-to-end testing, though, tes
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0375-10.png)
 
-**----- Start of picture text -----**<br>
-Service 1<br>End-to-end<br>End-to-end Tests<br>Component test Servi ce Service 2<br>Integration<br>Service ...<br>Unit<br>**----- End of picture text -----**<br>
+```text
+Service 1
+End-to-end
+End-to-end Tests
+Component test Servi ce Service 2
+Integration
+Service ...
+Unit
+```
 
 Figure 10.8 End-to-end tests are at the top of the test pyramid. They are slow, brittle, and time consuming to develop. You should minimize the number of end-to-end tests. 
 

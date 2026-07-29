@@ -64,13 +64,29 @@ Figure 11.2 shows a high-level view of how the FTGO application implements secur
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0381-02.png)
 
-**----- Start of picture text -----**<br>
-Log in to obtain session<br>token, which is a cookie.<br>**----- End of picture text -----**<br>
+```text
+Log in to obtain session
+token, which is a cookie.
+```
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0381-03.png)
 
-**----- Start of picture text -----**<br>
-POST /login<br>id=...<br>password=...<br>Browser HTTP/1.1 200 OK FTGO<br>or mobile Set-cookie: JSESSIONID=...<br>application ... application<br>Consumer<br>restaurant<br>courier<br>GET /orders/order-xyz<br>Cookie: JSESSIONID=...<br>Include session token cookie,<br>which identifies the user, in<br>subsequent requests.<br>**----- End of picture text -----**<br>
+```text
+POST /login
+id=...
+password=...
+Browser HTTP/1.1 200 OK FTGO
+or mobile Set-cookie: JSESSIONID=...
+application ... application
+Consumer
+restaurant
+courier
+GET /orders/order-xyz
+Cookie: JSESSIONID=...
+Include session token cookie,
+which identifies the user, in
+subsequent requests.
+```
 
 Figure 11.1 A client of the FTGO application first logs in to obtain a session token, which is often a cookie. The client includes the session token in each subsequent request it makes to the application. 
 
@@ -90,8 +106,29 @@ The other key part of the security implementation is the security _context_ , wh
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0382-03.png)
 
-**----- Start of picture text -----**<br>
-Log in with user ID<br>and password. Return session cookie.<br>FTGO application<br>POST /login Retrieves user information<br>Login from database<br>userId-Jane&password=.. handler<br>Jane<br>User<br>Initializes<br>database<br>Establishes<br>Session<br>Login-based HTTP/1.1 200 OKSe t -cookie: JSESSIONID=... UserId: janerules: [CONSUMER] UserId: janeSecurity context<br>client ... ... rules: [CONSUMER]<br>...<br>Reads<br>Establishes Reads<br>GET /orders/order-xyz SessionBased<br>Cookie: JSESSIONID=... Security OrderDetails<br>RequestHandler<br>Interceptor<br>**----- End of picture text -----**<br>
+```text
+Log in with user ID
+and password. Return session cookie.
+FTGO application
+POST /login Retrieves user information
+Login from database
+userId-Jane&password=.. handler
+Jane
+User
+Initializes
+database
+Establishes
+Session
+Login-based HTTP/1.1 200 OKSe t -cookie: JSESSIONID=... UserId: janerules: [CONSUMER] UserId: janeSecurity context
+client ... ... rules: [CONSUMER]
+...
+Reads
+Establishes Reads
+GET /orders/order-xyz SessionBased
+Cookie: JSESSIONID=... Security OrderDetails
+RequestHandler
+Interceptor
+```
 
 **Provides session cookie**
 
@@ -149,8 +186,24 @@ A service invoked by the API gateway needs to know the principal making the requ
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0385-03.png)
 
-**----- Start of picture text -----**<br>
-Pass token to services so<br>GETAuthorization:/orders/1 ...CREDENTIALS... API gateway that they can identify andauthorize the user.<br>API client ...<br>POST /login GET /orders/1<br>id=... ...SECURITY_TOKEN...<br>Order<br>password=...<br>Authentication Service<br>Interceptor<br>Login-based HTTP/1.1 200 OK<br>client<br>...SECURITY_TOKEN...<br>GET /orders/1<br>...SECURITY_TOKEN...<br>Login clients first obtain Include the security token<br>a security token. in each request.<br>**----- End of picture text -----**<br>
+```text
+Pass token to services so
+GETAuthorization:/orders/1 ...CREDENTIALS... API gateway that they can identify andauthorize the user.
+API client ...
+POST /login GET /orders/1
+id=... ...SECURITY_TOKEN...
+Order
+password=...
+Authentication Service
+Interceptor
+Login-based HTTP/1.1 200 OK
+client
+...SECURITY_TOKEN...
+GET /orders/1
+...SECURITY_TOKEN...
+Login clients first obtain Include the security token
+a security token. in each request.
+```
 
 Figure 11.3 The API gateway authenticates requests from clients and includes a security token in the requests it makes to services. The services use the token to obtain information about the principal. The API gateway can also use the security token as a session token. 
 
@@ -228,8 +281,25 @@ The sequence of events shown in figure 11.4 is as follows:
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0388-11.png)
 
-**----- Start of picture text -----**<br>
-POST/oauth/token<br>userid=...&password=... Spring OAuth2<br>Authenticatio n<br>Server<br>User<br>database<br>HTTP/1.1 200 OK<br>GET /orders/1 ...<br>Authorization: Basic... {<br>.... "access_token": "AccessToken"<br>API cli ent API gateway ...}<br>GET /orders/1<br>Authorization: Bearer AccessToken<br>Order<br>Service<br>Contains the user<br>ID and their roles<br>**----- End of picture text -----**<br>
+```text
+POST/oauth/token
+userid=...&password=... Spring OAuth2
+Authenticatio n
+Server
+User
+database
+HTTP/1.1 200 OK
+GET /orders/1 ...
+Authorization: Basic... {
+.... "access_token": "AccessToken"
+API cli ent API gateway ...}
+GET /orders/1
+Authorization: Bearer AccessToken
+Order
+Service
+Contains the user
+ID and their roles
+```
 
 Figure 11.4 An API gateway authenticates an API client by making a Password Grant request to the OAuth 2.0 authentication server. The server returns an access token, which the API gateway passes to the services. A service verifies the token’s signature and extracts information about the user, including their identity and roles. 
 
@@ -243,8 +313,28 @@ An OAuth 2.0-based API gateway can authenticate session-oriented clients by usin
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0389-06.png)
 
-**----- Start of picture text -----**<br>
-POST/oauth/token<br>POST/login userid=...&password=... Spring OAuth2<br>userId=...&password=... Authentication<br>Server<br>HTTP/1.1 200 OK User<br>Set-Cookie: access_token=... database<br>Set-Cookie:refresh_token=... Login HTTP/1.1 200 OK<br>handler ...<br>{<br>"access_token": "AccessToken"<br>...<br>}<br>Login-based API gateway<br>client<br>GET /orders/1<br>Session Authorization: Bearer AccessToken<br>authentication<br>interceptor<br>GET/orders/1<br>Cookie: access_token=...;refresh_token... ServiceOrder<br>**----- End of picture text -----**<br>
+```text
+POST/oauth/token
+POST/login userid=...&password=... Spring OAuth2
+userId=...&password=... Authentication
+Server
+HTTP/1.1 200 OK User
+Set-Cookie: access_token=... database
+Set-Cookie:refresh_token=... Login HTTP/1.1 200 OK
+handler ...
+{
+"access_token": "AccessToken"
+...
+}
+Login-based API gateway
+client
+GET /orders/1
+Session Authorization: Bearer AccessToken
+authentication
+interceptor
+GET/orders/1
+Cookie: access_token=...;refresh_token... ServiceOrder
+```
 
 Figure 11.5 A client logs in by POSTing its credentials to the API gateway. The API gateway authenticates the credentials using the OAuth 2.0 authentication server and returns the access token and refresh token as cookies. A client includes these tokens in the requests it makes to the API gateway. 
 
@@ -284,13 +374,28 @@ Nor does it make sense to hard-wire different sets of configuration properties i
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0391-02.png)
 
-**----- Start of picture text -----**<br>
-Environment-specific configuration<br>**----- End of picture text -----**<br>
+```text
+Environment-specific configuration
+```
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0391-03.png)
 
-**----- Start of picture text -----**<br>
-Apache Kafka<br>bootstrap.servers=kafka1:9092<br>Apache ..<br>Kafka «Order event channel»<br>consumer<br>Order «Delivery event channel»<br>History<br>Service<br>DynamoDB<br>adapter AWS DynamoDB<br>aws.access.key.id=...<br>aws.secret.access.key=...<br>aws.region=...<br>Environment-specific configuration<br>**----- End of picture text -----**<br>
+```text
+Apache Kafka
+bootstrap.servers=kafka1:9092
+Apache ..
+Kafka «Order event channel»
+consumer
+Order «Delivery event channel»
+History
+Service
+DynamoDB
+adapter AWS DynamoDB
+aws.access.key.id=...
+aws.secret.access.key=...
+aws.region=...
+Environment-specific configuration
+```
 
 Figure 11.6 **Order History Service** uses Apache Kafka and AWS DynamoDB. It needs to be configured with each service’s network location, credentials, and so on. select the appropriate set at runtime. That’s because doing so would introduce a security vulnerability and limit where it can be deployed. Additionally, sensitive data such as credentials should be stored securely using a secrets storage mechanism, such as Hashicorp Vault (www.vaultproject.io) or AWS Parameter Store (https://docs.aws .amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html). Instead, you should supply the appropriate configuration properties to the service at runtime by using the Externalized configuration pattern. 
 
@@ -312,8 +417,21 @@ The push model relies on the collaboration of the deployment environment and the
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0392-04.png)
 
-**----- Start of picture text -----**<br>
-Process<br>Configures<br>Environment variables<br>BOOTSTRAP_SERVERS=kafka1:9092<br>AWS_ACCESS_KEY_ID=<br>AWS_SECRET_ACCESS_KEY=...<br>AWS_REGION=...<br>.... Reads<br>Deployment<br>infrastructure<br>Creates Order<br>History Service<br>instance<br>**----- End of picture text -----**<br>
+```text
+Process
+Configures
+Environment variables
+BOOTSTRAP_SERVERS=kafka1:9092
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=...
+.... Reads
+Deployment
+infrastructure
+Creates Order
+History Service
+instance
+```
 
 Figure 11.7 When the deployment infrastructure creates an instance of **Order History Service** , it sets the environment variables containing the externalized configuration. **Order History Service** reads those environment variables. 
 
@@ -362,8 +480,19 @@ There are a variety of ways to implement a configuration server, including the f
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0394-02.png)
 
-**----- Start of picture text -----**<br>
-Process<br>Configures<br>Environment variables<br>CONFIG_SERVER_URL=...<br>Deployment Creates Order getConfiguration(“orderHistoryService”) Configuration<br>infrastructure History Service server<br>instance BOOTSTRAP_SERVERS=kafka1:9092<br>AWS_ACCESS_KEY_ID=<br>AWS_SECRET_ACCESS_KEY=...<br>AWS_REGION=...<br>....<br>**----- End of picture text -----**<br>
+```text
+Process
+Configures
+Environment variables
+CONFIG_SERVER_URL=...
+Deployment Creates Order getConfiguration(“orderHistoryService”) Configuration
+infrastructure History Service server
+instance BOOTSTRAP_SERVERS=kafka1:9092
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=...
+....
+```
 
 Figure 11.8 On startup, a service instance retrieves its configuration properties from a configuration server. The deployment infrastructure provides the configuration properties for accessing the configuration server. 
 
@@ -395,8 +524,41 @@ You can use the following patterns to design observable services:
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0395-07.png)
 
-**----- Start of picture text -----**<br>
-Key<br>Distributed<br>Pattern<br>Pattern tracing<br>participant server<br>Developer Operations<br>responsibility responsibility Health check Distributed<br>API pattern tracing pattern<br>Distributed<br>tracing Metrics<br>exporter Service<br>Health check Health<br>Invokes Metrics<br>invoker, such as check<br>exporter<br>monitoring service API<br>Observable Application<br>Service metrics pattern<br>Audit<br>Logging database<br>adapter<br>adapter<br>Exception Audit<br>Logging reporter logging pattern<br>Logging ag g regation L og file<br>Server<br>pipeline<br>Auditing<br>database<br>Log aggregation Exception<br>pattern tracking pattern Exception<br>Tracking<br>Service<br>**----- End of picture text -----**<br>
+```text
+Key
+Distributed
+Pattern
+Pattern tracing
+participant server
+Developer Operations
+responsibility responsibility Health check Distributed
+API pattern tracing pattern
+Distributed
+tracing Metrics
+exporter Service
+Health check Health
+Invokes Metrics
+invoker, such as check
+exporter
+monitoring service API
+Observable Application
+Service metrics pattern
+Audit
+Logging database
+adapter
+adapter
+Exception Audit
+Logging reporter logging pattern
+Logging ag g regation L og file
+Server
+pipeline
+Auditing
+database
+Log aggregation Exception
+pattern tracking pattern Exception
+Tracking
+Service
+```
 
 Figure 11.9 The observability patterns enable developers and operations to understand the behavior of an application and troubleshoot problems. Developers are responsible for ensuring that their services are observable. Operations are responsible for the infrastructure that collects the information exposed by the services. 
 
@@ -428,8 +590,21 @@ library implements a GET /hc endpoint (https://docs.microsoft.com/en-us/dotnet/ 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0397-03.png)
 
-**----- Start of picture text -----**<br>
-Tests the service’s connections<br>to infrastructure services<br>Health check<br>endpoint<br>Health check Invokes Health check Checks Messaging Message<br>invoker re quest adapter broker<br>handler<br>Service<br>Checks<br>Database<br>adapter<br>For example: monitoring MySQL<br>system, Service registry, and others<br>**----- End of picture text -----**<br>
+```text
+Tests the service’s connections
+to infrastructure services
+Health check
+endpoint
+Health check Invokes Health check Checks Messaging Message
+invoker re quest adapter broker
+handler
+Service
+Checks
+Database
+adapter
+For example: monitoring MySQL
+system, Service registry, and others
+```
 
 Figure 11.10 A service implements a health check endpoint, which is periodically invoked by the deployment infrastructure to determine the health of the service instance. 
 
@@ -463,8 +638,23 @@ The solution is to use log aggregation. As figure 11.11 shows, the log aggregati
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0399-03.png)
 
-**----- Start of picture text -----**<br>
-Service A<br>instance 1<br>Log User<br>Logging<br>library View Notify<br>Service B<br>instance 1 Log Logging<br>Log<br>Logging pipeline server<br>library<br>Service A<br>instance 2<br>Log<br>Logging<br>library<br>**----- End of picture text -----**<br>
+```text
+Service A
+instance 1
+Log User
+Logging
+library View Notify
+Service B
+instance 1 Log Logging
+Log
+Logging pipeline server
+library
+Service A
+instance 2
+Log
+Logging
+library
+```
 
 Figure 11.11 The log aggregation infrastructure ships the logs of each service instance to a centralized logging server. Users can view and search the logs. They can also set up alerts, which are triggered when log entries match search criteria. 
 
@@ -508,8 +698,9 @@ Figure 11.12 shows an example of how a distributed tracing server displays what 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0401-04.png)
 
-**----- Start of picture text -----**<br>
-Parent span Child span Trace<br>**----- End of picture text -----**<br>
+```text
+Parent span Child span Trace
+```
 
 Figure 11.12 The Zipkin server shows how the FTGO application handles a request that’s routed by the API gateway to **Order Service** . Each request is represented by a trace. A trace is a set of spans. Each span, which can contain child spans, is the invocation of a service. Depending on the level of detail collected, a span can also represent the invocation of an operation inside a service. 
 
@@ -535,8 +726,28 @@ If you search the logs for 8d8fdc37be104cc6, you’ll find all log entries for t
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0402-08.png)
 
-**----- Start of picture text -----**<br>
-Trace XYZ<br>Span ABC: API gateway<br>Span DEF: Order Service<br>GET/orders/1 HTTP/1.1<br>GET/orders/1 HTTP/1.1<br>X-B3-TraceId: XYZ<br>.... X-B3-ParentSpanId: ABC<br>API Order<br>gateway Service<br>Instrumentation Instrumentation<br>library library<br>Service: API gateway Transport Service: Order Service<br>TraceId: XYZ TraceId: XYZ<br>ParentSpan: NONE ParentSpan: ABC<br>Span: ABC Span: DEF<br>Views traces<br>Distributed tracing server<br>User<br>Trace<br>database<br>**----- End of picture text -----**<br>
+```text
+Trace XYZ
+Span ABC: API gateway
+Span DEF: Order Service
+GET/orders/1 HTTP/1.1
+GET/orders/1 HTTP/1.1
+X-B3-TraceId: XYZ
+.... X-B3-ParentSpanId: ABC
+API Order
+gateway Service
+Instrumentation Instrumentation
+library library
+Service: API gateway Transport Service: Order Service
+TraceId: XYZ TraceId: XYZ
+ParentSpan: NONE ParentSpan: ABC
+Span: ABC Span: DEF
+Views traces
+Distributed tracing server
+User
+Trace
+database
+```
 
 Figure 11.13 Each service (including the API gateway) uses an instrumentation library. The instrumentation library assigns an ID to each external request, propagates tracing state between services, and reports spans to the distributed tracing server. 
 
@@ -564,8 +775,24 @@ Services report metrics to a central server that provides aggregation, visualiza
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0404-02.png)
 
-**----- Start of picture text -----**<br>
-User<br>View Notify<br>Application code<br>Metrics library Visualization Alerts<br>Application framework Metrics<br>ingestion Metrics<br>Service<br>Language runtime<br>Metrics sample:<br>Service instance<br>name=cpu_percent<br>Deployment infrastructure value=68<br>timestamp=34938934893<br>dimensions: Metrics<br>machine=node1 database<br>...<br>**----- End of picture text -----**<br>
+```text
+User
+View Notify
+Application code
+Metrics library Visualization Alerts
+Application framework Metrics
+ingestion Metrics
+Service
+Language runtime
+Metrics sample:
+Service instance
+name=cpu_percent
+Deployment infrastructure value=68
+timestamp=34938934893
+dimensions: Metrics
+machine=node1 database
+...
+```
 
 Figure 11.14 Metrics at every level of the stack are collected and stored in a metrics service, which provides visualization and alerting. 
 
@@ -656,8 +883,20 @@ There are a couple of ways to integrate the exception tracking service into your
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0407-02.png)
 
-**----- Start of picture text -----**<br>
-User<br>View & manage Notify<br>Order Service<br>Exception tracking Report exception<br>Exception tracking service<br>client library<br>POST/exceptions<br>java.lang.NullPointerException<br>at net.chrisrichardson.ftgo...<br>at net.chrisrichardson.ftgo...<br>at net.chrisrichardson.ftgo...<br>Exception database<br>**----- End of picture text -----**<br>
+```text
+User
+View & manage Notify
+Order Service
+Exception tracking Report exception
+Exception tracking service
+client library
+POST/exceptions
+java.lang.NullPointerException
+at net.chrisrichardson.ftgo...
+at net.chrisrichardson.ftgo...
+at net.chrisrichardson.ftgo...
+Exception database
+```
 
 Figure 11.15 A service reports exceptions to an exception tracking service, which de-duplicates exceptions and alerts developers. It has a UI for viewing and managing exceptions. 
 
@@ -711,8 +950,15 @@ A much faster way to develop services is to build your services upon a microserv
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0409-05.png)
 
-**----- Start of picture text -----**<br>
-Service<br>Service code<br>Microservice chassis<br>Circuit breaker Service discovery<br>Distributed tracing Application metrics<br>Logging Health check<br>Externalized config. ...<br>**----- End of picture text -----**<br>
+```text
+Service
+Service code
+Microservice chassis
+Circuit breaker Service discovery
+Distributed tracing Application metrics
+Logging Health check
+Externalized config. ...
+```
 
 Figure 11.16 A microservice chassis is a framework that handles numerous concerns, such as exception tracking, logging, health checks, externalized configuration, and distributed tracing. 
 
@@ -756,8 +1002,21 @@ An emerging alternative that avoids this problem is to implement some of this fu
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0411-03.png)
 
-**----- Start of picture text -----**<br>
-API Order Restaurant<br>Microservice chassis<br>gateway Service Service<br>Logging Application metrics<br>Microservice Microservice Microservice<br>chassis chassis chassis Externalized config. Health check<br>Distributed tracing ...<br>Circuit breaker Service discovery<br>Service Smart traffic routing Functionality moved from<br>Distributed tracing mesh Load balancing microservice chassis to<br>service mesh<br>Secure communications<br>Deployment infrastructure<br>**----- End of picture text -----**<br>
+```text
+API Order Restaurant
+Microservice chassis
+gateway Service Service
+Logging Application metrics
+Microservice Microservice Microservice
+chassis chassis chassis Externalized config. Health check
+Distributed tracing ...
+Circuit breaker Service discovery
+Service Smart traffic routing Functionality moved from
+Distributed tracing mesh Load balancing microservice chassis to
+service mesh
+Secure communications
+Deployment infrastructure
+```
 
 Figure 11.17 All network traffic in and out of a service flows through the service mesh. The service mesh implements various functions including circuit breakers, distributed tracing, service discovery, and load balancing. Fewer functions are implemented by the microservice chassis. It also secures interprocess communication by using TLS-based IPC between services. 
 

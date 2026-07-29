@@ -56,8 +56,23 @@ The purpose of each view is as follows:
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0066-02.png)
 
-**----- Start of picture text -----**<br>
-What developers create What is produced by the build system<br>Elements: Classes and packages Elements: Modules, (JAR files) and<br>Relations: The relationships components (WAR files<br>between them or executables)<br>Relations: Their dependencies<br>Logical Implementation<br>view view<br>Animate the views.<br>Scenarios<br>Process Deployment<br>view view<br>Running components Processes running on “machines”<br>Elements: Processes Elements: Machines and processes<br>Relations: Inter-process Relations: Networking<br>communication<br>**----- End of picture text -----**<br>
+```text
+What developers create What is produced by the build system
+Elements: Classes and packages Elements: Modules, (JAR files) and
+Relations: The relationships components (WAR files
+between them or executables)
+Relations: Their dependencies
+Logical Implementation
+view view
+Animate the views.
+Scenarios
+Process Deployment
+view view
+Running components Processes running on “machines”
+Elements: Processes Elements: Machines and processes
+Relations: Inter-process Relations: Networking
+communication
+```
 
 Figure 2.1 The 4+1 view model describes an application’s architecture using four views, along with scenarios that show how the elements within each view collaborate to handle requests. or deployable units consisting of one or more modules. In Java, a module is a JAR file, and a component is typically a WAR file or an executable JAR file. The relations between them include dependency relationships between modules and composition relationships between components and modules. 
 
@@ -117,8 +132,28 @@ The business logic has one or more ports. A _port_ defines a set of operations a
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0069-02.png)
 
-**----- Start of picture text -----**<br>
-Inbound adapter Inbound adapter<br>Some<br>Message<br>Browser controller<br>consumer<br>class<br>Foo<br>service<br>Business logic Message broker<br>Messaging<br>interface<br>Inbound port<br>Repository<br>interface Message<br>producer<br>DAO<br>Outbound adapter<br>Outbound adapter<br>Outbound port<br>Database<br>**----- End of picture text -----**<br>
+```text
+Inbound adapter Inbound adapter
+Some
+Message
+Browser controller
+consumer
+class
+Foo
+service
+Business logic Message broker
+Messaging
+interface
+Inbound port
+Repository
+interface Message
+producer
+DAO
+Outbound adapter
+Outbound adapter
+Outbound port
+Database
+```
 
 Figure 2.2 An example of a hexagonal architecture, which consists of the business logic and one or more adapters that communicate with external systems. The business logic has one or more ports. Inbound adapters, which handled requests from external systems, invoke an inbound port. An outbound adapter implements an outbound port, and invokes an external system. 
 
@@ -150,8 +185,34 @@ Later in this chapter, I describe what is meant by _business capability_ . The c
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0071-02.png)
 
-**----- Start of picture text -----**<br>
-The API Gateway routes<br>requests from the mobile Services corresponding<br>applications to services. REST to business capabilities/<br>API DDD subdomains<br>Order<br>Service<br>Stripe<br>REST REST Adapter<br>API API<br>Courier GatewayAPI RESTAPI Restaurant AccountingService<br>REST Service<br>API<br>Twilio<br>REST Adapter<br>Consumer REST API<br>API Notification<br>Kitchen Service<br>Restaurant Service Amazon<br>Web UI SES<br>Adapter<br>Restaurant<br>REST<br>API<br>Delivery<br>Service<br>Services have APIs. A service’s data is private.<br>**----- End of picture text -----**<br>
+```text
+The API Gateway routes
+requests from the mobile Services corresponding
+applications to services. REST to business capabilities/
+API DDD subdomains
+Order
+Service
+Stripe
+REST REST Adapter
+API API
+Courier GatewayAPI RESTAPI Restaurant AccountingService
+REST Service
+API
+Twilio
+REST Adapter
+Consumer REST API
+API Notification
+Kitchen Service
+Restaurant Service Amazon
+Web UI SES
+Adapter
+Restaurant
+REST
+API
+Delivery
+Service
+Services have APIs. A service’s data is private.
+```
 
 Figure 2.3 A possible microservice architecture for the FTGO application. It consists of numerous services. 
 
@@ -169,8 +230,25 @@ Each service in a microservice architecture has its own architecture and, potent
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0072-03.png)
 
-**----- Start of picture text -----**<br>
-Service API<br>Commands:<br>createOrder()<br>Invokes<br>...<br>Queries:<br>findOrderbyId()<br>...<br>Order<br>Service Order Service<br>client<br>Subscribes to events Order<br>event<br>publisher<br>Order created<br>Order cancelled<br>Publishes events when data changes<br>**----- End of picture text -----**<br>
+```text
+Service API
+Commands:
+createOrder()
+Invokes
+...
+Queries:
+findOrderbyId()
+...
+Order
+Service Order Service
+client
+Subscribes to events Order
+event
+publisher
+Order created
+Order cancelled
+Publishes events when data changes
+```
 
 Figure 2.4 A service has an API that encapsulates the implementation. The API defines operations, which are invoked by clients. There are two types of operations: commands update data, and queries retrieve data. When its data changes, a service publishes events that clients can subscribe to. adapter invokes the business logic, and the events adapter publishes events emitted by the business logic. 
 
@@ -204,18 +282,49 @@ How should we define a microservice architecture? As with any software developme
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0074-04.png)
 
-**----- Start of picture text -----**<br>
-The starting point are the requirements,<br>such as the user stories.<br>**----- End of picture text -----**<br>
+```text
+The starting point are the requirements,
+such as the user stories.
+```
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0074-05.png)
 
-**----- Start of picture text -----**<br>
-A system operation represents<br>an external request.<br>**----- End of picture text -----**<br>
+```text
+A system operation represents
+an external request.
+```
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0074-06.png)
 
-**----- Start of picture text -----**<br>
-Step 1: Identify system operations<br>Functional requirements<br>createOrder()<br>As a consumer<br>I want to place an order<br>so that I can ...<br>FTGO<br>As a restaurant<br>I want to accept an order<br>acceptOrder()<br>so that I can ...<br>Step 2: Identify services Step 3: Define service APIs and collaborations<br>FTGO FTGO<br>createOrder()<br>createOrder()<br>Order<br>Order verifyOrder()<br>Service<br>Service<br>Restaurant<br>Iterate Restaurant<br>Service<br>createTicket() Service<br>Kitchen<br>Service<br>acceptOrder() acceptOrder() Kitchen<br>... Service<br>**----- End of picture text -----**<br>
+```text
+Step 1: Identify system operations
+Functional requirements
+createOrder()
+As a consumer
+I want to place an order
+so that I can ...
+FTGO
+As a restaurant
+I want to accept an order
+acceptOrder()
+so that I can ...
+Step 2: Identify services Step 3: Define service APIs and collaborations
+FTGO FTGO
+createOrder()
+createOrder()
+Order
+Order verifyOrder()
+Service
+Service
+Restaurant
+Iterate Restaurant
+Service
+createTicket() Service
+Kitchen
+Service
+acceptOrder() acceptOrder() Kitchen
+... Service
+```
 
 Figure 2.5 A three-step process for defining an application’s microservice architecture 
 
@@ -235,8 +344,25 @@ The first step in defining an application’s architecture is to define the syst
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0076-04.png)
 
-**----- Start of picture text -----**<br>
-Step 1 Step 2<br>High-level domain model Functional requirements<br>createOrder()<br>As a consumer<br>Order<br>Domain model I want to place an order<br>derived from so that I can ...<br>requirements<br>FTGO<br>Restaurant As a restaurant<br>I want to accept an order<br>acceptOrder()<br>so that I can ...<br>Delivery<br>Maps to<br>System operations are defined<br>in terms of domain model.<br>**----- End of picture text -----**<br>
+```text
+Step 1 Step 2
+High-level domain model Functional requirements
+createOrder()
+As a consumer
+Order
+Domain model I want to place an order
+derived from so that I can ...
+requirements
+FTGO
+Restaurant As a restaurant
+I want to accept an order
+acceptOrder()
+so that I can ...
+Delivery
+Maps to
+System operations are defined
+in terms of domain model.
+```
 
 Figure 2.6 System operations are derived from the application’s requirements using a two-step process. The first step is to create a high-level domain model. The second step is to define the system operations, which are defined in terms of the domain model. 
 
@@ -280,8 +406,21 @@ This scenario suggests the existence of Courier and Delivery classes. The end re
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0077-17.png)
 
-**----- Start of picture text -----**<br>
-Assigned to<br>Placed by For Restaurant Courier Location<br>Consumer Order<br>name available lat<br>state ... ... lon<br>...<br>Pays using Paid using<br>PaymentInfo DeliveryInfo OrderLineItem MenuItem Address<br>creditcardId deliveryTime quantity name street1<br>... price street2<br>city<br>state<br>zip<br>**----- End of picture text -----**<br>
+```text
+Assigned to
+Placed by For Restaurant Courier Location
+Consumer Order
+name available lat
+state ... ... lon
+...
+Pays using Paid using
+PaymentInfo DeliveryInfo OrderLineItem MenuItem Address
+creditcardId deliveryTime quantity name street1
+... price street2
+city
+state
+zip
+```
 
 Figure 2.7 The key classes in the FTGO domain model 
 
@@ -447,8 +586,33 @@ The decision of which level of the capability hierarchy to map to services, beca
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0083-02.png)
 
-**----- Start of picture text -----**<br>
-Capability hierarchy Services<br>Couriers and restaurants<br>Supplier management are very different<br>Courier management Courier Service kinds of suppliers<br>=> different services.<br>Restaurant information<br>Restaurant Service<br>management<br>Consumer management Consumer Service<br>Order taking and fulfillment<br>Three different services<br>Order management Order Service<br>handling different<br>Restaurant order phases of the order<br>ticket management Kitchen Service taking and fulfillment<br>Logistics<br>Courier availability<br>Delivery Service<br>management<br>Delivery management<br>Accounting<br>Consumer accounting Treat payments and<br>billing the same for now.<br>Restaurant accounting Accounting Service<br>Courier accounting<br>**----- End of picture text -----**<br>
+```text
+Capability hierarchy Services
+Couriers and restaurants
+Supplier management are very different
+Courier management Courier Service kinds of suppliers
+=> different services.
+Restaurant information
+Restaurant Service
+management
+Consumer management Consumer Service
+Order taking and fulfillment
+Three different services
+Order management Order Service
+handling different
+Restaurant order phases of the order
+ticket management Kitchen Service taking and fulfillment
+Logistics
+Courier availability
+Delivery Service
+management
+Delivery management
+Accounting
+Consumer accounting Treat payments and
+billing the same for now.
+Restaurant accounting Accounting Service
+Courier accounting
+```
 
 Figure 2.8 Mapping FTGO business capabilities to services. Capabilities at various levels of the capability hierarchy are mapped to services. 
 
@@ -476,8 +640,33 @@ DDD calls the scope of a domain model a _bounded context_ . A bounded context in
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0085-03.png)
 
-**----- Start of picture text -----**<br>
-FTGO domain<br>Order Service<br>Maps to Order<br>Order taking domain model<br>subdomain<br>Delivery Service<br>Maps to<br>Delivery<br>Delivery domain model<br>subdomain<br>Kitchen<br>subdomain<br>Kitchen Service<br>Maps to<br>Kitchen<br>domain model<br>....<br>subdomain Maps to<br>.... Service<br>Accounting<br>subdomain<br>Accounting Service<br>Maps to<br>Accounting<br>domain model<br>**----- End of picture text -----**<br>
+```text
+FTGO domain
+Order Service
+Maps to Order
+Order taking domain model
+subdomain
+Delivery Service
+Maps to
+Delivery
+Delivery domain model
+subdomain
+Kitchen
+subdomain
+Kitchen Service
+Maps to
+Kitchen
+domain model
+....
+subdomain Maps to
+.... Service
+Accounting
+subdomain
+Accounting Service
+Maps to
+Accounting
+domain model
+```
 
 Figure 2.9 From subdomains to services: each subdomain of the FTGO application domain is mapped to a service, which has its own domain model. 
 
@@ -563,8 +752,28 @@ As you can see, the Order class has fields and methods corresponding to order pr
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0089-02.png)
 
-**----- Start of picture text -----**<br>
-Order<br>OrderTotal<br>deliveryTime<br>status<br><<delivery>><br>pickupTime<br><<billing>><br>transactionid<br><<orderTaking>><br>create() Address Courier Consumer Restaurant PaymentInfo<br>cancel()<br><<restaurant>><br>accept()<br>reject()<br>noteReadyForPickup()<br><<delivery>><br>assignCourier()<br>notePickedUp()<br>noteDelivered()<br>OrderLineItem<br>**----- End of picture text -----**<br>
+```text
+Order
+OrderTotal
+deliveryTime
+status
+<<delivery>>
+pickupTime
+<<billing>>
+transactionid
+<<orderTaking>>
+create() Address Courier Consumer Restaurant PaymentInfo
+cancel()
+<<restaurant>>
+accept()
+reject()
+noteReadyForPickup()
+<<delivery>>
+assignCourier()
+notePickedUp()
+noteDelivered()
+OrderLineItem
+```
 
 Figure 2.10 The **Order** god class is bloated with numerous responsibilities. from disparate parts of the application. In its current form, this class makes it extremely difficult to split code into services. 
 
@@ -576,8 +785,14 @@ A much better approach is to apply DDD and treat each service as a separate subd
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0090-02.png)
 
-**----- Start of picture text -----**<br>
-Pickup location<br>Delivery Delivery location Address<br>status<br>scheduledPickupTime Assigned to<br>ScheduledDeliveryTime<br>Courier<br>**----- End of picture text -----**<br>
+```text
+Pickup location
+Delivery Delivery location Address
+status
+scheduledPickupTime Assigned to
+ScheduledDeliveryTime
+Courier
+```
 
 Figure 2.11 The **Delivery Service** domain model 
 
@@ -587,8 +802,12 @@ The Kitchen Service also has a much simpler view of an order. Its version of an 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0090-06.png)
 
-**----- Start of picture text -----**<br>
-Ticket TicketLineItem<br>status quantity<br>requestedDeliveryTime item<br>preparedByTime<br>**----- End of picture text -----**<br>
+```text
+Ticket TicketLineItem
+status quantity
+requestedDeliveryTime item
+preparedByTime
+```
 
 Figure 2.12 The **Kitchen Service** domain model 
 
@@ -596,8 +815,15 @@ The Order service has the most complex view of an order, shown in figure 2.13. E
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0090-09.png)
 
-**----- Start of picture text -----**<br>
-Order<br>status<br>orderTotal<br>Address PaymentInfo Consumer Restaurant<br>deliveryTime<br>...<br>OrderLineItem<br>**----- End of picture text -----**<br>
+```text
+Order
+status
+orderTotal
+Address PaymentInfo Consumer Restaurant
+deliveryTime
+...
+OrderLineItem
+```
 
 Figure 2.13 The **Order Service** domain model 
 

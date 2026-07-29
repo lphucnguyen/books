@@ -26,8 +26,30 @@ _Deployment_ is a combination of two interrelated concepts: process and architec
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0414-03.png)
 
-**----- Start of picture text -----**<br>
-Lightweight,<br>ephemeral,<br>automated<br>Application<br>Application<br>Serverless<br>runtime<br>Application<br>Container<br>runtime Hidden<br>Application infrastructure<br>Virtual Virtual<br>machine machine<br>Heavyweight,<br>Physical Physical Physical Physical<br>permanent,<br>machine machine machine machine<br>manual<br>Time<br>1990s 2006 2013 2014<br>AWS EC2 Initial Docker AWS Lambda<br>released release introduced<br>**----- End of picture text -----**<br>
+```text
+Lightweight,
+ephemeral,
+automated
+Application
+Application
+Serverless
+runtime
+Application
+Container
+runtime Hidden
+Application infrastructure
+Virtual Virtual
+machine machine
+Heavyweight,
+Physical Physical Physical Physical
+permanent,
+machine machine machine machine
+manual
+Time
+1990s 2006 2013 2014
+AWS EC2 Initial Docker AWS Lambda
+released release introduced
+```
 
 Figure 12.1 Heavyweight and long-lived physical machines have been abstracted away by increasingly lightweight and ephemeral technologies. 
 
@@ -47,8 +69,26 @@ Figure 12.2 shows a high-level view of a production environment. The production 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0415-06.png)
 
-**----- Start of picture text -----**<br>
-Service<br>Monitoring A<br>Observe and<br>troubleshoot Dash- Consumes<br>services boards Service Service services<br>Routing<br>B C<br>Developer User<br>Alerting<br>Service<br>Configure<br>D<br>and manage<br>services<br>Service Runtime<br>Deployment management Service<br>pipeline Update interface management<br>services<br>**----- End of picture text -----**<br>
+```text
+Service
+Monitoring A
+Observe and
+troubleshoot Dash- Consumes
+services boards Service Service services
+Routing
+B C
+Developer User
+Alerting
+Service
+Configure
+D
+and manage
+services
+Service Runtime
+Deployment management Service
+pipeline Update interface management
+services
+```
 
 Figure 12.2 A simplified view of the production environment. It provides four main capabilities: service management enables developers to deploy and manage their services, runtime management ensures that the services are running, monitoring visualizes service behavior and generates alerts, and request routing routes requests from users to the services. 
 
@@ -90,8 +130,20 @@ Ideally, you’ve set up your deployment pipeline to automatically deploy the se
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0417-06.png)
 
-**----- Start of picture text -----**<br>
-Build time Runtime Service instance<br>JVM<br>process JVM<br>JVM process<br>process<br>JDK/JRE JDK/JRE<br>Executable<br>JAR/WAR file Machine Machine<br>Service Deployment<br>Service runtime management<br>code pipeline<br>Production<br>**----- End of picture text -----**<br>
+```text
+Build time Runtime Service instance
+JVM
+process JVM
+JVM process
+process
+JDK/JRE JDK/JRE
+Executable
+JAR/WAR file Machine Machine
+Service Deployment
+Service runtime management
+code pipeline
+Production
+```
 
 Figure 12.3 The deployment pipeline builds an executable JAR file and deploys it into production. In production, each service instance is a JVM running on a machine that has the JDK or JRE installed. 
 
@@ -101,8 +153,14 @@ Sometimes you might deploy a single service instance on a machine, while retaini
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0418-02.png)
 
-**----- Start of picture text -----**<br>
-Service Service Service<br>instance A instance B instance ...<br>Tomcat Tomcat Tomcat<br>JVM JVM JVM<br>Process Process Process<br>Physical or virtual machine<br>**----- End of picture text -----**<br>
+```text
+Service Service Service
+instance A instance B instance ...
+Tomcat Tomcat Tomcat
+JVM JVM JVM
+Process Process Process
+Physical or virtual machine
+```
 
 Figure 12.4 Deploying multiple service instances on the same machine. They might be instances of the same service or instances of different services. The overhead of the OS is shared among the service instances. Each service instance is a separate process, so there’s some isolation between them. 
 
@@ -110,8 +168,14 @@ Some languages also let you run multiple services instances in a single process.
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0418-05.png)
 
-**----- Start of picture text -----**<br>
-Service Service Service<br>instance A instance B instance ...<br>Tomcat<br>JVM<br>Process<br>Physical or virtual machine<br>**----- End of picture text -----**<br>
+```text
+Service Service Service
+instance A instance B instance ...
+Tomcat
+JVM
+Process
+Physical or virtual machine
+```
 
 Figure 12.5 Deploying multiple services instances on the same web container or application server. They might be instances of the same service or instances of different services. The overhead of the OS and runtime is shared among all the service instances. But because the service instances are in the same process, there’s no isolation between them. 
 
@@ -187,8 +251,22 @@ The virtual machine image is built by the service’s deployment pipeline. The d
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0421-02.png)
 
-**----- Start of picture text -----**<br>
-Build time Runtime<br>Autoscaling group<br>Requests EC2 instance<br>Elastic load<br>balancer<br>Service<br>Deployed as<br>EC2 instance<br>Service VM image Creates AMI<br>code builder (VM Service<br>image)<br>Deployment pipeline<br>EC2 instance<br>Service<br>**----- End of picture text -----**<br>
+```text
+Build time Runtime
+Autoscaling group
+Requests EC2 instance
+Elastic load
+balancer
+Service
+Deployed as
+EC2 instance
+Service VM image Creates AMI
+code builder (VM Service
+image)
+Deployment pipeline
+EC2 instance
+Service
+```
 
 Figure 12.6 The deployment pipeline packages a service as a virtual machine image, such as an EC2 AMI, containing everything required to run the service, including the language runtime. At runtime, each service instance is a VM, such as an EC2 instance, instantiated from that image. An EC2 Elastic Load Balancer routes requests to the instances. 
 
@@ -270,8 +348,14 @@ Deploy services packaged as container images into production. Each service insta
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0424-03.png)
 
-**----- Start of picture text -----**<br>
-Service Service Service<br>process process process<br>Container Container Container<br>Container runtime, such as Docker<br>Operating System<br>Machine<br>**----- End of picture text -----**<br>
+```text
+Service Service Service
+process process process
+Container Container Container
+Container runtime, such as Docker
+Operating System
+Machine
+```
 
 **Shared by all of the containers** 
 
@@ -285,8 +369,31 @@ Let’s take a look at build-time and runtime steps in more detail.
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0425-02.png)
 
-**----- Start of picture text -----**<br>
-Build time Runtime<br>VM<br>Container<br>Service<br>instance<br>$ docker build ... Deployed<br>as Container<br>Service<br>instance<br>Service Container Creates Service<br>container<br>code builder tool<br>image<br>Deployment pipeline Container runtime<br>Container<br>image registry VM<br>Deployed<br>as Container<br>Docker<br>Service<br>file<br>instance<br>Container runtime<br>**----- End of picture text -----**<br>
+```text
+Build time Runtime
+VM
+Container
+Service
+instance
+$ docker build ... Deployed
+as Container
+Service
+instance
+Service Container Creates Service
+container
+code builder tool
+image
+Deployment pipeline Container runtime
+Container
+image registry VM
+Deployed
+as Container
+Docker
+Service
+file
+instance
+Container runtime
+```
 
 Figure 12.8 A service is packaged as a container image, which is stored in a registry. At runtime the service consists of multiple containers instantiated from that image. Containers typically run on virtual machines. A single VM will usually run multiple containers. 
 
@@ -400,8 +507,19 @@ A Docker orchestration framework, such as Kubernetes , has three main functions:
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0430-02.png)
 
-**----- Start of picture text -----**<br>
-SVC SVC SVC<br>A B C<br>Container Container Container<br>Service management<br>Scheduling<br>Resource management<br>Docker orchestration framework<br>Docker Docker Docker<br>Operating Operating Operating<br>system system system<br>Machine Machine Machine<br>**----- End of picture text -----**<br>
+```text
+SVC SVC SVC
+A B C
+Container Container Container
+Service management
+Scheduling
+Resource management
+Docker orchestration framework
+Docker Docker Docker
+Operating Operating Operating
+system system system
+Machine Machine Machine
+```
 
 Figure 12.9 A Docker orchestration framework turns a set of machines running Docker into a cluster of resources. It assigns containers to machines. The framework attempts to keep the desired number of healthy containers running at all times. 
 
@@ -419,8 +537,27 @@ A master runs several components, including the following:
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0431-02.png)
 
-**----- Start of picture text -----**<br>
-Kubernetes master<br>Scheduler<br>Kubecti<br>API Server<br>CLI<br>Developer<br>Controller<br>management<br>Deployment<br>pipeline<br>etcd<br>Configuration Aplication<br>commands user<br>Application<br>requests<br>Kubernetes node Kubernetes node<br>Kubelet Kube-proxy Kubelet Kube-proxy<br>Pod Pod<br>SVC SVC<br>**----- End of picture text -----**<br>
+```text
+Kubernetes master
+Scheduler
+Kubecti
+API Server
+CLI
+Developer
+Controller
+management
+Deployment
+pipeline
+etcd
+Configuration Aplication
+commands user
+Application
+requests
+Kubernetes node Kubernetes node
+Kubelet Kube-proxy Kubelet Kube-proxy
+Pod Pod
+SVC SVC
+```
 
 Figure 12.10 A Kubernetes cluster consists of a master, which manages the cluster, and nodes, which run the services. Developers and the deployment pipeline interact with Kubernetes through the API server, which along with other cluster-management software runs on the master. Application containers run on nodes. Each node runs a Kubelet, which manages the application container, and a kube-proxy, which routes application requests to the pods, either directly as a proxy or indirectly by configuring iptables routing rules built into the Linux kernel. 
 
@@ -651,8 +788,29 @@ The two main components of the control plane are the Pilot and the Mixer. The _P
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0439-07.png)
 
-**----- Start of picture text -----**<br>
-Key<br>Configuration<br>Pod Pod Requests<br>Consumer Policy check<br>API Gateway<br>container Service Telemetry<br>container<br>GET/consumers/1 GET/consumers/1<br>GET/consumers/1 Host: ftgo-consumer-service Host: ftgo-consumer-service<br>GET/consumers/1 Istio Envoy Istio data plane Istio Envoy<br>container container<br>Telemetry<br>Configures Checks Logging<br>Server<br>Pilot Mixer<br>Istio control plane Metrics<br>Server<br>Queries for deployed services<br>Kubernetes Monitoring infrastructure<br>Service registry<br>Service Pod<br>**----- End of picture text -----**<br>
+```text
+Key
+Configuration
+Pod Pod Requests
+Consumer Policy check
+API Gateway
+container Service Telemetry
+container
+GET/consumers/1 GET/consumers/1
+GET/consumers/1 Host: ftgo-consumer-service Host: ftgo-consumer-service
+GET/consumers/1 Istio Envoy Istio data plane Istio Envoy
+container container
+Telemetry
+Configures Checks Logging
+Server
+Pilot Mixer
+Istio control plane Metrics
+Server
+Queries for deployed services
+Kubernetes Monitoring infrastructure
+Service registry
+Service Pod
+```
 
 Figure 12.11 Istio consists of a control plane, whose components include the Pilot and the Mixer, and a data plane, which consists of Envoy proxy servers. The Pilot extracts information about deployed services from the underlying infrastructure and configures the data plane. The Mixer enforces policies such as quotas and gathers telemetry, reporting it to the monitoring infrastructure servers. The Envoy proxy servers route traffic in and out of services. There’s one Envoy proxy server per service instance. 
 
@@ -728,8 +886,36 @@ Let’s imagine that you deployed the ftgo-consumer-service-v2 deployment. In th
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0442-06.png)
 
-**----- Start of picture text -----**<br>
-Routes to the v1 subset All traffic routed to v1 Defines subsets<br>v1 and v2<br>kind: VirtualService<br>metadata:<br>name:ftgo-consumer-service<br>spec:<br>hosts:<br>-ftgo-consumer-service metadata:<br>http: Consumer labels:<br>-route:-destination: Service app: version: ftgo-consumer-service v1<br>host: ftgo-consumer-service v1 pod<br>subset: v1<br>weight: 100 kind: DestinationRule<br>metadata:<br>name:ftgo-consumer-service<br>spec:<br>GET/consumers/1 host: ftgo-consumer-service<br>host:ftgo-consumer- subsets:<br>API gateway service VirtualService DestinationRule -name:labels:v1<br>pod version: v1<br>-name: v2<br>labels:<br>version: v2<br>metadata:<br>Routing rule for the Defines subsets of Consumer labels:<br>Consumer Service pods of a service Service app: ftgo-consumer-service<br>v2 pod version: v2<br>No traffic routed to v2.<br>**----- End of picture text -----**<br>
+```text
+Routes to the v1 subset All traffic routed to v1 Defines subsets
+v1 and v2
+kind: VirtualService
+metadata:
+name:ftgo-consumer-service
+spec:
+hosts:
+-ftgo-consumer-service metadata:
+http: Consumer labels:
+-route:-destination: Service app: version: ftgo-consumer-service v1
+host: ftgo-consumer-service v1 pod
+subset: v1
+weight: 100 kind: DestinationRule
+metadata:
+name:ftgo-consumer-service
+spec:
+GET/consumers/1 host: ftgo-consumer-service
+host:ftgo-consumer- subsets:
+API gateway service VirtualService DestinationRule -name:labels:v1
+pod version: v1
+-name: v2
+labels:
+version: v2
+metadata:
+Routing rule for the Defines subsets of Consumer labels:
+Consumer Service pods of a service Service app: ftgo-consumer-service
+v2 pod version: v2
+No traffic routed to v2.
+```
 
 Figure 12.12 The routing rule for **Consumer Service** , which routes all traffic to the v1 pods. It consists of a **VirtualService** , which routes its traffic to the v1 subset, and a **DestinationRule** , which defines the v1 subset as the pods labeled with **version: v1** . Once you’ve defined this rule, you can safely deploy a new version without routing any traffic to it initially. 
 
@@ -942,15 +1128,42 @@ The service consists of a presentation tier consisting of the request handlers, 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0450-02.png)
 
-**----- Start of picture text -----**<br>
-API gateway<br>GET/restaurant/<br>POST/restaurant<br>{restaurantId}<br>AWS Lambda<br>functions<br>ftgo-create-restaurant ftgo-find-restaurant ftgo-...<br>«class»<br>«class» «class»<br>Create<br>Restaurant FindRestaurant ...<br>Request Request<br>Request<br>Handler Handler<br>Handler<br>ftgo-restaurant-service-aws-lambda.zip<br>**----- End of picture text -----**<br>
+```text
+API gateway
+GET/restaurant/
+POST/restaurant
+{restaurantId}
+AWS Lambda
+functions
+ftgo-create-restaurant ftgo-find-restaurant ftgo-...
+«class»
+«class» «class»
+Create
+Restaurant FindRestaurant ...
+Request Request
+Request
+Handler Handler
+Handler
+ftgo-restaurant-service-aws-lambda.zip
+```
 
 Figure 12.13 Deploying **Restaurant Service** as AWS Lambda functions. The AWS API Gateway routes HTTP requests to the AWS Lambda functions, which are implemented by request handler classes defined by **Restaurant Service** . 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0450-04.png)
 
-**----- Start of picture text -----**<br>
-POST/restaurant GET/restaurant/{restaurantId}<br>Create Find<br>Restaurant Restaurant ...<br>Request<br>Request Request<br>Handler<br>Handler Handler<br>Presentation layer<br>Business and<br>RestaurantService data access layer<br>RestaurantRepository Restaurant<br>**----- End of picture text -----**<br>
+```text
+POST/restaurant GET/restaurant/{restaurantId}
+Create Find
+Restaurant Restaurant ...
+Request
+Request Request
+Handler
+Handler Handler
+Presentation layer
+Business and
+RestaurantService data access layer
+RestaurantRepository Restaurant
+```
 
 Figure 12.14 The design of the AWS Lambda-based **Restaurant Service** . The presentation layer consists of request handler classes, which implement the lambda functions. They invoke the business tier, which is written in a traditional style consisting of a service class, an entity, and a repository. 
 
@@ -964,8 +1177,21 @@ The FindRestaurantRequestHandler class implements the GET /restaurant/ {restaura
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0451-06.png)
 
-**----- Start of picture text -----**<br>
-Request<br>Handler<br>Abstract<br>HttpHandler<br>Abstract<br>Autowiring<br>HttpRequest<br>Handler<br>Create Find<br>Restaurant Restaurant ...<br>Request<br>Request Request Handler<br>Handler Handler<br>**----- End of picture text -----**<br>
+```text
+Request
+Handler
+Abstract
+HttpHandler
+Abstract
+Autowiring
+HttpRequest
+Handler
+Create Find
+Restaurant Restaurant ...
+Request
+Request Request Handler
+Handler Handler
+```
 
 Figure 12.15 The design of the request handler classes. The abstract superclasses implement dependency injection and error handling. 
 

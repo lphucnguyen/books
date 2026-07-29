@@ -182,8 +182,15 @@ The _proxy interface_ usually encapsulates the underlying communication protocol
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0103-02.png)
 
-**----- Start of picture text -----**<br>
-Client Service<br>Business logic Business logic<br>invokes<br>Request<br>RPI RPI<br>proxy Reply server<br>Proxy interface Service interface<br>**----- End of picture text -----**<br>
+```text
+Client Service
+Business logic Business logic
+invokes
+Request
+RPI RPI
+proxy Reply server
+Proxy interface Service interface
+```
 
 Figure 3.1 The client’s business logic invokes an interface that is implemented by an _RPI proxy_ adapter class. The _RPI proxy class_ makes a request to the service. The _RPI server_ adapter class handles the request by invoking the service’s business logic. gRPC. I cover how to improve the availability of your services by properly handling partial failure and explain why a microservices-based application that uses RPI must use a service discovery mechanism. 
 
@@ -328,8 +335,16 @@ Consider, for example, the scenario shown in figure 3.2, where the Order Service
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0108-06.png)
 
-**----- Start of picture text -----**<br>
-Unresponsive remote service<br>API<br>gateway<br>POST/orders Create Order POST/orders<br>Mobile Order<br>order Service<br>app Service<br>endpoint proxy<br>**----- End of picture text -----**<br>
+```text
+Unresponsive remote service
+API
+gateway
+POST/orders Create Order POST/orders
+Mobile Order
+order Service
+app Service
+endpoint proxy
+```
 
 Figure 3.2 An API gateway must protect itself from unresponsive services, such as the **Order Service** . 
 
@@ -365,8 +380,29 @@ It’s likely that each service’s data isn’t equally important to the client
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0110-03.png)
 
-**----- Start of picture text -----**<br>
-How to handle each Unresponsive<br>unresponsive service? service<br>API Order GET/orders/xyz Order<br>gateway Service<br>Service<br>proxy<br>Kitchen GET/tickets?orderId=xyz Kitchen<br>Service<br>Service<br>Mobile Get/orders/xyz Get proxy<br>order<br>app<br>endpoint Delivery GET/deliveries?orderId-xyz<br>Delivery<br>Service<br>Service<br>proxy<br>...<br>Service ...<br>Service<br>proxy<br>**----- End of picture text -----**<br>
+```text
+How to handle each Unresponsive
+unresponsive service? service
+API Order GET/orders/xyz Order
+gateway Service
+Service
+proxy
+Kitchen GET/tickets?orderId=xyz Kitchen
+Service
+Service
+Mobile Get/orders/xyz Get proxy
+order
+app
+endpoint Delivery GET/deliveries?orderId-xyz
+Delivery
+Service
+Service
+proxy
+...
+Service ...
+Service
+proxy
+```
 
 Figure 3.3 The API gateway implements the **GET /orders/{orderId}** endpoint using API composition. It calls several services, aggregates their responses, and sends a response to the mobile app. The code that implements the endpoint must have a strategy for handling the failure of each service that it calls. the API gateway should return either a cached version of its data or omit it from the response. 
 
@@ -380,8 +416,21 @@ Service instances have dynamically assigned network locations. Moreover, the set
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0111-02.png)
 
-**----- Start of picture text -----**<br>
-Dynamically Dynamically created<br>assigned IP and destroyed<br>Order service<br>10.232.23.1<br>Service<br>instance 1<br>10.232.23.2<br>Service Service<br>?<br>client instance 2<br>10.232.23.3<br>Service<br>instance 3<br>**----- End of picture text -----**<br>
+```text
+Dynamically Dynamically created
+assigned IP and destroyed
+Order service
+10.232.23.1
+Service
+instance 1
+10.232.23.2
+Service Service
+?
+client instance 2
+10.232.23.3
+Service
+instance 3
+```
 
 Figure 3.4 Service instances have dynamically assigned IP addresses. 
 
@@ -405,8 +454,31 @@ One way to implement service discovery is for the application’s services and t
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0112-03.png)
 
-**----- Start of picture text -----**<br>
-Order service<br>10.232.23.1 Service<br>instance 1<br>Client-side discovery<br>Service<br>discovery library<br>Register("order-service", "10.232.23.1")<br>Service<br>client 10.232.23.2 Service<br>RPC/rest Load balance request instance 2<br>client Service<br>Service discovery library<br>discovery library<br>10.232.23.1 Query("order-service") 10.232.23.3 Service<br>10.232.23.2 instance 3<br>10.232.23.3 Query API Registration API Service<br>discovery library<br>Service registry<br>Service IP address Self registration pattern<br>order-service 10.232.23.1<br>order-service 10.232.23.2<br>order-service 10.232.23.3<br>... ...<br>**----- End of picture text -----**<br>
+```text
+Order service
+10.232.23.1 Service
+instance 1
+Client-side discovery
+Service
+discovery library
+Register("order-service", "10.232.23.1")
+Service
+client 10.232.23.2 Service
+RPC/rest Load balance request instance 2
+client Service
+Service discovery library
+discovery library
+10.232.23.1 Query("order-service") 10.232.23.3 Service
+10.232.23.2 instance 3
+10.232.23.3 Query API Registration API Service
+discovery library
+Service registry
+Service IP address Self registration pattern
+order-service 10.232.23.1
+order-service 10.232.23.2
+order-service 10.232.23.3
+... ...
+```
 
 Figure 3.5 The service registry keeps track of the service instances. Clients query the service registry to find network locations of available service instances. 
 
@@ -436,8 +508,32 @@ The deployment platform includes a service registry that tracks the IP addresses
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0114-02.png)
 
-**----- Start of picture text -----**<br>
-Service DNS name Order service<br>resolves to service VIP<br>10.232.23.1<br>Service<br>instance 1<br>Service<br>client<br>RPC/rest 10.232.23.2<br>client Service<br>instance 2<br>GET http://order-service/...<br>10.232.23.3<br>Service<br>instance 3<br>10.232.24.99 Observes<br>Service registry<br>Platform Queries Service IP address Updates<br>Registrar<br>router order-service 10.232.23.1<br>order-service 10.232.23.2<br>order-service 10.232.23.3<br>... ...<br>Deployment platform<br>Service virtual IP address (VIP) Server-side discovery 3rd party registration<br>**----- End of picture text -----**<br>
+```text
+Service DNS name Order service
+resolves to service VIP
+10.232.23.1
+Service
+instance 1
+Service
+client
+RPC/rest 10.232.23.2
+client Service
+instance 2
+GET http://order-service/...
+10.232.23.3
+Service
+instance 3
+10.232.24.99 Observes
+Service registry
+Platform Queries Service IP address Updates
+Registrar
+router order-service 10.232.23.1
+order-service 10.232.23.2
+order-service 10.232.23.3
+... ...
+Deployment platform
+Service virtual IP address (VIP) Server-side discovery 3rd party registration
+```
 
 Figure 3.6 The platform is responsible for service registration, discovery, and request routing. Service instances are registered with the service registry by the _registrar_ . Each service has a network location, a DNS name/virtual IP address. A client makes a request to the service’s network location. The router queries the service registry and load balances requests across the available service instances. 
 
@@ -499,8 +595,22 @@ As figure 3.7 shows, messages are exchanged over channels (www.enterpriseintegra
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0117-02.png)
 
-**----- Start of picture text -----**<br>
-Sender Receiver<br>Sending port Receiving port<br>Business<br>Messaging<br>logic<br>infrastructure<br>Service Business logic<br>Message<br>invokes<br>Message Sends Receives Message invokes<br>sender handler<br>Header<br>Message<br>Body channel<br>**----- End of picture text -----**<br>
+```text
+Sender Receiver
+Sending port Receiving port
+Business
+Messaging
+logic
+infrastructure
+Service Business logic
+Message
+invokes
+Message Sends Receives Message invokes
+sender handler
+Header
+Message
+Body channel
+```
 
 Figure 3.7 The business logic in the sender invokes a sending port interface, which is implemented by a  message sender adapter. The message sender sends a message to a receiver via a message channel. The message channel is an abstraction of messaging infrastructure. A message handler adapter in the receiver is invoked to handle the message. It invokes the receiving port interface implemented by the receiver’s business logic. business logic. Any number of senders can send messages to a channel. Similarly, any number of receivers can receive messages from a channel. 
 
@@ -526,8 +636,22 @@ The client and service implement the asynchronous request/response style interac
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0118-05.png)
 
-**----- Start of picture text -----**<br>
-Request<br>Request channel<br>Sends MessageId: msgId Reads<br>ReturnAddress: ReplyChannel<br>Client Body Service<br>Specifies<br>Reply<br>Reads Sends<br>CorrelationId:msgId<br>Body<br>Reply channel<br>Service sends reply to the specified reply<br>channel. The reply contains a correlationId,<br>which is the request’s msgId.<br>**----- End of picture text -----**<br>
+```text
+Request
+Request channel
+Sends MessageId: msgId Reads
+ReturnAddress: ReplyChannel
+Client Body Service
+Specifies
+Reply
+Reads Sends
+CorrelationId:msgId
+Body
+Reply channel
+Service sends reply to the specified reply
+channel. The reply contains a correlationId,
+which is the request’s msgId.
+```
 
 Figure 3.8 Implementing asynchronous request/response by including a reply channel and message identifier in the request message. The receiver processes the message and sends the reply to the specified reply channel. 
 
@@ -559,8 +683,21 @@ A service’s asynchronous API consists of operations, invoked by clients, and e
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0120-02.png)
 
-**----- Start of picture text -----**<br>
-Service API<br>Commands<br>C C C<br>Command<br>«Command channel» query<br>API<br>Replies<br>Service<br>«Reply channel» R R R<br>Event<br>publisher<br>Events<br>«Event channel»<br>**----- End of picture text -----**<br>
+```text
+Service API
+Commands
+C C C
+Command
+«Command channel» query
+API
+Replies
+Service
+«Reply channel» R R R
+Event
+publisher
+Events
+«Event channel»
+```
 
 Figure 3.9 A service’s asynchronous API consists of message channels and command, reply, and event message types. 
 
@@ -586,8 +723,15 @@ A messaging-based application typically uses a _message broker_ , an infrastruct
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0121-02.png)
 
-**----- Start of picture text -----**<br>
-Brokerless architecture Broker-based architecture<br>Service Service<br>Service<br>Service<br>Vs. Message broker<br>Service<br>Service<br>**----- End of picture text -----**<br>
+```text
+Brokerless architecture Broker-based architecture
+Service Service
+Service
+Service
+Vs. Message broker
+Service
+Service
+```
 
 Figure 3.10 The services in brokerless architecture communicate directly, whereas the services in a broker-based architecture communicate via a message broker. 
 
@@ -709,8 +853,22 @@ A common solution, used by modern message brokers like Apache Kafka and AWS Kine
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0125-02.png)
 
-**----- Start of picture text -----**<br>
-Routes based on a<br>hash of the shard-key<br>Logical receiver A<br>Receiver A<br>Create order Channel instance 1<br>request<br>Shard 0<br>Receiver<br>Shard-key:orderId Receiver A<br>Sender Router S hard 1<br>Shard instance 2<br>Shard ... assignment<br>Receiver<br>...<br>**----- End of picture text -----**<br>
+```text
+Routes based on a
+hash of the shard-key
+Logical receiver A
+Receiver A
+Create order Channel instance 1
+request
+Shard 0
+Receiver
+Shard-key:orderId Receiver A
+Sender Router S hard 1
+Shard instance 2
+Shard ... assignment
+Receiver
+...
+```
 
 Figure 3.11 Scaling consumers while preserving message ordering by using a sharded (partitioned) message channel. The sender includes the shard key in the message. The message broker writes the message to a shard determined by the shard key. The message broker assigns each partition to an instance of the replicated receiver. 
 
@@ -746,8 +904,20 @@ A simple solution is for a message consumer to track the messages that it has pr
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0126-08.png)
 
-**----- Start of picture text -----**<br>
-INSERT will fail for<br>duplicate messages.<br>Transaction<br>PROCESSED_MESSAGE table<br>MSG_ID<br>INSERT<br>xyz<br>Message<br>Consumer<br>id: xyz<br>Application table<br>UPDATE ... ...<br>**----- End of picture text -----**<br>
+```text
+INSERT will fail for
+duplicate messages.
+Transaction
+PROCESSED_MESSAGE table
+MSG_ID
+INSERT
+xyz
+Message
+Consumer
+id: xyz
+Application table
+UPDATE ... ...
+```
 
 Figure 3.12 A consumer detects and discards duplicate messages by recording the IDs of processed messages in a database table. If a message has been processed before, the INSERT into the PROCESSED_MESSAGES table will fail. 
 
@@ -769,8 +939,17 @@ Let’s imagine that your application is using a relational database. A straight
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0127-09.png)
 
-**----- Start of picture text -----**<br>
-Order<br>Service<br>Database<br>Transaction INSERT, INSERT<br>UPDATE,DELETE<br>ORDER table OUTBOX table<br>... ... Read Messagerelay Publish Messagebroker<br>OUTBOX<br>table<br>**----- End of picture text -----**<br>
+```text
+Order
+Service
+Database
+Transaction INSERT, INSERT
+UPDATE,DELETE
+ORDER table OUTBOX table
+... ... Read Messagerelay Publish Messagebroker
+OUTBOX
+table
+```
 
 Figure 3.13 A service reliably publishes a message by inserting it into an **OUTBOX** table as part of the transaction that updates the database. The **Message Relay** reads the **OUTBOX** table and publishes the messages to a message broker. 
 
@@ -814,8 +993,20 @@ A sophisticated solution is for MessageRelay to _tail_ the database transaction 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0129-05.png)
 
-**----- Start of picture text -----**<br>
-Order<br>Service<br>INSERT INTO OUTBOX ...<br>Database<br>OUTBOX table<br>Changes Transaction log Publish Message<br>Transaction log<br>miner broker<br>Committed inserts into Reads the transaction log<br>the OUTBOX table are<br>recorded in the database’s<br>transaction log.<br>**----- End of picture text -----**<br>
+```text
+Order
+Service
+INSERT INTO OUTBOX ...
+Database
+OUTBOX table
+Changes Transaction log Publish Message
+Transaction log
+miner broker
+Committed inserts into Reads the transaction log
+the OUTBOX table are
+recorded in the database’s
+transaction log.
+```
 
 Figure 3.14 A service publishes messages inserted into the **OUTBOX** table by mining the database’s transaction log. 
 
@@ -949,8 +1140,15 @@ To see why, consider the scenario shown in figure 3.15. The Order Service has a 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0133-12.png)
 
-**----- Start of picture text -----**<br>
-GET/consumers/id Consumer<br>Service<br>POST/orders Order<br>Client<br>Service<br>Restaurant<br>GET/restaurant/id Service<br>**----- End of picture text -----**<br>
+```text
+GET/consumers/id Consumer
+Service
+POST/orders Order
+Client
+Service
+Restaurant
+GET/restaurant/id Service
+```
 
 Figure 3.15 The **Order Service** invokes other services using REST. It’s straightforward, but it requires all the services to be simultaneously available, which reduces the availability of the API. 
 
@@ -988,8 +1186,23 @@ This service then asynchronously exchanges messages with other services and even
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0135-03.png)
 
-**----- Start of picture text -----**<br>
-Consumer request<br>channel<br>Create order<br>Consumer<br>request Service<br>Order request<br>channel Order<br>Client<br>Service<br>Order Service<br>reply channel Restaurant<br>Create order Service<br>Client reply response<br>channel Restaurant request<br>channel<br>**----- End of picture text -----**<br>
+```text
+Consumer request
+channel
+Create order
+Consumer
+request Service
+Order request
+channel Order
+Client
+Service
+Order Service
+reply channel Restaurant
+Create order Service
+Client reply response
+channel Restaurant request
+channel
+```
 
 Figure 3.16 The FTGO application has higher availability if its services communicate using asynchronous messaging instead of synchronous calls. 
 
@@ -1009,8 +1222,29 @@ In some situations, replicating data is a useful approach. For example, chapter 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0136-02.png)
 
-**----- Start of picture text -----**<br>
-Consumer event<br>Consumer Service database<br>channel<br>Consumer<br>«table»<br>Service<br>CONSUMERS<br>createOrder()<br>Order<br>Service<br>Restaurant Service database<br>Restaurant<br>Service «table»<br>Restaurant event RESTAURANTS<br>channel<br>Order Service database<br>«table» «table» «table» Services publish events<br>ORDERS CONSUMERS RESTAURANTS when their data changes.<br>Replicated data enables Order Service to<br>handle the createOrder() request without<br>synchronously invoking services.<br>**----- End of picture text -----**<br>
+```text
+Consumer event
+Consumer Service database
+channel
+Consumer
+«table»
+Service
+CONSUMERS
+createOrder()
+Order
+Service
+Restaurant Service database
+Restaurant
+Service «table»
+Restaurant event RESTAURANTS
+channel
+Order Service database
+«table» «table» «table» Services publish events
+ORDERS CONSUMERS RESTAURANTS when their data changes.
+Replicated data enables Order Service to
+handle the createOrder() request without
+synchronously invoking services.
+```
 
 Figure 3.17 **Order Service** is self-contained because it has replicas of the consumer and restaurant data. replication is that it doesn’t solve the problem of how a service updates data owned by other services. 
 
@@ -1038,8 +1272,23 @@ For example, if Order Service uses this approach, it creates an order in a PENDI
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0137-02.png)
 
-**----- Start of picture text -----**<br>
-Key<br>Synchronous<br>Order Service Consumer Service Restaurant Service ...<br>Asynchronous<br>Client<br>createOrder<br>create order<br>Synchronous createOrder Asynchronous<br>ValidateConsumerInfo<br>ValidateOrderDetails<br>ConsumerValidated<br>update order<br>OrderDetailsValidated<br>update order<br>...<br>**----- End of picture text -----**<br>
+```text
+Key
+Synchronous
+Order Service Consumer Service Restaurant Service ...
+Asynchronous
+Client
+createOrder
+create order
+Synchronous createOrder Asynchronous
+ValidateConsumerInfo
+ValidateOrderDetails
+ConsumerValidated
+update order
+OrderDetailsValidated
+update order
+...
+```
 
 Figure 3.18 **Order Service** creates an order without invoking any other service. It then asynchronously validates the newly created **Order** by exchanging messages with other services, including **Consumer Service** and **Restaurant Service** . 
 

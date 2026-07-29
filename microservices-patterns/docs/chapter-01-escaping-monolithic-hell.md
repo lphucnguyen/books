@@ -36,8 +36,28 @@ FTGO is a typical enterprise Java application. Figure 1.1 shows its architecture
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0033-05.png)
 
-**----- Start of picture text -----**<br>
-Cloud services<br>FTGO application<br>Twilio<br>Courier RESTAPI Restaurant adapterTwilio messagingservice<br>management<br>Order Delivery<br>management management<br>Consumer Payments<br>Amazon AWS SES<br>Notification SE S email<br>adapter service<br>Web Billing<br>UI<br>Stripe<br>adapter<br>MySQL Stripe<br>Restaurant adapter payment<br>service<br>Adapters invoke<br>MySQL cloud services.<br>**----- End of picture text -----**<br>
+```text
+Cloud services
+FTGO application
+Twilio
+Courier RESTAPI Restaurant adapterTwilio messagingservice
+management
+Order Delivery
+management management
+Consumer Payments
+Amazon AWS SES
+Notification SE S email
+adapter service
+Web Billing
+UI
+Stripe
+adapter
+MySQL Stripe
+Restaurant adapter payment
+service
+Adapters invoke
+MySQL cloud services.
+```
 
 Figure 1.1 The FTGO application has a hexagonal architecture. It consists of business logic surrounded by adapters that implement UIs and interface with external systems, such as mobile applications and cloud services for payments, messaging, and email. 
 
@@ -73,8 +93,23 @@ A major problem with the FTGO application is that it’s too complex. It’s too
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0035-02.png)
 
-**----- Start of picture text -----**<br>
-FTGO development Large Single code base creates Large, complex<br>development communication and unreliable, difficult<br>Order management team organization coordination overhead. to maintain<br>Restaurant management team<br>Deployment pipeline<br>Jenkins Manual FTGO<br>Cl Backlog testing application<br>Source<br>Delivery management team code<br>repository<br>Production<br>The path from code commit to<br>production is arduous.<br>Changes sit in a queue until<br>they can be manually tested.<br>**----- End of picture text -----**<br>
+```text
+FTGO development Large Single code base creates Large, complex
+development communication and unreliable, difficult
+Order management team organization coordination overhead. to maintain
+Restaurant management team
+Deployment pipeline
+Jenkins Manual FTGO
+Cl Backlog testing application
+Source
+Delivery management team code
+repository
+Production
+The path from code commit to
+production is arduous.
+Changes sit in a queue until
+they can be manually tested.
+```
 
 Figure 1.2 A case of monolithic hell. The large FTGO developer team commits their changes to a single source code repository. The path from code commit to production is long and arduous and involves manual testing. The FTGO application is large, complex, unreliable, and difficult to maintain. 
 
@@ -180,8 +215,26 @@ My definition of the microservice architecture is inspired by Martin Abbott and 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0039-03.png)
 
-**----- Start of picture text -----**<br>
-Microservices<br>Y-axis scaling,<br>a.k.a. functional<br>decomposition<br>Scale by splitting<br>things that are<br>Many<br>different, such as<br>partitions<br>by function.<br>Z-axis scaling,<br>a.k.a. data partitioning<br>Monolith One Scale by splitting<br>One Many partition similar things, such as<br>instance instances by customer ID.<br>X-axis scaling,<br>a.k.a. horizontal duplication<br>Scale by cloning.<br>**----- End of picture text -----**<br>
+```text
+Microservices
+Y-axis scaling,
+a.k.a. functional
+decomposition
+Scale by splitting
+things that are
+Many
+different, such as
+partitions
+by function.
+Z-axis scaling,
+a.k.a. data partitioning
+Monolith One Scale by splitting
+One Many partition similar things, such as
+instance instances by customer ID.
+X-axis scaling,
+a.k.a. horizontal duplication
+Scale by cloning.
+```
 
 Figure 1.3 The scale cube defines three separate ways to scale an application: X-axis scaling load balances requests across multiple, identical instances; Z-axis scaling routes requests based on an attribute of the request; Y-axis functionally decomposes an application into services. 
 
@@ -199,15 +252,39 @@ In this example, each application instance is responsible for a subset of users.
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0040-02.png)
 
-**----- Start of picture text -----**<br>
-Route requests using a N  identical application<br>load balancing algorithm. instances<br>Application<br>instance 1<br>Request Load Application<br>Client<br>balancer instance 2<br>Application<br>instance 3<br>**----- End of picture text -----**<br>
+```text
+Route requests using a N  identical application
+load balancing algorithm. instances
+Application
+instance 1
+Request Load Application
+Client
+balancer instance 2
+Application
+instance 3
+```
 
 Figure 1.4 X-axis scaling runs multiple, identical instances of the monolithic application behind a load balancer. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0040-04.png)
 
-**----- Start of picture text -----**<br>
-Uses the userId to decide N  identical application<br>where to route requests instances<br>Application<br>instance 1<br>Users: a–h<br>Request:<br>GET /...<br>Authorization: userId:password Application<br>Client Router<br>instance 2<br>Users: i-p<br>Application<br>instance 3<br>Each instance is responsible Users: r–z<br>for a subset of the users.<br>**----- End of picture text -----**<br>
+```text
+Uses the userId to decide N  identical application
+where to route requests instances
+Application
+instance 1
+Users: a–h
+Request:
+GET /...
+Authorization: userId:password Application
+Client Router
+instance 2
+Users: i-p
+Application
+instance 3
+Each instance is responsible Users: r–z
+for a subset of the users.
+```
 
 Figure 1.5 Z-axis scaling runs multiple identical instances of the monolithic application behind a router, which routes based on a **request** attribute . Each instance is responsible for a subset of the data. the _N_ identical instances of the application. Z-axis scaling is a great way to scale an application to handle increasing transaction and data volumes. 
 
@@ -217,8 +294,30 @@ X- and Z-axis scaling improve the application’s capacity and availability. But
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0041-02.png)
 
-**----- Start of picture text -----**<br>
-Y-axis scaling functionality decomposes<br>an application into services.<br>Order service<br>Order<br>Service<br>Application instance 1<br>Order<br>Order Request Load<br>Service<br>Order Service balancer<br>instance 2<br>requests<br>Order<br>Service<br>Customer Customer<br>Client instance 3<br>requests Service<br>Review<br>requests Review<br>Service<br>Each service is typically scaled using<br>X-axis and possibly Z-axis scaling.<br>**----- End of picture text -----**<br>
+```text
+Y-axis scaling functionality decomposes
+an application into services.
+Order service
+Order
+Service
+Application instance 1
+Order
+Order Request Load
+Service
+Order Service balancer
+instance 2
+requests
+Order
+Service
+Customer Customer
+Client instance 3
+requests Service
+Review
+requests Review
+Service
+Each service is typically scaled using
+X-axis and possibly Z-axis scaling.
+```
 
 Figure 1.6 Y-axis scaling splits the application into a set of services. Each service is responsible for a particular function. A service is scaled using X-axis scaling and, possibly, Z-axis scaling. 
 
@@ -264,8 +363,34 @@ The FTGO application’s business logic consists of numerous backend services. E
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0043-05.png)
 
-**----- Start of picture text -----**<br>
-The API Gateway routes Services corresponding<br>requests from the mobile to business capabilities/<br>applications to services. REST domain-driven design<br>API (DDD) subdomains<br>Order<br>Service<br>Stripe<br>REST REST Adapter<br>API API<br>Courier GatewayAPI RESTAPI Restaurant AccountingService<br>REST Service<br>API<br>Twilio<br>REST Adapter<br>Consumer REST API<br>API Notification<br>Kitchen Service<br>Restaurant Service Amazon<br>Web UI SES<br>Adapter<br>Restaurant<br>REST<br>API<br>Delivery<br>Service<br>Services have APIs. A service’s data is private.<br>**----- End of picture text -----**<br>
+```text
+The API Gateway routes Services corresponding
+requests from the mobile to business capabilities/
+applications to services. REST domain-driven design
+API (DDD) subdomains
+Order
+Service
+Stripe
+REST REST Adapter
+API API
+Courier GatewayAPI RESTAPI Restaurant AccountingService
+REST Service
+API
+Twilio
+REST Adapter
+Consumer REST API
+API Notification
+Kitchen Service
+Restaurant Service Amazon
+Web UI SES
+Adapter
+Restaurant
+REST
+API
+Delivery
+Service
+Services have APIs. A service’s data is private.
+```
 
 Figure 1.7 Some of the services of the microservice architecture-based version of the FTGO application. An API Gateway routes requests from the mobile applications to services. The services collaborate via APIs. 
 
@@ -339,8 +464,29 @@ Another benefit of the microservice architecture is that each service is relativ
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0046-02.png)
 
-**----- Start of picture text -----**<br>
-Small, autonomous, Each service has Each service has Small, simple,<br>loosely coupled teams its own source its own automated reliable, easy to<br>code repository. deployment pipeline. maintain services<br>FTGO development<br>Order management team<br>Deployment pipeline<br>Jenkins Cl Order Service<br>Order Service<br>source code<br>Restaurant management team repository<br>Deployment pipeline<br>Jenkins Cl Restaurant Service<br>Restaurant Service<br>source code<br>Delivery management team<br>repository<br>Deployment pipeline<br>Jenkins Cl Delivery Service<br>Delivery Service Production<br>source code<br>repository<br>**----- End of picture text -----**<br>
+```text
+Small, autonomous, Each service has Each service has Small, simple,
+loosely coupled teams its own source its own automated reliable, easy to
+code repository. deployment pipeline. maintain services
+FTGO development
+Order management team
+Deployment pipeline
+Jenkins Cl Order Service
+Order Service
+source code
+Restaurant management team repository
+Deployment pipeline
+Jenkins Cl Restaurant Service
+Restaurant Service
+source code
+Delivery management team
+repository
+Deployment pipeline
+Jenkins Cl Delivery Service
+Delivery Service Production
+source code
+repository
+```
 
 Figure 1.8 The microservices-based FTGO application consists of a set of loosely coupled services. Each team develops, tests, and deploys their services independently. 
 
@@ -492,8 +638,17 @@ In addition, you can organize patterns that tackle issues in a particular proble
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0052-07.png)
 
-**----- Start of picture text -----**<br>
-Monolithic Key<br>architecture Predecessor Successor<br>Alternative A Alternative B<br>General Specific<br>Microservice Single service<br>architecture per host<br>Pattern Service-per-container<br>Deployment<br>Problem area<br>**----- End of picture text -----**<br>
+```text
+Monolithic Key
+architecture Predecessor Successor
+Alternative A Alternative B
+General Specific
+Microservice Single service
+architecture per host
+Pattern Service-per-container
+Deployment
+Problem area
+```
 
 Figure 1.9 The visual representation of different types of relationships between the patterns: a _successor_ pattern solves a problem created by applying the _predecessor_ pattern; two or more patterns can be _alternative_ solutions to the same problem; one pattern can be a _specialization_ of another pattern; and patterns that solve problems in the same area can be grouped, or _generalized_ . 
 
@@ -517,8 +672,30 @@ The pattern language consists of several groups of patterns. On the left in figu
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0053-06.png)
 
-**----- Start of picture text -----**<br>
-Key Application patterns<br>Predecessor Successor<br>Database<br>Alternative AGeneral Alternative BSpecific Decomposition architecture Maintaining Testing<br>data consistency<br>Problem area<br>Querying<br>Application infrastructure patterns<br>Monolithic Observability<br>Transactional messaging<br>architecture<br>Cross-cutting<br>Security<br>concerns Communication style Reliability<br>Microservice Infrastructure patterns<br>architecture<br>Discovery<br>Application<br>architecture External<br>Deployment API<br>Communication patterns<br>Microservice patterns<br>**----- End of picture text -----**<br>
+```text
+Key Application patterns
+Predecessor Successor
+Database
+Alternative AGeneral Alternative BSpecific Decomposition architecture Maintaining Testing
+data consistency
+Problem area
+Querying
+Application infrastructure patterns
+Monolithic Observability
+Transactional messaging
+architecture
+Cross-cutting
+Security
+concerns Communication style Reliability
+Microservice Infrastructure patterns
+architecture
+Discovery
+Application
+architecture External
+Deployment API
+Communication patterns
+Microservice patterns
+```
 
 Figure 1.10 A high-level view of the Microservice architecture pattern language showing the different problem areas that the patterns solve. On the left are the application architecture patterns: Monolithic architecture and Microservice architecture. All the other groups of patterns solve problems that result from choosing the Microservice architecture pattern. 
 
@@ -538,8 +715,15 @@ Deciding how to decompose a system into a set of services is very much an art, b
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0054-09.png)
 
-**----- Start of picture text -----**<br>
-Key<br>Predecessor Successor Decompose by<br>business capability<br>Alternative A Alternative B<br>General Specific<br>Problem area Decompose by<br>subdomain<br>**----- End of picture text -----**<br>
+```text
+Key
+Predecessor Successor Decompose by
+business capability
+Alternative A Alternative B
+General Specific
+Problem area Decompose by
+subdomain
+```
 
 Figure 1.11 There are two decomposition patterns: Decompose by business capability, which organizes services around business capabilities, and Decompose by subdomain, which organizes services around domaindriven design (DDD) subdomains. 
 
@@ -561,8 +745,34 @@ An application built using the microservice architecture is a distributed system
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0055-02.png)
 
-**----- Start of picture text -----**<br>
-Key<br>Polling Transaction<br>Predecessor Successor publisher log tailing<br>Alternative A Alternative B<br>General Specific<br>Transactional<br>outbox<br>Problem area<br>Transactional messaging<br>Remote procedure<br>Messaging<br>invocation<br>Circuit<br>breaker<br>Domain-specific<br>Reliability<br>Communication style<br>Client-side<br>Self registration<br>discovery<br>API gateway<br>Service registry<br>Backend for<br>Server-side 3rd-party frontend<br>discovery registration<br>Discovery External API<br>**----- End of picture text -----**<br>
+```text
+Key
+Polling Transaction
+Predecessor Successor publisher log tailing
+Alternative A Alternative B
+General Specific
+Transactional
+outbox
+Problem area
+Transactional messaging
+Remote procedure
+Messaging
+invocation
+Circuit
+breaker
+Domain-specific
+Reliability
+Communication style
+Client-side
+Self registration
+discovery
+API gateway
+Service registry
+Backend for
+Server-side 3rd-party frontend
+discovery registration
+Discovery External API
+```
 
 Figure 1.12 The five groups of communication patterns 
 
@@ -580,15 +790,30 @@ The other issue with using a database per service is that some queries need to j
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0056-02.png)
 
-**----- Start of picture text -----**<br>
-Domain<br>Key<br>event<br>Predecessor Successor<br>Alternative A Alternative B<br>General Specific Database perservice Saga sourcingEvent<br>Problem area<br>Aggregate<br>**----- End of picture text -----**<br>
+```text
+Domain
+Key
+event
+Predecessor Successor
+Alternative A Alternative B
+General Specific Database perservice Saga sourcingEvent
+Problem area
+Aggregate
+```
 
 Figure 1.13 Because each service has its own database, you must use the Saga pattern to maintain data consistency across services. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0056-04.png)
 
-**----- Start of picture text -----**<br>
-Key Database<br>Predecessor Successor per service<br>Alternative A Alternative B<br>General Specific<br>Problem area API<br>CQRS<br>composition<br>**----- End of picture text -----**<br>
+```text
+Key Database
+Predecessor Successor per service
+Alternative A Alternative B
+General Specific
+Problem area API
+CQRS
+composition
+```
 
 Figure 1.14 Because each service has its own database, you must use one of the querying patterns to retrieve data scattered across multiple services. 
 
@@ -604,8 +829,28 @@ The traditional, and often manual, way of deploying applications in a languagesp
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0057-02.png)
 
-**----- Start of picture text -----**<br>
-Key<br>Predecessor Successor<br>Traditional approach of deploying A modern approach, which<br>Alternative A Alternative B services using their language-specific encapsulates a service’s<br>General Specific packaging, such as WAR files technology stack<br>Problem area<br>Multiple services Single service<br>A modern approach, per host per host<br>which runs your code<br>without you having to<br>worry about managing<br>the infrastructure Serverless<br>deployment<br>Service-per-container<br>Automated, self-service<br>platform for deploying<br>and managing services<br>Service deployment<br>Service-per-VM<br>platform<br>**----- End of picture text -----**<br>
+```text
+Key
+Predecessor Successor
+Traditional approach of deploying A modern approach, which
+Alternative A Alternative B services using their language-specific encapsulates a service’s
+General Specific packaging, such as WAR files technology stack
+Problem area
+Multiple services Single service
+A modern approach, per host per host
+which runs your code
+without you having to
+worry about managing
+the infrastructure Serverless
+deployment
+Service-per-container
+Automated, self-service
+platform for deploying
+and managing services
+Service deployment
+Service-per-VM
+platform
+```
 
 Figure 1.15 Several patterns for deploying microservices. The traditional approach is to deploy services in a language-specific packaging format. There are two modern approaches to deploying services. The first deploys services as VM or containers. The second is the serverless approach. You simply upload the service’s code and the serverless platform runs it. You should use a service deployment platform, which is an automated, self-service platform for deploying and managing services. 
 
@@ -659,8 +904,18 @@ For a large, complex application, the microservice architecture is usually the b
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0059-05.png)
 
-**----- Start of picture text -----**<br>
-Process:<br>DevOps/continuous delivery/deployment<br>Enables Enables<br>Rapid, frequent,<br>and reliable delivery<br>of software<br>Organization: Architecture:<br>Small, autonomous, Microservice<br>Enables<br>cross-functional teams architecture<br>**----- End of picture text -----**<br>
+```text
+Process:
+DevOps/continuous delivery/deployment
+Enables Enables
+Rapid, frequent,
+and reliable delivery
+of software
+Organization: Architecture:
+Small, autonomous, Microservice
+Enables
+cross-functional teams architecture
+```
 
 Figure 1.16 The rapid, frequent, and reliable delivery of large, complex applications requires a combination of DevOps, which includes continuous delivery/deployment, small, autonomous teams, and the microservice architecture. 
 

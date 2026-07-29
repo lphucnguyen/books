@@ -42,8 +42,24 @@ This service consists of the business logic and the following adapters:
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0178-03.png)
 
-**----- Start of picture text -----**<br>
-POST/orders<br>Inbound adapters GET/order/Id<br>REST API<br>Order<br>Service requests Order<br>command<br>handlers<br>Order Service<br>business logic<br>Order events<br>Domain event<br>publisher adapter<br>Database<br>adapter<br>Outbound adapters<br>Order database<br>**----- End of picture text -----**<br>
+```text
+POST/orders
+Inbound adapters GET/order/Id
+REST API
+Order
+Service requests Order
+command
+handlers
+Order Service
+business logic
+Order events
+Domain event
+publisher adapter
+Database
+adapter
+Outbound adapters
+Order database
+```
 
 Figure 5.1 The **Order Service** has a hexagonal architecture. It consists of the business logic and one or more adapters that interface with external applications and other services. 
 
@@ -55,8 +71,20 @@ Although I’m a strong advocate of the object-oriented approach, there are some
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0179-05.png)
 
-**----- Start of picture text -----**<br>
-Classes with<br>OrderService behavior<br>createOrder()<br>reviseOrder()<br>cancelOrder()<br>...<br>OrderDao Order<br>save(Order) orderId<br>findOrderById() orderLineItems<br>... ...<br>Classes<br>with state<br>**----- End of picture text -----**<br>
+```text
+Classes with
+OrderService behavior
+createOrder()
+reviseOrder()
+cancelOrder()
+...
+OrderDao Order
+save(Order) orderId
+findOrderById() orderLineItems
+... ...
+Classes
+with state
+```
 
 Figure 5.2 Organizing business logic as transaction scripts. In a typical transaction script–based design, one set of classes implements behavior and another set stores state. The transaction scripts are organized into classes that typically have no state. The scripts use data classes, which typically have no behavior. 
 
@@ -80,8 +108,26 @@ In an object-oriented design, the business logic consists of an object model, a 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0180-09.png)
 
-**----- Start of picture text -----**<br>
-Some classes have only behavior. Some classes have only state.<br>OrderService DeliveryInformation<br>createOrder() deliveryTime<br>reviseOrder() deliveryAddress<br>cancelOrder()<br>...<br>Uses<br>Order<br>OrderRepository «private»<br>orderId<br>findOrderById() orderLineItems<br>...<br>...<br>revise()<br>cancel()<br>Many classes have «static»<br>state and behavior.<br>create()<br>**----- End of picture text -----**<br>
+```text
+Some classes have only behavior. Some classes have only state.
+OrderService DeliveryInformation
+createOrder() deliveryTime
+reviseOrder() deliveryAddress
+cancelOrder()
+...
+Uses
+Order
+OrderRepository «private»
+orderId
+findOrderById() orderLineItems
+...
+...
+revise()
+cancel()
+Many classes have «static»
+state and behavior.
+create()
+```
 
 Figure 5.3 Organizing business logic as a domain model. The majority of the business logic consists of classes that have state and behavior. 
 
@@ -115,8 +161,21 @@ In traditional object-oriented design, a domain model is a collection of classes
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0182-08.png)
 
-**----- Start of picture text -----**<br>
-Assigned to<br>Placed by For Restaurant Courier Location<br>Consumer Order<br>name available lat<br>state ... ... lon<br>...<br>Pays using Paid using<br>PaymentInfo DeliveryInfo OrderLineItem MenuItem Address<br>creditcardId deliveryTime quantity name street1<br>... price street2<br>city<br>state<br>zip<br>**----- End of picture text -----**<br>
+```text
+Assigned to
+Placed by For Restaurant Courier Location
+Consumer Order
+name available lat
+state ... ... lon
+...
+Pays using Paid using
+PaymentInfo DeliveryInfo OrderLineItem MenuItem Address
+creditcardId deliveryTime quantity name street1
+... price street2
+city
+state
+zip
+```
 
 Figure 5.4 A traditional domain model is a web of interconnected classes. It doesn’t explicitly specify the boundaries of business objects, such as **Consumer** and **Order** . 
 
@@ -155,8 +214,17 @@ Figure 5.5 shows the Order aggregate and its boundary. An Order aggregate consis
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0185-02.png)
 
-**----- Start of picture text -----**<br>
-«value object» «aggregate root» «aggregate root» «value object»<br>DeliveryInfo Order Consumer DeliveryInfo<br>«value object» «value object»<br>PaymentInfo PaymentInfo<br>Consumer aggregate<br>«value object» «aggregate root»<br>OrderLineItem Restaurant<br>quantity ...<br>Order aggregate Restaurant aggregate<br>**----- End of picture text -----**<br>
+```text
+«value object» «aggregate root» «aggregate root» «value object»
+DeliveryInfo Order Consumer DeliveryInfo
+«value object» «value object»
+PaymentInfo PaymentInfo
+Consumer aggregate
+«value object» «aggregate root»
+OrderLineItem Restaurant
+quantity ...
+Order aggregate Restaurant aggregate
+```
 
 Figure 5.5 Structuring a domain model as a set of aggregates makes the boundaries explicit. 
 
@@ -186,8 +254,19 @@ Another rule is that aggregates reference each other by identity (for example, p
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0186-07.png)
 
-**----- Start of picture text -----**<br>
-DeliveryInfo «aggregate root» «aggregate root» DeliveryInfo<br>Order Consumer<br>consumerId<br>PaymentInfo restaurantId ... PaymentInfo<br>...<br>Consumer aggregate<br>«aggregate root»<br>OrderLineItem<br>Restaurant<br>quantity ...<br>Order aggregate Restaurant aggregate<br>**----- End of picture text -----**<br>
+```text
+DeliveryInfo «aggregate root» «aggregate root» DeliveryInfo
+Order Consumer
+consumerId
+PaymentInfo restaurantId ... PaymentInfo
+...
+Consumer aggregate
+«aggregate root»
+OrderLineItem
+Restaurant
+quantity ...
+Order aggregate Restaurant aggregate
+```
 
 Figure 5.6 References between aggregates are by primary key rather than by object reference. The **Order** aggregate has the IDs of the **Consumer** and **Restaurant** aggregates. Within an aggregate, objects have references to one another. 
 
@@ -205,8 +284,13 @@ This rule makes it more complicated to implement operations that need to create 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0187-06.png)
 
-**----- Start of picture text -----**<br>
-Saga<br>Service A Service B<br>Local transaction 1 Local transaction 2 Local transaction 3<br>Create/update Create/update Create/update<br>Aggregate X Aggregate Y Aggregate Z<br>**----- End of picture text -----**<br>
+```text
+Saga
+Service A Service B
+Local transaction 1 Local transaction 2 Local transaction 3
+Create/update Create/update Create/update
+Aggregate X Aggregate Y Aggregate Z
+```
 
 Figure 5.7 A transaction can only create or update a single aggregate, so an application uses a saga to update multiple aggregates. Each step of the saga creates or updates one aggregate. 
 
@@ -224,8 +308,18 @@ For example, earlier I mentioned how in the FTGO application’s domain model Or
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0188-05.png)
 
-**----- Start of picture text -----**<br>
-<<aggregate root>><br>DeliveryInfo Order DeliveryInfo<br>Consumer<br>restaurantId<br>PaymentInfo ... ... PaymentInfo<br><<aggregate root>><br>OrderLineItem<br>Restaurant<br>quantity ...<br>Consumer aggregate Restaurant aggregate<br>**----- End of picture text -----**<br>
+```text
+<<aggregate root>>
+DeliveryInfo Order DeliveryInfo
+Consumer
+restaurantId
+PaymentInfo ... ... PaymentInfo
+<<aggregate root>>
+OrderLineItem
+Restaurant
+quantity ...
+Consumer aggregate Restaurant aggregate
+```
 
 Figure 5.8 An alternative design defines a **Customer** aggregate that contains the **Customer** and **Order** classes. This design enables an application to atomically update a **Consumer** and one or more of its **Orders** . 
 
@@ -239,8 +333,35 @@ In a typical (micro)service, the bulk of the business logic consists of aggregat
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0189-04.png)
 
-**----- Start of picture text -----**<br>
-REST API<br>Order<br>command<br>handlers<br>«service»<br>OrderService<br>createOrder()<br>reviseOrder()<br>Domain cancelOrder()<br>event<br>publisher<br>«saga»<br>CreateOrder<br>«aggregate» Saga<br>Order<br>id «saga»<br>... ReviseOrder<br>Saga<br>«value object»<br>OrderLineItem «repository»<br>OrderRepository<br>quantity<br>menuItem voidSave(Order)<br>name Orer findOne(id)<br>...<br>Database<br>adapter<br>**----- End of picture text -----**<br>
+```text
+REST API
+Order
+command
+handlers
+«service»
+OrderService
+createOrder()
+reviseOrder()
+Domain cancelOrder()
+event
+publisher
+«saga»
+CreateOrder
+«aggregate» Saga
+Order
+id «saga»
+... ReviseOrder
+Saga
+«value object»
+OrderLineItem «repository»
+OrderRepository
+quantity
+menuItem voidSave(Order)
+name Orer findOne(id)
+...
+Database
+adapter
+```
 
 Figure 5.9 An aggregate-based design for the **Order Service** business logic 
 
@@ -368,8 +489,9 @@ Figure 5.10 shows the result of an event-storming workshop. In just a couple of 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0193-11.png)
 
-**----- Start of picture text -----**<br>
-Event Command Aggregate Policy<br>**----- End of picture text -----**<br>
+```text
+Event Command Aggregate Policy
+```
 
 Figure 5.10 The result of an event-storming workshop that lasted a couple of hours. The sticky notes are events, which are laid out along a timeline; commands, which represent user actions; and aggregates, which emit events in response to a command. 
 
@@ -555,8 +677,35 @@ The service also has two outbound adapters:
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0199-02.png)
 
-**----- Start of picture text -----**<br>
-Restaurant<br>accept<br>reject<br>preparing<br>readyForPickup<br>pickedUp<br>REST API<br>Create ticket Restaurant created<br>Confirm create ticket Restaurant menu revised<br>KitchenService KitchenService<br>CommandHandler EventConsumer<br>Kitchen Service Restaurant Events<br>command channel Kitchen channel<br>Service<br>«aggregate»<br>Ticket<br>«repository»<br>Ticket<br>Domain event<br>Repository<br>publisher<br>«aggregate»<br>restaurant<br>Domain event Database<br>publishing adapter «repository» adapter<br>Ticket events Restaurant Kitchen Service<br>channel Repository database<br>**----- End of picture text -----**<br>
+```text
+Restaurant
+accept
+reject
+preparing
+readyForPickup
+pickedUp
+REST API
+Create ticket Restaurant created
+Confirm create ticket Restaurant menu revised
+KitchenService KitchenService
+CommandHandler EventConsumer
+Kitchen Service Restaurant Events
+command channel Kitchen channel
+Service
+«aggregate»
+Ticket
+«repository»
+Ticket
+Domain event
+Repository
+publisher
+«aggregate»
+restaurant
+Domain event Database
+publishing adapter «repository» adapter
+Ticket events Restaurant Kitchen Service
+channel Repository database
+```
 
 Figure 5.11 The design of **Kitchen Service** 
 
@@ -732,8 +881,48 @@ In addition to the Order and Restaurant aggregates, the business logic consists 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0204-03.png)
 
-**----- Start of picture text -----**<br>
-Consumer<br>createOrder()<br>cancelOrder() Restaurant Events<br>reviseOrder() channel<br>Ticket events<br>channel<br>REST API<br>Order Service<br>command channel<br>OrderEvent<br>consumer<br>Consumer Service<br>Domain event<br>Order command channel<br>publishing command<br>adapter handlers<br>OrderService<br>Kitchen Service<br>Outbound command channel<br>Domain event «saga» Command command<br>publisher *OrderSaga producer message<br>adapter<br>Accounting Service<br>command channel<br>«aggregate»<br>Restaurant<br>«aggregate» Create order saga<br>«repository» Order reply channel<br>Restaurant<br>Repository<br>Cancel order saga<br>«repository»<br>OrderRepository SagaReply reply channel<br>message<br>adapter<br>Revise order saga<br>Database reply channel<br>adapter<br>Order Service<br>database<br>**----- End of picture text -----**<br>
+```text
+Consumer
+createOrder()
+cancelOrder() Restaurant Events
+reviseOrder() channel
+Ticket events
+channel
+REST API
+Order Service
+command channel
+OrderEvent
+consumer
+Consumer Service
+Domain event
+Order command channel
+publishing command
+adapter handlers
+OrderService
+Kitchen Service
+Outbound command channel
+Domain event «saga» Command command
+publisher *OrderSaga producer message
+adapter
+Accounting Service
+command channel
+«aggregate»
+Restaurant
+«aggregate» Create order saga
+«repository» Order reply channel
+Restaurant
+Repository
+Cancel order saga
+«repository»
+OrderRepository SagaReply reply channel
+message
+adapter
+Revise order saga
+Database reply channel
+adapter
+Order Service
+database
+```
 
 Figure 5.12 The design of the **Order Service** . It has a REST API for managing orders. It exchanges messages and events with other services via several message channels. and Restaurants. OrderRepository defines methods for persisting Orders, and RestaurantRepository has methods for persisting Restaurants. Order Service has several inbound adapters: 
 
@@ -765,8 +954,27 @@ Figure 5.13 shows the structure of the Order aggregate. The Order class is the r
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0205-14.png)
 
-**----- Start of picture text -----**<br>
-«value object»<br>Address<br>«value object» street1<br>DeliveryInfo street2<br>deliveryTime city<br>state<br>zip<br>«aggregate»<br>Order<br>state «value object»<br>consumerId PaymentInfo<br>restaurantId<br>... paymentMethodId<br>Order minimum<br>«value object»<br>OrderLineItem Price «value object»<br>quantity Money<br>menuItem amount<br>name<br>**----- End of picture text -----**<br>
+```text
+«value object»
+Address
+«value object» street1
+DeliveryInfo street2
+deliveryTime city
+state
+zip
+«aggregate»
+Order
+state «value object»
+consumerId PaymentInfo
+restaurantId
+... paymentMethodId
+Order minimum
+«value object»
+OrderLineItem Price «value object»
+quantity Money
+menuItem amount
+name
+```
 
 Figure 5.13 The design of the **Order** aggregate, which consists of the **Order** aggregate root and various value objects. 
 
@@ -815,8 +1023,17 @@ a semantic lock countermeasure, which helps ensure that sagas are isolated from 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0207-03.png)
 
-**----- Start of picture text -----**<br>
-Initial state cancelConfirmed<br>CANCEL_PENDING CANCELLED<br>cancelRejected cancel<br>authorized<br>APPROVAL_PENDING APPROVED ...<br>reviseConfirmed<br>revise<br>rejected reviseRejected<br>REJECTED REVISION_PENDING<br>**----- End of picture text -----**<br>
+```text
+Initial state cancelConfirmed
+CANCEL_PENDING CANCELLED
+cancelRejected cancel
+authorized
+APPROVAL_PENDING APPROVED ...
+reviseConfirmed
+revise
+rejected reviseRejected
+REJECTED REVISION_PENDING
+```
 
 Figure 5.14 Part of the state machine model of the **Order** aggregate 
 

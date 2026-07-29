@@ -55,8 +55,16 @@ Let’s first look at the concept of an automated test. Then I discuss the diffe
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0325-02.png)
 
-**----- Start of picture text -----**<br>
-Test suite<br>Test Verifies behavior of System Under<br>Test (SUT)<br>Figure 9.1 The goal of a test is to<br>verify the behavior of the system<br>under test. An SUT might be as<br>small as a class or as large as an<br>entire application.<br>**----- End of picture text -----**<br>
+```text
+Test suite
+Test Verifies behavior of System Under
+Test (SUT)
+Figure 9.1 The goal of a test is to
+verify the behavior of the system
+under test. An SUT might be as
+small as a class or as large as an
+entire application.
+```
 
 **WRITING AUTOMATED TESTS**
 
@@ -64,8 +72,17 @@ Automated tests are usually written using a testing framework. JUnit, for exampl
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0325-05.png)
 
-**----- Start of picture text -----**<br>
-Test class<br>Test method Fixture<br>Setup<br>Execute<br>Executes<br>Test runne r Test method SUT<br>Verify<br>Teardown<br>Test method<br>**----- End of picture text -----**<br>
+```text
+Test class
+Test method Fixture
+Setup
+Execute
+Executes
+Test runne r Test method SUT
+Verify
+Teardown
+Test method
+```
 
 Figure 9.2 Each automated test is implemented by a test method, which belongs to a test class. A test consists of four phases: _setup_ , which initializes the test fixture, which is everything required to run the test; _execute_ , which invokes the SUT; _verify_ , which verifies the outcome of the test; and _teardown_ , which cleans up the test fixture. 
 
@@ -89,8 +106,15 @@ The solution, as figure 9.3 shows, is to replace the SUT’s dependencies with t
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0326-07.png)
 
-**----- Start of picture text -----**<br>
-Slow, complex Tests System Under<br>Dependency<br>test Test (SUT)<br>Replaced with<br>Faster, simpler Tests System Under<br>Test double<br>test Test (SUT)<br>**----- End of picture text -----**<br>
+```text
+Slow, complex Tests System Under
+Dependency
+test Test (SUT)
+Replaced with
+Faster, simpler Tests System Under
+Test double
+test Test (SUT)
+```
 
 Figure 9.3 Replacing a dependency with a test double enables the SUT to be tested in isolation. The test is simpler and faster. 
 
@@ -130,8 +154,27 @@ A good way to categorize tests is Brian Marick’s _test quadrant_ (www.exampler
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0328-02.png)
 
-**----- Start of picture text -----**<br>
-Business facing<br>Q2 AUTOMATED Q3 MANUAL<br>Exploratory<br>Functional/<br>testing, usability<br>acceptance tests<br>testing<br>Q1 AUTOMATED Q4 MANUAL/<br>AUTOMATED<br>Non-functional<br>Unit,<br>acceptance tests:<br>integration,<br>performance<br>component<br>and more<br>Technology facing<br>Critique project<br>Support programming<br>**----- End of picture text -----**<br>
+```text
+Business facing
+Q2 AUTOMATED Q3 MANUAL
+Exploratory
+Functional/
+testing, usability
+acceptance tests
+testing
+Q1 AUTOMATED Q4 MANUAL/
+AUTOMATED
+Non-functional
+Unit,
+acceptance tests:
+integration,
+performance
+component
+and more
+Technology facing
+Critique project
+Support programming
+```
 
 Figure 9.4 The test quadrant categorizes tests along two dimensions. The first dimension is whether a test is business facing or technology facing. The second is whether the purpose of the test is to support programming or critique the application. 
 
@@ -159,8 +202,18 @@ The key idea of the test pyramid is that as we move up the pyramid we should wri
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0329-02.png)
 
-**----- Start of picture text -----**<br>
-Slow, brittle, costly<br>Acceptance tests for End-to-end<br>an application<br>Acceptance tests<br>Component<br>for a service<br>Verify that a service<br>communicates with Integration<br>its dependencies<br>Test the business logic Unit Fast, reliable, cheap<br>**----- End of picture text -----**<br>
+```text
+Slow, brittle, costly
+Acceptance tests for End-to-end
+an application
+Acceptance tests
+Component
+for a service
+Verify that a service
+communicates with Integration
+its dependencies
+Test the business logic Unit Fast, reliable, cheap
+```
 
 Figure 9.5 The test pyramid describes the relative proportions of each type of test that you need to write. As you move up the pyramid, you should write fewer and fewer tests. 
 
@@ -180,8 +233,31 @@ Other services interact through request/asynchronous reply or publish/subscribe 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0330-03.png)
 
-**----- Start of picture text -----**<br>
-Key<br>REST client REST service<br>Subscriber E Domain event<br>publisher Invokes services<br>(Command message) C Replier using HTTP<br>requestor<br>API<br>gateway<br>Restaurant Delivery<br>Service Service<br>E<br>Consumer E Order History<br>Service Service<br>C E Subscribes to<br>order* events<br>E<br>C<br>Order Kitchen<br>C<br>Service Service<br>Order Service saga<br>sends commands Accounting<br>to various services. Service<br>**----- End of picture text -----**<br>
+```text
+Key
+REST client REST service
+Subscriber E Domain event
+publisher Invokes services
+(Command message) C Replier using HTTP
+requestor
+API
+gateway
+Restaurant Delivery
+Service Service
+E
+Consumer E Order History
+Service Service
+C E Subscribes to
+order* events
+E
+C
+Order Kitchen
+C
+Service Service
+Order Service saga
+sends commands Accounting
+to various services. Service
+```
 
 Figure 9.6 Some of the interservice communication in the FTGO application. Each arrow points from a consumer service to a producer service. 
 
@@ -219,8 +295,18 @@ The team that develops the consumer writes a contract test suite and adds it (fo
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0332-04.png)
 
-**----- Start of picture text -----**<br>
-API gateway team Order History Service team ... Service team<br>Writes Writes Writes<br>API gateway - Order History ... Service -<br>Order Service Service - Order Order Service<br>contract test Service contract contract test<br>suite test suite suite<br>Order Service deployment pipeline<br>Tests Tests Tests<br>Order<br>Service<br>**----- End of picture text -----**<br>
+```text
+API gateway team Order History Service team ... Service team
+Writes Writes Writes
+API gateway - Order History ... Service -
+Order Service Service - Order Order Service
+contract test Service contract contract test
+suite test suite suite
+Order Service deployment pipeline
+Tests Tests Tests
+Order
+Service
+```
 
 Figure 9.7 Each team that develops a service that consumes **Order Service** ’s API contributes a contract test suite. The test suite verifies that the API matches the consumer’s expectations. This test suite, along with those contributed by other teams, is run by **Order Service** ’s deployment pipeline. 
 
@@ -252,8 +338,24 @@ Say, for example, you’re working on API Gateway and want to write a consumer c
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0334-02.png)
 
-**----- Start of picture text -----**<br>
-Contract.make {<br>request {..} Order Service<br>response {...} consumer<br>Writes } Code generated contract tests<br>} from<br>API gateway team<br>Develops Tests<br>Published<br>Order<br>API gateway contract Service<br>Maven repository<br>Tests Develops<br>Reads Publishes<br>API gateway<br>integration test<br>Order Service team<br>**----- End of picture text -----**<br>
+```text
+Contract.make {
+request {..} Order Service
+response {...} consumer
+Writes } Code generated contract tests
+} from
+API gateway team
+Develops Tests
+Published
+Order
+API gateway contract Service
+Maven repository
+Tests Develops
+Reads Publishes
+API gateway
+integration test
+Order Service team
+```
 
 Figure 9.8 The **API Gateway** team writes the contracts. The **Order Service** team uses those contracts to test **Order Service** and publishes them to a repository. The **API Gateway** team uses the published contracts to test **API Gateway** . 
 
@@ -301,8 +403,17 @@ Every service has a deployment pipeline. Jez Humble’s book, Continuous Deliver
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0336-03.png)
 
-**----- Start of picture text -----**<br>
-Fast feedback Slow feedback<br>Not production Production<br>ready ready<br>Deployment pipeline<br>Commit Integration Component<br>Pre-commit Deploy Production<br>tests tests tests<br>tests stage environment<br>stage stage stage<br>**----- End of picture text -----**<br>
+```text
+Fast feedback Slow feedback
+Not production Production
+ready ready
+Deployment pipeline
+Commit Integration Component
+Pre-commit Deploy Production
+tests tests tests
+tests stage environment
+stage stage stage
+```
 
 Figure 9.9 An example deployment pipeline for **Order Service** . It consists of a series of stages. The pre-commit tests are run by the developer prior to committing their code. The remaining stages are executed by an automated tool, such as the Jenkins CI server. 
 
@@ -336,8 +447,24 @@ As figure 9.10 shows, unit tests are the lowest level of the test pyramid. They�
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0337-07.png)
 
-**----- Start of picture text -----**<br>
-Stub/mock<br>dependency 1<br>Solitary Tests Stub/mock<br>Cl ass<br>unit test dependency 2<br>Stub/mock<br>dependency<br>End-to-end ...<br>Component<br>Dependency 1<br>Integration<br>Social Tests<br>unit test Cl ass Dependency 2<br>Unit<br>Dependency<br>...<br>**----- End of picture text -----**<br>
+```text
+Stub/mock
+dependency 1
+Solitary Tests Stub/mock
+Cl ass
+unit test dependency 2
+Stub/mock
+dependency
+End-to-end ...
+Component
+Dependency 1
+Integration
+Social Tests
+unit test Cl ass Dependency 2
+Unit
+Dependency
+...
+```
 
 Figure 9.10 Unit tests are the base of the pyramid. They’re fast running, easy to write, and reliable. A solitary unit test tests a class in isolation, using mocks or stubs for its dependencies. A sociable unit test tests a class and its dependencies. 
 
@@ -351,8 +478,30 @@ The responsibilities of the class and its role in the architecture determine whi
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0338-06.png)
 
-**----- Start of picture text -----**<br>
-POST/something<br>Solitary GET/something/id<br>unit test<br>Controller<br>Inbound<br>message<br>adapter<br>«Message Channel» Domain logic<br>Service<br>Solitary Sociable<br>unit test unit test<br>Entity<br>Value<br>object<br>Saga<br>Outbound<br>m essage<br>adapter<br>«Message Channel» Repository<br>Database<br>adapter<br>Database<br>**----- End of picture text -----**<br>
+```text
+POST/something
+Solitary GET/something/id
+unit test
+Controller
+Inbound
+message
+adapter
+«Message Channel» Domain logic
+Service
+Solitary Sociable
+unit test unit test
+Entity
+Value
+object
+Saga
+Outbound
+m essage
+adapter
+«Message Channel» Repository
+Database
+adapter
+Database
+```
 
 Figure 9.11 The responsibilities of a class determine whether to use a solitary or sociable unit test. 
 

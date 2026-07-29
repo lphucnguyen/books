@@ -38,18 +38,28 @@ The traditional approach to persistence maps classes to database tables, fields 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0215-04.png)
 
-**----- Start of picture text -----**<br>
-«class»<br>Order<br>«class»<br>OrderLineItem<br>**----- End of picture text -----**<br>
+```text
+«class»
+Order
+«class»
+OrderLineItem
+```
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0215-05.png)
 
-**----- Start of picture text -----**<br>
-ORDER table<br>ID CUSTOMER_ID ORDER_TOTAL ...<br>1234 customer-abc 1234.56 ...<br>**----- End of picture text -----**<br>
+```text
+ORDER table
+ID CUSTOMER_ID ORDER_TOTAL ...
+1234 customer-abc 1234.56 ...
+```
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0215-06.png)
 
-**----- Start of picture text -----**<br>
-ORDER_LINE_ITEM table<br>ID ORDER_ID QUANTITY ...<br>567 1234 2 ...<br>**----- End of picture text -----**<br>
+```text
+ORDER_LINE_ITEM table
+ID ORDER_ID QUANTITY ...
+567 1234 2 ...
+```
 
 Figure 6.1 The traditional approach to persistence maps classes to tables and objects to rows in those tables. 
 
@@ -148,8 +158,13 @@ Some events, such as the Order Shipped event, contain little or no data and just
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0219-02.png)
 
-**----- Start of picture text -----**<br>
-Event<br>apply()<br>«aggregate» «aggregate»<br>Order Order<br>S S’<br>**----- End of picture text -----**<br>
+```text
+Event
+apply()
+«aggregate» «aggregate»
+Order Order
+S S’
+```
 
 **Objects and field values** 
 
@@ -163,8 +178,18 @@ The business logic handles a request to update an aggregate by calling a command
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0219-08.png)
 
-**----- Start of picture text -----**<br>
-Event<br>Process(command)<br>«aggregate»<br>Order<br>S<br>Event<br>apply()<br>«aggregate» «aggregate»<br>Order Order<br>S S’<br>**----- End of picture text -----**<br>
+```text
+Event
+Process(command)
+«aggregate»
+Order
+S
+Event
+apply()
+«aggregate» «aggregate»
+Order Order
+S S’
+```
 
 Figure 6.4 Processing a command generates events without changing the state of the aggregate. An aggregate is updated by applying an event. 
 
@@ -176,8 +201,41 @@ The Eventuate Client framework, an event-sourcing framework described in more de
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0220-04.png)
 
-**----- Start of picture text -----**<br>
-public class Order {<br>public List<DomainEvent> revise(OrderRevision orderRevision) {<br>switch (state) {<br>case AUTHORIZED:<br>LineItemQuantityChange change =<br>orderLineItems.lineItemQuantityChange(orderRevision);<br>if (change.newOrderTotal.isGreaterThanOrEqual(orderMinimum)) {<br>throw new OrderMinimumNotMetException();<br>}<br>this.state = REVISION_PENDING;<br>return …;<br>default:<br>throw new UnsupportedStateTransitionException(state);<br>}<br>}<br>public class Order {<br>public List<Event> process(ReviseOrder command) {<br>OrderRevision orderRevision = command.getOrderRevision();<br>switch (state) {<br>case AUTHORIZED:<br>LineItemQuantityChange change =<br>orderLineItems.lineItemQuantityChange(orderRevision);<br>if (change.newOrderTotal.isGreaterThanOrEqual(orderMinimum)) { public class Order {<br>throw new OrderMinimumNotMetException();<br>}return singletonList( publicthis.statevoid =apply(OrderRevisionProposedREVISION_PENDING; event) {<br>new OrderRevisionProposed( }<br>orderRevision, change.currentOrderTotal,<br>change.newOrderTotal));<br>default:<br>throw new UnsupportedStateTransitionException(state);<br>}<br>}<br>Returns events without updating the Order Applies events to update the Order<br>**----- End of picture text -----**<br>
+```text
+public class Order {
+public List<DomainEvent> revise(OrderRevision orderRevision) {
+switch (state) {
+case AUTHORIZED:
+LineItemQuantityChange change =
+orderLineItems.lineItemQuantityChange(orderRevision);
+if (change.newOrderTotal.isGreaterThanOrEqual(orderMinimum)) {
+throw new OrderMinimumNotMetException();
+}
+this.state = REVISION_PENDING;
+return …;
+default:
+throw new UnsupportedStateTransitionException(state);
+}
+}
+public class Order {
+public List<Event> process(ReviseOrder command) {
+OrderRevision orderRevision = command.getOrderRevision();
+switch (state) {
+case AUTHORIZED:
+LineItemQuantityChange change =
+orderLineItems.lineItemQuantityChange(orderRevision);
+if (change.newOrderTotal.isGreaterThanOrEqual(orderMinimum)) { public class Order {
+throw new OrderMinimumNotMetException();
+}return singletonList( publicthis.statevoid =apply(OrderRevisionProposedREVISION_PENDING; event) {
+new OrderRevisionProposed( }
+orderRevision, change.currentOrderTotal,
+change.newOrderTotal));
+default:
+throw new UnsupportedStateTransitionException(state);
+}
+}
+Returns events without updating the Order Applies events to update the Order
+```
 
 Figure 6.5 Event sourcing splits a method that updates an aggregate into a **process()** method, which takes a command and returns events, and one or more **apply()** methods, which take an event and update the aggregate. 
 
@@ -320,8 +378,21 @@ The problem with this approach is that transactions can commit in an order that�
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0224-09.png)
 
-**----- Start of picture text -----**<br>
-Transaction A Transaction B<br>BEGIN BEGIN<br>INSERT event with<br>EVENT_ID = 1010<br>INSERT event with<br>EVENT_ID = 1020<br>COMMIT<br>SELECT * FROM EVENTS Retrieves event 1020<br>WHERE EVENT_ID > ....<br>Commits last<br>COMMIT<br>SELECT * FROM EVENTS Skips event 1010 because<br>WHERE EVENT_ID > 1020... 1010 <= event 1020<br>**----- End of picture text -----**<br>
+```text
+Transaction A Transaction B
+BEGIN BEGIN
+INSERT event with
+EVENT_ID = 1010
+INSERT event with
+EVENT_ID = 1020
+COMMIT
+SELECT * FROM EVENTS Retrieves event 1020
+WHERE EVENT_ID > ....
+Commits last
+COMMIT
+SELECT * FROM EVENTS Skips event 1010 because
+WHERE EVENT_ID > 1020... 1010 <= event 1020
+```
 
 Figure 6.6 A scenario where an event is skipped because its transaction _A_ commits after transaction _B_ . Polling sees **eventId=1020** and then later skips **eventId=1010** . 
 
@@ -359,8 +430,11 @@ A common solution is to periodically persist a snapshot of the aggregate’s sta
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0225-14.png)
 
-**----- Start of picture text -----**<br>
-Event 1 Event 2 Event ... Event  N Event N +1 Event N +2<br>Snapshot<br>version  N<br>**----- End of picture text -----**<br>
+```text
+Event 1 Event 2 Event ... Event  N Event N +1 Event N +2
+Snapshot
+version  N
+```
 
 Figure 6.7 Using a snapshot improves performance by eliminating the need to load all events. An application only needs to load the snapshot and the events that occur after it. 
 
@@ -563,8 +637,26 @@ Eventuate Local is an open source event store. Figure 6.9 shows the architecture
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0233-05.png)
 
-**----- Start of picture text -----**<br>
-Event relay<br>Application<br>Event database<br>EVENTS<br>event_id event_type entity_type entity_id event_data<br>102 Order Order 101 {...}<br>Created<br>103 AppOrderroved Order 101 {...} Event broker<br>... ... ... ... ... Order topic<br>Event relay<br>ENTITIES<br>Customer topic<br>entity_type entity_id entity_version ...<br>... ... ... ...<br>SNAPSHOTS<br>entity_type entity_id entity_version ... Publishes events stored<br>in the database to<br>... ... ... ... the message broker<br>**----- End of picture text -----**<br>
+```text
+Event relay
+Application
+Event database
+EVENTS
+event_id event_type entity_type entity_id event_data
+102 Order Order 101 {...}
+Created
+103 AppOrderroved Order 101 {...} Event broker
+... ... ... ... ... Order topic
+Event relay
+ENTITIES
+Customer topic
+entity_type entity_id entity_version ...
+... ... ... ...
+SNAPSHOTS
+entity_type entity_id entity_version ... Publishes events stored
+in the database to
+... ... ... ... the message broker
+```
 
 Figure 6.9 The architecture of Eventuate Local. It consists of an event database (such as MySQL) that stores the events, an event broker (like Apache Kafka) that delivers events to subscribers, and an event relay that publishes events stored in the event database to the event broker. 
 
@@ -657,13 +749,30 @@ The Eventuate client framework enables developers to write event sourcing-based 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0236-03.png)
 
-**----- Start of picture text -----**<br>
-Abstract classes and interfaces that<br>application classes extend or implement<br>**----- End of picture text -----**<br>
+```text
+Abstract classes and interfaces that
+application classes extend or implement
+```
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0236-04.png)
 
-**----- Start of picture text -----**<br>
-Eventuate client framework<br>Aggregate «abstract» «interface» «interface» «annotation»<br>Repository ReflectiveMutableCommand Command Event Event<br>ProcessingAggregate Subscriber<br>save()<br>find()<br>update()<br>Order Service<br>Order Order «interface» «interface» OrderService<br>Service OrderCommand OrderEvent EventHandlers<br>process()<br>apply()<br>createOrder() creditReserved()<br>«command» «event»<br>CreateOrder OrderCreated<br>**----- End of picture text -----**<br>
+```text
+Eventuate client framework
+Aggregate «abstract» «interface» «interface» «annotation»
+Repository ReflectiveMutableCommand Command Event Event
+ProcessingAggregate Subscriber
+save()
+find()
+update()
+Order Service
+Order Order «interface» «interface» OrderService
+Service OrderCommand OrderEvent EventHandlers
+process()
+apply()
+createOrder() creditReserved()
+«command» «event»
+CreateOrder OrderCreated
+```
 
 Figure 6.10 The main classes and interfaces provided by the Eventuate client framework for Java 
 
@@ -859,8 +968,23 @@ Order aggregate and persists it in the event store. The event store publishes th
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0242-03.png)
 
-**----- Start of picture text -----**<br>
-Order Service<br>OrderCreated<br>Order<br>EventHandler<br>Persist an<br>OrderCreated<br>event.<br>CreateOrderSaga<br>Create a CreateOrderSaga<br>in response to an<br>OrderCreated event.<br>OrderCreated<br>Persisted as<br>Event store<br>OrderCreated<br>**----- End of picture text -----**<br>
+```text
+Order Service
+OrderCreated
+Order
+EventHandler
+Persist an
+OrderCreated
+event.
+CreateOrderSaga
+Create a CreateOrderSaga
+in response to an
+OrderCreated event.
+OrderCreated
+Persisted as
+Event store
+OrderCreated
+```
 
 Figure 6.11 Using an event handler to reliably create a saga after a service creates an event sourcing-based aggregate 
 
@@ -908,8 +1032,39 @@ This example looks at Accounting Service, one of the participants of Create Orde
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0244-04.png)
 
-**----- Start of picture text -----**<br>
-Send command to Authorize<br>accounting service. the account.<br>Accounting Service<br>Account<br>Order Service<br>Authorize authorize()<br>command<br>Account Authorize account<br>Create command channel command handler<br>order<br>saga<br>Authorize SagaReply Saga command<br>requested<br>reply dispatcher<br>EventHandler<br>Create order saga<br>reply channel Eventuate saga framework<br>SagaReplyRequested<br>Eventuate API<br>Aggregate<br>Event dispatcher<br>repository<br>Handle SagaReply<br>requested event AccountAuthorized<br>and send reply. SagaReplyRequested<br>AccountCreated<br>.... Emit<br>SagaReply<br>AccountAuthorized requested<br>event.<br>Event store<br>**----- End of picture text -----**<br>
+```text
+Send command to Authorize
+accounting service. the account.
+Accounting Service
+Account
+Order Service
+Authorize authorize()
+command
+Account Authorize account
+Create command channel command handler
+order
+saga
+Authorize SagaReply Saga command
+requested
+reply dispatcher
+EventHandler
+Create order saga
+reply channel Eventuate saga framework
+SagaReplyRequested
+Eventuate API
+Aggregate
+Event dispatcher
+repository
+Handle SagaReply
+requested event AccountAuthorized
+and send reply. SagaReplyRequested
+AccountCreated
+.... Emit
+SagaReply
+AccountAuthorized requested
+event.
+Event store
+```
 
 Figure 6.12 How the event sourcing-based **Accounting Service** participates in **Create Order Saga** 
 
@@ -990,8 +1145,19 @@ The trick is to persist a SagaCommandEvent, which represents a command to send. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0247-04.png)
 
-**----- Start of picture text -----**<br>
-Service Message broker<br>Sends<br>«saga» SagaCommand command Service Command<br>CreateOrderSaga EventHandler Channel<br>1. Emit a SagaCommandEvent Persisted as SagaCommandEvent 2. Handle SagaCommandEvent<br>for each command to send. by sending a command.<br>Event store<br>SagaCreatedEvent<br>SagaCommandEvent<br>SagaUpdatedEvent<br>SagaCommandEvent<br>**----- End of picture text -----**<br>
+```text
+Service Message broker
+Sends
+«saga» SagaCommand command Service Command
+CreateOrderSaga EventHandler Channel
+1. Emit a SagaCommandEvent Persisted as SagaCommandEvent 2. Handle SagaCommandEvent
+for each command to send. by sending a command.
+Event store
+SagaCreatedEvent
+SagaCommandEvent
+SagaUpdatedEvent
+SagaCommandEvent
+```
 
 Figure 6.13 How an event sourcing-based saga orchestrator sends commands to saga participants 
 

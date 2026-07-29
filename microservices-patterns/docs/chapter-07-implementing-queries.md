@@ -38,8 +38,22 @@ The information displayed by the _Order Status_ view includes basic information 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0252-03.png)
 
-**----- Start of picture text -----**<br>
-Order status view FTGO frontend<br>Order id: 3492-2323<br>Restaurant: Ajanta Order status<br>Status: En route<br>ETA: 6:25 pm<br>Payment: Paid<br>OrderDetails findOrder(orderId)<br>FTGO application<br>Order Service Kitchen Service Delivery Service Accounting Service<br>Order Ticket Delivery Bill<br>id:3492-2323 id:3492-2323 id:45-4545 id:343-45611<br>restaurant:Ajanta status:PREPARED orderId:3492-2323 orderId:3492-2323<br>status:ENROUTE status:PAID<br>eta:6:25 pm<br>**----- End of picture text -----**<br>
+```text
+Order status view FTGO frontend
+Order id: 3492-2323
+Restaurant: Ajanta Order status
+Status: En route
+ETA: 6:25 pm
+Payment: Paid
+OrderDetails findOrder(orderId)
+FTGO application
+Order Service Kitchen Service Delivery Service Accounting Service
+Order Ticket Delivery Bill
+id:3492-2323 id:3492-2323 id:45-4545 id:343-45611
+restaurant:Ajanta status:PREPARED orderId:3492-2323 orderId:3492-2323
+status:ENROUTE status:PAID
+eta:6:25 pm
+```
 
 Figure 7.1 The **findOrder()** operation is invoked by a FTGO frontend module and returns the details of an **Order** . restaurant’s perspective, and delivery status, including its location and estimated delivery time if in transit. 
 
@@ -65,8 +79,16 @@ One way to implement query operations, such as findOrder(), that retrieve data o
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0253-05.png)
 
-**----- Start of picture text -----**<br>
-Implements the query operation<br>by invoking the providers and API composer<br>combining the results.<br>query()<br>Services that own data<br>queryA() queryB() queryC()<br>Provider Service A Provider Service B Provider Service C<br>Database A Database B Database C<br>**----- End of picture text -----**<br>
+```text
+Implements the query operation
+by invoking the providers and API composer
+combining the results.
+query()
+Services that own data
+queryA() queryB() queryC()
+Provider Service A Provider Service B Provider Service C
+Database A Database B Database C
+```
 
 Figure 7.2 The API composition pattern consists of an API composer and two or more provider services. The API composer implements a query by querying the providers and combining the results. 
 
@@ -84,8 +106,17 @@ The findOrder() query operation corresponds to a simple primary key-based equijo
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0254-05.png)
 
-**----- Start of picture text -----**<br>
-GET/order/{orderId}<br>Find Order<br>Composer<br>GET/orders/ GET/tickets? GET/deliveries? GET/charges?<br>{orderId} orderId= orderId= orderId=<br>{orderId} {orderId} {orderId}<br>Order Service Kitchen Service Delivery Service Accounting Service<br>«aggregate» «aggregate» «aggregate» «aggregate»<br>Order RestaurantOrder Delivery Charge<br>**----- End of picture text -----**<br>
+```text
+GET/order/{orderId}
+Find Order
+Composer
+GET/orders/ GET/tickets? GET/deliveries? GET/charges?
+{orderId} orderId= orderId= orderId=
+{orderId} {orderId} {orderId}
+Order Service Kitchen Service Delivery Service Accounting Service
+«aggregate» «aggregate» «aggregate» «aggregate»
+Order RestaurantOrder Delivery Charge
+```
 
 Figure 7.3 Implementing **findOrder()** using the API composition pattern 
 
@@ -109,8 +140,14 @@ One decision that you must make is who plays the role of the query operation’s
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0255-09.png)
 
-**----- Start of picture text -----**<br>
-Client, such as web application<br>API composer<br>Order Delivery<br>Service Service<br>Kitchen Accounting<br>Service Service<br>**----- End of picture text -----**<br>
+```text
+Client, such as web application
+API composer
+Order Delivery
+Service Service
+Kitchen Accounting
+Service Service
+```
 
 Figure 7.4 Implementing API composition in a client. The client queries the provider services to retrieve the data. 
 
@@ -124,13 +161,30 @@ The third option, shown in figure 7.6, is to implement an _API composer_ as a st
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0256-02.png)
 
-**----- Start of picture text -----**<br>
-External client, such as<br>mobile application<br>findOrder()<br>API gateway<br>API composer<br>Order Delivery<br>Service Service<br>Kitchen Accounting<br>Service Service<br>**----- End of picture text -----**<br>
+```text
+External client, such as
+mobile application
+findOrder()
+API gateway
+API composer
+Order Delivery
+Service Service
+Kitchen Accounting
+Service Service
+```
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0256-03.png)
 
-**----- Start of picture text -----**<br>
-Clients<br>findOrder()<br>Find Order Service<br>API composer<br>Order Delivery<br>Service Service<br>Kitchen Accounting<br>Service Service<br>**----- End of picture text -----**<br>
+```text
+Clients
+findOrder()
+Find Order Service
+API composer
+Order Delivery
+Service Service
+Kitchen Accounting
+Service Service
+```
 
 Figure 7.5 Implementing API composition in the API gateway. The API queries the provider services to retrieve the data, combines the results, and returns a response to the client. 
 
@@ -214,8 +268,17 @@ There are two ways an _API composer_ could solve this problem. One solution is f
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0260-04.png)
 
-**----- Start of picture text -----**<br>
-GET/order?consumerId=&keyword=<br>Find orders<br>composer<br>GET/orders? GET/tickets? GET/deliveries? GET/charges?<br>consumerId= consumerId= consumerId= consumerId=<br>&keyword= &keyword=<br>Order Service Kitchen Service Delivery Service Accounting Service<br>«aggregate» «aggregate» «aggregate» «aggregate»<br>Order RestaurantOrder Delivery Charge<br>**----- End of picture text -----**<br>
+```text
+GET/order?consumerId=&keyword=
+Find orders
+composer
+GET/orders? GET/tickets? GET/deliveries? GET/charges?
+consumerId= consumerId= consumerId= consumerId=
+&keyword= &keyword=
+Order Service Kitchen Service Delivery Service Accounting Service
+«aggregate» «aggregate» «aggregate» «aggregate»
+Order RestaurantOrder Delivery Charge
+```
 
 **These services don’t store the data needed for a keyword search, so will return all of a consumer’s orders.** 
 
@@ -271,8 +334,23 @@ Both the non-CQRS and CQRS versions of the service have an API consisting of var
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0263-02.png)
 
-**----- Start of picture text -----**<br>
-Non-CQRS CQRS<br>CRUD operations CRUD operations<br>Service Service<br>CRUD R CUD R<br>Domain model Command/domain model Events Query model<br>Aggregate Query Aggregate Event<br>bypass handler<br>Aggregate Aggregate<br>Command-side<br>Database Query database<br>database<br>Single database for all CRUD One database for creates, updates, and deletes. A<br>separate database for queries. It is kept up-to-date<br>by using events that are published whenever the<br>command-side database changes.<br>**----- End of picture text -----**<br>
+```text
+Non-CQRS CQRS
+CRUD operations CRUD operations
+Service Service
+CRUD R CUD R
+Domain model Command/domain model Events Query model
+Aggregate Query Aggregate Event
+bypass handler
+Aggregate Aggregate
+Command-side
+Database Query database
+database
+Single database for all CRUD One database for creates, updates, and deletes. A
+separate database for queries. It is kept up-to-date
+by using events that are published whenever the
+command-side database changes.
+```
 
 Figure 7.8 On the left is the non-CQRS version of the service, and on the right is the CQRS version. CQRS restructures a service into command-side and query-side modules, which have separate databases. 
 
@@ -286,8 +364,23 @@ Not only can CQRS be applied within a service, but you can also use this pattern
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0264-03.png)
 
-**----- Start of picture text -----**<br>
-Order<br>events<br>Order Service<br>findOrderHistory()<br>findOrder()<br>Ticket<br>events<br>Kitchen Service Event Order History<br>handlers Service<br>Delivery<br>events<br>Delivery Service Accounting<br>events Order history<br>view database<br>Accounting Service<br>**----- End of picture text -----**<br>
+```text
+Order
+events
+Order Service
+findOrderHistory()
+findOrder()
+Ticket
+events
+Kitchen Service Event Order History
+handlers Service
+Delivery
+events
+Delivery Service Accounting
+events Order history
+view database
+Accounting Service
+```
 
 Figure 7.9 The design of **Order History Service** , which is a query-side service. It implements the **findOrderHistory()** query operation by querying a database, which it maintains by subscribing to events published by multiple other services. 
 
@@ -361,8 +454,19 @@ A CQRS view module has an API consisting of one more query operations. It implem
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0267-02.png)
 
-**----- Start of picture text -----**<br>
-find...()<br>...<br>CQRS view module<br>Events<br>Event<br>Query API<br>handlers<br>update() query()<br>Implements data<br>access logic Data access<br>View database<br>**----- End of picture text -----**<br>
+```text
+find...()
+...
+CQRS view module
+Events
+Event
+Query API
+handlers
+update() query()
+Implements data
+access logic Data access
+View database
+```
 
 Figure 7.10 The design of a CQRS view module. Event handlers update the view database, which is queried by the Query API module. 
 
@@ -430,8 +534,14 @@ As mentioned in chapter 3, an event handler may be invoked with the same event m
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0270-05.png)
 
-**----- Start of picture text -----**<br>
-Time<br>Delivery picked up Delivery delivered Delivery picked up Delivery delivered<br>OrderId: 123 OrderId: 123 OrderId: 123 OrderId: 123<br>State: PICKED_UP State: DELIVERED State: PICKED_UP State: DELIVERED<br>Order History View<br>Temporarily out of date<br>**----- End of picture text -----**<br>
+```text
+Time
+Delivery picked up Delivery delivered Delivery picked up Delivery delivered
+OrderId: 123 OrderId: 123 OrderId: 123 OrderId: 123
+State: PICKED_UP State: DELIVERED State: PICKED_UP State: DELIVERED
+Order History View
+Temporarily out of date
+```
 
 Figure 7.11 The **DeliveryPickedUp** and **DeliveryDelivered** events are delivered twice, which causes the order state in view to be temporarily out-of-date. 
 
@@ -490,8 +600,24 @@ The CQRS view for the findOrderHistory() consumes events from multiple services,
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0273-04.png)
 
-**----- Start of picture text -----**<br>
-findOrderHistory()<br>findOrder<br>Order<br>delivery<br>... Order History Service<br>events<br>OrderHistory<br>OrderHistory<br>Event<br>Query<br>Handlers<br>Update Query<br>OrderHistoryDataAccess<br>OrderHistoryDAO<br><DynamoDB table><br>ftgo-order-history<br>**----- End of picture text -----**<br>
+```text
+findOrderHistory()
+findOrder
+Order
+delivery
+... Order History Service
+events
+OrderHistory
+OrderHistory
+Event
+Query
+Handlers
+Update Query
+OrderHistoryDataAccess
+OrderHistoryDAO
+<DynamoDB table>
+ftgo-order-history
+```
 
 Figure 7.12 The design of **OrderHistoryService** . **OrderHistoryEventHandlers** updates the database in response to events. The **OrderHistoryQuery** module implements the query operations by querying the database. These two modules use the **OrderHistoryDataAccess** module to access the database. 
 

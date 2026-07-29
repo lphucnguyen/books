@@ -50,8 +50,24 @@ Instead of doing a big bang rewrite, you should, as figure 13.1 shows, increment
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0461-05.png)
 
-**----- Start of picture text -----**<br>
-Strangler application<br>Service<br>Service Service<br>Service Service<br>Service Service<br>Service Service Service<br>Service Service Service<br>Service Service Service Service<br>Service Service Service ... Service Service<br>Time<br>... Monolith<br>Monolith<br>Monolith<br>Monolith<br>Monolith<br>The monolith shrinks over time.<br>**----- End of picture text -----**<br>
+```text
+Strangler application
+Service
+Service Service
+Service Service
+Service Service
+Service Service Service
+Service Service Service
+Service Service Service Service
+Service Service Service ... Service Service
+Time
+... Monolith
+Monolith
+Monolith
+Monolith
+Monolith
+The monolith shrinks over time.
+```
 
 Figure 13.1 The monolith is incrementally replaced by a strangler application comprised of services. Eventually, the monolith is replaced entirely by the strangler application or becomes another microservice. 
 
@@ -123,8 +139,27 @@ That’s because the essence of a microservice architecture is a set of loosely 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0465-02.png)
 
-**----- Start of picture text -----**<br>
-Service<br>API gateway implementing<br>Old features New features new feature<br>Inbound Inbound<br>adapter adapter<br>Inbound Outbound<br>adapter adapter «aggregate»<br>DelayedDelivery<br>Service<br>Integration<br>Monolith glue «aggregate»<br>Order<br>Event Event «aggregate»<br>publisher subscriber Notification<br>adapter adapter<br>Database Database<br>adapter adapter<br>Monolith Service<br>database database<br>**----- End of picture text -----**<br>
+```text
+Service
+API gateway implementing
+Old features New features new feature
+Inbound Inbound
+adapter adapter
+Inbound Outbound
+adapter adapter «aggregate»
+DelayedDelivery
+Service
+Integration
+Monolith glue «aggregate»
+Order
+Event Event «aggregate»
+publisher subscriber Notification
+adapter adapter
+Database Database
+adapter adapter
+Monolith Service
+database database
+```
 
 Figure 13.2 A new feature is implemented as a service that’s part of the strangler application. The integration glue integrates the service with the monolith and consists of adapters that implement synchronous and asynchronous APIs. An API gateway routes requests that invoke new functionality to the service. few fields and methods to an existing class. Or the new feature might be too tightly coupled to the code in the monolith. If you attempted to implement this kind of feature as a service you would typically find that performance would suffer because of excessive interprocess communication. You might also have problems maintaining data consistency. If a new feature can’t be implemented as a service, the solution is often to initially implement the new feature in the monolith. Later on, you can then extract that feature along with other related features into their own service. 
 
@@ -144,8 +179,26 @@ There is usually a clean separation between the presentation logic and the busin
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0466-08.png)
 
-**----- Start of picture text -----**<br>
-Monolith containing Smaller, independently Smaller, independently<br>presentation logic and deployable presentation deployable backend<br>backend business logic logic monolith monolith<br>Browser Browser<br>HTML pages<br>HTML pages<br>Web<br>app<br>Web<br>application<br>REST<br>Split REST API<br>client<br>Business logic Business logic<br>Database Database<br>adapter adapter<br>MySQL An API that is callable MySQL<br>by any future services<br>**----- End of picture text -----**<br>
+```text
+Monolith containing Smaller, independently Smaller, independently
+presentation logic and deployable presentation deployable backend
+backend business logic logic monolith monolith
+Browser Browser
+HTML pages
+HTML pages
+Web
+app
+Web
+application
+REST
+Split REST API
+client
+Business logic Business logic
+Database Database
+adapter adapter
+MySQL An API that is callable MySQL
+by any future services
+```
 
 Figure 13.3 Splitting the frontend from the backend enables each to be deployed independently. It also exposes an API for services to invoke. 
 
@@ -177,8 +230,29 @@ Extracting a service is often time consuming, especially because the monolith’
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0468-02.png)
 
-**----- Start of picture text -----**<br>
-Code to Service containing<br>extract into extracted code<br>Monolith a service<br>API gateway<br>Inbound Inbound Inbound<br>adapter adapter adapter<br>Inbound Outbound<br>«service» «service» adapter adapter «service»<br>Order Service Order Service Order Service<br>«aggregate» Integration «aggregate»<br>«aggregate» Courier «aggregate» glue Courier<br>Order Order<br>«aggregate»<br>Plan Inbound Outbound «aggregate»<br>adapter adapter Plan<br>Database Database Database<br>adapter adapter adapter<br>Monolith Monolith Service<br>database database database<br>Glue code integrating<br>service with monolith<br>**----- End of picture text -----**<br>
+```text
+Code to Service containing
+extract into extracted code
+Monolith a service
+API gateway
+Inbound Inbound Inbound
+adapter adapter adapter
+Inbound Outbound
+«service» «service» adapter adapter «service»
+Order Service Order Service Order Service
+«aggregate» Integration «aggregate»
+«aggregate» Courier «aggregate» glue Courier
+Order Order
+«aggregate»
+Plan Inbound Outbound «aggregate»
+adapter adapter Plan
+Database Database Database
+adapter adapter adapter
+Monolith Monolith Service
+database database database
+Glue code integrating
+service with monolith
+```
 
 Figure 13.4 Break apart the monolith by extracting services. You identify a slice of functionality, which consists of business logic and adapters, to extract into a service. You move that code into the service. The newly extracted service and the monolith collaborate via the APIs provided by the integration glue. services to extract. It’s important to focus on refactoring those parts of the application that provide a lot of value. Before extracting a service, ask yourself what the benefit is of doing that. 
 
@@ -198,13 +272,20 @@ In order to extract a service, you need to extract its domain model out of the m
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0469-04.png)
 
-**----- Start of picture text -----**<br>
-Extracted service<br>**----- End of picture text -----**<br>
+```text
+Extracted service
+```
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0469-05.png)
 
-**----- Start of picture text -----**<br>
-FTGO monolith Delivery Service FTGO monolith<br>?<br>«Entity» «Entity» «Entity» «Entity»<br>Order Restaurant Order Restaurant<br>Object reference that spans<br>service boundaries<br>**----- End of picture text -----**<br>
+```text
+FTGO monolith Delivery Service FTGO monolith
+?
+«Entity» «Entity» «Entity» «Entity»
+Order Restaurant Order Restaurant
+Object reference that spans
+service boundaries
+```
 
 Figure 13.5 The **Order** domain class has a reference to a **Restaurant** class. If we extract **Order** into a separate service, we need to do something about its reference to **Restaurant** , because object references between processes don’t make sense. 
 
@@ -212,8 +293,14 @@ One good way to solve this problem is to think in terms of DDD aggregates, descr
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0469-08.png)
 
-**----- Start of picture text -----**<br>
-Delivery Service FTGO monolith Delivery Service FTGO monolith<br>«Entity» ? «Entity» «Entity» «Entity»<br>Order Restaurant Order Restaurant<br>restaurantId<br>Object reference that spans<br>service boundaries Replace with primary key.<br>**----- End of picture text -----**<br>
+```text
+Delivery Service FTGO monolith Delivery Service FTGO monolith
+«Entity» ? «Entity» «Entity» «Entity»
+Order Restaurant Order Restaurant
+restaurantId
+Object reference that spans
+service boundaries Replace with primary key.
+```
 
 Figure 13.6 The **Order** class’s reference to **Restaurant** is replaced with the **Restaurant** 's primary key in order to eliminate an object that would span process boundaries. 
 
@@ -241,8 +328,35 @@ Preserving the structure of the Order entity by replicating data from Delivery S
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0471-05.png)
 
-**----- Start of picture text -----**<br>
-FTGO monolith<br>«Entity»<br>Order<br>...<br>consumerId<br>scheduledPickupTime<br>scheduledDeliveryTime<br>...<br>ORDER table<br>Read-only ORDER_ID RESTAURANT_ID ... SCHEDULED_PICKUP_TIME SCHEDULED_DELIVERY_TIME<br>... ... ... ... ...<br>delivery-related<br>fields<br>Extract Order Service and move columns from<br>ORDER table to a new DELIVERY table.<br>FTGO monolith Delivery Service<br>«Entity» «Entity»<br>Order Delivery<br>... ...<br>consumerId orderId<br>scheduledPickupTime scheduledPickupTime<br>scheduledDeliveryTime scheduledDeliveryTime<br>... ...<br>ORDER table DELIVERY table<br>ORDER_ID RESTAURANT_ID ... SCHEDULED_PICKUP_TIME SCHEDULED_DELIVERY_TIME ORDER_ID ... SCHEDULED_PICKUP_TIME SCHEDULED_DELIVERY_TIME<br>... ... ... ... ... ... ... ... ...<br>Replicate data from Delivery Service to FTGO monolith.<br>**----- End of picture text -----**<br>
+```text
+FTGO monolith
+«Entity»
+Order
+...
+consumerId
+scheduledPickupTime
+scheduledDeliveryTime
+...
+ORDER table
+Read-only ORDER_ID RESTAURANT_ID ... SCHEDULED_PICKUP_TIME SCHEDULED_DELIVERY_TIME
+... ... ... ... ...
+delivery-related
+fields
+Extract Order Service and move columns from
+ORDER table to a new DELIVERY table.
+FTGO monolith Delivery Service
+«Entity» «Entity»
+Order Delivery
+... ...
+consumerId orderId
+scheduledPickupTime scheduledPickupTime
+scheduledDeliveryTime scheduledDeliveryTime
+... ...
+ORDER table DELIVERY table
+ORDER_ID RESTAURANT_ID ... SCHEDULED_PICKUP_TIME SCHEDULED_DELIVERY_TIME ORDER_ID ... SCHEDULED_PICKUP_TIME SCHEDULED_DELIVERY_TIME
+... ... ... ... ... ... ... ... ...
+Replicate data from Delivery Service to FTGO monolith.
+```
 
 Figure 13.7 Minimize the scope of the changes to the FTGO monolith by replicating delivery-related data from the newly extracted **Delivery Service** back to the monolith’s database. 
 
@@ -278,8 +392,17 @@ The interaction between a service and the monolith is, as described earlier, fac
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0473-06.png)
 
-**----- Start of picture text -----**<br>
-Integration<br>glue<br>API API<br>adapter adapter<br>Outbound Inbound<br>adapter adapter<br>Monolith Service<br>Inbound Outbound<br>adapter adapter<br>**----- End of picture text -----**<br>
+```text
+Integration
+glue
+API API
+adapter adapter
+Outbound Inbound
+adapter adapter
+Monolith Service
+Inbound Outbound
+adapter adapter
+```
 
 Figure 13.8 When migrating a monolith to microservices, the services and monolith often need to access each other’s data. This interaction is facilitated by the integration glue, which consists of adapters that implement APIs. Some APIs are messaging based. Other APIs are RPI based. 
 
@@ -325,8 +448,20 @@ If one party needs to query data owned by the other party, there are several opt
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0475-07.png)
 
-**----- Start of picture text -----**<br>
-Delayed<br>Delivery Service<br>FTGO<br>monolith<br>Customer<br>ContactInfo<br>Repository<br>GET/customers/{customerId} REST<br>REST API<br>client<br>Monolith<br>database<br>**----- End of picture text -----**<br>
+```text
+Delayed
+Delivery Service
+FTGO
+monolith
+Customer
+ContactInfo
+Repository
+GET/customers/{customerId} REST
+REST API
+client
+Monolith
+database
+```
 
 Figure 13.9 The adapter that implements the **CustomerContactInfoRepository** interface invokes the monolith’s REST API to retrieve the customer information. 
 
@@ -338,8 +473,24 @@ An alternative approach is for the data consumer to maintain a replica of the da
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0476-03.png)
 
-**----- Start of picture text -----**<br>
-Delayed<br>Delivery Service FTGO<br>monolith<br>Customer<br>ContactInfo<br>Repository Customer<br>domain<br>Event Event<br>event<br>query() subscriber publisher<br>Database update()<br>Monolith<br>adapter database<br>Customer event channel<br>Service<br>database<br>**----- End of picture text -----**<br>
+```text
+Delayed
+Delivery Service FTGO
+monolith
+Customer
+ContactInfo
+Repository Customer
+domain
+Event Event
+event
+query() subscriber publisher
+Database update()
+Monolith
+adapter database
+Customer event channel
+Service
+database
+```
 
 Figure 13.10 The integration glue replicates data from the monolith to the service. The monolith publishes domain events, and an event handler implemented by the service updates the service’s database. 
 
@@ -361,8 +512,22 @@ The goal of an ACL is to prevent a legacy monolith’s domain model from polluti
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0477-06.png)
 
-**----- Start of picture text -----**<br>
-Ubiquitous language of service<br>Delayed Anti-corruption layer<br>Delivery Service FTGO<br>monolith<br>Customer<br>API<br>ContactInfo<br>Repository<br>Translation layer REST<br>GET/user/{userId}<br>API<br>Monolith layer<br>REST client<br>Ubiquitous language of monolith<br>**----- End of picture text -----**<br>
+```text
+Ubiquitous language of service
+Delayed Anti-corruption layer
+Delivery Service FTGO
+monolith
+Customer
+API
+ContactInfo
+Repository
+Translation layer REST
+GET/user/{userId}
+API
+Monolith layer
+REST client
+Ubiquitous language of monolith
+```
 
 Figure 13.11 A service adapter that invokes the monolith must translate between the service’s domain model and the monolith’s domain model. 
 
@@ -372,8 +537,23 @@ An event subscriber, which consumes domain events, also has an ACL. Domain event
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0478-03.png)
 
-**----- Start of picture text -----**<br>
-Ubiquitous language of service<br>Anti-corruption layer<br>Delayed<br>FTGO<br>Delivery<br>monolith<br>Service<br>Event<br>Order<br>publisher Event handler<br>event<br>Translation layer<br>Messaging client<br>Event channel<br>Ubiquitous language of monolith<br>**----- End of picture text -----**<br>
+```text
+Ubiquitous language of service
+Anti-corruption layer
+Delayed
+FTGO
+Delivery
+monolith
+Service
+Event
+Order
+publisher Event handler
+event
+Translation layer
+Messaging client
+Event channel
+Ubiquitous language of monolith
+```
 
 Figure 13.12 An event handler must translate from the event publisher’s domain model to the subscriber’s domain model. 
 
@@ -549,8 +729,32 @@ Fortunately, there’s a straightforward way to solve this problem that only req
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0484-03.png)
 
-**----- Start of picture text -----**<br>
-Login Query User<br>handler database<br>Log in with user<br>ID and password. Initializes<br>POST/login<br>userId: xxx<br>Log in with user roles:[a, b, c]<br>ID and password. Return session cookie. ...<br>POST/login HTTP/1.1 200 OK<br>Browser-based API Set-cookie: JSESSIONID=...<br>SPA application gateway Set-cookie: USERINFO=TOKEN<br>...<br>Provide session cookie.<br>GET/orders<br>Cookie: JSESSIONID=... FTGO Monolith<br>Cookie: USERINFO=TOKEN Provide JWT.<br>... GET/orders<br>Authorization: TOKEN OrderHistory<br>... RequestHandler<br>In-memory<br>Order History Service<br>session<br>Contains user information,<br>such as ID and roles<br>**----- End of picture text -----**<br>
+```text
+Login Query User
+handler database
+Log in with user
+ID and password. Initializes
+POST/login
+userId: xxx
+Log in with user roles:[a, b, c]
+ID and password. Return session cookie. ...
+POST/login HTTP/1.1 200 OK
+Browser-based API Set-cookie: JSESSIONID=...
+SPA application gateway Set-cookie: USERINFO=TOKEN
+...
+Provide session cookie.
+GET/orders
+Cookie: JSESSIONID=... FTGO Monolith
+Cookie: USERINFO=TOKEN Provide JWT.
+... GET/orders
+Authorization: TOKEN OrderHistory
+... RequestHandler
+In-memory
+Order History Service
+session
+Contains user information,
+such as ID and roles
+```
 
 Figure 13.13 The login handler is enhanced to set a **USERINFO** cookie, which is a JWT containing user information. **API Gateway** transfers the **USERINFO** cookie to an authorization header when it invokes a service. 
 
@@ -614,8 +818,29 @@ Delayed Order Service doesn’t own the Order and Restaurant entities. Instead, 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0487-02.png)
 
-**----- Start of picture text -----**<br>
-API gateway<br>GetDelayedOrders()<br>REST REST<br>API API<br>Integration Delayed «Service»<br>glue Order DelayedDelivery<br>??? ??? Service Service<br>«stereotype»<br>Order<br>Monolith «entity»<br>Notification «entity»<br>Restaurant<br>«repository»<br>Customer «entity»<br>ContactInfo OpeningHours<br>Repository<br>Send apology<br>notification.<br>Notification Create case.<br>Service<br>Need to design. CRM system<br>**----- End of picture text -----**<br>
+```text
+API gateway
+GetDelayedOrders()
+REST REST
+API API
+Integration Delayed «Service»
+glue Order DelayedDelivery
+??? ??? Service Service
+«stereotype»
+Order
+Monolith «entity»
+Notification «entity»
+Restaurant
+«repository»
+Customer «entity»
+ContactInfo OpeningHours
+Repository
+Send apology
+notification.
+Notification Create case.
+Service
+Need to design. CRM system
+```
 
 Figure 13.14 The design of **Delayed Delivery Service** . The integration glue provides **Delayed Delivery Service** access to data owned by the monolith, such as the **Order** and **Restaurant** entities, and the customer contact information. 
 
@@ -629,8 +854,22 @@ Figure 13.15 shows the design of the integration glue. The FTGO monolith publish
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0488-03.png)
 
-**----- Start of picture text -----**<br>
-Order<br>events Order events<br>Domain<br>Restaurant Event<br>event<br>events subscriber<br>publisher<br>Monolith Restaurant events Delayed Order Service<br><Repository><br>REST getCustomerContactInfo() Customer Customer<br>ContactInfo<br>endpoint ContactInfo<br>Proxy<br>Repository<br>**----- End of picture text -----**<br>
+```text
+Order
+events Order events
+Domain
+Restaurant Event
+event
+events subscriber
+publisher
+Monolith Restaurant events Delayed Order Service
+<Repository>
+REST getCustomerContactInfo() Customer Customer
+ContactInfo
+endpoint ContactInfo
+Proxy
+Repository
+```
 
 Figure 13.15 The integration glue provides **Delayed Delivery Service** with access to the data owned by the monolith. 
 
@@ -692,8 +931,36 @@ Quite often what’s extracted into a service is, as mentioned in section 13.2.3
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0491-02.png)
 
-**----- Start of picture text -----**<br>
-Order operations: Courier operations:<br>acceptOrder() updateCourierLocation()<br>cancelOrder() updateCourierAvailability()<br>getOrderStatus() getCourierPlan()<br>getOrderHistory()<br>API<br>FTGO monolith<br>«Service»<br>OrderService<br>...<br>«delivery management» «Service»<br>scheduleDelivery() CourierService<br>rescheduleDelivery()<br>cancelDelivery()<br>reviseSchedule()<br>...<br>«entity»<br>Courier<br>«entity»<br>Order<br>«value object»<br>Plan<br>«entity»<br>Restaurant «value object»<br>Action<br>«value object»<br>Pickup «value object»<br>Dropoff<br>**----- End of picture text -----**<br>
+```text
+Order operations: Courier operations:
+acceptOrder() updateCourierLocation()
+cancelOrder() updateCourierAvailability()
+getOrderStatus() getCourierPlan()
+getOrderHistory()
+API
+FTGO monolith
+«Service»
+OrderService
+...
+«delivery management» «Service»
+scheduleDelivery() CourierService
+rescheduleDelivery()
+cancelDelivery()
+reviseSchedule()
+...
+«entity»
+Courier
+«entity»
+Order
+«value object»
+Plan
+«entity»
+Restaurant «value object»
+Action
+«value object»
+Pickup «value object»
+Dropoff
+```
 
 Figure 13.16 Delivery management is entangled with order management within the FTGO monolith. consider the Courier-related commands and queries to be part of delivery management. After all, delivery management creates the courier plans and is the primary consumer of the Courier location and availability information. But in order to minimize the development effort, we’ll leave those operations in the monolith and just extract the core of the algorithm. Consequently, the first iteration of Delivery Service won’t expose a publicly accessible API. Instead, it will only be invoked by the monolith. Next, let’s explore the design of Delivery Service. 
 
@@ -703,8 +970,25 @@ The proposed new Delivery Service is responsible for scheduling, rescheduling, a
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0492-04.png)
 
-**----- Start of picture text -----**<br>
-What API does the Delivery Service<br>expose to the monolith?<br>FTGO Monolith Delivery Service<br>Monolith Delivery Service<br>domain model domain model<br>Integration glue<br>Adapter Adapter<br>Which behavior and<br>data is moved to the<br>Delivery Service?<br>Delivery<br>Monolith<br>Service<br>database<br>database<br>What API does the monolith<br>expose to the Delivery Service?<br>**----- End of picture text -----**<br>
+```text
+What API does the Delivery Service
+expose to the monolith?
+FTGO Monolith Delivery Service
+Monolith Delivery Service
+domain model domain model
+Integration glue
+Adapter Adapter
+Which behavior and
+data is moved to the
+Delivery Service?
+Delivery
+Monolith
+Service
+database
+database
+What API does the monolith
+expose to the Delivery Service?
+```
 
 Figure 13.17 The high-level view of the FTGO application after extracting **Delivery Service** . The FTGO monolith and **Delivery Service** collaborate using the integration glue, which consists of APIs in each of them. The two key decisions that need to be made are which functionality and data are moved to **Delivery Service** and how do the monolith and **Delivery Service** collaborate via APIs? 
 
@@ -732,8 +1016,25 @@ The first step in the process of designing Delivery Service is to carefully revi
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0493-08.png)
 
-**----- Start of picture text -----**<br>
-Order<br>«Monolith Read/Write»<br>«Service Read»<br>state Courier<br>deliveryAddress «Monolith Read/Write»<br>promisedDeliveryTime «Service Read»<br>preparedByTime Location<br>availability<br>«Service Read/Write»<br>«Monolith Read» «Service Read/Write»<br>scheduledPickupTime «Monolith Read»<br>scheduledDeliveryTime<br>Plan<br>Restaurant<br>Task<br>«Read»<br>address<br>**----- End of picture text -----**<br>
+```text
+Order
+«Monolith Read/Write»
+«Service Read»
+state Courier
+deliveryAddress «Monolith Read/Write»
+promisedDeliveryTime «Service Read»
+preparedByTime Location
+availability
+«Service Read/Write»
+«Monolith Read» «Service Read/Write»
+scheduledPickupTime «Monolith Read»
+scheduledDeliveryTime
+Plan
+Restaurant
+Task
+«Read»
+address
+```
 
 Figure 13.18 The entities and fields that are accessed by delivery management and other functionality implemented by the monolith. A field can be read or written or both. It can be accessed by delivery management, the monolith, or both. 
 
@@ -757,8 +1058,26 @@ Delivery Service is not a standalone service. Let’s look at the design of the 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0495-02.png)
 
-**----- Start of picture text -----**<br>
-Delivery Service<br>DeliveryService<br>NotificationHandlers<br>«interface»<br>DeliveryService<br>void schedule(...)<br>void reschedule(...)<br>void cancel(...)<br>DeliveryServiceImpl<br>«interface»<br>CourierService<br>noteCourierLocationUpdated(...) «entity»<br>noteCourierAvailabilityUpdated(...) «entity» Courier<br>Delivery<br>«value object»<br>Plan<br>DeliveryService<br>EventsHandlers<br>**----- End of picture text -----**<br>
+```text
+Delivery Service
+DeliveryService
+NotificationHandlers
+«interface»
+DeliveryService
+void schedule(...)
+void reschedule(...)
+void cancel(...)
+DeliveryServiceImpl
+«interface»
+CourierService
+noteCourierLocationUpdated(...) «entity»
+noteCourierAvailabilityUpdated(...) «entity» Courier
+Delivery
+«value object»
+Plan
+DeliveryService
+EventsHandlers
+```
 
 Figure 13.19 The design of the **Delivery Service** 's domain model 
 
@@ -774,8 +1093,22 @@ Delivery Service must provide an API that enables the monolith to schedule, revi
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0496-02.png)
 
-**----- Start of picture text -----**<br>
-Delivery Service Delivery<br>Delivery notifications Service<br>Service notifications<br>proxy Courier events handlers<br>«interface» Messaging Courier DeliveryService«interface»<br>DeliveryServiceFTGO adapter Courier events subscriberevent CourierService«interface»<br>monolith<br>Delivery events Delivery<br>Service<br>Delivery<br>event Courier events Messaging<br>adapter<br>subscriber<br>Delivery events<br>**----- End of picture text -----**<br>
+```text
+Delivery Service Delivery
+Delivery notifications Service
+Service notifications
+proxy Courier events handlers
+«interface» Messaging Courier DeliveryService«interface»
+DeliveryServiceFTGO adapter Courier events subscriberevent CourierService«interface»
+monolith
+Delivery events Delivery
+Service
+Delivery
+event Courier events Messaging
+adapter
+subscriber
+Delivery events
+```
 
 Figure 13.20 The design of the **Delivery Service** integration glue. **Delivery Service** has a delivery management API. The service and the FTGO monolith synchronize data by exchanging domain events. revises, and cancels a Delivery. A benefit of this approach is that the monolith doesn’t need to explicitly invoke Delivery Service. The drawback of relying on domain events is that it requires Delivery Service to know how each Order event impacts the corresponding Delivery. 
 
@@ -805,8 +1138,18 @@ The first step is to encapsulate the delivery management code with a Java interf
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0497-10.png)
 
-**----- Start of picture text -----**<br>
-«interface»<br>DeliveryService<br>void schedule(...)<br>void reschedule(...)<br>void cancel(...)<br>Delivery<br>management DeliveryServiceImpl<br>client<br>Delivery<br>management<br>**----- End of picture text -----**<br>
+```text
+«interface»
+DeliveryService
+void schedule(...)
+void reschedule(...)
+void cancel(...)
+Delivery
+management DeliveryServiceImpl
+client
+Delivery
+management
+```
 
 Figure 13.21 The first step is to define **DeliveryService** , which is a coarse-grained, remotable API for invoking the delivery management logic. 
 
@@ -820,8 +1163,16 @@ Next, as figure 13.22 shows, we need to identify all the places in the FTGO mono
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0498-06.png)
 
-**----- Start of picture text -----**<br>
-«interface»<br>Delivery DeliveryService<br>management v oid schedule(...)<br>client void reschedule(...)<br>void cancel(...)<br>DeliveryServiceImpl<br>Delivery<br>management<br>**----- End of picture text -----**<br>
+```text
+«interface»
+Delivery DeliveryService
+management v oid schedule(...)
+client void reschedule(...)
+void cancel(...)
+DeliveryServiceImpl
+Delivery
+management
+```
 
 Figure 13.22 The second step is to change the FTGO monolith to invoke delivery management via the **DeliveryService** interface. 
 
@@ -833,8 +1184,23 @@ The final step is to replace the DeliveryServiceImpl class with a proxy that sen
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0499-02.png)
 
-**----- Start of picture text -----**<br>
-«interface»<br>Delivery DeliveryService<br>management v oid schedule(...)<br>client void reschedule(...)<br>void cancel(...)<br>FeatureToggleBased<br>DeliveryServiceImpl<br>Invokes<br>Invokes<br>DeliveryServiceImpl<br>Sends<br>message<br>DeliveryServiceProxy<br>Delivery Delivery notifications<br>management<br>**----- End of picture text -----**<br>
+```text
+«interface»
+Delivery DeliveryService
+management v oid schedule(...)
+client void reschedule(...)
+void cancel(...)
+FeatureToggleBased
+DeliveryServiceImpl
+Invokes
+Invokes
+DeliveryServiceImpl
+Sends
+message
+DeliveryServiceProxy
+Delivery Delivery notifications
+management
+```
 
 Figure 13.23 The final step is to implement **DeliveryService** with a proxy class that sends messages **Delivery Service** . A feature toggle controls whether the FTGO monolith uses the old implementation or the new **Delivery Service** . 
 
@@ -1028,15 +1394,46 @@ ZeroMQ 91 Zipkin 373
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0521-00.png)
 
-**----- Start of picture text -----**<br>
-Process:<br>DevOps/continuous delivery/deployment<br>Enables Enables<br>Rapid, frequent,<br>and reliable delivery<br>of software<br>Organization: Architecture:<br>Small, autonomous, Microservice<br>Enables<br>cross-functional teams architecture<br>**----- End of picture text -----**<br>
+```text
+Process:
+DevOps/continuous delivery/deployment
+Enables Enables
+Rapid, frequent,
+and reliable delivery
+of software
+Organization: Architecture:
+Small, autonomous, Microservice
+Enables
+cross-functional teams architecture
+```
 
 The rapid, frequent, and reliable delivery of large, complex applications requires a combination of DevOps, which includes continuous delivery/deployment, small, autonomous teams, and the microservice architecture. 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0521-02.png)
 
-**----- Start of picture text -----**<br>
-Small, autonomous, Each service has Each service has Small, simple,<br>loosely coupled teams its own source its own automated reliable, easy to<br>code repository. deployment pipeline. maintain services<br>FTGO development<br>Order management team<br>Deployment pipeline<br>Jenkins Cl Order Service<br>Order Service<br>source code<br>Restaurant management team repository<br>Deployment pipeline<br>Jenkins Cl Restaurant Service<br>Restaurant Service<br>source code<br>Delivery management team<br>repository<br>Deployment pipeline<br>Jenkins Cl Delivery Service<br>Delivery Service Production<br>source code<br>repository<br>**----- End of picture text -----**<br>
+```text
+Small, autonomous, Each service has Each service has Small, simple,
+loosely coupled teams its own source its own automated reliable, easy to
+code repository. deployment pipeline. maintain services
+FTGO development
+Order management team
+Deployment pipeline
+Jenkins Cl Order Service
+Order Service
+source code
+Restaurant management team repository
+Deployment pipeline
+Jenkins Cl Restaurant Service
+Restaurant Service
+source code
+Delivery management team
+repository
+Deployment pipeline
+Jenkins Cl Delivery Service
+Delivery Service Production
+source code
+repository
+```
 
 The microservice architecture structures an application as a set of loosely coupled services that are organized around business capabilities. Each team develops, tests, and deploys their services independently. 
 
@@ -1064,8 +1461,9 @@ Written for enterprise developers familiar with standard enterprise application 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0522-12.png)
 
-**----- Start of picture text -----**<br>
-See first page<br>**----- End of picture text -----**<br>
+```text
+See first page
+```
 
 “A comprehensive overview of the challenges teams face when moving to microservices, with industry-tested solutions to these problems.” —Tim Moore, Lightbend 
 

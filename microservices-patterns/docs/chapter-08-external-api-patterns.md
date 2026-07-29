@@ -42,8 +42,31 @@ One approach to API design is for clients to invoke the services directly. On th
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0285-02.png)
 
-**----- Start of picture text -----**<br>
-Lower-performance Firewall<br>internet<br>Web<br>Higher-performance<br>application<br>LAN<br>Web page<br>requests<br>Browser<br>HTML<br>API<br>JavaScript requests Backend services<br>application<br>Order Service<br>API<br>iPhone/<br>Android requests Consumer<br>application Service<br>API Delivery<br>requests Service<br>3rd-party<br>application Kitchen<br>Service<br>**----- End of picture text -----**<br>
+```text
+Lower-performance Firewall
+internet
+Web
+Higher-performance
+application
+LAN
+Web page
+requests
+Browser
+HTML
+API
+JavaScript requests Backend services
+application
+Order Service
+API
+iPhone/
+Android requests Consumer
+application Service
+API Delivery
+requests Service
+3rd-party
+application Kitchen
+Service
+```
 
 Figure 8.1 The FTGO application’s services and their clients. There are several different types of clients. Some are inside the firewall, and others are outside. Those outside the firewall access the services over the lower-performance internet/mobile network. Those clients inside the firewall use a higherperformance LAN. 
 
@@ -67,8 +90,28 @@ If the mobile client invokes the services directly, then it must, as figure 8.2 
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0286-07.png)
 
-**----- Start of picture text -----**<br>
-One API required<br>Firewall<br>iPhone/<br>Android Internet getOrderDetails() Monolithic FTGO<br>consumer application<br>application<br>Firewall FTGO backend services<br>Order Service<br>getOrder()<br>Internet<br>getDelivery() Delivery<br>iPhone/ Service<br>Android<br>consumer getBill()<br>application Accounting<br>Service<br>getTicket()<br>Kitchen<br>Service<br>Many API calls required<br>**----- End of picture text -----**<br>
+```text
+One API required
+Firewall
+iPhone/
+Android Internet getOrderDetails() Monolithic FTGO
+consumer application
+application
+Firewall FTGO backend services
+Order Service
+getOrder()
+Internet
+getDelivery() Delivery
+iPhone/ Service
+Android
+consumer getBill()
+application Accounting
+Service
+getTicket()
+Kitchen
+Service
+Many API calls required
+```
 
 Figure 8.2 A client can retrieve the order details from the monolithic FTGO application with a single request. But the client must make multiple requests to retrieve the same information in a microservice architecture. 
 
@@ -132,8 +175,32 @@ Section 8.1.1 described the drawbacks of clients, such as the FTGO mobile applic
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0290-03.png)
 
-**----- Start of picture text -----**<br>
-Lower-performance Firewall<br>internet<br>Web<br>Higher-performance<br>application<br>LAN<br>Web page<br>Browser requests<br>HTML<br>API<br>JavaScript requests Backend services<br>application<br>Order Service<br>API<br>iPhone/<br>requests API<br>Android Consumer<br>gateway<br>application Service<br>API<br>requests Delivery<br>Service<br>3rd-party<br>application<br>**----- End of picture text -----**<br>
+```text
+Lower-performance Firewall
+internet
+Web
+Higher-performance
+application
+LAN
+Web page
+Browser requests
+HTML
+API
+JavaScript requests Backend services
+application
+Order Service
+API
+iPhone/
+requests API
+Android Consumer
+gateway
+application Service
+API
+requests Delivery
+Service
+3rd-party
+application
+```
 
 Figure 8.3 The API gateway is the single entry point into the application for API calls from outside the firewall. 
 
@@ -153,8 +220,34 @@ The FTGO API gateway provides a coarse-grained API that enables mobile clients t
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0291-06.png)
 
-**----- Start of picture text -----**<br>
-Firewall FTGO backend services<br>Internet Order Service<br>getOrder()<br>Delivery<br>iPhone/ getDelivery() Service<br>Android<br>consumer<br>application getBill() Accounting<br>Service<br>getTicket()<br>Kitchen<br>Service<br>Firewall FTGO backend services<br>LAN<br>Order Service<br>getOrder()<br>Internet<br>iPhone/ getDelivery() Delivery<br>Android getOrderDetails() API Service<br>consumer gateway getBill()<br>application Accounting<br>Service<br>getTicket() Kitchen<br>Service<br>Lower-performance One API call required Higher-performance<br>network network<br>**----- End of picture text -----**<br>
+```text
+Firewall FTGO backend services
+Internet Order Service
+getOrder()
+Delivery
+iPhone/ getDelivery() Service
+Android
+consumer
+application getBill() Accounting
+Service
+getTicket()
+Kitchen
+Service
+Firewall FTGO backend services
+LAN
+Order Service
+getOrder()
+Internet
+iPhone/ getDelivery() Delivery
+Android getOrderDetails() API Service
+consumer gateway getBill()
+application Accounting
+Service
+getTicket() Kitchen
+Service
+Lower-performance One API call required Higher-performance
+network network
+```
 
 Figure 8.4 An API gateway often does API composition, which enables a client such as a mobile device to efficiently retrieve data using a single API request. 
 
@@ -198,8 +291,15 @@ An API gateway has a layered, modular architecture. Its architecture, shown in f
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0293-07.png)
 
-**----- Start of picture text -----**<br>
-Browser JavaScript<br>Mobile client 3rd-party application<br>application<br>API gateway<br>API layer<br>Mobile API Browser API Public API<br>Common layer<br>**----- End of picture text -----**<br>
+```text
+Browser JavaScript
+Mobile client 3rd-party application
+application
+API gateway
+API layer
+Mobile API Browser API Public API
+Common layer
+```
 
 Figure 8.5 An API gateway has a layered modular architecture. The API for each client is implemented by a separate module. The common layer implements functionality common to all APIs, such as authentication. 
 
@@ -231,8 +331,19 @@ One concern with an API gateway is that responsibility for it is blurred. Multip
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0295-02.png)
 
-**----- Start of picture text -----**<br>
-Mobile client team Browser client team Public API team<br>Browser JavaScript<br>Mobile client 3rd-party application<br>application<br>Owns Owns Owns<br>API gateway<br>API layer<br>Mobile API Browser API Public API<br>Common layer<br>Owns<br>API gateway team<br>**----- End of picture text -----**<br>
+```text
+Mobile client team Browser client team Public API team
+Browser JavaScript
+Mobile client 3rd-party application
+application
+Owns Owns Owns
+API gateway
+API layer
+Mobile API Browser API Public API
+Common layer
+Owns
+API gateway team
+```
 
 Figure 8.6 A client team owns their API module. As they change the client, they can change the API module and not ask the API gateway team to make the changes. 
 
@@ -244,8 +355,18 @@ Implement a separate API gateway for each type of client. See http://microservic
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0296-02.png)
 
-**----- Start of picture text -----**<br>
-Mobile client team Browser client team Public API team<br>Browser JavaScript<br>Mobile client 3rd-party application<br>application<br>Owns Owns Owns<br>Mobile API Browser API Public API<br>gateway gateway gateway<br>API layer API layer API layer<br>Mobile API Browser API Public API<br>Common layer Common layer Common layer<br>**----- End of picture text -----**<br>
+```text
+Mobile client team Browser client team Public API team
+Browser JavaScript
+Mobile client 3rd-party application
+application
+Owns Owns Owns
+Mobile API Browser API Public API
+gateway gateway gateway
+API layer API layer API layer
+Mobile API Browser API Public API
+Common layer Common layer Common layer
+```
 
 Figure 8.7 The Backends for frontends pattern defines a separate API gateway for each client. Each client team owns their API gateway. An API gateway team owns the common layer. 
 
@@ -433,8 +554,31 @@ Figure 8.8 shows the key parts of an API gateway built using this framework.
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0304-07.png)
 
-**----- Start of picture text -----**<br>
-static void main(String[]args){<br>«@SpringBootApplication»ApiGatewayApplication ...<br>}<br>Orders«API package»<br>«Spring Configuration»OrderConfiguration<br>orders* «@Bean» «@Bean» GET/orders/{orderId}<br>http://orderservice=> orderProxyRouting orderHandlerRouting OrderHandlers::getOrderDetails=><br>Order handlers<br>mono<ServerResponse><br>getOrderDetails(ServerRequest){<br>getOrderDetails() ...<br>}<br>«proxy» «proxy» «proxy»<br>.... DeliveryService OrderService<br>findDeliveryByOrder() findOrderById() mono<OrderInfo><br>findOrderById()(orderId){<br>Remote proxies«package» ...WebClient<br>.get()<br>.url("http://order-service/..."}<br>}<br>Spring Cloud Gateway<br>Spring 5 Spring webFlux<br>Project reactor<br>**----- End of picture text -----**<br>
+```text
+static void main(String[]args){
+«@SpringBootApplication»ApiGatewayApplication ...
+}
+Orders«API package»
+«Spring Configuration»OrderConfiguration
+orders* «@Bean» «@Bean» GET/orders/{orderId}
+http://orderservice=> orderProxyRouting orderHandlerRouting OrderHandlers::getOrderDetails=>
+Order handlers
+mono<ServerResponse>
+getOrderDetails(ServerRequest){
+getOrderDetails() ...
+}
+«proxy» «proxy» «proxy»
+.... DeliveryService OrderService
+findDeliveryByOrder() findOrderById() mono<OrderInfo>
+findOrderById()(orderId){
+Remote proxies«package» ...WebClient
+.get()
+.url("http://order-service/..."}
+}
+Spring Cloud Gateway
+Spring 5 Spring webFlux
+Project reactor
+```
 
 Figure 8.8 The architecture of an API gateway built using Spring Cloud Gateway 
 
@@ -654,8 +798,28 @@ Implementing an API gateway with a REST API that supports a diverse set of clien
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0310-05.png)
 
-**----- Start of picture text -----**<br>
-API gateway<br>Consumer Service<br>Graph-based API framework<br>Consumer<br>Query<br>Graph schema<br>Consumer Order Service<br>Query<br>Order<br>Schema<br>Query =><br>Client<br>Order Service<br>Query Restaurant Service<br>mapping<br>Restaurant<br>Query<br>Restaurant Delivery<br>Delivery Service<br>Delivery<br>**----- End of picture text -----**<br>
+```text
+API gateway
+Consumer Service
+Graph-based API framework
+Consumer
+Query
+Graph schema
+Consumer Order Service
+Query
+Order
+Schema
+Query =>
+Client
+Order Service
+Query Restaurant Service
+mapping
+Restaurant
+Query
+Restaurant Delivery
+Delivery Service
+Delivery
+```
 
 Figure 8.9 The API gateway’s API consists of a graph-based schema that’s mapped to the services. A client issues a query that retrieves multiple graph nodes. The graph-based API framework executes the query by retrieving data from one or more services. 
 
@@ -683,8 +847,36 @@ There’s also a small amount of glue code that integrates the GraphQL server wi
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0312-03.png)
 
-**----- Start of picture text -----**<br>
-Apollo<br>graphQL<br>client<br>http://.../graphql?query={orders(consumerId:1){orde rId,restaurant{id}}}<br>FTGO API gateway<br>Express web framework<br>function resolveOrder(_. {orderId}, context){<br>Apollo graphQL engine return context.orderServiceProxy.findOrder(orderI d);<br>}<br>type Query{ const resolvers = {<br>orders(consumerId:Int!): [Order] Query:{<br>order(orderId : int!): Order orders: resolveOrders,<br>consumer(consumerId : int!): Consumer order: resolveOrder,<br>} ...<br>},<br>type Order { Order:{<br>orderId: ID, consumer: resolveOrderConsumer,<br>consumerId: Int, restaurant: resolveOrderRestaurant,<br>consumer: Consumer deliveryInfo: resolveOrderDeliveryInfo<br>restaurant: Restaurant },<br>deliveryInfo : DeliveryInfo ...<br>...<br>function resolveOrderDeliveryInfo({orderId}, args, context) {<br>return context.deliveryServiceProxy.findDeliveryF orOrder(orderId);<br>}<br>ConsumerServiceProxy OrderServiceProxy RestaurantServiceProxy DeliveryServiceProxy<br>invokes invokes invokes invokes<br>Consumer Service Order Service Restaurant Service Delivery Service<br>**----- End of picture text -----**<br>
+```text
+Apollo
+graphQL
+client
+http://.../graphql?query={orders(consumerId:1){orde rId,restaurant{id}}}
+FTGO API gateway
+Express web framework
+function resolveOrder(_. {orderId}, context){
+Apollo graphQL engine return context.orderServiceProxy.findOrder(orderI d);
+}
+type Query{ const resolvers = {
+orders(consumerId:Int!): [Order] Query:{
+order(orderId : int!): Order orders: resolveOrders,
+consumer(consumerId : int!): Consumer order: resolveOrder,
+} ...
+},
+type Order { Order:{
+orderId: ID, consumer: resolveOrderConsumer,
+consumerId: Int, restaurant: resolveOrderRestaurant,
+consumer: Consumer deliveryInfo: resolveOrderDeliveryInfo
+restaurant: Restaurant },
+deliveryInfo : DeliveryInfo ...
+...
+function resolveOrderDeliveryInfo({orderId}, args, context) {
+return context.deliveryServiceProxy.findDeliveryF orOrder(orderId);
+}
+ConsumerServiceProxy OrderServiceProxy RestaurantServiceProxy DeliveryServiceProxy
+invokes invokes invokes invokes
+Consumer Service Order Service Restaurant Service Delivery Service
+```
 
 Figure 8.10 The design of the GraphQL-based FTGO API Gateway 
 
@@ -833,8 +1025,29 @@ Figure 8.11 shows how this algorithm executes the query that retrieves a consume
 
 ![](../images/Microservices_Patterns_With_examples_in_Java_-Chris_Richardson-_-Z-Library--0317-07.png)
 
-**----- Start of picture text -----**<br>
-Schema Query document<br>Query arguments passed to resolver<br>query{<br>type Query{ consumer(consumerId:1){ consumer = resolveConsumer(..., 1)<br>consumer(consumerId:int!): Consumer id<br>} firstName<br>lastName<br>type Order { orders{ orders = resolveConsumerOrders(consumer)<br>... orderId<br>restaurant: Restaurant restaurant{<br>deliveryInfo : DeliveryInfo id resolveOrderRestaurant(order, ...)<br>... name<br>}<br>deliveryInfo{<br>estimatedDeliveryTime resolveOrderDeliveryInfo(order)<br>name<br>}<br>}<br>}<br>Resolver functions<br>}<br>**----- End of picture text -----**<br>
+```text
+Schema Query document
+Query arguments passed to resolver
+query{
+type Query{ consumer(consumerId:1){ consumer = resolveConsumer(..., 1)
+consumer(consumerId:int!): Consumer id
+} firstName
+lastName
+type Order { orders{ orders = resolveConsumerOrders(consumer)
+... orderId
+restaurant: Restaurant restaurant{
+deliveryInfo : DeliveryInfo id resolveOrderRestaurant(order, ...)
+... name
+}
+deliveryInfo{
+estimatedDeliveryTime resolveOrderDeliveryInfo(order)
+name
+}
+}
+}
+Resolver functions
+}
+```
 
 Figure 8.11 GraphQL executes a query by recursively invoking the resolver functions for the fields specified in the Query document. First, it executes the resolver for the query, and then it recursively invokes the resolvers for the fields in the result object hierarchy. 
 
