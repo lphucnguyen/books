@@ -44,7 +44,6 @@ Choreography is desirable in the majority of interteam communications, as it all
 The relationships between the microservices define the workflow of a choreographed architecture. A series of microservices operating together can be responsible for providing the business functionality of the workflow. This choreographed workflow is a form of _emergent behavior_, where it is not just the individual microservices that dictate the workflow, but the relationships between them as well.
 
 
-![](../images/event_driven_microservices_page_0155_0.png)
 
 Direct-call microservice architectures focus on providing reusable _services_, to be used as building blocks for business workflows. Event-driven microservice architectures, on the other hand, focus on providing reusable _events_, with no foreknowledge of downstream consumption. The latter architecture enables the usage of highly decoupled, choreographed architectures.
 
@@ -78,7 +77,6 @@ Both services C and B must be edited to consume from streams 1 and 2, respective
 While choreography allows for simple addition of new steps at the end of the workflow, it may be problematic to insert steps into the middle or to change the order of the workflow. The relationships between the services may also be difficult to understand outside the context of the workflow, a challenge that is exacerbated as the number of services in the workflow increases. Choreographed workflows can be brittle, particularly when business functions cross multiple microservice instances. This can be mitigated by carefully respecting the bounded contexts of services and ensuring that full business functionality remains local to a single service. However, even when correctly implemented, small business logic changes may require you to modify or rewrite numerous services, especially those that change the order of the workflow itself.
 
 
-![](../images/event_driven_microservices_page_0157_3.png)
 
 ### Monitoring a Choreographed Workflow
 
@@ -97,7 +95,6 @@ Be sure you know what it is you’re trying to make visible in the choreographed
 In the orchestration pattern a central microservice, the orchestrator, issues commands to and awaits responses from subordinate worker microservices. Orchestration can be thought of much like a musical orchestra, where a single conductor commands the musicians during the performance. The orchestrator microservice contains the entire workflow logic for a given business process and sends specific events to worker microservices to tell them what to do.
 
 
-![](../images/event_driven_microservices_page_0158_4.png)
 
 The orchestrator awaits responses from the instructed microservices and handles the results according to the workflow logic. This is in contrast to the choreographed workflow, in which there is no centralized coordination.
 
@@ -197,7 +194,6 @@ The orchestrator can keep track of events in the workflow by materializing each 
 Orchestration results in a tight coupling between services. The relationship between the orchestrator and the dependent worker services must be explicitly defined.
 
 
-![](../images/event_driven_microservices_page_0162_7.png)
 
 It is important to ensure that the orchestrator is responsible only for orchestrating the business workflow. A common anti-pattern is creating a single “God” service that issues granular commands to many weak minion services. This anti-pattern spreads workflow business logic between the orchestrator and the worker services, making for poor encapsulation, ill-defined bounded contexts, and difficulty in scaling ownership of the workflow microservices beyond a single team. The orchestrator should delegate full responsibility to the dependent worker services to minimize the amount of business logic it performs.
 
@@ -237,7 +233,6 @@ Suppose now that service C is unable to complete its part of the transaction. It
 _Figure 8-6. Choreographed transaction failure with rollbacks_
 
 
-![](../images/event_driven_microservices_page_0164_10.png)
 
 Service A, the original consumer of the input event, must now decide what to do with the failed transaction results. A curious situation is already evident in the preceding two figures. The status of a successful transaction comes from the output of microservice C. However, the status of the aborted transaction comes out of microservice A, so a consumer would need to listen to both the output of C and the failed transaction stream from A to get a complete picture of finalized transactions.
 
@@ -256,7 +251,6 @@ Orchestrated transactions can also support a variety of signals, such as timeout
 The transaction can be aborted at any point in the workflow due to a return value from one of the worker microservices, a timeout, or an interrupt sent from a human operator.
 
 
-![](../images/event_driven_microservices_page_0165_11.png)
 
 A simple two-stage orchestrated transaction topology is shown in Figure 8-7.
 
@@ -275,7 +269,6 @@ Service B cannot perform the necessary operation and, after exhausting its own r
 Each microservice is fully responsible for ensuring its own retry policy, error handling, and intermittent failure management. The orchestrator does not manage any of these.
 
 
-![](../images/event_driven_microservices_page_0166_14.png)
 
 Figure 8-9 demonstrates the orchestrator issuing a rollback command to service A (service B’s failure response indicates it did not write anything to its internal data store). In this example, Service A performs the rollback successfully, but if it were to fail during its rollback, it would be up to the orchestrator to determine what to do next. The orchestrator could reissue the command a number of times, issue alerts via monitoring frameworks, or terminate the application to prevent further issues.
 

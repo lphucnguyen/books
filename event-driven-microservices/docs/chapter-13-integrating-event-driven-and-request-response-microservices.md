@@ -1,6 +1,5 @@
 # Chapter 13: Integrating Event-Driven and Request-Response Microservices
 
-![](../images/event_driven_microservices_page_0229_0.png)
 
 As powerful as event-driven microservice patterns are, they cannot serve all of the business needs of an organization. Request-response endpoints provide the means to serve important data in real time, particularly when you are:
 
@@ -34,7 +33,6 @@ Now, you may be wondering if, say, requests to load the next 60s of the current 
 The second type of externally generated event is a _reactive_ event, which is generated _in response_ to a request from one of your services. Your service composes a request, sends it to the endpoint, and awaits a response. In some cases, it’s really only important that the request is received, and the requesting client doesn’t need any other details from the response. For example, if you need to issue requests to send advertisement emails, collecting the response from the third-party service handling the requests may not be useful if turned into events. Once the request is successfully issued (HTTP 202 response), you can assume that the third-party email application will make it happen. Collecting the responses and converting them into events may not be necessary if there is no action to take from the results.
 
 
-![](../images/event_driven_microservices_page_0231_1.png)
 
 On the other hand, your business requirements may expect significant detail from the response of the request. A prime example of this is the use of a third-party payment service, where the input event states the amount that is due to be paid by the customer. The response payload from the third-party API is _extremely_ important, as it specifies whether the payment succeeded or not, any error messages, and any additional details such as a unique, traceable number indicating the payment information. This data is important to put into an event stream, as it allows downstream accounting services to reconcile accounts payable with received payments.
 
@@ -51,7 +49,6 @@ Use schemas to encode events when generating them on the client side. This ensur
 Schematized events are essential for consuming analytical events at scale. Schemas clarify exactly what is collected so users can make sense of the event at a later date. They also provide a mechanism for version control and evolution, and put the onus of populating, validating, and testing the event on the producer of that data (the application developers) and not the consumers (backend recipients and analysts). Ensuring that the event adheres to a schema _at creation time_ means that the receiver service no longer needs to interpret and parse the event, as could be the case with a format such as plain text.
 
 
-![](../images/event_driven_microservices_page_0232_3.png)
 
 There are a number of restrictions that you must account for when ingesting analytical events from devices running multiple versions of code. For instance, this is a particularly common scenario for any application running on an end user’s moble device. Adding new fields to collect new data, or ceasing the collection of other event data is certainly reasonable. However, while you could force users to upgrade their applications by locking out older versions, it’s not realistic to make them update their application for every small change. Plan for multiple versions of analytical events, as shown in Figure 13-2.
 
@@ -128,7 +125,6 @@ _Figure 13-4. Overview of an EDM with a REST API serving content to a client_
 Now, it is quite common that multiple microservice instances are required to handle the load and that internal state may be split up between instances. When using multiple microservice instances, you must route requests for state to the correct instance hosting that data, as all internal state is sharded according to key, and a keyed value can only ever be assigned to one partition. Figure 13-5 shows a client making a request that is then forwarded to the correct instance containing the necessary state.
 
 
-![](../images/event_driven_microservices_page_0236_7.png)
 
 ![](../images/event_driven_microservices_page_0236_8.png)
 
@@ -162,7 +158,6 @@ _success‐rate_ = 1/ _number_ _of_ _instances_
 In fact, for a very large number of instances, almost all requests will result in a miss followed by a redirect, increasing the latency of the response and load on the application (as each request will likely require up to two network calls to process it, instead of one). Luckily, a smart load balancer can perform the routing logic _before_ sending the initial request to the microservices, as demonstrated in Figure 13-7.
 
 
-![](../images/event_driven_microservices_page_0238_10.png)
 
 ![](../images/event_driven_microservices_page_0238_11.png)
 
@@ -177,7 +172,6 @@ Using a smart load balancer is just a best effort to reduce latency. Due to race
 Serving from an external state store has two advantages over the internal state store approach. For one, all state is available to each instance, meaning that the request does not need to be forwarded to the microservice instance hosting the data as per the internal storage model. Second, consumer group rebalances also don’t require the microservice to rematerialize the internal state in the new instance, since again, all state is maintained external to the instance. This allows the microservice to provide seamless scaling and zero-downtime options that can be difficult to provide with internal state stores.
 
 
-![](../images/event_driven_microservices_page_0239_12.png)
 
 Ensure that state is accessed via the request-response API of the microservice and _not_ through a direct coupling with the state store. Failure to do so introduces a shared data store, resulting in tight coupling between services, and makes changes difficult and risky.
 
@@ -194,7 +188,6 @@ Both input event stream processing and request-response serving capacity scale b
 One of the main advantages of this pattern is that it doesn’t require much in the way of deployment coordination. This is a single all-in-one microservice that can continue to serve state from the external state store regardless of the current instance count.
 
 
-![](../images/event_driven_microservices_page_0240_14.png)
 
 **Serving requests via a separate microservice**
 
@@ -226,7 +219,6 @@ _Figure 13-10. Handling requests directly versus turning them into events first_
 The leftmost portion of the preceding figure shows a traditional object creation operation being performed, with the results written directly to the database. Alternately, the rightmost portion shows an event-first solution, where the request is parsed into
 
 
-![](../images/event_driven_microservices_page_0242_17.png)
 
 an event and published to a corresponding event stream, prior to the event-driven workflow consuming it, applying business logic, and storing it in the database.
 
@@ -245,7 +237,6 @@ There are certain asynchronous UI techniques you can use to help manage your use
 Another factor to consider is that the microservice may need to continually process incoming nonuser events while awaiting further user input. You must decide when
 
 
-![](../images/event_driven_microservices_page_0243_18.png)
 
 the service’s event processing has progressed sufficiently for an update to be pushed to the UI. In fact, you must also decide when the _initial_ processing of events from the beginning of time has caught up to the present, despite the ongoing updates that most EDM services must handle.
 
@@ -283,9 +274,7 @@ _Figure 13-12. Newspaper design and approval workflow as microservices_
 There is a fair bit to unpack in this example, so let’s start with the newspaper populator microservice. This service consumes layout templates, advertisements, and articles streams into a relational database. Here, the employee responsible for layout performs their tasks, and when the newspaper is ready for approval, they compile the populated newspaper into a PDF, save it to an external store, and produce it to the populated newspaper event stream. The format for the populated newspaper event is as follows:
 
 
-![](../images/event_driven_microservices_page_0245_21.png)
 
-![](../images/event_driven_microservices_page_0245_22.png)
 
 ```
 //Populated newspaper event
@@ -374,7 +363,6 @@ A mock-up of the new microservice layout is shown in Figure 13-13.
 _Figure 13-13. Independent advertiser and editor approval services_
 
 
-![](../images/event_driven_microservices_page_0248_24.png)
 
 There are _two_ new event streams to consider. The first is in step 2, the editorapproved p.n. stream. The format of this stream is identical to that of the populated newspaper stream, but this event is produced only after the editor is satisfied with the overall newspaper and releases it for advertiser approval.
 
@@ -437,7 +425,6 @@ Microfrontends are a compositional pattern, meaning you can add services as need
 By aligning microfrontends strictly on business bounded contexts, just as you’d do with other microservices operating in the backend, you can trace specific business requirements directly to their implementations. This way, you can easily inject experimental products into an application without adversely affecting the codebase of existing core services. And should their performance or user uptake not be as expected, you can just as easily remove them. This alignment and isolation ensures that product requirements from various workflows do not bleed into one another.
 
 
-![](../images/event_driven_microservices_page_0251_26.png)
 
 ## Drawbacks of Microfrontends
 
@@ -482,7 +469,6 @@ _Figure 13-16. Experiences search and review application, GUI mockup version 2 w
 Now the product boundary encapsulates both the search and review microfrontends and contains all the logic necessary to stitch these two services together. It does not, however, contain any business logic pertaining to these services. This updated UI also illustrates how the microfrontend’s responsibilities have changed, as it must now support geolocation search functionality. The user’s address is transposed into lat-lon coordinates, which can be used to compute the distance to nearby experiences. Meanwhile, the review microfrontend’s responsibilities remain the same, but it is freed of its coupling to the search service. Figure 13-17 shows how this migration into microfrontends could look.
 
 
-![](../images/event_driven_microservices_page_0254_29.png)
 
 ![](../images/event_driven_microservices_page_0254_30.png)
 

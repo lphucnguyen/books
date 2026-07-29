@@ -70,7 +70,6 @@ The consumer receives the event and gets the schema (step 4) for that specific I
 Confluent has provided an excellent implementation of a schema registry for Apache Kafka. It supports Apache Avro, Protobuf, and JSON formats and is freely available for production use.
 
 
-![](../images/event_driven_microservices_page_0261_1.png)
 
 Registering the schemas to a dedicated event stream frees the schema registry implementation from having to provide durable storage. This is the design choice Confluent made with its schema registry.
 
@@ -93,7 +92,6 @@ _Application reset: Resetting the offset_
 Changing the logic of the microservice may require that you reprocess events from a previous point in time. Usually reprocessing requires starting at the beginning of the stream, but your selection point may vary depending on your service’s needs.
 
 
-![](../images/event_driven_microservices_page_0262_2.png)
 
 _Application reset: Advancing the offset_
 

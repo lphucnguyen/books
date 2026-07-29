@@ -56,7 +56,6 @@ There is an opportunity for compromise here. You can use data liberation pattern
 _Figure 4-4. Liberating and materializing state between two services_
 
 
-![](../images/event_driven_microservices_page_0075_4.png)
 
 ### Converting Liberated Data to Events
 
@@ -117,7 +116,6 @@ A custom query is limited only by the client querying language. This approach is
 The first step of any incremental update is to ensure that the necessary timestamp or autoincrementing ID is available in the records of your data set. There must be a field that the query can use to filter out records it has already processed from those it has yet to process. Data sets that lack these fields will need to have them added, and the data store will need to be configured to populate the necessary `updated_at`
 
 
-![](../images/event_driven_microservices_page_0078_5.png)
 
 timestamp or the autoincrementing ID field. If the fields cannot be added to the data set, then incremental updates will not be possible with a query-based pattern.
 
@@ -227,7 +225,6 @@ The inclusion of outbox tables introduces additional load on the data store and 
 An outbox does not need to map 1:1 with an internal table. In fact, one of the major benefits of the outbox is that the data store client can isolate the internal data model from downstream consumers. The internal data model of the domain may use a number of highly normalized tables that are optimized for relational operations but are largely unsuitable for consumption by downstream consumers. Even simple domains may comprise multiple tables, which if exposed as independent streams, would require reconstruction for usage by downstream consumers. This quickly becomes extremely expensive in terms of operational overhead, as multiple downstream teams will have to reconstruct the domain model and deal with handling relational data in event streams.
 
 
-![](../images/event_driven_microservices_page_0084_8.png)
 
 Exposing the internal data model to downstream consumers is an anti-pattern. Downstream consumers should only access data formatted with public-facing data contracts as described in Chapter 3.
 
@@ -280,7 +277,6 @@ _Figure 4-11. Multiple outbox tables (note that the data is not serialized, whic
 A failure to serialize indicates that the data of the event does not comply with its defined schema and so cannot be published. This is where the serialization-afterwrite option becomes more difficult to maintain, as an already completed transaction
 
 
-![](../images/event_driven_microservices_page_0087_14.png)
 
 will have pushed incompatible data into the outbox table, and there is no guarantee that the transaction can be reversed.
 
@@ -303,7 +299,6 @@ _Isolation of the internal data model_ Data store application developers can sel
 _Denormalization_ Data can be denormalized as needed before being written to the outbox table.
 
 
-![](../images/event_driven_microservices_page_0088_15.png)
 
 **Drawbacks of event production with outbox tables**
 
@@ -337,9 +332,7 @@ Figure 4-13 shows a continuation of the previous example. After-the-fact validat
 The change-data capture table schema is the bridge between the internal table schema and the output event stream schema. Compatibility among all three is essential for ensuring that data can be produced to the output event stream. Because output schema validation is typically not performed during trigger execution, it is best to keep the change-data table in sync with the format of the output event schema.
 
 
-![](../images/event_driven_microservices_page_0090_17.png)
 
-![](../images/event_driven_microservices_page_0090_18.png)
 
 ![](../images/event_driven_microservices_page_0090_19.png)
 
@@ -352,7 +345,6 @@ That being said, triggers can work great in many legacy systems. Legacy systems 
 Try to avoid the use of triggers if you can instead use more modern functionality for generating or accessing change-data. You should not underestimate the overhead performance and management required for a trigger-based solution, particularly when many dozens or hundreds of tables and data models are involved.
 
 
-![](../images/event_driven_microservices_page_0091_20.png)
 
 **Benefits of using triggers**
 
@@ -379,9 +371,7 @@ _After-the-fact schema enforcement_ Schema enforcement for the output event occu
 Some databases allow for triggers to be executed with languages that can validate compatibility with output event schemas during the trigger’s execution (e.g., Python for PostgreSQL). This can increase the complexity and expense, but significantly reduces the risk of downstream schema incompatibilities.
 
 
-![](../images/event_driven_microservices_page_0092_21.png)
 
-![](../images/event_driven_microservices_page_0092_22.png)
 
 ## Making Data Definition Changes to Data Sets Under Capture
 
@@ -430,7 +420,6 @@ There are two main traps that you can fall into when using a centralized framewo
 The second issue is a bit more pervasive, especially in an organization where eventdriven principles are only partially adopted. Systems can become too reliant upon frameworks and connectors to do their event-driven work for them. Once data has been liberated from the internal state stores and published to event streams, the organization may become complacent about moving onward into microservices. Teams can become overly reliant upon the connector framework for sourcing and sinking data, and choose not to refactor their applications into native event-driven applications. In this scenario they instead prefer to just requisition new sources and sinks as necessary, leaving their entire underlying application completely ignorant to events.
 
 
-![](../images/event_driven_microservices_page_0095_23.png)
 
 CDC tools are _not_ the final destination in moving to an eventdriven architecture, but instead are primarily meant to help bootstrap the process. The real value of the event broker as the data communication layer is in providing a robust, reliable, and truthful source of event data decoupled from the implementation layers, and the broker is only as good as the quality and reliability of its data.
 

@@ -9,7 +9,6 @@ Event-driven microservices share the testing best practices that are common to a
 Now, before going much further, it’s important to note that this chapter is meant to be a companion to more extensive works on the principles and how-tos of testing. After all, many books, blogs, and documents have been written on testing, and I certainly can’t cover testing to the extent that they do. This chapter primarily looks at eventdriven-specific testing methodologies and principles and how they integrate into the overall testing picture. Consult your own sources on language-specific testing frameworks and testing best practices to complement this chapter.
 
 
-![](../images/event_driven_microservices_page_0274_0.png)
 
 ## Unit-Testing Topology Functions
 
@@ -230,7 +229,6 @@ _Figure 15-2. Heavyweight microservice using containerized testing dependencies 
 Some services used in production may simply not have any locally available options, and this is a disadvantage for both development and integration testing. A current example is the absence of any emulator for Microsoft Azure’s Event Hub. The lack of a locally available implementation means that remote environments must be provisioned for each developer, in addition to integration testing environments for these applications. This is also where lines can begin to blur, as integration testing up to this point has been primarily about isolating a single application instance in a disposable, easily managed, local environment. The overhead incurred in this scenario can be a real impediment to independent development and integration testing efforts, so be sure to give it careful consideration before moving forward.
 
 
-![](../images/event_driven_microservices_page_0283_3.png)
 
 Alleviating this issue generally requires close coordination with infrastructure teams to ensure either that independent testing environments can be independently provisioned via access controls or that a large, common environment can be created for all to use (this has its own issues, as discussed later in the chapter). Security issues may arise from developers having to connect their local staging environment to remote resources. Cleanup and management of the remote staging environment(s) can also become problematic. There are many ways to approach this challenge, but the problems that the situation may pose are too large to comprehensively tackle here.
 
@@ -352,7 +350,6 @@ _Disadvantages_
 - Incompatible events may be produced to other services’ input event streams.
 
 
-![](../images/event_driven_microservices_page_0287_4.png)
 
 - Event stream data inevitably becomes stale and must be updated with newer events.
 

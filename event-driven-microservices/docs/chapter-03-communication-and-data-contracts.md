@@ -11,7 +11,6 @@ The format of the data to be communicated and the logic under which it is create
 There are two components of a well-defined data contract. First is the _data definition_, or what will be produced (i.e., the fields, types, and various data structures). The second component is the _triggering logic_, or why it is produced (i.e., the specific business logic that triggered the event’s creation). Changes can be made to both the data definition and the triggering logic as the business requirements evolve.
 
 
-![](../images/event_driven_microservices_page_0058_0.png)
 
 You must take care when changing the data definition, so as not to delete or alter fields that are being used by downstream consumers. Similarly, you must also be careful when modifying the triggering logic. It is far more common to change the data definition than the triggering mechanism, as altering the latter often breaks the meaning of the original event definition.
 
@@ -79,9 +78,7 @@ The biggest benefit of code generator support is being able to write your applic
 There are times when the schema definition must change in a way that results in a breaking evolutionary change. This can happen for a number of reasons, including evolving business requirements that alter the model of the original domain, improper scoping of the original domain, and human error while defining the schema. While the producing service can be fairly easily changed to accommodate the new schema, the impacts to downstream consumers vary and need to be taken into account.
 
 
-![](../images/event_driven_microservices_page_0062_3.png)
 
-![](../images/event_driven_microservices_page_0062_4.png)
 
 The most important thing when dealing with breaking schema changes is to communicate early and clearly with downstream consumers. Ensure that any migration plans have the understanding and approval of everyone involved and that no one is caught unprepared.
 
@@ -102,9 +99,7 @@ The reality is that the consumer will never be in a better position than the pro
 The second option is more difficult for the producer, but ensures that the business entities, both old and new, are redefined consistently. In practice, the producer must reprocess the source data that led to the generation of the old entities and apply the new business logic to re-create the entities under the new format. This approach forces the organization as a whole to resolve what these entities mean and how they should be understood and used by producer and consumer alike.
 
 
-![](../images/event_driven_microservices_page_0063_5.png)
 
-![](../images/event_driven_microservices_page_0063_6.png)
 
 Leave the old entities under the old schema in their original event stream, because you may need them for reprocessing validation and forensic investigations. Produce the new and updated entities using the new schema to a new stream.
 
@@ -123,7 +118,6 @@ While there are many options available for formatting and serializing event data
 You may be tempted to choose a more flexible option in the form of plain-text events using simple key/value pairs, which still offers some structure but provides no explicit schema or schema evolution frameworks. Proceed cautiously with this approach,
 
 
-![](../images/event_driven_microservices_page_0064_7.png)
 
 however, as it can compromise microservices’ ability to remain isolated from one another via a strong data contract, requiring far more interteam communication.
 
@@ -161,7 +155,6 @@ One common anti-pattern is adding a `type` field to an event definition, where d
 There are several problems with this approach. Each `type` parameter value usually has a fundamentally different business meaning, even if its technical representation is
 
 
-![](../images/event_driven_microservices_page_0066_8.png)
 
 nearly identical to the others. It is also possible for these meanings to change over time and for the scope that an event covers to creep. Some of these types may require the addition of new parameters to track type-specific information, whereas other types require separate parameters. Eventually you could have a situation where there are several very distinct events all inhabiting the same event schema, making it difficult to reason about what the event truly represents.
 
@@ -226,7 +219,6 @@ MovieClick {
 }
 ```
 
-![](../images/event_driven_microservices_page_0068_9.png)
 
 ```
 BookClick {

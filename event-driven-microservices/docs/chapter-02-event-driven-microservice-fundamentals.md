@@ -13,7 +13,6 @@ The term _topology_ comes up frequently in discussions of event-driven microserv
 A microservice topology is the event-driven topology internal to a single microservice. This defines the data-driven operations to be performed on incoming events, including transformation, storage, and emission.
 
 
-![](../images/event_driven_microservices_page_0040_0.png)
 
 Figure 2-1 shows a single microservice topology ingesting from two input event streams.
 
@@ -72,7 +71,6 @@ Entity events are particularly important in event-driven architectures. They pro
 A keyed event contains a key but does _not represent an entity_. Keyed events are usually used for partitioning the stream of events to guarantee data locality within a single partition of an event stream (more on this later in the chapter). An example could be a stream of events, keyed on ISBN, indicating which user has interacted with the book.
 
 
-![](../images/event_driven_microservices_page_0043_3.png)
 
 **Key** **Value** ISBN: 372719 UserId: A537FE
 
@@ -93,7 +91,6 @@ _Figure 2-3. Materializing an event stream into a table_
 In the same way, you can have a table record all updates and in doing so produce a stream of data representing the table’s state over time. In the following example, BB is upserted twice, while DD is upserted just once. The output stream in Figure 2-4 shows three upsert events representing these operations.
 
 
-![](../images/event_driven_microservices_page_0044_5.png)
 
 ![](../images/event_driven_microservices_page_0044_6.png)
 
@@ -237,7 +234,6 @@ Message brokers have a long history and have been used in large-scale messageori
 Event brokers, on the other hand, are designed around providing an ordered log of facts. Event brokers meet two very specific needs that are not satisfied by the message broker. For one, the message broker provides only _queues_ of messages, where the
 
 
-![](../images/event_driven_microservices_page_0050_8.png)
 
 consumption of the message is handled on a per-queue basis. Applications that share consumption from a queue will each receive only a subset of the records. This makes it impossible to correctly communicate state via events, since each consumer is unable to obtain a full copy of all events. Unlike the message broker, the event broker maintains a single ledger of records and manages individual access via indices, so each independent consumer can access all required events. Additionally, a message broker deletes events after acknowledgment, whereas an event broker retains them for as long as the organization needs. The deletion of the event after consumption makes a message broker insufficient for providing the indefinitely stored, globally accessible, replayable, single source of truth for all applications.
 
@@ -254,7 +250,6 @@ Though not a definitive standard, commonly available event brokers use an append
 Each consumer is responsible for updating its own pointers to previously read indices within the event stream. This index, known as the _offset_, is the measurement of the current event from the beginning of the event stream. Offsets permit multiple consumers to consume and track their progress independently of one another, as shown in Figure 2-6.
 
 
-![](../images/event_driven_microservices_page_0051_9.png)
 
 ![](../images/event_driven_microservices_page_0051_10.png)
 
@@ -288,7 +283,6 @@ The adoption of event-driven microservices enables the creation of services that
 Managing microservices can become increasingly difficult as the number of services grows. Each microservice requires specific compute resources, data stores, configurations, environment variables, and a whole host of other microservice-specific properties. Each microservice must also be manageable and deployable by the team that owns it. Containerization and virtualization, along with their associated management systems, are common ways to achieve this. Both options allow individual teams to customize the requirements of their microservices through a single unit of deployability.
 
 
-![](../images/event_driven_microservices_page_0053_12.png)
 
 ### Putting Microservices into Containers
 
@@ -309,7 +303,6 @@ Containers and VMs are managed through a variety of purpose-built software known
 Microservices must be able to scale up and down depending on changing workloads, service-level agreements (SLAs), and performance requirements. Vertical scaling must be supported, in which compute resources such as CPU, memory, and disk are
 
 
-![](../images/event_driven_microservices_page_0054_13.png)
 
 increased or decreased on each microservice instance. Horizontal scaling must also be supported, with new instances added or removed.
 

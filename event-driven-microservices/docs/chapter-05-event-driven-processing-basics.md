@@ -46,7 +46,6 @@ A transform processes a single event and emits zero or more output events. Trans
 _Filter_ Propagate the event if it meets the necessary criteria. Emits zero or one events.
 
 
-![](../images/event_driven_microservices_page_0099_1.png)
 
 _Map_ Changes the key and/or value of the event, emitting exactly one event. Note that if you change the key, you may need to repartition to ensure data locality.
 
@@ -67,7 +66,6 @@ If you do end up merging event streams, define a new unified schema representati
 Event streams are partitioned according to the event key and the event partitioner logic. For each event, the event partitioner is applied, and a partition is selected for the event to be written to. _Repartitioning_ is the act of producing a new event stream with one or more of the following properties:
 
 
-![](../images/event_driven_microservices_page_0100_2.png)
 
 _Different partition count_ Increase an event stream’s partition count to increase downstream parallelism or to match the number of partitions of another stream for copartitioning (covered later in this chapter).
 

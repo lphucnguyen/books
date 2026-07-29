@@ -65,7 +65,6 @@ Conversely, aligning microservices on technical requirements is problematic. Thi
 Figure 1-2 shows both scenarios: sole ownership on the left and cross-cutting ownership on the right. With sole ownership, the team is fully organized around the two independent business requirements (bounded contexts) and has complete control over its application code and the database layer. On the right, the teams have been organized via technical requirements, where the application layer is managed separate from the data layer. This creates explicit dependencies between the teams, as well as implicit dependencies between the business requirements.
 
 
-![](../images/event_driven_microservices_page_0024_1.png)
 
 ![](../images/event_driven_microservices_page_0024_2.png)
 
@@ -121,7 +120,6 @@ Because domain concepts span the business, domain data is often needed by other 
 Data communication structures play a pivotal role in how an organization designs and builds products, but for many organizations this structure has long been missing. As noted, implementation communication structures frequently play this role in addition to their own.
 
 
-![](../images/event_driven_microservices_page_0028_6.png)
 
 Some organizations attempt to mitigate the inability to access domain data from other implementations, but these efforts have their own drawbacks. For example, shared databases are often used, though these frequently promote anti-patterns and often cannot scale sufficiently to accommodate all performance requirements. Databases may provide read-only replicas; however, this can expose their inner data models unnecessarily. Batch processes can dump data to a file store to be read by other processes, but this approach can create issues around data consistency and multiple sources of truth. Lastly, all of these solutions result in a strong coupling between implementations and further harden an architecture into direct point-to-point relationships.
 
@@ -159,7 +157,6 @@ Most teams would choose the second option—adding the functionality to the exis
 - Accessing another system’s data is difficult to do reliably, especially at scale and in real time.
 
 
-![](../images/event_driven_microservices_page_0030_7.png)
 
 - Creating and managing new services has substantial overhead and risk associated with it, especially if there is no established way to do so within the organization.
 
@@ -304,7 +301,6 @@ Multiple API definitions and service versions will often need to exist at the sa
 Synchronous microservices have all the same problems as traditional services when it comes to accessing external data. Although there are service design strategies for
 
 
-![](../images/event_driven_microservices_page_0037_8.png)
 
 mitigating the need to access external data, microservices will often still need to access commonly used data from other services. This puts the onus of data access and scalability back on the implementation communication structure.
 

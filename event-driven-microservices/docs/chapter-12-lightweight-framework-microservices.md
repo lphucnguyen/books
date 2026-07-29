@@ -26,7 +26,6 @@ Data of the same key must be local to a given processing instance for any key-ba
 The lightweight framework leverages the event broker to provide this communication path and illustrates the deeper integration of the lightweight application with the event broker. Contrast this with the heavyweight framework, where shuffling requires extensive coordination directly between the nodes. When combined with application management options provided by the CMS, the lightweight framework is much more aligned than the heavyweight framework with the application deployment and management required of modern-day microservices.
 
 
-![](../images/event_driven_microservices_page_0219_1.png)
 
 ## Handling State and Using Changelogs
 
@@ -87,7 +86,6 @@ Currently, there are two main options that fit the lightweight framework model, 
 Kafka Streams is a feature-rich stream processing library that is embedded within an individual application, where the input and output events are stored in the Kafka cluster. It combines the simplicity of writing and deploying standard JVM-based applications with a powerful stream-processing framework leveraging deep integration with the Kafka cluster.
 
 
-![](../images/event_driven_microservices_page_0222_3.png)
 
 ### Apache Samza: Embedded Mode
 
@@ -252,7 +250,6 @@ AdKey5
 sum=10, name=null, type=null
 ```
 
-![](../images/event_driven_microservices_page_0227_5.png)
 
 This sample table shows the expected aggregations from stage 3, joined with the `Advertising` entity data. `AdKey4` and `AdKey5` each show the results of a full outer join: no conversions have yet occurred for `AdKey4`, while there is no advertising entity data yet available for `AdKey5`.
 

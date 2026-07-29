@@ -13,7 +13,6 @@ _Implement a standardized deployment process_ The deployment process should be c
 _Provide necessary supportive tooling_ Deployments may require teams to reset consumer group offsets, purge state stores, check and update schema evolution, and delete internal event streams. Supportive tooling provides these functions to enable further automation of deployment and support team autonomy.
 
 
-![](../images/event_driven_microservices_page_0292_0.png)
 
 _Consider event stream reprocessing impacts_ Reconsuming input event streams can be time-consuming, leading to stale results for downstream consumers. Additionally, this microservice may subsequently generate a large volume of output events, causing another high load for downstream consumers. Very large event streams and those with large amounts of consumers may see nontrivial surges in processing power requirements. You must also consider side effects, particularly those that can be disruptive to customers (e.g., resending multiple years’ worth of promotional emails).
 
@@ -30,7 +29,6 @@ Microservices should be independently deployable, and it is an anti-pattern if t
 There are several major components of the microservice deployment architecture, each of which plays a pivotal role. This architecture can be roughly broken down into two main components: the system used to build and deploy the code, and the compute resources used by the microservices.
 
 
-![](../images/event_driven_microservices_page_0293_1.png)
 
 ### Continuous Integration, Delivery, and Deployment Systems
 
@@ -64,7 +62,6 @@ The basic full-stop deployment pattern is the basis of all other patterns, and t
 2. **Execute automated unit and integration tests.** This step is part of the CI pipeline to validate that the committed code passes all the unit and integration tests necessary for merging. Integration tests may require that you spin up transient environments and populate them with data to perform more complex tests. This requires integration of the CI pipeline with the tooling described in “Local Integration Testing” on page 259 so that each service can bring up its own integration testing environment.
 
 
-![](../images/event_driven_microservices_page_0295_3.png)
 
 It’s best to have independent integration testing environments for any sort of automated integration, as it allows you to run tests for a given service in isolation from other services. This significantly reduces multitenancy issues that arise from having a long-running and shared integration test environment.
 
@@ -83,9 +80,7 @@ b. **Deploy.** Perform the actual deployment. Deploy the containerized code and 
 5. **Run post-deployment validation tests.** Validate that the microservice is operating normally, that consumer lag is returning to normal, that there are no logging errors, and that endpoints are working as expected.
 
 
-![](../images/event_driven_microservices_page_0296_4.png)
 
-![](../images/event_driven_microservices_page_0296_5.png)
 
 Consider the impacts to all dependent services, including SLAs, downtime, stream processing catch-up time, output event load, new event streams, and breaking schema changes. Communicate with dependent service owners to ensure that the impacts are acceptable.
 
@@ -146,7 +141,6 @@ There are two main options for migrating a breaking schema change:
 Eventual migration via two event streams requires that the producer write events with both the old and new format, each to its respective stream. The old stream is marked as deprecated, and the consumers of it will, in their own time, migrate to the new
 
 
-![](../images/event_driven_microservices_page_0299_7.png)
 
 stream instead. Once all of the consumers have migrated, the old stream can be removed or offloaded into long-term data storage.
 
@@ -169,7 +163,6 @@ This strategy also makes a few assumptions:
 - **Migration must happen synchronously to eliminate downstream inconsisten‐** **cies.** The domain has changed so significantly that services need to update to
 
 
-![](../images/event_driven_microservices_page_0300_8.png)
 
 ensure that business requirements can be met. Downstream services could have major inconsistencies otherwise. For example, consider an entity where the selection criteria for creation of the event has changed.
 
@@ -186,9 +179,7 @@ The main goal of blue-green deployment is to provide zero downtime while deployi
 _Figure 16-3. Blue-green deployment pattern_
 
 
-![](../images/event_driven_microservices_page_0301_10.png)
 
-![](../images/event_driven_microservices_page_0301_11.png)
 
 In this example, a full copy of the new microservice (blue) is brought up in parallel with the old microservice (green). The blue service has a fully isolated instance of its external data store, its own event stream consumer group, and its own IP addresses for remote access. It consumes input events until monitoring indicates that it is sufficiently caught up to the green service, at which point traffic from the green instances can begin to be rerouted.
 

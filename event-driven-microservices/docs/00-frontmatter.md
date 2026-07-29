@@ -118,11 +118,8 @@ The tools that we use shape and influence our inventions significantly. Event-dr
 The technologies that support event-driven microservices have a significant impact on how we think about and solve problems, as well as on how our businesses and organizations are structured. Event-driven microservices change how a business works, how problems can be solved, and how teams, people, and business units communicate. These tools give you a truly new way of doing things that has not been possible until only recently.
 
 
-![](../images/event_driven_microservices_page_0016_0.png)
 
-![](../images/event_driven_microservices_page_0016_1.png)
 
-![](../images/event_driven_microservices_page_0016_2.png)
 
 ![](../images/event_driven_microservices_page_0016_3.png)
 

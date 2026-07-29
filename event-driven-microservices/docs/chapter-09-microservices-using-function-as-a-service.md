@@ -102,7 +102,6 @@ You can see that `myFunction` is set to trigger when a new event is delivered to
 Once the triggers, metadata, and policies are established, the function is ready to process incoming events. When a new event arrives in its input event stream, the function will be started by the FaaS framework, get passed a batch of events, and begin processing. Upon completion, the function will terminate and wait for more events to come in. This is a typical implementation of the event-stream listener pattern, which is discussed more in the next section.
 
 
-![](../images/event_driven_microservices_page_0173_0.png)
 
 Each function-based microservice implementation must have its own independent consumer group, just as with other non-FaaS microservices.
 
@@ -144,7 +143,6 @@ Though not shown in the previous examples, function results can be output to the
 _Synchronous_ triggers require the function to complete before they issue the next events. This is particularly important for maintaining the processing order and is limited by the parallelism of the event stream being processed. Conversely, _asynchro‐_ _nous_ triggering can issue multiple events to multiple functions, each one reporting
 
 
-![](../images/event_driven_microservices_page_0175_3.png)
 
 back as it is completed. This will _not_ maintain the processing order, however, and should be used only when processing order is not important to the business logic.
 
@@ -243,7 +241,6 @@ FaaS frameworks will continue to grow and include new features. Simple managemen
 Functions are often used to execute other functions and may also be used for both choreographed and orchestrated workflows. Communication between functions can be facilitated asynchronously through events, via request-response calls, or with a combination of both. These choices depend highly on the FaaS framework and the problem space of the bounded context. It’s common to use choreography and orchestration design patterns when implementing a multifunction solution.
 
 
-![](../images/event_driven_microservices_page_0179_5.png)
 
 To avoid out-of-order processing issues, ensure that all processing is completed for one event before processing the next event.
 
@@ -363,7 +360,6 @@ Each function has specific needs based on its workload. Optimizing the resources
 Each function can be allocated a specific amount of CPU and memory. It is important to tune these parameters to the needs of your function; overallocation can be expensive, while underallocation may result in your functions crashing or taking too long to complete.
 
 
-![](../images/event_driven_microservices_page_0184_9.png)
 
 Maximum execution time is another factor, as it limits how long a function may run. This parameter is closely related to the batch size, as the time a function needs to process events is very often linearly related, on average, with the number of events to process. Set the maximum execution time higher than the maximum expected time to process a specific batch size of events to avoid unnecessary function timeout errors.
 
@@ -386,7 +382,6 @@ Additionally, some event-listener triggering systems, such as those provided by 
 FaaS solutions provide exceptional capabilities for the parallelization of work, especially for queues and event streams where the order in which data is processed is not important. For partitioned event streams, if the order of events is indeed important,
 
 
-![](../images/event_driven_microservices_page_0185_10.png)
 
 the maximum level of parallelization is limited by the number of partitions in your event streams, just as it is for all microservice implementations.
 

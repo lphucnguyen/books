@@ -53,7 +53,6 @@ Once the data communication layer is available, it’s time to get the business-
 Start by liberating the data that is most commonly used and most critical to your organization’s next major goals. There are various ways to extract information from the various services and data stores, and each method has benefits and drawbacks. It’s important to weigh the impact on the existing service against the risks of stale data, lack of schemas, and exposure of internal data models in the liberated event streams.
 
 
-![](../images/event_driven_microservices_page_0306_0.png)
 
 Having readily available business data in the form of event streams allows for services to be built by _composition_. A new service needs only to subscribe to the event streams of interest via the event broker, rather than directly connecting to each service that would otherwise provide the data.
 

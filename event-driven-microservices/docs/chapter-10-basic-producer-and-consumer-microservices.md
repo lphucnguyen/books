@@ -55,7 +55,6 @@ _Pricing_ The prices must be set according to regions and formats.
 Each of these event streams acts as a driver of logic. When a new event comes in on any of these streams, it is first materialized in its proper table and subsequently used to look up every other table to see if the other events are present. Figure 10-3 illustrates an example.
 
 
-![](../images/event_driven_microservices_page_0190_2.png)
 
 ![](../images/event_driven_microservices_page_0190_3.png)
 
@@ -70,7 +69,6 @@ Explicit approval from a human being may also be required in the gating pattern.
 The BPC is also a suitable approach when the underlying data layer performs most of the business logic, such as a geospatial data store; free-text search; and machine learning, AI, and neural network applications. An ecommerce company may ingest new products scraped from websites and perform classification using a BPC microservice, with the backend data layer being a batch-trained machine learning categorizer. Alternately, user behavior events, such as opening the application, may be correlated with a geospatial data store to determine the nearest retailers from which to show advertisements. In these scenarios, the complexity of processing the event is offloaded entirely to the underlying data layer, with the producer and consumer components acting as simple integration mechanisms.
 
 
-![](../images/event_driven_microservices_page_0191_4.png)
 
 ### Independent Scaling of the Processing and Data Layer
 
@@ -111,7 +109,6 @@ Say your BPC service needs to leverage the joining capabilities of a stream-proc
 _Figure 10-4. A typical outsourceable operation performed at scale by a stream-processing_ _framework_
 
 
-![](../images/event_driven_microservices_page_0193_6.png)
 
 The hybrid BPC needs to use a compatible client to start up the work on the external stream processing framework. This client will transform the code into instructions for the framework, which will itself handle consuming, joining, and producing events into the joined output event stream. This design outsources the work to an external processing service that will return the results in the form of an event stream. The workflow for this would look like Figure 10-5.
 

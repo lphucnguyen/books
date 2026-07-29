@@ -13,7 +13,6 @@ Here are the three main questions addressed in this chapter:
 We can answer these questions by examining timestamps, event scheduling, watermarks, and stream times, and how they contribute to deterministic processing. Bugs, errors, and changes in business logic will also necessitate reprocessing, making deterministic results important. This chapter also explores how out-of-order and latearriving events can occur, strategies for handling them, and mitigating their impact on our workflows.
 
 
-![](../images/event_driven_microservices_page_0108_0.png)
 
 This chapter is fairly information-dense despite my best efforts to find a simple and concise way to explain the key concepts. There are a number of sections where I will refer you to further resources to explore on your own, as the details often go beyond the scope of this book.
 
@@ -70,7 +69,6 @@ For the vast majority of business cases, frequent synchronization to NTP servers
 Timestamps provide a way to process events distributed across multiple event streams and partitions in a consistent temporal order. Many use cases require you to maintain order between events based on time, and need consistent, reproducible results regardless of when the event stream is processed. Using offsets as a means of comparison works only for events within a single event stream partition, while events quite commonly need to be processed from multiple different event streams.
 
 
-![](../images/event_driven_microservices_page_0111_2.png)
 
 **Example: Selecting order of events when processing multiple partitions**
 
@@ -89,7 +87,6 @@ Deterministic processing requires that events be processed consistently, such th
 The most common event-scheduling implementation selects and dispatches the event with the oldest timestamp from all assigned input partitions to the downstream processing topology.
 
 
-![](../images/event_driven_microservices_page_0112_4.png)
 
 Event scheduling is a feature of many stream-processing frameworks, but is typically absent from basic consumer implementations. You will need to determine if it is required for your microservice implementation.
 
@@ -129,7 +126,6 @@ A watermark is a declaration to downstream nodes _within the same processing top
 _Figure 6-3. Watermark propagation between nodes in a single topology_
 
 
-![](../images/event_driven_microservices_page_0114_6.png)
 
 In this figure, the consumer node has the highest watermark time because it’s consuming from the source event stream. New watermarks are generated periodically, such as after a period of wall-clock or event time has elapsed or after some minimum number of events has been processed. These watermarks propagate downstream to the other processing nodes in the topology, which update their own event time accordingly.
 
@@ -172,7 +168,6 @@ Stream time is maintained by processing each event completely through the topolo
 Consider again the same two-instance consumer example from Figure 6-4, but this time with the stream time approach championed by Kafka Streams (see Figure 6-6). A notable difference is that the Kafka Streams approach sends the repartitioned events _back_ to the event broker using what’s known as an _internal event stream_. This stream is then reconsumed by the instances, with all repartitioned data colocated by key within single partitions. This is functionally the same as the shuffle mechanism within the heavyweight cluster, but does not require a dedicated cluster (note: Kafka Streams is very microservice friendly).
 
 
-![](../images/event_driven_microservices_page_0117_9.png)
 
 ![](../images/event_driven_microservices_page_0117_10.png)
 
@@ -189,7 +184,6 @@ Watermarking strategies can also use repartition event streams. Apache Samza off
 In an ideal world, all events are produced without issue and available to the consumer with zero latency. Unfortunately for all of us living in the real world, this is never the case, so we must plan to accommodate out-of-order events. An event is said to be out of order if its timestamp isn’t equal to or greater than the events ahead of it in the
 
 
-![](../images/event_driven_microservices_page_0118_11.png)
 
 event stream. In Figure 6-7, event `F` is out of order because its timestamp is lower than `G`’s, just as event `H` is out of order as its timestamp is lower than `I`’s.
 
@@ -206,7 +200,6 @@ _Figure 6-7. Out-of-order events in an event stream partition_
 Events from a single partition should always be processed according to their offset order, regardless of their timestamp. This can lead to out-of-order events.
 
 
-![](../images/event_driven_microservices_page_0119_13.png)
 
 An event can be considered _late_ only when viewed from the perspective of the consuming microservice. One microservice may consider _any_ out-of-order events as late, whereas another may be fairly tolerant and require many hours of wall-clock or event time to pass before considering an event to be late.
 
@@ -233,7 +226,6 @@ The most obvious, of course, is when events are sourced from out-of-order data. 
 Multiple producers writing to multiple output partitions can introduce out-of-order events. Repartitioning an existing event stream is one way in which this can happen. Figure 6-8 shows the repartitioning of two partitions by two consumer instances. In this scenario the source events indicate which product the user has interacted with. For instance, Harry has interacted with products ID12 and ID77. Say that a data analyst needs to rekey these events on the user ID, such that they can perform sessionbased analysis of the user’s engagements. The resultant output streams may end up with some out-of-order events.
 
 
-![](../images/event_driven_microservices_page_0120_14.png)
 
 ![](../images/event_driven_microservices_page_0120_15.png)
 
@@ -250,7 +242,6 @@ Instance 0 was only slightly ahead of instance 1 in stream time, but because of 
 A single-threaded producer will not create out-of-order events in normal operation unless it is sourcing its data from an out-of-order source.
 
 
-![](../images/event_driven_microservices_page_0121_17.png)
 
 Since the stream time is incremented whenever an event with a higher timestamp is detected, it is possible to end up in a scenario where a large number of events are considered late due to reordering. This may have an effect on processing depending on how the consumers choose to handle out-of-order events.
 

@@ -17,7 +17,6 @@ Each microservice design must also take into account where the service will stor
 - Internally, such that the data is stored in the same container as the processor, allocated in memory or on disk.
 
 
-![](../images/event_driven_microservices_page_0130_0.png)
 
 - Externally, such that the data is stored outside of the processor’s container, in some form of external storage service. This is often done across a network.
 
@@ -130,7 +129,6 @@ _Figure 7-6. Rebalance due to instance 1 termination_
 Once processing has resumed, new hot replicas must be built from the changelog to maintain the minimum replica count. The new hot replicas are built and added to the remaining instances, as shown in Figure 7-7.
 
 
-![](../images/event_driven_microservices_page_0137_7.png)
 
 ![](../images/event_driven_microservices_page_0137_8.png)
 
@@ -147,7 +145,6 @@ When a newly created microservice instance joins the consumer group, any statefu
 If no changelog is maintained, the microservice instance can rebuild its state stores from the input streams. It must re-consume all of its input events from the very beginning of its assigned event stream partitions. Each event must be consumed and processed in strict incrementing order, its state updated, and any subsequent output events produced.
 
 
-![](../images/event_driven_microservices_page_0138_9.png)
 
 Consider the impact of events produced during a full reprocessing. Downstream consumers may need to process these idempotently or eliminate them as duplicates.
 
@@ -168,9 +165,7 @@ Do not share direct state access with other microservices. Instead, all microser
 Unlike internal state stores, external state stores can provide access to all materialized data for each microservice instance, though each instance is still responsible for materializing its own assigned partitions. A single materialized data set eliminates the need for partition locality when you are performing lookups, relational queries on foreign keys, and geospatial queries between a large number of elements.
 
 
-![](../images/event_driven_microservices_page_0139_10.png)
 
-![](../images/event_driven_microservices_page_0139_11.png)
 
 Use state stores with strong read-after-write guarantees to eliminate inconsistent results when using multiple instances.
 
@@ -214,7 +209,6 @@ Scaling and recovery of microservices using an external state store simply requi
 To reiterate an earlier point, having a list of acceptable external data services with guides on how to properly manage, scale, back up, and restore them is essential for providing developers a sustainable way forward. Unfortunately, the number of state store technologies is prohibitively large and effectively impossible to discuss in this book. Instead, I’ll simply generalize the strategies of building state into three main techniques: rebuilding from the source streams, using changelogs, and creating snapshots.
 
 
-![](../images/event_driven_microservices_page_0141_12.png)
 
 **Using the source streams**
 
@@ -235,7 +229,6 @@ If the stored state is idempotent, there is no need to ensure that the offsets a
 If the stored state is not idempotent and any duplicate events are not acceptable, then you should store your consumer’s partition offsets alongside the data within the data store. This ensures that the consumer offsets and the associated state are consistent. When state is restored from the snapshot, the consumer can set its consumer group offsets to those found in the snapshot from the exact time that the snapshot was created. This is covered in more detail in “Maintaining consistent state” on page 132.
 
 
-![](../images/event_driven_microservices_page_0142_13.png)
 
 ## Rebuilding Versus Migrating State Stores
 
@@ -269,7 +262,6 @@ _Idempotent writes_ are one commonly supported feature among event broker implem
 _Transactions_ may also be supported by your event broker. Currently, full transactional support is offered only by Apache Kafka, though Apache Pulsar is making progress towards its own implementation. Much like a relational database can support multitable updates in a single transaction, an event broker implementation may also support the atomic writing of multiple events to multiple separate event streams. This allows a producer to publish its events to multiple event streams in a single, atomic transaction. Competing event broker implementations that lack transactional support require that the client ensure its own effectively once processing. The next section
 
 
-![](../images/event_driven_microservices_page_0144_14.png)
 
 covers both of these options and evaluates how you can leverage them for your own microservices.
 
@@ -316,9 +308,7 @@ _Figure 7-11. Restoring the state from the broker using changelogs and previous 
 Effectively once processing of events is also possible for implementations that do not support client-broker transactions, though it requires more work and a careful consideration of duplicate events. First, if upstream services are not able to provide effectively once event production guarantees, then it is possible that they may produce
 
 
-![](../images/event_driven_microservices_page_0147_19.png)
 
-![](../images/event_driven_microservices_page_0147_20.png)
 
 duplicate records. Any duplicate events created by upstream processes need to be identified and filtered out. Second, state and offset management need to be updated in a _local transaction_ to ensure that the event processing is applied only once to the system state. By following this strategy, clients can be assured that the internal state generated by their processor is consistent with the logical narrative of the input event streams. Let’s take a look at these steps in more detail.
 
@@ -341,7 +331,6 @@ _Idempotent production_ is supported by numerous event brokers and can mitigate 
 If idempotent production of events is _not_ available and there are duplicates (with unique offsets and unique timestamps) in the event stream, then it is up to you to mitigate their impact. First, determine if the duplicates actually cause any problems. In many cases duplicates have a minor, if not negligible, effect and can simply be ignored. For those scenarios where duplicate events _do_ cause problems, you will need to figure out how to identify them. One way to do this is to have the producer
 
 
-![](../images/event_driven_microservices_page_0148_21.png)
 
 generate a unique ID for each event, such that any duplicates will generate the same unique hash.
 
@@ -364,7 +353,6 @@ Any effectively once consumer must either identify and discard duplicates, perfo
 Perfect deduplication requires that each consumer indefinitely maintain a lookup of each dedupe ID already processed, but time and space requirements can become prohibitively expensive if an attempt is made to guard against too large a range. In practice, deduplication is generally only performed for a specific rolling time-window or offset-window as a best-effort attempt.
 
 
-![](../images/event_driven_microservices_page_0149_22.png)
 
 ![](../images/event_driven_microservices_page_0149_23.png)
 

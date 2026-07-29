@@ -7,7 +7,6 @@ One defining characteristic of a heavyweight streaming framework is that it requ
 A second defining characteristic is that the heavyweight framework uses its own internal mechanisms for handling failures, recovery, resource allocation, task distribution, data storage, communication, and coordination between processing instances and tasks. This is in contrast to the lightweight framework, FaaS, and BPC implementations that rely heavily on the container management system (CMS) and the event broker for these functions.
 
 
-![](../images/event_driven_microservices_page_0196_0.png)
 
 These two characteristics are the main reasons why these frameworks are dubbed “heavyweight.” Having to manage and maintain additional clustered frameworks independently of the event broker and the CMS is no small task.
 
@@ -22,7 +21,6 @@ Heavyweight stream-processing frameworks are directly descended from their heavy
 MapReduce was one of the first widely available means of processing extremely large batches of data (aka big data), but, while powerful, it executes slowly in comparison to many of today’s options. The size of big data has steadily increased over time; although workloads of hundreds (or thousands) of gigabytes were common in the early days, workloads today have scaled to sizes in the terabyte and petabyte range. As these data sets have grown so has the demand for faster processing, more powerful options, simpler execution options, and solutions that can provide near-real-time stream-processing capabilities.
 
 
-![](../images/event_driven_microservices_page_0197_1.png)
 
 This is where Spark, Flink, Storm, Heron, and Beam come in. These solutions were developed to process streams of data and provide actionable results much sooner than those provided by batch-based MapReduce jobs. Some of these, like Storm and Heron, are streaming-only technologies and do not currently provide batch processing. Others, like Spark and Flink, merge batch and streaming processing into a single solution.
 
@@ -37,7 +35,6 @@ Make sure that you thoroughly read and understand the documents detailing how yo
 A heavyweight stream processing cluster is a grouping of dedicated processing and storage resources, broken down into two primary roles. The first role is the master node, which prioritizes, assigns, and manages executors and tasks performed by the workers. The second role, the executor, completes these tasks using the processing power, memory, local, and remote disk available to that worker node. In event-driven processing, these tasks will connect to the event broker and consume events from event streams. Figure 11-1 shows a rough breakdown of how this works.
 
 
-![](../images/event_driven_microservices_page_0198_2.png)
 
 ![](../images/event_driven_microservices_page_0198_3.png)
 
@@ -107,7 +104,6 @@ One thing to note about these services is that they seem to be continually movin
 A heavyweight framework may have its own dedicated scalable resource cluster independent of the CMS. This deployment is the historical norm for heavyweight clusters, as it closely models the original Hadoop distributions. It is common in situations where the heavyweight framework will be used by services requiring a large number (hundreds or thousands) of worker nodes.
 
 
-![](../images/event_driven_microservices_page_0202_5.png)
 
 ### Create Clusters with CMS Integration
 
@@ -126,7 +122,6 @@ Historically, the heavyweight cluster has been responsible for assigning and man
 Spark and Flink enable you to directly leverage Kubernetes for scalable application deployment beyond their original dedicated cluster configuration, where each application has its own set of dedicated worker nodes. For example, Apache Flink allows for applications to run independently within their own isolated session cluster using Kubernetes. Apache Spark offers a similar option, allowing Kubernetes to play the role of the master node and maintain isolated worker resources for each application. A basic overview of how this works is shown in Figure 11-3.
 
 
-![](../images/event_driven_microservices_page_0203_6.png)
 
 ![](../images/event_driven_microservices_page_0203_7.png)
 
@@ -172,7 +167,6 @@ Stateful operations may be persisted using either internal or external state (Ch
 _Checkpoints_, snapshots of the application’s current internal state, are used to rebuild state after scaling or node failures. A checkpoint is persisted to durable storage external to the application worker nodes to guard against data loss. Checkpointing can be done using any sort of store that is compatible with the framework, such as Hadoop Distributed File System (HDFS, a common option) or a highly available external data
 
 
-![](../images/event_driven_microservices_page_0205_8.png)
 
 store. Each partitioned state store can then restore itself from the checkpoint, providing both full restoration capabilities in the case of a total application failure, and partial restoration capabilities in the case of scaling and worker node failures.
 
@@ -193,7 +187,6 @@ Restoring from a checkpointed state is functionally equivalent to using snapshot
 The state associated with the application task must be completely loaded from the checkpoint before you can process any new data. The heavyweight framework must also verify that the operator state and the associated keyed state match for each task,
 
 
-![](../images/event_driven_microservices_page_0206_10.png)
 
 ensuring the correct assignment of partitions among tasks. Each of the major heavyweight frameworks discussed at the start of this chapter implements checkpoints in its own way, so be sure to check the corresponding documentation for the particulars.
 
@@ -238,7 +231,6 @@ Executor/instances of tasks can now be terminated, since the downstream operatio
 _Figure 11-8. Downscaled application using an external shuffle service (note instance 1 is_ _gone)_
 
 
-![](../images/event_driven_microservices_page_0209_15.png)
 
 Shuffles in real-time event stream continue to be an area of development for heavyweight frameworks. In the next chapter, we take a look at how lightweight frameworks directly leverage the event broker to play the role of the external shuffle service.
 
@@ -257,7 +249,6 @@ Having dedicated and persistent separate storage for the ESS prevents the CMS fr
 The second strategy, scaling an application by restarting it, is supported by all heavyweight streaming frameworks. Consumption of streams is paused, the application is checkpointed, and then it is stopped. Next, the application is reinitialized with the new resources and parallelism, with stateful data reloaded from the checkpoints as required. For example, Flink provides a simple REST mechanism for these purposes, while Storm provides its own rebalance command.
 
 
-![](../images/event_driven_microservices_page_0210_16.png)
 
 ### Autoscaling Applications
 
@@ -293,7 +284,6 @@ SQL-like languages are also becoming more common. These allow for topologies to 
 Choosing a heavyweight stream-processing framework is much like selecting a CMS and event broker. You must determine how much operational overhead your organization is willing to authorize, and if that support is sufficient for running a full production cluster at scale. This overhead includes regular operational duties such as monitoring, scaling, troubleshooting, debugging, and assigning costs, all of which are peripheral to implementing and deploying the actual applications.
 
 
-![](../images/event_driven_microservices_page_0212_17.png)
 
 Software service providers may offer these platforms as a service, though the options tend to be more limited than selecting providers for your CMS and event broker. Evaluate the options available to you and choose accordingly.
 
@@ -362,7 +352,6 @@ clickStream
 A visual representation of this topology is shown in Figure 11-9, with a parallelism of 2 (note the 2 separate instances).
 
 
-![](../images/event_driven_microservices_page_0214_18.png)
 
 ![](../images/event_driven_microservices_page_0214_19.png)
 
