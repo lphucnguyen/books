@@ -338,7 +338,7 @@ Action {
 
 This abbreviated Apache Flink source code shows the topology using its MapReducestyle API:
 
-```
+```java
 DataStream clickStream = ... //Create stream of click events
 DataStream viewStream = ... //Create stream of view events
 clickStream

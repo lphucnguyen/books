@@ -13,7 +13,7 @@ There are also event-driven microservices that derive their input _event_ from a
 In stream-sourced event-driven microservices, the microservice instance will create a producer client and a consumer client and register itself with any necessary consumer groups, if applicable. The microservice starts a loop to poll the consumer client for new events, processing them as they come in and emitting any required output events. This workflow is shown in the following pseudocode. (Your implementation will of course vary according to your language, stream-processing framework, eventbroker selection, and other technical factors.)
 
 
-```
+```java
 Consumer consumerClient = new consumerClient(consumerGroupName, ...);
 Producer producerClient = new producerClient(...);
 while(true) {

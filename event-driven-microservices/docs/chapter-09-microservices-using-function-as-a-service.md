@@ -69,7 +69,7 @@ There are four main components you must consider when working with functionbased
 
 The first component of a FaaS implementation is the function itself. It can be implemented in any code supported by the FaaS framework.
 
-```
+```java
   public int myfunction(Event[] events, Context context) {
     println ("hello world!");
     return 0;
@@ -150,7 +150,7 @@ _Batch size_ and _batch window_ are two important properties to consider in stre
 
 A function executed by a stream-listener trigger looks something like the following:
 
-```
+```scala
   public int myEventfunction(Event[] events, Context context) {
     for(Event event: events)
         try {
@@ -175,7 +175,7 @@ Lag monitoring typically involves computing and reporting lag metrics to your mo
 
 One of the major differences between the previously mentioned event-stream listener trigger and this one is that with lag triggering, the function does _not_ consume the events until _after_ it is started. Functions started by the lag trigger have a wider domain of responsibilities, including establishing a client connection with the event broker, consuming the events, and committing back any offset updates. This makes functions triggered by lag much more similar to basic producer/consumer clients, albeit with a limited lifespan. The following example function illustrates this workflow:
 
-```
+```java
   public int myLagConsumerfunction(Context context) {
     String consumerGroup = context.consumerGroup;
     String streamName = context.streamName;
@@ -276,7 +276,7 @@ One major downside to asynchronous direct calls is in ensuring that the consumer
 Another potentially major issue is that events may be processed out of order due to multiple invocations of function B. Consider the code for function A:
 
 
-```
+```scala
   public int functionA(Event[] events, Context context) {
     for(Event event: events) {
       //Do function A's processing work
@@ -293,7 +293,7 @@ Function B is called inline with the work from function A. Depending on your Faa
 
 Similarly, writing your code as follows will not solve ordering problems either. Processing will still happen out of order, as function A’s processing work will be executed for all events in the batch prior to function B’s execution.
 
-```
+```java
   public int functionA(Event[] events, Context context) {
     for(Event event: events) {
       //Do function A's processing work
@@ -322,7 +322,7 @@ _Figure 9-5. Orchestrated synchronous function calls within a bounded context_
 
 Here is an example of the orchestration code:
 
-```
+```java
   public int orchestrationFunction(Event[] events, Context context) {
     for(Event event: events) {
       //Synchronous function Calls

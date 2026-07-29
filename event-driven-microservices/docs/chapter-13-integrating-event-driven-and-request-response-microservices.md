@@ -276,7 +276,7 @@ There is a fair bit to unpack in this example, so let’s start with the newspap
 
 
 
-```
+```yaml
 //Populated newspaper event
 Key: String pn_key        //Populated newspaper key
 Value: {
@@ -298,7 +298,7 @@ The populated newspaper stream might get out of sync with the state within the n
 Approvals are handled by a separate microservice, where the populated newspaper event is loaded by the editor to view and approve. The editor can mark up a copy of the PDF as necessary, add comments, and provide tentative approval to move it on to the next step: advertiser approval. The editor may also reject it at any point of the workflow, before, during, or after obtaining advertiser review. The event structure is as follows:
 
 
-```
+```yaml
 //Editor approval event
 Key: String pn_key               //Populated newspaper key
 Value: {
@@ -317,7 +317,7 @@ Value: {
 
 Advertisers are provided with a UI for approving their advertisement size and placement. This service is responsible for determining _which_ advertisements require approval and which do not, and for cutting up the PDF into appropriate pieces for the advertiser to view. It is important to not leak information about news stories or competitors’ advertisements. Approval events are written to an advertiser’s approval stream, similar to that of the editor:
 
-```
+```yaml
 //Advertiser approval event
 Key: String pn_key          //Populated newspaper key
 Value: {
@@ -372,7 +372,7 @@ A major advantage of this design is that _all_ editor gating logic stays complet
 
 The second new event stream is in step 3, the ad-approvals summary stream. It contains the summaries of the results from the advertiser approval service, designed to provide both a historical record and the current status of each of the responses for a given newspaper. Keep in mind that as a separate service, the editor approval service has no way to know which advertisers have been sent instructions to approve their advertisements. That information is strictly the domain of the advertising approval system, though it can communicate a summary of the results to the editor. The format of the ad-approval summary event is as follows:
 
-```
+```yaml
 //Ad-approval summary event
 Key: String pn_key
 Value: {

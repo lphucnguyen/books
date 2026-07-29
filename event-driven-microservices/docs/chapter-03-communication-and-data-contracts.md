@@ -169,7 +169,7 @@ Remember the principles of the data contract definition. Events should be relate
 Imagine a simple website where a user can read a book or watch a movie. When the user first engages the website, say by opening the book or starting the movie, a backend service publishes an event of this engagement, named `ProductEngagement`, into an event stream. The data structure of this cautionary tale event may look something like this:
 
 
-```
+```yaml
 TypeEnum: Book, Movie
 ActionEnum: Click
 ProductEngagement {
@@ -195,7 +195,7 @@ At this point, `watchedPreview` has nothing to do with `Books`, but it’s added
 
 Another new business requirement comes in: you need to track users who place a bookmark in their book, and log what page it is on. Again, because there is only a single defined structure of events for product engagements, your course of action is constrained to adding a new action entity (`Bookmark`) and adding a nullable `PageId` field.
 
-```
+```yaml
 TypeEnum: Book, Movie
 ActionEnum: Click, Bookmark
 ProductEngagement {

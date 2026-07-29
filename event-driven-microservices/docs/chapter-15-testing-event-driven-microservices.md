@@ -20,7 +20,7 @@ Make sure to test boundary conditions, such as null and maximum values, for each
 
 Stateless functions do not require any persistent state from previous function calls, and so are quite easy to test independently. The following code shows an example of an EDM topology similar to one that you would find in a map-reduce-style framework:
 
-```
+```java
 myInputStream
     .filter(myFilterFunction)
     .map(myMapFunction)
@@ -36,7 +36,7 @@ Stateful functions are generally more complicated to test than stateless ones. S
 Here is an example of a stateful aggregation function that might be found in a basic producer-consumer implementation:
 
 
-```
+```scala
 public Long addValueToAggregation(String key, Long eventValue) {
     //The data store needs to be made available to the unit-test environment
     Long storedValue = datastore.getOrElse(key, 0L);
@@ -58,7 +58,7 @@ Topology testing is more complex than a single unit test and exercises the entir
 
 For example, consider the following map-reduce-style topology definition:
 
-```
+```java
 myInputStream
     .map(myMapFunction)
     .groupByKey()
